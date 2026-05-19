@@ -4,11 +4,11 @@ title = "Tech Blog"
 theme = "PaperMod"
 
 [params]
-  homeInfoParams = {Title = "👋 Tech Blog", Content = "Open Source Analysis / Coding Test / Tech Bluting"}
+  homeInfoParams = {Title = "👋 Tech Blog", Content = "Open Source Analysis / Coding Test / Tech Blurting"}
 
 [[menus.main]]
-  name = "Tech Bluting"
-  url = "/categories/tech-bluting"
+  name = "Tech Blurting"
+  url = "/categories/tech-blurting"
   weight = 1
 
 [[menus.main]]
