@@ -1,0 +1,22 @@
+baseURL = "https://xodbs1021.github.io/"
+languageCode = "en-us"
+title = "Tech Blog"
+theme = "PaperMod"
+
+[params]
+  homeInfoParams = {Title = "👋 Tech Blog", Content = "Open Source Analysis / Coding Test / Tech Bluting"}
+
+[[menus.main]]
+  name = "Tech Bluting"
+  url = "/categories/tech-bluting"
+  weight = 1
+
+[[menus.main]]
+  name = "Open Source Analysis"
+  url = "/categories/open-source-analysis"
+  weight = 2
+
+[[menus.main]]
+  name = "Coding Test"
+  url = "/categories/coding-test"
+  weight = 3
