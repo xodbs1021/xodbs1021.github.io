@@ -4,7 +4,7 @@ title = "태형이 따라잡기"
 theme = "PaperMod"
 
 [params]
-  homeInfoParams = {Title = "👋 태형이 따라잡기", Content = "Open Source Analysis / Coding Test / Tech Blurting"}
+  homeInfoParams = {Title = "태형이 따라잡기", Content = "Open Source Analysis / Coding Test / Tech Blurting"}
   showFullContent = false
   showReadingTime = true
   showPostsOnHomePage = true
