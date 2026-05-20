@@ -1,0 +1,59 @@
+.post-content {
+  line-height: 1.9;
+  font-size: 16px;
+}
+
+.post-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+.post-content th, .post-content td {
+  border: 1px solid var(--border);
+  padding: 10px 16px;
+  text-align: left;
+}
+.post-content th {
+  background: var(--code-bg);
+  font-weight: 600;
+}
+
+.post-content blockquote {
+  border-left: 3px solid var(--primary);
+  margin: 1rem 0;
+  padding: 0.6rem 1.2rem;
+  background: var(--code-bg);
+  border-radius: 0 6px 6px 0;
+}
+.post-content blockquote p {
+  margin: 0.2rem 0;
+}
+
+.post-content h2 {
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+.post-content h3 {
+  margin-top: 1.8rem;
+  margin-bottom: 0.6rem;
+}
+
+.post-content p {
+  margin: 1rem 0;
+}
+
+.post-content ul, .post-content ol {
+  padding-left: 1.5rem;
+  margin: 0.8rem 0;
+}
+.post-content li {
+  margin: 0.4rem 0;
+}
+
+.post-content code {
+  font-size: 14px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
