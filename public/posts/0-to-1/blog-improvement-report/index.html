@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>GitHub Pages 블로그 자동화 시스템 고도화 보고서 | 태형이 따라잡기</title>
+<meta name="keywords" content="">
+<meta name="description" content="1. 개요
+본 문서는 GitHub Pages 블로그 자동화 시스템 초기 구축 이후 진행된 기능 고도화 작업에 대한 회고 보고서이다. 성공적으로 구현된 기능뿐 아니라 시도하였으나 실패하거나 한계에 부딪힌 사례도 함께 기록하여, 실제 개발 과정을 있는 그대로 남긴다.
+
+2. 고도화 항목 목록
+
+  
+      
+          항목
+          결과
+      
+  
+  
+      
+          Netlify CMS &#43; Cloudflare Workers OAuth
+          ✅ 성공
+      
+      
+          Weight 기반 글 정렬 자동화
+          ✅ 성공
+      
+      
+          URL 파라미터 기반 카테고리 네비게이션
+          ✅ 성공
+      
+      
+          홈페이지 최신순 정렬
+          ✅ 성공
+      
+      
+          CSS 커스터마이징
+          ✅ 성공
+      
+      
+          GitHub Actions Pages 배포 방식 전환
+          ✅ 성공
+      
+      
+          CMS 에디터에서 초성 입력 지원
+          ❌ 부분 성공 (한계 존재)
+      
+      
+          카테고리별 prev/next 완전 자동화
+          ⚠️ 구현하였으나 불완전
+      
+  
+
+
+3. 기능별 상세 내용 및 트러블슈팅
+3-1. 블로그 관리 UI (Netlify CMS &#43; Cloudflare Workers)
+도입 이유
+GitHub Issue 방식 외에 블로그 내에서 직접 글을 작성·수정·삭제할 수 있는 GUI가 필요하였다.">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/posts/0-to-1/blog-improvement-report/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.5b2613c1114a6d07e4fbeafaf32233b555467bbc6b50ee31e67b8734f2a2357c.css" integrity="sha256-WyYTwRFKbQfk&#43;&#43;r68yIztVVGe7xrUO4x5nuHNPKiNXw=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/0-to-1/blog-improvement-report/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="태형이 따라잡기 (Alt + H)">태형이 따라잡기</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="http://localhost:1313/categories/tech-blurting" title="Tech Blurting">
+                    <span>Tech Blurting</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/open-source-analysis" title="Open Source Analysis">
+                    <span>Open Source Analysis</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/coding-test" title="Coding Test">
+                    <span>Coding Test</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/categories/0-to-1" title="0 to 1">
+                    <span>0 to 1</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">GitHub Pages 블로그 자동화 시스템 고도화 보고서</h1>
+    <div class="post-meta">
+
+<span title='2026-05-20 18:00:00 +0900 KST'>2026년 5월 20일</span>
+    </div>
+  </header>
+  <div class="post-content"><h2 id="1-개요">1. 개요</h2>
+<p>본 문서는 GitHub Pages 블로그 자동화 시스템 초기 구축 이후 진행된 기능 고도화 작업에 대한 회고 보고서이다. 성공적으로 구현된 기능뿐 아니라 시도하였으나 실패하거나 한계에 부딪힌 사례도 함께 기록하여, 실제 개발 과정을 있는 그대로 남긴다.</p>
+<hr>
+<h2 id="2-고도화-항목-목록">2. 고도화 항목 목록</h2>
+<table>
+  <thead>
+      <tr>
+          <th>항목</th>
+          <th>결과</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Netlify CMS + Cloudflare Workers OAuth</td>
+          <td>✅ 성공</td>
+      </tr>
+      <tr>
+          <td>Weight 기반 글 정렬 자동화</td>
+          <td>✅ 성공</td>
+      </tr>
+      <tr>
+          <td>URL 파라미터 기반 카테고리 네비게이션</td>
+          <td>✅ 성공</td>
+      </tr>
+      <tr>
+          <td>홈페이지 최신순 정렬</td>
+          <td>✅ 성공</td>
+      </tr>
+      <tr>
+          <td>CSS 커스터마이징</td>
+          <td>✅ 성공</td>
+      </tr>
+      <tr>
+          <td>GitHub Actions Pages 배포 방식 전환</td>
+          <td>✅ 성공</td>
+      </tr>
+      <tr>
+          <td>CMS 에디터에서 초성 입력 지원</td>
+          <td>❌ 부분 성공 (한계 존재)</td>
+      </tr>
+      <tr>
+          <td>카테고리별 prev/next 완전 자동화</td>
+          <td>⚠️ 구현하였으나 불완전</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="3-기능별-상세-내용-및-트러블슈팅">3. 기능별 상세 내용 및 트러블슈팅</h2>
+<h3 id="3-1-블로그-관리-ui-netlify-cms--cloudflare-workers">3-1. 블로그 관리 UI (Netlify CMS + Cloudflare Workers)</h3>
+<p><strong>도입 이유</strong>
+GitHub Issue 방식 외에 블로그 내에서 직접 글을 작성·수정·삭제할 수 있는 GUI가 필요하였다.</p>
+<blockquote>
+<p><strong>트러블 1.</strong> Netlify OAuth 엔드포인트 Not Found
+GitHub Pages는 Netlify 인프라를 사용하지 않으므로 <code>api.netlify.com</code> OAuth 엔드포인트가 동작하지 않았다. 대안으로 <code>sveltia-cms-auth</code> 오픈소스 프록시를 시도하였으나 해당 서버가 운영 중단 상태였다.
+→ <strong>해결:</strong> Cloudflare Workers에 GitHub OAuth 프록시를 직접 구축하였다.</p>
+</blockquote>
+<hr>
+<h3 id="3-2-cms-에디터-초성-입력-문제-부분-실패">3-2. CMS 에디터 초성 입력 문제 (부분 실패)</h3>
+<p><strong>시도 이유</strong>
+한글 초성만으로 메모를 작성하는 것은 블러팅의 특성상 자연스러운 입력 방식이다. CMS 에디터에서도 초성 입력이 가능해야 한다고 판단하였다.</p>
+<p><strong>시도한 방법들</strong></p>
+<p>1차 시도: Rich Text 에디터에서 초성 입력 → CMS가 완성되지 않은 문자로 인식하여 저장 자체를 차단하였다.</p>
+<p>2차 시도: <code>config.yml</code>에서 내용 필드를 <code>required: false</code>로 설정 → 필드 자체를 비워도 저장은 되나, 초성 입력 시 여전히 동일한 문제가 발생하였다.</p>
+<p>3차 시도: <code>modes: [&quot;raw&quot;], default_mode: &quot;raw&quot;</code> 설정으로 Markdown 모드를 기본값으로 지정 → Markdown 모드는 순수 텍스트 입력창으로 동작하므로 초성 입력이 가능해졌다. 단, Markdown 모드에서도 초성만 입력된 상태로 저장 시 일부 환경에서 렌더링 문제가 발생할 수 있다.</p>
+<p><strong>결론</strong>
+Netlify CMS 자체의 한글 초성 처리 방식이 근본적인 원인으로, CMS 소스 코드를 직접 수정하지 않는 한 완전한 해결은 불가능하다. Markdown 모드로 전환하는 것이 현재 가능한 최선의 대안이다.</p>
+<hr>
+<h3 id="3-3-글-정렬-자동화-weight-자동-부여">3-3. 글 정렬 자동화 (Weight 자동 부여)</h3>
+<p><strong>도입 이유</strong>
+초기에는 날짜 기준으로 정렬을 시도하였으나, <code>/admin</code>에서 글 작성 시 날짜를 수동으로 수정할 수 있어 순서가 뒤바뀔 위험이 있었다. 또한 weight 필드를 수동으로 입력하게 하는 방식은 동시 작성 시 충돌 가능성이 있었다. 이에 GitHub Actions가 자동으로 순서 번호를 부여하는 방식을 채택하였다.</p>
+<blockquote>
+<p><strong>트러블 2.</strong> <code>draft: false</code> 없는 파일에서 weight 삽입 실패
+<code>/admin</code>에서 생성된 파일에는 <code>draft: false</code> 항목이 존재하지 않아, <code>replace(&quot;draft: false&quot;, ...)</code> 방식의 삽입이 실패하였다.
+→ <strong>해결:</strong> 정규식으로 frontmatter 닫는 <code>---</code> 구분자 직전에 weight를 삽입하는 방식으로 변경하였다.</p>
+</blockquote>
+<blockquote>
+<p><strong>트러블 3.</strong> 봇 커밋이 deploy 워크플로우를 트리거하지 못함
+GitHub Actions 봇 커밋은 기본적으로 다른 워크플로우를 트리거하지 않는 보안 정책이 있다. weight 부여 후 배포가 자동으로 이루어지지 않았다.
+→ <strong>해결:</strong> Personal Access Token(PAT)을 GitHub Secret에 등록하고, <code>assign-weight.yml</code>의 checkout 단계에서 PAT를 사용하도록 변경하였다.</p>
+</blockquote>
+<blockquote>
+<p><strong>트러블 4.</strong> <code>assign-weight.yml</code>과 <code>deploy.yml</code>의 gh-pages 브랜치 충돌
+두 워크플로우가 동시에 gh-pages 브랜치에 push를 시도하면서 &ldquo;cannot lock ref&rdquo; 오류가 발생하였다.
+→ <strong>해결:</strong> 배포 방식을 <code>peaceiris/actions-gh-pages</code> 브랜치 배포에서 GitHub 공식 <code>actions/deploy-pages</code> 방식으로 전환하고, Pages Source를 &ldquo;GitHub Actions&quot;로 변경하였다.</p>
+</blockquote>
+<hr>
+<h3 id="3-4-카테고리-인식-네비게이션-불완전한-구현">3-4. 카테고리 인식 네비게이션 (불완전한 구현)</h3>
+<p><strong>도입 이유</strong>
+메인 페이지에서 글에 접근하는 경우 전체 글 순서로, 카테고리 페이지에서 접근하는 경우 해당 카테고리 내 글 순서로 이전/다음 글 네비게이션이 동작해야 한다.</p>
+<p><strong>1차 시도: document.referrer 방식</strong>
+접근 이전 URL을 JavaScript로 감지하여 카테고리 페이지에서 왔는지 판단하는 방식을 구현하였다. 그러나 같은 탭에서 이동했을 때만 작동하고, 새 탭으로 열거나 URL을 직접 입력하면 항상 전체 nav가 표시되는 한계가 있었다.</p>
+<p><strong>2차 시도: URL 파라미터 방식 (현재 적용)</strong>
+카테고리 목록 페이지에서 각 글 링크에 <code>?from=카테고리슬러그</code> 파라미터를 삽입하고, 글 상세 페이지에서 JavaScript로 파라미터를 감지하여 nav를 전환하는 방식으로 개선하였다.</p>
+<blockquote>
+<p><strong>트러블 5.</strong> <code>layouts/_default/list.html</code>이 적용되지 않음
+PaperMod 테마는 <code>layouts/_default/</code> 구조 없이 <code>layouts/</code> 바로 아래에 템플릿을 배치한다. <code>layouts/_default/list.html</code>로 생성하여 적용이 되지 않았다.
+→ <strong>해결:</strong> <code>layouts/list.html</code>로 경로를 변경하였다.</p>
+</blockquote>
+<blockquote>
+<p><strong>트러블 6.</strong> cat-nav display 전환 실패
+JavaScript에서 <code>style.display = 'flex'</code>로 cat-nav를 표시하려 하였으나, PaperMod paginav 클래스가 flex 레이아웃이 아닌 경우 렌더링이 되지 않았다.
+→ <strong>해결:</strong> <code>display: 'block'</code>으로 변경하였다.</p>
+</blockquote>
+<p><strong>현재 한계</strong>
+URL 파라미터 방식은 카테고리 목록 페이지를 경유하지 않으면 파라미터가 붙지 않는다. 예를 들어 외부에서 링크를 직접 공유받아 접근하는 경우 항상 전체 글 nav가 표시된다. 완전한 해결을 위해서는 서버 사이드 렌더링 또는 별도의 상태 관리가 필요하나, 정적 사이트의 특성상 현재 방식이 가능한 최선이다.</p>
+<hr>
+<h3 id="3-5-홈페이지-최신순-정렬">3-5. 홈페이지 최신순 정렬</h3>
+<p><strong>도입 이유</strong>
+메인 페이지에서 가장 최근에 작성된 글이 최상단에 표시되어야 한다.</p>
+<blockquote>
+<p><strong>트러블 7.</strong> Hugo 기본 홈 레이아웃에 정렬 설정 미적용
+<code>hugo.toml</code>에 정렬 관련 파라미터를 추가하여도 홈페이지에 반영되지 않았다. Hugo PaperMod의 홈 레이아웃이 별도의 정렬 설정을 지원하지 않기 때문이었다.
+→ <strong>해결:</strong> <code>layouts/index.html</code> 커스텀 템플릿을 직접 작성하여 <code>sort $pages &quot;Params.weight&quot; &quot;desc&quot;</code> 정렬을 명시적으로 적용하였다.</p>
+</blockquote>
+<hr>
+<h3 id="3-6-css-커스터마이징">3-6. CSS 커스터마이징</h3>
+<p><strong>도입 이유</strong>
+PaperMod 기본 스타일에서 테이블 정렬이 깨지고, 인용구 가독성이 낮았으며, 헤딩 간격이 좁았다.</p>
+<p><code>assets/css/extended/custom.css</code> 파일을 생성하여 테이블 border, 인용구 스타일, 헤딩 간격, 단락 및 리스트 간격을 개선하였다.</p>
+<hr>
+<h3 id="3-7-카테고리-확장-0-to-1">3-7. 카테고리 확장 (0 to 1)</h3>
+<p>직접 구축한 프로젝트를 기록하는 전용 카테고리로 <code>0 to 1</code>을 추가하였다. 해당 카테고리는 학습 내용 블러팅이 아닌 프로젝트 기록 목적이므로 AI 피드백 없이 원문 그대로 업로드되도록 설계하였다.</p>
+<hr>
+<h2 id="4-현재-시스템-구성">4. 현재 시스템 구성</h2>
+<table>
+  <thead>
+      <tr>
+          <th>카테고리</th>
+          <th>AI 피드백</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Tech Blurting</td>
+          <td>✅</td>
+      </tr>
+      <tr>
+          <td>Coding Test</td>
+          <td>✅</td>
+      </tr>
+      <tr>
+          <td>Open Source Analysis</td>
+          <td>✅</td>
+      </tr>
+      <tr>
+          <td>0 to 1</td>
+          <td>❌</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="5-결론-및-회고">5. 결론 및 회고</h2>
+<p>이번 고도화 과정에서 가장 인상 깊었던 점은, 정적 사이트의 구조적 한계가 생각보다 자주 마주쳐진다는 것이다. 카테고리 인식 네비게이션, 초성 입력 지원, 봇 커밋 트리거 문제 등은 모두 정적 사이트 또는 서드파티 CMS의 근본적인 제약에서 비롯된 것이었다. 이를 우회하는 과정에서 Cloudflare Workers, GitHub Actions PAT, URL 파라미터 방식 등 다양한 기술을 활용하였으며, 완전한 해결이 불가능한 경우 그 한계를 명확히 인식하고 차선의 방법을 선택하는 판단도 중요한 경험이었다.</p>
+
+  </div>
+  <footer class="post-footer">
+
+    <nav class="paginav" id="global-nav">
+        <a class="next" href="/posts/tech-blurting/kafka-core-concepts-technical-review/">
+          <span class="title">다음 글 »</span><br>
+          <span>Kafka 핵심 개념 기술 피드백</span>
+        </a>
+    </nav>
+
+    <nav class="paginav" id="cat-nav" style="display:none">
+        <a class="next" href="/posts/0-to-1/github-pages-blog-automation/?from=0-to-1">
+          <span class="title">다음 글 »</span><br>
+          <span>GitHub Pages 블로그 자동화 구축기</span>
+        </a>
+    </nav>
+
+  </footer>
+</article>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const from = params.get('from');
+  if (from) {
+    document.getElementById('global-nav').style.display = 'none';
+    document.getElementById('cat-nav').style.display = 'block';
+  }
+</script>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">태형이 따라잡기</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

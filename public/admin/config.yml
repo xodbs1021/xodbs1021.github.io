@@ -1,0 +1,53 @@
+backend:
+  name: github
+  repo: xodbs1021/xodbs1021.github.io
+  branch: main
+  base_url: https://github-oauth-proxy.xodbs9810.workers.dev
+
+media_folder: static/images
+public_folder: /images
+
+collections:
+  - name: "tech-blurting"
+    label: "Tech Blurting"
+    folder: "content/posts/tech-blurting"
+    create: true
+    delete: true
+    fields:
+      - {label: "제목", name: "title", widget: "string"}
+      - {label: "날짜", name: "date", widget: "datetime"}
+      - {label: "카테고리", name: "categories", widget: "hidden", default: ["tech-blurting"]}
+      - {label: "내용", name: "body", widget: "markdown", required: false, default_value: "", buttons: [], editor_components: [], modes: ["raw"], default_mode: "raw"}
+
+  - name: "coding-test"
+    label: "Coding Test"
+    folder: "content/posts/coding-test"
+    create: true
+    delete: true
+    fields:
+      - {label: "제목", name: "title", widget: "string"}
+      - {label: "날짜", name: "date", widget: "datetime"}
+      - {label: "카테고리", name: "categories", widget: "hidden", default: ["coding-test"]}
+      - {label: "내용", name: "body", widget: "markdown", required: false, default_value: "", buttons: [], editor_components: [], modes: ["raw"], default_mode: "raw"}
+
+  - name: "open-source-analysis"
+    label: "Open Source Analysis"
+    folder: "content/posts/open-source-analysis"
+    create: true
+    delete: true
+    fields:
+      - {label: "제목", name: "title", widget: "string"}
+      - {label: "날짜", name: "date", widget: "datetime"}
+      - {label: "카테고리", name: "categories", widget: "hidden", default: ["open-source-analysis"]}
+      - {label: "내용", name: "body", widget: "markdown", required: false, default_value: "", buttons: [], editor_components: [], modes: ["raw"], default_mode: "raw"}
+
+  - name: "0-to-1"
+    label: "0 to 1"
+    folder: "content/posts/0-to-1"
+    create: true
+    delete: true
+    fields:
+      - {label: "제목", name: "title", widget: "string"}
+      - {label: "날짜", name: "date", widget: "datetime"}
+      - {label: "카테고리", name: "categories", widget: "hidden", default: ["0-to-1"]}
+      - {label: "내용", name: "body", widget: "markdown", required: false, default_value: "", buttons: [], editor_components: [], modes: ["raw"], default_mode: "raw"}

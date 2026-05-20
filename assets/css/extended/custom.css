@@ -57,3 +57,22 @@
   padding: 2px 6px;
   border-radius: 4px;
 }
+.paginav {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.paginav a {
+    flex: 1;
+    padding: 1rem;
+}
+
+.paginav .prev {
+    text-align: left;
+}
+
+.paginav .next {
+    text-align: right;
+    margin-left: auto;
+}
