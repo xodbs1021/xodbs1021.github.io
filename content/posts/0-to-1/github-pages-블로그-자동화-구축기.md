@@ -1,6 +1,6 @@
 ---
-title: GitHub Pages 블로그 자동화 구축기
-date: 2026-05-20T04:07:13.181Z
+title: GitHub Pages 블로그 자동화 구축기1
+date: 2026-05-20T08:37:47.360Z
 categories:
   - 0-to-1
 ---
