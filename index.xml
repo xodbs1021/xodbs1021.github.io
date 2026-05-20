@@ -20,9 +20,4 @@
 &lt;li&gt;&lt;strong&gt;&amp;ldquo;실시간성이 강함&amp;rdquo;&lt;/strong&gt;: 맞습니다. Kafka는 낮은 지연 시간으로 메시지를 전달하고 처리할 수 있어, 실시간 데이터 분석, 모니터링, 이벤트 처리 등의 시나리오에 매우 적합합니다.&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;&amp;ldquo;메세지 묶음 처리 그러나 용도에 따라 이것을 조정해서 사용가능&amp;rdquo;&lt;/strong&gt;: 맞습니다. 프로듀서는 여러 메시지를 모아서 한 번에 브로커로 전송하는 배치 처리(Batching)를 통해 네트워크 및 디스크 I/O 효율을 높입니다. 이 배치 크기, 배치 전송을 기다리는 시간 등은 프로듀서의 설정(예: &lt;code&gt;batch.size&lt;/code&gt;, &lt;code&gt;linger.ms&lt;/code&gt;)을 통해 조정할 수 있으며, 이는 처리량과 지연 시간 간의 트레이드오프를 결정하는 중요한 요소입니다.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;누락된 주요 기술 개념 추가:&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>카프카 핵심 정리</title><link>https://xodbs1021.github.io/posts/tech-blurting/kafka-summary/</link><pubDate>Wed, 20 May 2026 00:00:00 +0000</pubDate><guid>https://xodbs1021.github.io/posts/tech-blurting/kafka-summary/</guid><description>&lt;h2 id="내가-이해한-것"&gt;내가 이해한 것&lt;/h2&gt;
-&lt;p&gt;카프카란 대용량 이벤트 처리 시스템 디스크에 순차적으로 저장하기 때문에 속도가 빠름 비동기 처리 백에서 작동 직접적으로 클라이언트와 소통하지 않음 이녀석의 역할을 단순히 데이터를 저장하는 역할 jvm에 접근하지 않고 os cache page를 사용하기 때문에 속도가 빠름 실시간성이 강함 메세지 묶음 처리 그러나 용도에 따라 이것을 조정해서 사용가능&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2 id="보완-및-정리"&gt;보완 및 정리&lt;/h2&gt;
-&lt;p&gt;안녕하세요! 카프카에 대한 핵심적인 내용을 잘 정리해주셨습니다. 빠르고 간결하게 카프카의 주요 특징들을 파악하기에 좋은 노트입니다.&lt;/p&gt;
-&lt;p&gt;몇 가지 개선점을 제안드립니다.&lt;/p&gt;</description></item></channel></rss>
+&lt;p&gt;&lt;strong&gt;누락된 주요 기술 개념 추가:&lt;/strong&gt;&lt;/p&gt;</description></item></channel></rss>
