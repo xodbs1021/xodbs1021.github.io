@@ -1,0 +1,44 @@
+{{- define "main" }}
+{{- $pages := where site.RegularPages "Type" "posts" }}
+{{- $pages = $pages | complement (where $pages "Draft" true) }}
+{{- $pages = sort $pages "Date" "desc" }}
+{{- $currentIndex := -1 }}
+{{- range $i, $p := $pages }}
+  {{- if eq $p.RelPermalink $.RelPermalink }}
+    {{- $currentIndex = $i }}
+  {{- end }}
+{{- end }}
+
+<article class="post-single">
+  <header class="post-header">
+    {{- partial "breadcrumbs.html" . }}
+    <h1 class="post-title">{{- .Title }}</h1>
+    <div class="post-meta">
+      {{- partial "post_meta.html" . }}
+    </div>
+  </header>
+  <div class="post-content">
+    {{- .Content }}
+  </div>
+  <footer class="post-footer">
+    <nav class="paginav">
+      {{- if gt $currentIndex 0 }}
+        {{- $prev := index $pages (sub $currentIndex 1) }}
+        <a class="prev" href="{{ $prev.RelPermalink }}">
+          <span class="title">« 이전 글</span>
+          <br>
+          <span>{{ $prev.Title }}</span>
+        </a>
+      {{- end }}
+      {{- if lt $currentIndex (sub (len $pages) 1) }}
+        {{- $next := index $pages (add $currentIndex 1) }}
+        <a class="next" href="{{ $next.RelPermalink }}">
+          <span class="title">다음 글 »</span>
+          <br>
+          <span>{{ $next.Title }}</span>
+        </a>
+      {{- end }}
+    </nav>
+  </footer>
+</article>
+{{- end }}
