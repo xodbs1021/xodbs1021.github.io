@@ -1,4 +1,5 @@
 {{- define "main" }}
+
 {{- $allPages := where site.RegularPages "Section" "posts" }}
 {{- $allPages = sort $allPages "Params.weight" "asc" }}
 {{- $.Scratch.Set "currentIndex" 0 }}
@@ -8,6 +9,16 @@
   {{- end }}
 {{- end }}
 {{- $currentIndex := $.Scratch.Get "currentIndex" }}
+
+{{- $cat := index .Params.categories 0 }}
+{{- $catPages := where $allPages "Params.categories" "intersect" (slice $cat) }}
+{{- $.Scratch.Set "catIndex" 0 }}
+{{- range $i, $p := $catPages }}
+  {{- if eq $p.Permalink $.Permalink }}
+    {{- $.Scratch.Set "catIndex" $i }}
+  {{- end }}
+{{- end }}
+{{- $catIndex := $.Scratch.Get "catIndex" }}
 
 <article class="post-single">
   <header class="post-header">
@@ -21,24 +32,52 @@
     {{- .Content }}
   </div>
   <footer class="post-footer">
-    <nav class="paginav">
+
+    {{/* 전체 글 nav */}}
+    <nav class="paginav" id="global-nav">
       {{- if gt $currentIndex 0 }}
         {{- $prev := index $allPages (sub $currentIndex 1) }}
         <a class="prev" href="{{ $prev.RelPermalink }}">
-          <span class="title">« 이전 글</span>
-          <br>
+          <span class="title">« 이전 글</span><br>
           <span>{{ $prev.Title }}</span>
         </a>
       {{- end }}
       {{- if lt $currentIndex (sub (len $allPages) 1) }}
         {{- $next := index $allPages (add $currentIndex 1) }}
         <a class="next" href="{{ $next.RelPermalink }}">
-          <span class="title">다음 글 »</span>
-          <br>
+          <span class="title">다음 글 »</span><br>
           <span>{{ $next.Title }}</span>
         </a>
       {{- end }}
     </nav>
+
+    {{/* 카테고리 내 nav */}}
+    <nav class="paginav" id="cat-nav" style="display:none">
+      {{- if gt $catIndex 0 }}
+        {{- $prev := index $catPages (sub $catIndex 1) }}
+        <a class="prev" href="{{ $prev.RelPermalink }}">
+          <span class="title">« 이전 글</span><br>
+          <span>{{ $prev.Title }}</span>
+        </a>
+      {{- end }}
+      {{- if lt $catIndex (sub (len $catPages) 1) }}
+        {{- $next := index $catPages (add $catIndex 1) }}
+        <a class="next" href="{{ $next.RelPermalink }}">
+          <span class="title">다음 글 »</span><br>
+          <span>{{ $next.Title }}</span>
+        </a>
+      {{- end }}
+    </nav>
+
   </footer>
 </article>
+
+<script>
+  const ref = document.referrer;
+  if (ref && ref.includes('/categories/')) {
+    document.getElementById('global-nav').style.display = 'none';
+    document.getElementById('cat-nav').style.display = 'flex';
+  }
+</script>
+
 {{- end }}
