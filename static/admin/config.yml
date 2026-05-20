@@ -1,0 +1,41 @@
+backend:
+  name: github
+  repo: xodbs1021/xodbs1021.github.io
+  branch: main
+
+media_folder: static/images
+public_folder: /images
+
+collections:
+  - name: "tech-blurting"
+    label: "Tech Blurting"
+    folder: "content/posts/tech-blurting"
+    create: true
+    delete: true
+    fields:
+      - {label: "제목", name: "title", widget: "string"}
+      - {label: "날짜", name: "date", widget: "datetime"}
+      - {label: "카테고리", name: "categories", widget: "hidden", default: ["tech-blurting"]}
+      - {label: "내용", name: "body", widget: "markdown"}
+
+  - name: "coding-test"
+    label: "Coding Test"
+    folder: "content/posts/coding-test"
+    create: true
+    delete: true
+    fields:
+      - {label: "제목", name: "title", widget: "string"}
+      - {label: "날짜", name: "date", widget: "datetime"}
+      - {label: "카테고리", name: "categories", widget: "hidden", default: ["coding-test"]}
+      - {label: "내용", name: "body", widget: "markdown"}
+
+  - name: "open-source-analysis"
+    label: "Open Source Analysis"
+    folder: "content/posts/open-source-analysis"
+    create: true
+    delete: true
+    fields:
+      - {label: "제목", name: "title", widget: "string"}
+      - {label: "날짜", name: "date", widget: "datetime"}
+      - {label: "카테고리", name: "categories", widget: "hidden", default: ["open-source-analysis"]}
+      - {label: "내용", name: "body", widget: "markdown"}
