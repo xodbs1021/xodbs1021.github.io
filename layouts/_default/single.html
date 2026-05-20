@@ -32,7 +32,6 @@
   </div>
   <footer class="post-footer">
 
-    {{/* 전체 글 nav - desc 정렬이므로 next가 이전글, prev가 다음글 */}}
     <nav class="paginav" id="global-nav">
       {{- if lt $currentIndex (sub (len $allPages) 1) }}
         {{- $prev := index $allPages (add $currentIndex 1) }}
@@ -50,18 +49,17 @@
       {{- end }}
     </nav>
 
-    {{/* 카테고리 내 nav */}}
     <nav class="paginav" id="cat-nav" style="display:none">
       {{- if lt $catIndex (sub (len $catPages) 1) }}
         {{- $prev := index $catPages (add $catIndex 1) }}
-        <a class="prev" href="{{ $prev.RelPermalink }}">
+        <a class="prev" href="{{ $prev.RelPermalink }}?from={{ $cat }}">
           <span class="title">« 이전 글</span><br>
           <span>{{ $prev.Title }}</span>
         </a>
       {{- end }}
       {{- if gt $catIndex 0 }}
         {{- $next := index $catPages (sub $catIndex 1) }}
-        <a class="next" href="{{ $next.RelPermalink }}">
+        <a class="next" href="{{ $next.RelPermalink }}?from={{ $cat }}">
           <span class="title">다음 글 »</span><br>
           <span>{{ $next.Title }}</span>
         </a>
@@ -72,8 +70,9 @@
 </article>
 
 <script>
-  const ref = document.referrer;
-  if (ref && ref.includes('/categories/')) {
+  const params = new URLSearchParams(window.location.search);
+  const from = params.get('from');
+  if (from) {
     document.getElementById('global-nav').style.display = 'none';
     document.getElementById('cat-nav').style.display = 'flex';
   }

@@ -1,0 +1,25 @@
+{{- define "main" }}
+{{- $pages := .Pages }}
+{{- $pages = sort $pages "Params.weight" "desc" }}
+
+<header class="page-header">
+  <h1>{{ .Title }}</h1>
+</header>
+
+{{- range $pages }}
+<article class="post-entry">
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">{{ .Title }}</h2>
+  </header>
+  <div class="entry-content">
+    <p>{{ .Summary | plainify | htmlUnescape }}{{ if .Truncated }}...{{ end }}</p>
+  </div>
+  <footer class="entry-footer">
+    {{- partial "post_meta.html" . -}}
+  </footer>
+  {{- $cat := index $.Params.term "" }}
+  <a class="entry-link" aria-label="post link to {{ .Title | plainify }}"
+     href="{{ .Permalink }}?from={{ index .Params.categories 0 }}"></a>
+</article>
+{{- end }}
+{{- end }}
