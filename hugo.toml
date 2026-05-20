@@ -1,5 +1,6 @@
 baseURL = "https://xodbs1021.github.io/"
-languageCode = "en-us"
+languageCode = "ko-kr"
+timeZone = "Asia/Seoul"
 title = "태형이 따라잡기"
 theme = "PaperMod"
 
@@ -8,6 +9,10 @@ theme = "PaperMod"
   showFullContent = false
   showReadingTime = false
   showPostsOnHomePage = true
+  ShowPostNavLinks = true
+  ShowBreadCrumbs = true
+  ShowCodeCopyButtons = true
+  dateFormat = "2006년 01월 02일 15:04"
 
 [markup]
   [markup.goldmark]
