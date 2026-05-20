@@ -1,12 +1,16 @@
 import os
-from datetime import datetime
 import glob
+from datetime import datetime
 from google import genai
 
 client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
 title = os.environ["ISSUE_TITLE"]
 body = os.environ["ISSUE_BODY"]
+
+# 현재 전체 글 수 계산해서 weight 자동 부여
+all_posts = glob.glob("content/posts/**/*.md", recursive=True)
+next_weight = len(all_posts) + 1
 
 prompt = f"""You are a senior software engineer reviewing a junior developer's raw study notes in Korean.
 
@@ -18,12 +22,18 @@ Categories:
 - 0-to-1: "0 to 1", "zero to one", "0to1", "프로젝트" etc.
 Default to tech-blurting if no tag found.
 
+STRICT RULES:
+- DO NOT give any writing advice or formatting tips
+- ONLY talk about the TECHNICAL CONTENT itself
+- If something is technically WRONG, correct it
+- If something is MISSING, add the missing technical knowledge
+
 Respond ONLY in this exact format:
 CATEGORY: category-slug
 SLUG: your-english-slug
 TITLE: 한국어 제목
 FEEDBACK:
-(feedback here - leave completely empty if category is 0-to-1)
+(feedback in Korean - leave empty if category is 0-to-1)
 
 Issue Title: {title}
 Content:
@@ -63,6 +73,7 @@ title: "{post_title}"
 date: {date}
 categories: ["{category_slug}"]
 draft: false
+weight: {next_weight}
 ---
 
 {body}
@@ -73,6 +84,7 @@ title: "{post_title}"
 date: {date}
 categories: ["{category_slug}"]
 draft: false
+weight: {next_weight}
 ---
 
 ## 내가 이해한 것
@@ -96,3 +108,4 @@ with open(filepath, "w", encoding="utf-8") as f:
 print(f"파일 생성: {filepath}")
 print(f"카테고리: {category_slug}")
 print(f"제목: {post_title}")
+print(f"weight: {next_weight}")
