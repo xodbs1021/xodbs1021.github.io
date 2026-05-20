@@ -54,7 +54,7 @@ for line in lines:
         feedback_lines.append(line)
 
 feedback = "\n".join(feedback_lines).strip()
-date = datetime.now().strftime("%Y-%m-%d")
+date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S+09:00")
 
 if category_slug == "0-to-1" or not feedback:
     markdown = f"""---
