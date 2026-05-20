@@ -3,7 +3,7 @@ import subprocess
 import os
 from datetime import datetime
 
-client = genai.Client(api_key="AIzaSyC3AhiEbl91jNRljGDCGL47kHis1YL0U7Q")
+client = genai.Client(api_key="")
 
 def get_content():
     print("내용 입력 (입력 끝나면 엔터 두 번):")
