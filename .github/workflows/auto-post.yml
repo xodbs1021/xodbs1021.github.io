@@ -31,125 +31,29 @@ jobs:
           ISSUE_TITLE: ${{ github.event.issue.title }}
           ISSUE_BODY: ${{ github.event.issue.body }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
-        run: |
-          python3 << 'PYEOF'
-          import os
-          import re
-          from datetime import datetime
-          from google import genai
-
-          client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
-
-          title = os.environ["ISSUE_TITLE"]
-          body = os.environ["ISSUE_BODY"]
-
-          prompt = f"""You are a tech blog assistant. The user gives raw Korean study notes.
-The issue title or body may contain a category tag like @tech blurting, @coding test, @open source analysis (with possible typos or case variations).
-
-Categories:
-- tech-blurting: anything resembling "tech blurting", "blurting", "bluting" etc.
-- coding-test: anything resembling "coding test", "코딩테스트" etc.
-- open-source-analysis: anything resembling "open source", "오픈소스" etc.
-
-If no category tag found, default to tech-blurting.
-
-Your job:
-1. Detect category
-2. Generate a short English slug (lowercase, hyphens only)
-3. Generate a Korean display title
-4. Keep user's original content EXACTLY as-is
-5. Add supplementary feedback in Korean markdown
-
-Respond ONLY in this exact format:
-CATEGORY: category-slug
-SLUG: your-english-slug
-TITLE: 한국어 제목
-FEEDBACK:
-(feedback in Korean markdown)
-
-Issue Title: {title}
-Content:
-{body}"""
-
-          response = client.models.generate_content(
-              model="gemini-2.5-flash",
-              contents=prompt
-          )
-          raw = response.text
-
-          lines = raw.split("\n")
-          category_slug = "tech-blurting"
-          slug = ""
-          post_title = ""
-          feedback_lines = []
-          in_feedback = False
-
-          for line in lines:
-              if line.startswith("CATEGORY:"):
-                  category_slug = line.replace("CATEGORY:", "").strip()
-              elif line.startswith("SLUG:"):
-                  slug = line.replace("SLUG:", "").strip()
-              elif line.startswith("TITLE:"):
-                  post_title = line.replace("TITLE:", "").strip()
-              elif line.startswith("FEEDBACK:"):
-                  in_feedback = True
-              elif in_feedback:
-                  feedback_lines.append(line)
-
-          feedback = "\n".join(feedback_lines).strip()
-          date = datetime.now().strftime("%Y-%m-%d")
-
-          markdown = f"""---
-title: "{post_title}"
-date: {date}
-categories: ["{category_slug}"]
-draft: false
----
-
-## 내가 이해한 것
-
-{body}
-
----
-
-## 보완 및 정리
-
-{feedback}
-"""
-
-          post_dir = f"content/posts/{category_slug}"
-          os.makedirs(post_dir, exist_ok=True)
-          filepath = f"{post_dir}/{slug}.md"
-
-          with open(filepath, "w", encoding="utf-8") as f:
-              f.write(markdown)
-
-          print(f"✅ 파일 생성: {filepath}")
-          print(f"📁 카테고리: {category_slug}")
-          print(f"📝 제목: {post_title}")
-          PYEOF
+        run: python3 .github/workflows/generate_post.py
 
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "post: new blog post from issue #${{ github.event.issue.number }}"
+          git diff --staged --quiet || git commit -m "post: new blog post from issue #${{ github.event.issue.number }}"
           git push
 
-      - name: Close issue
+      - name: Close issue and comment
         uses: actions/github-script@v7
         with:
           script: |
-            github.rest.issues.update({
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: '✅ 블로그 포스팅 완료! 1~2분 후 https://xodbs1021.github.io 에서 확인하세요.'
+            })
+            await github.rest.issues.update({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
               state: 'closed'
-            })
-            github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: '✅ 블로그 포스팅이 완료됐어요! 1~2분 후 https://xodbs1021.github.io 에서 확인하세요.'
             })
