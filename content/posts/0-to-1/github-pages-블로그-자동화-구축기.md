@@ -4,12 +4,7 @@ date: 2026-05-20T04:07:13.181Z
 categories:
   - 0-to-1
 ---
-- - -
 
-title: "GitHub Pages 블로그 자동화 구축 보고서"
-date: 2026-05-20
-categories: \["open-source-analysis"]
-draft: false
 
 - - -
 
