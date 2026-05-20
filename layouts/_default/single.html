@@ -1,5 +1,4 @@
 {{- define "main" }}
-
 {{- $allPages := where site.RegularPages "Section" "posts" }}
 {{- $allPages = sort $allPages "Params.weight" "desc" }}
 {{- $.Scratch.Set "currentIndex" 0 }}
@@ -33,17 +32,17 @@
   </div>
   <footer class="post-footer">
 
-    {{/* 전체 글 nav */}}
+    {{/* 전체 글 nav - desc 정렬이므로 next가 이전글, prev가 다음글 */}}
     <nav class="paginav" id="global-nav">
-      {{- if gt $currentIndex 0 }}
-        {{- $prev := index $allPages (sub $currentIndex 1) }}
+      {{- if lt $currentIndex (sub (len $allPages) 1) }}
+        {{- $prev := index $allPages (add $currentIndex 1) }}
         <a class="prev" href="{{ $prev.RelPermalink }}">
           <span class="title">« 이전 글</span><br>
           <span>{{ $prev.Title }}</span>
         </a>
       {{- end }}
-      {{- if lt $currentIndex (sub (len $allPages) 1) }}
-        {{- $next := index $allPages (add $currentIndex 1) }}
+      {{- if gt $currentIndex 0 }}
+        {{- $next := index $allPages (sub $currentIndex 1) }}
         <a class="next" href="{{ $next.RelPermalink }}">
           <span class="title">다음 글 »</span><br>
           <span>{{ $next.Title }}</span>
@@ -53,15 +52,15 @@
 
     {{/* 카테고리 내 nav */}}
     <nav class="paginav" id="cat-nav" style="display:none">
-      {{- if gt $catIndex 0 }}
-        {{- $prev := index $catPages (sub $catIndex 1) }}
+      {{- if lt $catIndex (sub (len $catPages) 1) }}
+        {{- $prev := index $catPages (add $catIndex 1) }}
         <a class="prev" href="{{ $prev.RelPermalink }}">
           <span class="title">« 이전 글</span><br>
           <span>{{ $prev.Title }}</span>
         </a>
       {{- end }}
-      {{- if lt $catIndex (sub (len $catPages) 1) }}
-        {{- $next := index $catPages (add $catIndex 1) }}
+      {{- if gt $catIndex 0 }}
+        {{- $next := index $catPages (sub $catIndex 1) }}
         <a class="next" href="{{ $next.RelPermalink }}">
           <span class="title">다음 글 »</span><br>
           <span>{{ $next.Title }}</span>
