@@ -1,12 +1,13 @@
 {{- define "main" }}
 {{- $allPages := where site.RegularPages "Section" "posts" }}
 {{- $allPages = sort $allPages "Params.weight" "asc" }}
-{{- $currentIndex := 0 }}
+{{- $.Scratch.Set "currentIndex" 0 }}
 {{- range $i, $p := $allPages }}
   {{- if eq $p.Permalink $.Permalink }}
-    {{- $currentIndex = $i }}
+    {{- $.Scratch.Set "currentIndex" $i }}
   {{- end }}
 {{- end }}
+{{- $currentIndex := $.Scratch.Get "currentIndex" }}
 
 <article class="post-single">
   <header class="post-header">
