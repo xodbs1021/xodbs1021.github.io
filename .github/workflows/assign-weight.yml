@@ -1,0 +1,52 @@
+name: Assign Weight to New Posts
+
+on:
+  push:
+    paths:
+      - 'content/posts/**/*.md'
+    branches:
+      - main
+
+jobs:
+  assign-weight:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Assign weight to new posts
+        run: |
+          python3 << 'PYEOF'
+          import glob
+          import re
+          import os
+
+          all_posts = sorted(glob.glob("content/posts/**/*.md", recursive=True))
+          
+          changed = os.popen("git diff --name-only HEAD~1 HEAD").read().strip().split("\n")
+          new_posts = [f for f in changed if f.startswith("content/posts/") and f.endswith(".md")]
+
+          for new_post in new_posts:
+              if not os.path.exists(new_post):
+                  continue
+              with open(new_post, "r") as f:
+                  content = f.read()
+              if "weight:" in content:
+                  continue
+              total = len(all_posts)
+              content = content.replace("draft: false", f"draft: false\nweight: {total}", 1)
+              with open(new_post, "w") as f:
+                  f.write(content)
+              print(f"weight: {total} assigned to {new_post}")
+          PYEOF
+
+      - name: Commit weight changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add content/posts/
+          git diff --staged --quiet || git commit -m "auto: assign weight to new posts"
+          git push
