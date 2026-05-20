@@ -16,6 +16,7 @@ collections:
     fields:
       - {label: "제목", name: "title", widget: "string"}
       - {label: "날짜", name: "date", widget: "datetime"}
+      - {label: "순서", name: "weight", widget: "number", default: 999}
       - {label: "카테고리", name: "categories", widget: "hidden", default: ["tech-blurting"]}
       - {label: "내용", name: "body", widget: "markdown"}
 
@@ -27,6 +28,7 @@ collections:
     fields:
       - {label: "제목", name: "title", widget: "string"}
       - {label: "날짜", name: "date", widget: "datetime"}
+      - {label: "순서", name: "weight", widget: "number", default: 999}
       - {label: "카테고리", name: "categories", widget: "hidden", default: ["coding-test"]}
       - {label: "내용", name: "body", widget: "markdown"}
 
@@ -38,6 +40,7 @@ collections:
     fields:
       - {label: "제목", name: "title", widget: "string"}
       - {label: "날짜", name: "date", widget: "datetime"}
+      - {label: "순서", name: "weight", widget: "number", default: 999}
       - {label: "카테고리", name: "categories", widget: "hidden", default: ["open-source-analysis"]}
       - {label: "내용", name: "body", widget: "markdown"}
 
@@ -49,5 +52,6 @@ collections:
     fields:
       - {label: "제목", name: "title", widget: "string"}
       - {label: "날짜", name: "date", widget: "datetime"}
+      - {label: "순서", name: "weight", widget: "number", default: 999}
       - {label: "카테고리", name: "categories", widget: "hidden", default: ["0-to-1"]}
       - {label: "내용", name: "body", widget: "markdown"}
