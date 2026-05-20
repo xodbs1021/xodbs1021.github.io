@@ -23,3 +23,8 @@ theme = "PaperMod"
   name = "Coding Test"
   url = "/categories/coding-test"
   weight = 3
+
+[[menus.main]]
+  name = "0 to 1"
+  url = "/categories/0-to-1"
+  weight = 4
