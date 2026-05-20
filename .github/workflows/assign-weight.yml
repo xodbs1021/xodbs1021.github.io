@@ -16,6 +16,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Assign weight to posts without weight
         run: |
@@ -59,6 +60,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "auto: assign weight to new posts [skip-weight]"
+            git commit -m "auto: assign weight to new posts"
             git push
           fi
