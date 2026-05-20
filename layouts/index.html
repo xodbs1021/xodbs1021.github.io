@@ -1,0 +1,25 @@
+{{- define "main" }}
+{{- $pages := where site.RegularPages "Section" "posts" }}
+{{- $pages = sort $pages "Params.weight" "desc" }}
+
+<div class="home-info">
+  {{- partial "home_info.html" . -}}
+</div>
+
+{{- range $pages }}
+<article class="post-entry">
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">
+      {{- .Title }}
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>{{ .Summary | plainify | htmlUnescape }}{{ if .Truncated }}...{{ end }}</p>
+  </div>
+  <footer class="entry-footer">
+    {{- partial "post_meta.html" . -}}
+  </footer>
+  <a class="entry-link" aria-label="post link to {{ .Title | plainify }}" href="{{ .Permalink }}"></a>
+</article>
+{{- end }}
+{{- end }}
