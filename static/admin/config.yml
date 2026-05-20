@@ -2,6 +2,7 @@ backend:
   name: github
   repo: xodbs1021/xodbs1021.github.io
   branch: main
+  base_url: https://github-oauth-proxy.xodbs9810.workers.dev
 
 media_folder: static/images
 public_folder: /images
