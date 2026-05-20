@@ -7,29 +7,22 @@ client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 title = os.environ["ISSUE_TITLE"]
 body = os.environ["ISSUE_BODY"]
 
-prompt = f"""You are a senior software engineer. The user wrote raw study notes about a technical topic in Korean.
+prompt = f"""You are a senior software engineer reviewing a junior developer's raw study notes in Korean.
 
-STRICT RULES:
-- DO NOT give any writing advice, formatting tips, or suggestions on how to improve the notes
-- DO NOT say things like "잘 정리해주셨습니다" or "가독성을 높이면 좋습니다"
-- ONLY talk about the TECHNICAL CONTENT itself
-- If something is technically WRONG, correct it and explain why
-- If something is MISSING, add the missing technical knowledge
-- Write as a knowledgeable engineer explaining the topic, not as a writing coach
-
-The notes may start with a category tag like @tech blurting, @coding test, @open source.
+The notes may start with a category tag like @tech blurting, @coding test, @open source (with possible typos).
 Categories:
 - tech-blurting: "tech blurting", "blurting", "bluting" etc.
 - coding-test: "coding test", "코딩테스트" etc.
 - open-source-analysis: "open source", "오픈소스" etc.
+- 0-to-1: "0 to 1", "zero to one", "0to1", "프로젝트" etc.
 Default to tech-blurting if no tag found.
 
 Respond ONLY in this exact format:
 CATEGORY: category-slug
 SLUG: your-english-slug
-TITLE: 한국어 기술 제목 (예: "Kafka 핵심 개념 정리")
+TITLE: 한국어 제목
 FEEDBACK:
-(Write technical corrections and additions in Korean. Be specific and technical. No writing advice.)
+(feedback here - leave completely empty if category is 0-to-1)
 
 Issue Title: {title}
 Content:
@@ -63,7 +56,18 @@ for line in lines:
 feedback = "\n".join(feedback_lines).strip()
 date = datetime.now().strftime("%Y-%m-%d")
 
-markdown = f"""---
+if category_slug == "0-to-1" or not feedback:
+    markdown = f"""---
+title: "{post_title}"
+date: {date}
+categories: ["{category_slug}"]
+draft: false
+---
+
+{body}
+"""
+else:
+    markdown = f"""---
 title: "{post_title}"
 date: {date}
 categories: ["{category_slug}"]
