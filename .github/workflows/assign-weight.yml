@@ -24,7 +24,7 @@ jobs:
           import re
 
           all_posts = sorted(glob.glob("content/posts/**/*.md", recursive=True))
-          
+
           # weight 있는 파일들의 최대 weight 찾기
           max_weight = 0
           for post in all_posts:
@@ -41,7 +41,14 @@ jobs:
               if "weight:" in content:
                   continue
               max_weight += 1
-              content = content.replace("draft: false", f"draft: false\nweight: {max_weight}", 1)
+              # --- 구분자 뒤에 weight 삽입
+              content = re.sub(
+                  r'^(---\n(?:.*\n)*?)(---)',
+                  lambda m: m.group(1) + f'weight: {max_weight}\n' + m.group(2),
+                  content,
+                  count=1,
+                  flags=re.MULTILINE
+              )
               with open(post, "w") as f:
                   f.write(content)
               print(f"weight: {max_weight} assigned to {post}")
