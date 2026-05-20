@@ -25,25 +25,4 @@
 &lt;hr&gt;
 &lt;h2 id="보완-및-정리"&gt;보완 및 정리&lt;/h2&gt;
 &lt;p&gt;안녕하세요! 카프카에 대한 핵심적인 내용을 잘 정리해주셨습니다. 빠르고 간결하게 카프카의 주요 특징들을 파악하기에 좋은 노트입니다.&lt;/p&gt;
-&lt;p&gt;몇 가지 개선점을 제안드립니다.&lt;/p&gt;</description></item><item><title>카프카: 대용량 이벤트 처리 시스템</title><link>https://xodbs1021.github.io/posts/tech-blurting/kafka-introduction-and-features/</link><pubDate>Wed, 20 May 2026 00:00:00 +0000</pubDate><guid>https://xodbs1021.github.io/posts/tech-blurting/kafka-introduction-and-features/</guid><description>&lt;h2 id="내가-이해한-것"&gt;내가 이해한 것&lt;/h2&gt;
-&lt;p&gt;카프카란 대용량 이벤트 처리 시스템 디스크에 순차적으로 저장하기 때문에 속도가 빠름 비동기 처리 백에서 작동 직접적으로 클라이언트와 소통하지 않음 이녀석의 역할을 단순히 데이터를 저장하는 역할 jvm에 접근하지 않고 os cache page를 사용하기 때문에 속도가 빠름 실시간성이 강함 메세지 묶음 처리 그러나 용도에 따라 이것을 조정해서 사용가능&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2 id="보완-및-정리"&gt;보완 및 정리&lt;/h2&gt;
-&lt;p&gt;안녕하세요! 제공해주신 노트를 바탕으로 &lt;code&gt;tech-blurting&lt;/code&gt; 카테고리를 잘 감지했습니다.&lt;/p&gt;
-&lt;p&gt;블로그 게시물로 다듬기 위한 몇 가지 제안입니다:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;&lt;strong&gt;구조화&lt;/strong&gt;: 현재 내용은 핵심 키워드 중심으로 나열되어 있습니다. 문단 나누기, 소제목 추가, 불릿 포인트 등을 활용하여 가독성을 높일 수 있습니다.
-&lt;ul&gt;
-&lt;li&gt;예: &amp;ldquo;카프카란 무엇인가?&amp;rdquo;, &amp;ldquo;카프카의 특징 및 동작 원리&amp;rdquo;, &amp;ldquo;성능 향상 비결&amp;rdquo; 등으로 나눌 수 있습니다.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;문장 다듬기&lt;/strong&gt;: 정보는 충분하지만, 완결된 문장 형태로 다듬어주시면 독자가 내용을 이해하기 더욱 쉬울 것입니다. (예: &amp;ldquo;카프카는 대용량 이벤트 처리 시스템입니다. 디스크에 데이터를 순차적으로 저장하기 때문에 빠른 속도를 보장합니다.&amp;rdquo;)&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;세부 설명&lt;/strong&gt;:
-&lt;ul&gt;
-&lt;li&gt;&amp;ldquo;JVM에 접근하지 않고 OS cache page를 사용하기 때문에 속도가 빠름&amp;rdquo; 부분은 카프카의 핵심 최적화 요소이므로, 이 부분을 좀 더 자세히 설명해주시면 좋을 것 같습니다. (운영체제 페이지 캐시의 이점 등)&lt;/li&gt;
-&lt;li&gt;&amp;ldquo;실시간성이 강함&amp;quot;과 &amp;ldquo;메세지 묶음 처리&amp;quot;는 언뜻 상충되는 것처럼 보일 수 있습니다. 이 둘의 관계, 즉 &amp;lsquo;배치 처리 기반의 높은 처리량&amp;rsquo;과 &amp;lsquo;준실시간성&amp;rsquo;이라는 특성을 함께 설명해주시면 오해를 줄일 수 있습니다.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;용도 및 예시&lt;/strong&gt;: 카프카가 실제로 어떤 상황에서 유용하게 사용되는지 구체적인 사용 사례(로그 수집, 스트림 처리 등)를 덧붙이면 독자의 이해를 도울 수 있습니다.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;지금 가지고 계신 핵심 정보들이 매우 좋으니, 위 제안들을 참고하여 더욱 풍부한 블로그 글을 작성하실 수 있을 거예요!&lt;/p&gt;</description></item></channel></rss>
+&lt;p&gt;몇 가지 개선점을 제안드립니다.&lt;/p&gt;</description></item></channel></rss>
