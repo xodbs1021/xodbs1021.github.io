@@ -17,7 +17,7 @@ collections:
       - {label: "제목", name: "title", widget: "string"}
       - {label: "날짜", name: "date", widget: "datetime"}
       - {label: "카테고리", name: "categories", widget: "hidden", default: ["tech-blurting"]}
-      - {label: "내용", name: "body", widget: "markdown", required: false}
+      - {label: "내용", name: "body", widget: "markdown", required: false, default_value: "", buttons: [], editor_components: [], modes: ["raw"], default_mode: "raw"}
 
   - name: "coding-test"
     label: "Coding Test"
@@ -28,7 +28,7 @@ collections:
       - {label: "제목", name: "title", widget: "string"}
       - {label: "날짜", name: "date", widget: "datetime"}
       - {label: "카테고리", name: "categories", widget: "hidden", default: ["coding-test"]}
-      - {label: "내용", name: "body", widget: "markdown", required: false}
+      - {label: "내용", name: "body", widget: "markdown", required: false, default_value: "", buttons: [], editor_components: [], modes: ["raw"], default_mode: "raw"}
 
   - name: "open-source-analysis"
     label: "Open Source Analysis"
@@ -39,7 +39,7 @@ collections:
       - {label: "제목", name: "title", widget: "string"}
       - {label: "날짜", name: "date", widget: "datetime"}
       - {label: "카테고리", name: "categories", widget: "hidden", default: ["open-source-analysis"]}
-      - {label: "내용", name: "body", widget: "markdown", required: false}
+      - {label: "내용", name: "body", widget: "markdown", required: false, default_value: "", buttons: [], editor_components: [], modes: ["raw"], default_mode: "raw"}
 
   - name: "0-to-1"
     label: "0 to 1"
@@ -50,4 +50,4 @@ collections:
       - {label: "제목", name: "title", widget: "string"}
       - {label: "날짜", name: "date", widget: "datetime"}
       - {label: "카테고리", name: "categories", widget: "hidden", default: ["0-to-1"]}
-      - {label: "내용", name: "body", widget: "markdown", required: false}
+      - {label: "내용", name: "body", widget: "markdown", required: false, default_value: "", buttons: [], editor_components: [], modes: ["raw"], default_mode: "raw"}
