@@ -15,32 +15,36 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
-      - name: Assign weight to new posts
+      - name: Assign weight to posts without weight
         run: |
           python3 << 'PYEOF'
           import glob
           import re
-          import os
 
           all_posts = sorted(glob.glob("content/posts/**/*.md", recursive=True))
           
-          changed = os.popen("git diff --name-only HEAD~1 HEAD").read().strip().split("\n")
-          new_posts = [f for f in changed if f.startswith("content/posts/") and f.endswith(".md")]
+          # weight 있는 파일들의 최대 weight 찾기
+          max_weight = 0
+          for post in all_posts:
+              with open(post, "r") as f:
+                  content = f.read()
+              match = re.search(r'^weight:\s*(\d+)', content, re.MULTILINE)
+              if match:
+                  max_weight = max(max_weight, int(match.group(1)))
 
-          for new_post in new_posts:
-              if not os.path.exists(new_post):
-                  continue
-              with open(new_post, "r") as f:
+          # weight 없는 파일에 순차 부여
+          for post in all_posts:
+              with open(post, "r") as f:
                   content = f.read()
               if "weight:" in content:
                   continue
-              total = len(all_posts)
-              content = content.replace("draft: false", f"draft: false\nweight: {total}", 1)
-              with open(new_post, "w") as f:
+              max_weight += 1
+              content = content.replace("draft: false", f"draft: false\nweight: {max_weight}", 1)
+              with open(post, "w") as f:
                   f.write(content)
-              print(f"weight: {total} assigned to {new_post}")
+              print(f"weight: {max_weight} assigned to {post}")
           PYEOF
 
       - name: Commit weight changes
