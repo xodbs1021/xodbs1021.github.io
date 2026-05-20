@@ -1,7 +1,7 @@
 {{- define "main" }}
 {{- $pages := where site.RegularPages "Type" "posts" }}
 {{- $pages = $pages | complement (where $pages "Draft" true) }}
-{{- $pages = sort $pages "Date" "desc" }}
+{{- $pages = sort $pages "Date" "asc" }}
 {{- $currentIndex := -1 }}
 {{- range $i, $p := $pages }}
   {{- if eq $p.RelPermalink $.RelPermalink }}
