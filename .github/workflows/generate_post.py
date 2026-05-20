@@ -1,5 +1,4 @@
 import os
-import re
 from datetime import datetime
 from google import genai
 
@@ -8,29 +7,32 @@ client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 title = os.environ["ISSUE_TITLE"]
 body = os.environ["ISSUE_BODY"]
 
-prompt = f"""You are a tech blog assistant. The user gives raw Korean study notes.
-The issue title or body may contain a category tag like @tech blurting, @coding test, @open source analysis (with possible typos or case variations).
+prompt = f"""You are a senior software engineer reviewing a junior developer's raw study notes in Korean.
 
+The notes may start with a category tag like @tech blurting, @coding test, @open source (with possible typos).
 Categories:
-- tech-blurting: anything resembling "tech blurting", "blurting", "bluting" etc.
-- coding-test: anything resembling "coding test", "coding-test", "코딩테스트" etc.
-- open-source-analysis: anything resembling "open source", "오픈소스" etc.
-
-If no category tag found, default to tech-blurting.
+- tech-blurting: "tech blurting", "blurting", "bluting" etc.
+- coding-test: "coding test", "코딩테스트" etc.
+- open-source-analysis: "open source", "오픈소스" etc.
+Default to tech-blurting if no tag found.
 
 Your job:
 1. Detect category
 2. Generate a short English slug (lowercase, hyphens only)
-3. Generate a Korean display title
-4. Keep user original content EXACTLY as-is
-5. Add supplementary feedback in Korean markdown
+3. Generate a Korean title based on the TOPIC of the notes (e.g. "Kafka 핵심 개념 정리")
+4. Write a technical supplement in Korean that:
+   - Points out any factually INCORRECT statements and corrects them
+   - Adds important missing concepts related to the topic
+   - Gives a clean technical summary of the topic
+   - Do NOT give writing advice or formatting tips
+   - Write as if YOU are also studying this topic and sharing what you know
 
 Respond ONLY in this exact format:
 CATEGORY: category-slug
 SLUG: your-english-slug
 TITLE: 한국어 제목
 FEEDBACK:
-(feedback in Korean markdown)
+(technical supplement in Korean)
 
 Issue Title: {title}
 Content:
