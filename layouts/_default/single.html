@@ -1,7 +1,7 @@
 {{- define "main" }}
 
 {{- $allPages := where site.RegularPages "Section" "posts" }}
-{{- $allPages = sort $allPages "Params.weight" "asc" }}
+{{- $allPages = sort $allPages "Params.weight" "desc" }}
 {{- $.Scratch.Set "currentIndex" 0 }}
 {{- range $i, $p := $allPages }}
   {{- if eq $p.Permalink $.Permalink }}

@@ -9,10 +9,6 @@ theme = "PaperMod"
   showFullContent = false
   showReadingTime = false
   showPostsOnHomePage = true
-  ShowPostNavLinks = true
-  ShowBreadCrumbs = true
-  ShowCodeCopyButtons = true
-  dateFormat = "2006년 01월 02일 15:04"
 
 [markup]
   [markup.goldmark]
