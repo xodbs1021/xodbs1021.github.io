@@ -8,6 +8,7 @@ jobs:
   create-post:
     runs-on: ubuntu-latest
     if: github.event.issue.user.login == 'xodbs1021'
+    if: github.event.issue.user.login == 'xodbs1021'
     permissions:
       contents: write
       issues: write
