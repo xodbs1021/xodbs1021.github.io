@@ -1,0 +1,15 @@
+{
+  "last_updated": "2026-05-30",
+  "current_topic": "2-2",
+  "completed": [],
+  "notes": {
+    "skip": "레벨 1 (기초 개념)은 나중에 순서대로 돌아와서 채울 예정",
+    "today": "과제: HLS(2-2) + LL-HLS(2-4)"
+  },
+  "learner_profile": {
+    "level": "완전 초보자",
+    "style": "개념 조금 → 실습 → 다시 개념",
+    "background": "React + Tailwind 가능, HiPick 랜딩페이지 제작 경험",
+    "goal": "HiPick 개발을 위한 스트리밍 기술 기반 습득"
+  }
+}

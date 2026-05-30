@@ -8,11 +8,31 @@ client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 title = os.environ["ISSUE_TITLE"]
 body = os.environ["ISSUE_BODY"]
 
-# 현재 전체 글 수 계산해서 weight 자동 부여
-all_posts = glob.glob("content/posts/**/*.md", recursive=True)
-next_weight = len(all_posts) + 1
+# weight 없는 파일들의 최대 weight 찾기
+import re
+all_posts = sorted(glob.glob("content/posts/**/*.md", recursive=True))
+max_weight = 0
+for post in all_posts:
+    with open(post, "r") as f:
+        content = f.read()
+    match = re.search(r'^weight:\s*(\d+)', content, re.MULTILINE)
+    if match:
+        max_weight = max(max_weight, int(match.group(1)))
+next_weight = max_weight + 1
 
-prompt = f"""You are a senior software engineer reviewing a junior developer's raw study notes in Korean.
+prompt = f"""You are a senior software engineer at a top Korean tech company (Naver, Kakao, Kakao TV, Chzzk level).
+The user is a junior developer preparing to enter companies like Naver or Chzzk (Naver's live streaming platform).
+They have written raw Korean study notes about a technical topic.
+
+STRICT RULES:
+- DO NOT give any writing advice or formatting tips
+- ONLY talk about the TECHNICAL CONTENT itself
+- If something is technically WRONG, correct it with a clear explanation of why
+- If something is MISSING that would be expected knowledge for a Naver/Chzzk-level engineer, add it
+- Point out practical real-world usage patterns used at large-scale Korean tech companies
+- Mention performance considerations, scalability, and production-level concerns where relevant
+- Write as a senior engineer doing a thorough technical code/concept review
+- Be direct and specific, not generic
 
 The notes may start with a category tag like @tech blurting, @coding test, @open source (with possible typos).
 Categories:
@@ -21,12 +41,6 @@ Categories:
 - open-source-analysis: "open source", "오픈소스" etc.
 - 0-to-1: "0 to 1", "zero to one", "0to1", "프로젝트" etc.
 Default to tech-blurting if no tag found.
-
-STRICT RULES:
-- DO NOT give any writing advice or formatting tips
-- ONLY talk about the TECHNICAL CONTENT itself
-- If something is technically WRONG, correct it
-- If something is MISSING, add the missing technical knowledge
 
 Respond ONLY in this exact format:
 CATEGORY: category-slug
