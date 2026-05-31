@@ -38,8 +38,3 @@ theme = "PaperMod"
   name = "Book Review"
   url = "/categories/book-review"
   weight = 5
-
-[[menus.main]]
-  name = "Dev Log"
-  url = "/categories/dev-log"
-  weight = 6
