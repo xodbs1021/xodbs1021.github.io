@@ -3,7 +3,6 @@ title: "Kafka 핵심 개념 기술 피드백"
 date: 2026-05-18T10:00:00+09:00
 categories: ["tech-blurting"]
 draft: false
-weight: 1
 ---
 
 ## 내가 이해한 것

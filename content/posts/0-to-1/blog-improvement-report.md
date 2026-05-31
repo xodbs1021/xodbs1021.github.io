@@ -3,7 +3,6 @@ title: "GitHub Pages 블로그 자동화 시스템 고도화 보고서"
 date: 2026-05-20T18:00:00+09:00
 categories: ["0-to-1"]
 draft: false
-weight: 4
 ---
 
 ## 1. 개요
