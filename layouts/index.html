@@ -1,6 +1,6 @@
 {{- define "main" }}
 {{- $pages := where site.RegularPages "Section" "posts" }}
-{{- $pages = sort $pages "Params.weight" "desc" }}
+{{- $pages = sort $pages "Date" "desc" }}
 
 {{- range first 4 $pages }}
 <article class="post-entry">
