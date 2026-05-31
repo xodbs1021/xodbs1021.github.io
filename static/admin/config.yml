@@ -51,3 +51,14 @@ collections:
       - {label: "날짜", name: "date", widget: "datetime"}
       - {label: "카테고리", name: "categories", widget: "hidden", default: ["0-to-1"]}
       - {label: "내용", name: "body", widget: "markdown", required: false, default_value: "", buttons: [], editor_components: [], modes: ["raw"], default_mode: "raw"}
+
+  - name: "book-review"
+    label: "Book Review"
+    folder: "content/posts/book-review"
+    create: true
+    delete: true
+    fields:
+      - {label: "제목", name: "title", widget: "string"}
+      - {label: "날짜", name: "date", widget: "datetime"}
+      - {label: "카테고리", name: "categories", widget: "hidden", default: ["book-review"]}
+      - {label: "내용", name: "body", widget: "markdown", required: false, default_value: "", buttons: [], editor_components: [], modes: ["raw"], default_mode: "raw"}
