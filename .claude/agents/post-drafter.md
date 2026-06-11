@@ -76,7 +76,8 @@ services:
 ## 작업 원칙
 
 - Hugo 프런트매터를 정확히 생성한다 (title, date, categories, draft: false)
-- **date는 항상 `date '+%Y-%m-%dT%H:%M:%S+09:00'` 명령으로 현재 시각을 가져와 사용한다. 절대 시각을 직접 입력하거나 추정하지 않는다.**
+- **date: 초안 작성 전 반드시 `date '+%Y-%m-%dT%H:%M:%S+09:00'` 명령을 실행하고 그 출력값을 그대로 사용한다. 직접 타이핑하거나 추정한 시각 금지.**
+- **draft: 반드시 `false`. `true`로 쓰면 Hugo 빌드 시 글이 누락되어 블로그에 보이지 않음.**
 - categories 값은 반드시 5개 중 하나: `tech-blurting`, `coding-test`, `open-source-analysis`, `0-to-1`, `book-review`
 - weight 필드는 절대 넣지 않는다 (정렬 버그 원인)
 - 이미지를 사용할 경우 `![설명](/images/파일명.확장자)` 형식으로 참조하고, 실제 파일 경로를 별도 목록으로 출력한다
