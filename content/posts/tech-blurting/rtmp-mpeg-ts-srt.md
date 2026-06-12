@@ -5,6 +5,8 @@ categories: ["tech-blurting"]
 draft: false
 ---
 
+![live streaming broadcast protocol](/images/rtmp-mpeg-ts-srt.webp)
+
 HLS를 공부하고 나서 스트리밍 기술을 어느 정도 안다고 생각했다. 그런데 직접 시스템을 구축하다 보니 전혀 모르는 이름들이 튀어나왔다. RTMP, MPEG-TS, SRT.
 
 치지직 스트림을 서버에서 수신해서 오디오 트랙을 분리하는 파이프라인을 만들어야 했다. 처음엔 "HLS로 받으면 되지 않나?" 싶었는데, 그게 아니었다. 이 글은 그 과정에서 왜 이 프로토콜들을 써야 하는지 이해하게 된 이야기다.
