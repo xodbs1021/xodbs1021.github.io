@@ -1,180 +1,99 @@
 ---
 title: "HLS만 알던 내가 RTMP, MPEG-TS, SRT를 배운 이유"
-date: 2026-06-12T18:45:48+09:00
+date: 2026-06-13T00:13:50+09:00
 categories: ["tech-blurting"]
 draft: false
 ---
 
-![live streaming broadcast protocol](/images/rtmp-mpeg-ts-srt.webp)
+HLS 공부하고 나서 스트리밍 기술은 어느 정도 알겠다 싶었는데, 직접 시스템 만들다 보니까 처음 보는 이름들이 계속 튀어나왔다. RTMP, MPEG-TS, SRT.
 
-HLS를 공부하고 나서 스트리밍 기술을 어느 정도 안다고 생각했다. 그런데 직접 시스템을 구축하다 보니 전혀 모르는 이름들이 튀어나왔다. RTMP, MPEG-TS, SRT.
-
-치지직 스트림을 서버에서 수신해서 오디오 트랙을 분리하는 파이프라인을 만들어야 했다. 처음엔 "HLS로 받으면 되지 않나?" 싶었는데, 그게 아니었다. 이 글은 그 과정에서 왜 이 프로토콜들을 써야 하는지 이해하게 된 이야기다.
+치지직 스트림에서 오디오를 분리해서 분석하는 파이프라인을 짜야 했는데, 처음엔 "HLS로 받으면 되지 않나?" 싶었다. 근데 그게 아니었다. 이 글은 왜 이 세 가지가 필요했는지 이해하게 된 과정을 정리한 거다.
 
 ---
 
-## 문제의 시작 — 오디오 트랙을 분리해야 했다
+## 전체 구조부터 보면
 
-라이브 방송에는 여러 소리가 섞여 있다. 게임 소리, 마이크, 디스코드, 후원 알림음. 이걸 각각 따로 분석하고 싶었다.
+![PokeClip 시스템 아키텍처](/images/pokeclip-architecture.png)
 
-처음에 RTMP로 받으면 어떨까 생각했다. 치지직이 RTMP로 스트림을 받으니까 그냥 그걸 그대로 가져오면 되지 않을까 했는데, RTMP는 오디오 트랙을 **1개만** 지원한다. 스트리머가 OBS에서 여러 소리를 섞어서 하나로 만든 다음 보내는 구조라, 받는 시점엔 이미 합쳐진 상태다. 분리할 방법이 없다.
+OBS에서 스트림을 두 군데로 동시에 내보낸다.
 
-그래서 MPEG-TS를 알게 됐다.
+- **치지직 방향**: RTMP로 보내서 시청자한테 HLS로 뿌리는 일반적인 방송 흐름
+- **PokeClip 방향**: SRT+MPEG-TS로 직접 우리 서버에 보내서 오디오 트랙 분리 후 분석
 
----
-
-## RTMP — 치지직이 ingest에 쓰는 이유
-
-[RTMP(Real-Time Messaging Protocol)](https://rtmp.veriskope.com/docs/spec/)는 Adobe가 만든 라이브 스트리밍 ingest 표준이다. 2012년에 Flash와 함께 사실상 죽었어야 했는데 아직도 살아있다.
-
-이유는 단순하다. **생태계가 너무 크다.** OBS, Streamlabs, XSplit — 모든 방송 소프트웨어가 RTMP를 지원한다. 치지직, 트위치, 유튜브 라이브 전부 RTMP로 스트림을 받는다.
-
-```
-스트리머 OBS
-  └─ RTMP push ──→ rtmp://rtmp.chzzk.naver.com/live
-                        │
-                   내부에서 트랜스코딩
-                        │
-              시청자 ←── HLS pull ──── CDN
-```
-
-HLS는 **시청자 방향**(서버 → 시청자)이고, RTMP는 **ingest 방향**(스트리머 → 서버)이다. 완전히 다른 역할이다.
-
-RTMP의 한계는 명확하다. 오디오 트랙 1개. 분석 파이프라인에서 멀티 트랙이 필요하다면 다른 방법을 써야 한다.
+치지직은 RTMP로 받으니까 이미 단일 믹스 오디오다. 거기서 분석용 데이터를 가져오는 게 아니라, OBS에서 아예 따로 받는 구조다.
 
 ---
 
-## MPEG-TS — 30년 방송 표준이 아직 살아있는 이유
+## RTMP — 왜 아직도 이걸 쓰나
 
-[MPEG-TS(MPEG-2 Transport Stream)](https://www.iso.org/standard/44169.html)는 1995년에 만들어진 방송 전송 포맷이다. 위성방송, 케이블TV, 디지털방송(DVB) 전부 이걸로 돌아간다.
+RTMP는 Adobe가 만든 ingest 프로토콜이다. Flash 죽을 때 같이 없어졌어야 했는데 2026년인 지금도 살아있다.
 
-HLS 공부할 때 `.ts` 파일을 봤다면 그게 MPEG-TS 세그먼트다. 파일로 잘린 형태와 끝없이 흐르는 스트림 형태 두 가지로 쓰인다.
+이유는 단순하다. OBS, Streamlabs, XSplit — 방송 소프트웨어란 소프트웨어는 전부 RTMP를 지원한다. 치지직, 트위치, 유튜브 전부 RTMP로 받는다. 생태계가 여기 맞춰져 있으니 플랫폼 입장에서도 굳이 바꿀 이유가 없다.
 
-### 핵심 구조: 188바이트 고정 패킷
+근데 RTMP에 구조적 한계가 있다. **오디오 트랙을 1개밖에 못 담는다.** 스트리머가 OBS에서 게임 소리, 마이크, 디스코드를 전부 믹스해서 하나로 합친 다음 보내는 구조라, 받는 시점엔 이미 합쳐진 상태다. 분리가 불가능하다.
 
-```
-[ 1byte  ][ 3byte ][ 1byte ][ 184byte ]
- 0x47      PID     flags    payload
-  ↑
-sync byte — 항상 이 값. 패킷 경계 찾을 때 쓴다
-```
+그래서 분석용 스트림은 따로 받아야 했고, 거기서 MPEG-TS가 나온다.
 
-패킷 하나가 손실돼도 다음 `0x47`을 찾으면 바로 복구할 수 있다. 위성 신호처럼 노이즈가 심한 환경을 위해 이렇게 설계했다.
+---
 
-### PID로 멀티 트랙 관리
+## MPEG-TS — 멀티 오디오 트랙이 가능한 이유
 
-여기가 핵심이다. PID(Packet Identifier)를 보면 이 패킷이 어느 트랙인지 알 수 있다.
+![MPEG-TS 패킷 구조](/images/mpeg-ts-packet.png)
+
+[MPEG-TS](https://www.iso.org/standard/44169.html)는 1995년에 방송 전송용으로 만들어진 포맷이다. 위성방송, 케이블TV, 디지털방송 전부 이걸 쓴다. HLS 공부할 때 봤던 `.ts` 파일이 바로 이거다.
+
+핵심은 **188바이트 고정 패킷**과 **PID** 구조다.
+
+패킷 앞에 항상 `0x47`이 붙어있어서, 스트림 중간 어디서든 이걸 찾으면 패킷 경계를 알 수 있다. 패킷 몇 개가 사라져도 다음 `0x47`부터 다시 읽으면 복구된다. 위성 신호처럼 노이즈 심한 환경을 위해 이렇게 설계한 거다.
+
+그리고 PID(Packet Identifier)로 하나의 스트림 안에 여러 트랙을 독립적으로 담을 수 있다.
 
 ```
 MPEG-TS 스트림 안에
-├── PID 0x100: Video (H.264)
-├── PID 0x101: Audio — 게임 소리
-├── PID 0x102: Audio — 마이크
-├── PID 0x103: Audio — 디스코드
-└── PID 0x104: Audio — 후원 알림음
+├── PID 0x100 → Video (H.264)
+├── PID 0x101 → Audio: 게임 소리
+├── PID 0x102 → Audio: 마이크
+├── PID 0x103 → Audio: 디스코드
+└── PID 0x104 → Audio: 후원 알림음
 ```
 
-FFmpeg로 받으면 PID 기준으로 트랙을 분리해서 각각 처리할 수 있다.
+FFmpeg로 받으면 PID 기준으로 트랙을 뽑아서 각각 분석 파이프라인에 넣을 수 있다.
 
 ```bash
-# MPEG-TS 스트림의 트랙 구성 확인
-ffprobe -i srt://localhost:8890 2>&1 | grep Stream
-# Stream #0:0: Video: h264
-# Stream #0:1: Audio: aac (게임)
-# Stream #0:2: Audio: aac (마이크)
-# Stream #0:3: Audio: aac (디스코드)
-```
-
-RTMP로는 이 구조가 불가능하다. 처음부터 멀티 트랙이 설계에 없다.
-
-### 왜 대안이 없나
-
-fMP4(LL-HLS에서 쓰는 포맷), RTP 같은 대안도 있다. 기술적으로 멀티 트랙을 지원한다. 그런데 MPEG-TS가 "바이블"로 불리는 이유는 **FFmpeg 생태계** 때문이다. 30년치 엣지케이스가 다 잡혀 있고, 모든 방송 장비가 MPEG-TS를 뱉는다. 굳이 덜 검증된 대안을 쓸 이유가 없다.
-
----
-
-## SRT — MPEG-TS를 전송하는 현대적인 방법
-
-[SRT(Secure Reliable Transport)](https://www.haivision.com/products/srt-secure-reliable-transport/)는 Haivision이 만들고 오픈소스로 공개한 전송 프로토콜이다. UDP 기반이지만 신뢰성을 보장한다.
-
-SRT는 컨테이너 포맷이 아니다. MPEG-TS를 **어떻게 전달할지**의 문제다.
-
-### UDP인데 왜 신뢰성이 있나
-
-ARQ(Automatic Repeat reQuest)를 얹었다.
-
-```
-송신: 패킷 전송 + 버퍼 보관
-수신: 빠진 패킷 발견 → NACK 전송 → "42번 패킷 다시 줘"
-송신: 버퍼에서 꺼내서 재전송
-```
-
-TCP와 비슷하지만 라이브 스트리밍에 맞게 타임아웃이 짧다(기본 120ms). 늦게 오는 것보다 버리는 게 낫기 때문이다.
-
-### RTMP vs SRT 비교
-
-| | RTMP | SRT |
-|---|---|---|
-| 기반 | TCP | UDP + ARQ |
-| 지연 | ~2-3초 | ~0.5-1초 |
-| 멀티 오디오 트랙 | ❌ | ✅ (MPEG-TS 컨테이너로) |
-| 네트워크 적응 | 없음 | 대역폭 자동 조절 |
-| 암호화 | 없음 | AES 기본 내장 |
-| FFmpeg 지원 | ✅ | ✅ 네이티브 |
-| 생태계 | 압도적 | 빠르게 성장 중 |
-
-참고: [SRT Alliance 공식 문서](https://www.srtalliance.org/)
-
-### FFmpeg에서 SRT 받기
-
-```bash
-# SRT listener 모드로 스트림 수신
 ffmpeg -i "srt://0.0.0.0:8890?mode=listener" \
-  -map 0:v -c:v copy video.ts \          # 비디오 트랙
-  -map 0:a:0 -c:a copy audio_game.ts \   # 게임 소리
-  -map 0:a:1 -c:a copy audio_mic.ts \    # 마이크
-  -map 0:a:2 -c:a copy audio_discord.ts  # 디스코드
+  -map 0:a:0 -c:a copy audio_game.aac \    # 게임 소리
+  -map 0:a:1 -c:a copy audio_mic.aac \     # 마이크
+  -map 0:a:2 -c:a copy audio_discord.aac   # 디스코드
 ```
+
+fMP4나 RTP도 멀티 트랙을 지원하긴 한다. 근데 MPEG-TS가 방송 업계 표준으로 30년을 버텨온 이유가 있다. FFmpeg에서 엣지케이스가 다 잡혀있고, 모든 방송 장비가 MPEG-TS를 뱉는다. 굳이 덜 검증된 대안을 쓸 이유가 없다.
 
 ---
 
-## 세 프로토콜의 역할 분리
+## SRT — MPEG-TS를 어떻게 안정적으로 보내나
 
-```
-스트리머 OBS
-    │
-  [RTMP]  ← 스트리머 → 플랫폼. 생태계 때문에 아직 표준
-    │
-치지직 서버 (내부 처리)
-    │
-  [SRT + MPEG-TS]  ← 서버 간 전송. 낮은 지연 + 멀티 트랙
-    │
-  수신 서버
-    │
-  FFmpeg demux (PID 기준 트랙 분리)
-    ├── Video
-    ├── Audio 1 (게임)
-    ├── Audio 2 (마이크)
-    └── Audio 3 (디스코드)
-```
+![SRT ARQ 재전송 메커니즘](/images/srt-arq.png)
 
-각 프로토콜이 다른 문제를 해결한다.
-- **RTMP**: 스트리머 → 플랫폼 ingest. 생태계가 이미 여기 있다.
-- **MPEG-TS**: 멀티 트랙을 담는 그릇. 30년 표준.
-- **SRT**: 그 그릇을 안정적으로 전달하는 현대적 방법.
+SRT는 MPEG-TS를 담는 그릇이 아니라, 그걸 **어떻게 전달할지**의 문제다. UDP 기반인데 신뢰성이 있다. ARQ(Automatic Repeat reQuest)를 얹었기 때문이다.
+
+패킷이 사라지면 수신 측이 NACK을 보내고, 송신 측이 버퍼에서 꺼내서 재전송한다. TCP의 재전송이랑 비슷한 개념인데, 라이브 스트리밍에 맞게 타임아웃이 짧다 (기본 120ms). 늦게 오는 것보다 버리는 게 낫기 때문이다.
+
+![RTMP vs SRT 비교](/images/rtmp-vs-srt.png)
+
+RTMP는 TCP 기반이라 재전송 자체는 있지만, 지연이 2~3초고 멀티 트랙이 안 된다. SRT는 UDP+ARQ로 지연을 0.5~1초로 줄이면서 안정성도 확보했다. [SRT Alliance](https://www.srtalliance.org/)에서 오픈소스로 공개해서 FFmpeg도 네이티브로 지원한다.
 
 ---
 
-## 배우고 나서
+## 정리
 
-HLS를 공부할 때는 "시청자에게 어떻게 잘 전달하나"의 관점이었다. RTMP/MPEG-TS/SRT를 배우고 나니 "플랫폼이 스트림을 어떻게 받고 처리하는가"의 관점이 생겼다.
+HLS만 알 때는 "시청자한테 어떻게 잘 전달하나"만 보였는데, 이걸 공부하고 나니까 플랫폼 안에서 어떻게 돌아가는지가 보이기 시작했다.
 
-치지직 같은 플랫폼이 스트리머로부터 RTMP로 받아서 내부적으로 MPEG-TS로 처리하고 시청자에게 HLS로 뿌리는 구조가 이제 눈에 들어온다. 각 단계마다 그 프로토콜을 쓰는 이유가 있다.
+치지직이 RTMP로 받아서 HLS로 뿌리는 구조, OBS가 동시에 여러 목적지로 스트림을 내보낼 수 있다는 것, MPEG-TS의 PID 구조가 왜 방송에서 표준인지. 각 선택마다 이유가 있었다.
 
 ---
 
-**참고 자료**
-- [RTMP 스펙 문서](https://rtmp.veriskope.com/docs/spec/)
+**참고**
+- [RTMP 스펙](https://rtmp.veriskope.com/docs/spec/)
 - [MPEG-2 Transport Stream (ISO 13818-1)](https://www.iso.org/standard/44169.html)
-- [SRT Alliance 공식 사이트](https://www.srtalliance.org/)
-- [FFmpeg SRT 문서](https://ffmpeg.org/ffmpeg-protocols.html#srt)
+- [SRT Alliance](https://www.srtalliance.org/)
+- [FFmpeg SRT 프로토콜](https://ffmpeg.org/ffmpeg-protocols.html#srt)
