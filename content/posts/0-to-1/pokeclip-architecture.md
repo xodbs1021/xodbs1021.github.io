@@ -25,6 +25,8 @@ draft: false
 
 ## 스트림 수신 — 왜 OBS에서 두 갈래로 보내는가
 
+![OBS 듀얼 출력 구조](/images/pokeclip-obs-dual-output.png)
+
 처음 문제는 오디오였다.
 
 하이라이트를 잘 잡으려면 게임 소리만으로는 부족하다. 스트리머 마이크 반응, 디스코드로 들어오는 팀원 소리, 후원 알림음까지 각각 따로 분석해야 한다. 근데 치지직으로 가는 RTMP 스트림은 이 소리들이 전부 하나로 믹스된 상태라, 거기서 가져오면 분리가 불가능하다.
@@ -59,6 +61,8 @@ ffmpeg -i "srt://0.0.0.0:8890?mode=listener" \
 
 ## 분석 엔진 — 5개 병렬 실행
 
+![5개 병렬 분석 엔진](/images/pokeclip-analysis-engines.png)
+
 분석 엔진은 5개가 동시에 돌아간다.
 
 | 엔진 | 입력 | 역할 |
@@ -75,6 +79,8 @@ ffmpeg -i "srt://0.0.0.0:8890?mode=listener" \
 
 ## 점수 통합 — Hybrid Voting
 
+![Hybrid Voting 점수 통합](/images/pokeclip-hybrid-voting.png)
+
 5개 엔진이 각자 "이 구간이 하이라이트다"라는 신호를 내보내면, Score Integration 단계에서 합친다.
 
 단순 평균이 아니라 Hybrid Voting 방식으로 처리한다. 여러 엔진이 동시에 같은 구간을 하이라이트로 판단할수록 가중치가 높아진다. 마이크 하나만 반응하는 구간보다, 마이크 + 채팅 + 게임 사운드가 동시에 튀는 구간이 실제로 재밌는 장면일 가능성이 높기 때문이다.
@@ -90,6 +96,8 @@ Whisper로 변환된 텍스트, 게임 이벤트 로그, 채팅 내용을 LLM에
 ---
 
 ## 하이라이트 추출 및 저장
+
+![Output 파이프라인](/images/pokeclip-output-pipeline.png)
 
 점수 + 태그 기반으로 클립 구간을 확정하고, 실제 영상을 잘라서 저장한다.
 
