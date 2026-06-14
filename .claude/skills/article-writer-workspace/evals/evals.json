@@ -1,0 +1,23 @@
+{
+  "skill_name": "article-writer",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "vLLM으로 LLM 추론 서버 세팅하는 방법 아티클 써줘. open-source-analysis 카테고리. 직접 로컬에서 테스트해봤고 RTX 4090 기준 벤치마크 수치 있어. 발행은 안 해도 되고 draft.md만 만들어줘.",
+      "expected_output": "Medium 스타일 아티클 초안 (도입 훅, vLLM 개념 설명, docker-compose 또는 설치 코드 완전 제공, 수치 포함, 결론). article-style-checker 검토 결과 포함.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "HLS 세그먼트 크기(ts-duration) 트레이드오프 아티클 작성해줘. 2초/6초/10초 각각의 장단점, 실제 측정값 넣어서. tech-blurting 카테고리. draft만.",
+      "expected_output": "HLS 개념 설명 → 세그먼트 크기별 지연/버퍼링/CPU 비교 표 → 권장 설정 → 결론 구조. 구체적 수치 있어야 함.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Docker 멀티스테이지 빌드로 Node.js 이미지 크기를 1GB → 120MB로 줄인 과정 아티클로 정리해줘. 0-to-1 카테고리. 실제 Dockerfile 코드 있고, before/after 이미지 사이즈 비교 넣어줘. draft만 써줘.",
+      "expected_output": "문제 제기(큰 이미지 문제) → 멀티스테이지 빌드 개념 → 완전한 Dockerfile 코드(주석 포함) → before/after 표 → 결론 구조.",
+      "files": []
+    }
+  ]
+}

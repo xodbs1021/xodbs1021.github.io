@@ -1,6 +1,6 @@
 {{- define "main" }}
 {{- $pages := .Pages }}
-{{- $pages = sort $pages "Params.weight" "desc" }}
+{{- $pages = sort $pages "Date" "desc" }}
 
 <header class="page-header">
   <h1>{{ .Title }}</h1>

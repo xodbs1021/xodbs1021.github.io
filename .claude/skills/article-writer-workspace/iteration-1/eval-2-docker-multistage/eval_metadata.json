@@ -1,0 +1,13 @@
+{
+  "eval_id": 2,
+  "eval_name": "docker-multistage-build",
+  "prompt": "Docker 멀티스테이지 빌드로 Node.js 이미지 크기를 1GB → 120MB로 줄인 과정 아티클로 정리해줘. 0-to-1 카테고리. 실제 Dockerfile 코드 있고, before/after 이미지 사이즈 비교 넣어줘. draft만 써줘.",
+  "assertions": [
+    {"id": "has-intro-hook", "description": "도입부에 큰 이미지 문제/배포 속도 문제 제기가 있는가"},
+    {"id": "has-complete-dockerfile", "description": "멀티스테이지 Dockerfile이 완전하게(FROM...COPY...RUN 모두) 포함되는가"},
+    {"id": "has-before-after", "description": "before/after 이미지 크기(숫자)가 명시되어 있는가 (1GB→120MB 수준)"},
+    {"id": "has-code-comments", "description": "Dockerfile의 핵심 라인에 주석이 달려 있는가"},
+    {"id": "has-conclusion", "description": "결론이 도입 문제(이미지 크기)에 직접 답하는가"},
+    {"id": "hugo-frontmatter", "description": "Hugo 프런트매터(title, date, categories, draft: false)가 있는가"}
+  ]
+}

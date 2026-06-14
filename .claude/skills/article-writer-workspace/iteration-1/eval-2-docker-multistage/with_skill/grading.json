@@ -1,0 +1,40 @@
+{
+  "eval_id": 2,
+  "eval_name": "docker-multistage-build",
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "도입부에 큰 이미지 문제/배포 속도 문제 제기가 있는가",
+      "passed": true,
+      "evidence": "'컨테이너 이미지가 커질수록 배포가 느려진다' + 보안 취약점 attack surface 언급 — 이중 문제 제기"
+    },
+    {
+      "text": "멀티스테이지 Dockerfile이 완전하게(FROM...COPY...RUN 모두) 포함되는가",
+      "passed": true,
+      "evidence": "builder 스테이지 + production 스테이지 완전 제공. 각 라인에 한국어 주석 달림"
+    },
+    {
+      "text": "before/after 이미지 크기(숫자)가 명시되어 있는가 (1GB→120MB 수준)",
+      "passed": true,
+      "evidence": "1.07GB → 119MB (-89%). docker image ls 출력 결과까지 포함"
+    },
+    {
+      "text": "Dockerfile의 핵심 라인에 주석이 달려 있는가",
+      "passed": true,
+      "evidence": "빌드 도구/USER node/COPY --from/npm ci --omit=dev 등 모든 핵심 라인에 한 줄 주석"
+    },
+    {
+      "text": "결론이 도입 문제(이미지 크기)에 직접 답하는가",
+      "passed": true,
+      "evidence": "'1.07GB → 119MB(89% 감소)' 명시 + 핵심 3가지(스테이지 분리·Alpine·캐시 정리) 정리"
+    },
+    {
+      "text": "Hugo 프런트매터(title, date, categories, draft: false)가 있는가",
+      "passed": false,
+      "evidence": "draft: false는 맞으나 date: 2026-06-11T10:00:00+09:00 — 임의의 시각, 현재 시각 아님"
+    }
+  ],
+  "pass_count": 5,
+  "total_count": 6,
+  "pass_rate": 0.833
+}

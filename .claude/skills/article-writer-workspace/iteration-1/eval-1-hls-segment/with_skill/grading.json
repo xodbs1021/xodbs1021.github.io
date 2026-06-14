@@ -1,0 +1,35 @@
+{
+  "eval_id": 1,
+  "eval_name": "hls-segment-tradeoff",
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "도입부에 HLS/스트리밍 현실 문제 또는 트렌드 제기가 있는가",
+      "passed": true,
+      "evidence": "'라이브 스트리밍 서비스를 처음 구성할 때, 흔히 넘어가는 설정값' — 실무 맥락의 훅"
+    },
+    {
+      "text": "세그먼트 크기 비교 표(Table)가 있는가",
+      "passed": true,
+      "evidence": "6개 지표(지연·재버퍼링·CDN 요청·캐시 히트율·CPU·적합 유형) 2초/6초/10초 비교 표"
+    },
+    {
+      "text": "지연시간, 버퍼링, CPU 등 구체적 수치가 있는가",
+      "passed": true,
+      "evidence": "7.2초/18초/38초 지연, 4.1/1.8/1.1회/분 재버퍼링, 300/100/60회 CDN 요청, 78/92/96% 캐시 히트율"
+    },
+    {
+      "text": "각 세그먼트 크기의 장단점이 모두 다뤄지는가",
+      "passed": true,
+      "evidence": "2초/6초/10초 각각 장점·단점·언제 쓸까 섹션 구성. GOP 정렬 심화 내용까지 포함"
+    },
+    {
+      "text": "Hugo 프런트매터(title, date, categories, draft: false)가 있는가",
+      "passed": false,
+      "evidence": "draft: true 로 설정됨. date도 2026-06-11T10:00:00+09:00 — 임의의 시각 사용, 현재 시각 아님"
+    }
+  ],
+  "pass_count": 4,
+  "total_count": 5,
+  "pass_rate": 0.8
+}

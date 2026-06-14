@@ -1,0 +1,40 @@
+{
+  "eval_id": 0,
+  "eval_name": "vllm-article",
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "도입부에 산업 트렌드/문제 제기가 있는가",
+      "passed": true,
+      "evidence": "'회사 서버에 LLM 추론 엔드포인트를 올려야 한다 — GPT API 비용·보안 이슈' 로 현실 문제 제기"
+    },
+    {
+      "text": "구체적 수치(tokens/s, 메모리 등)가 본문에 등장하는가",
+      "passed": true,
+      "evidence": "동시 요청별 처리량 표(54.3~502.1 tokens/s), TTFT 표, GPU 메모리 분포(GB), transformers 대비 7.6배 비교"
+    },
+    {
+      "text": "완전한 코드 블록(docker-compose or pip install + 실행 커맨드)이 있는가",
+      "passed": true,
+      "evidence": "pip 설치, 서버 구동 커맨드, docker-compose.yml(주석 포함), Python 동기·스트리밍 클라이언트, curl — 모두 복사-붙여넣기 가능"
+    },
+    {
+      "text": "공식 문서/출처 링크가 최소 1개 이상 있는가",
+      "passed": true,
+      "evidence": "vLLM 공식 문서, PagedAttention 논문(arXiv), GitHub, HuggingFace, Docker Hub — 5개"
+    },
+    {
+      "text": "article-style-checker 검토 결과가 출력에 포함되는가",
+      "passed": true,
+      "evidence": "style_check.md에 7/7 통과 상세 결과 있음"
+    },
+    {
+      "text": "Hugo 프런트매터(title, date, categories, draft: false)가 있는가",
+      "passed": true,
+      "evidence": "draft: false, categories: open-source-analysis, date: 2026-06-11T21:56:06+09:00 — 모두 정확"
+    }
+  ],
+  "pass_count": 6,
+  "total_count": 6,
+  "pass_rate": 1.0
+}

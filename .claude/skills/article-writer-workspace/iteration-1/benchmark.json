@@ -1,0 +1,178 @@
+{
+  "metadata": {
+    "skill_name": "article-writer",
+    "skill_path": "/Users/kty/tech-blog/.claude/skills/article-writer",
+    "executor_model": "claude-sonnet-4-6",
+    "analyzer_model": "claude-sonnet-4-6",
+    "timestamp": "2026-06-11T13:05:00Z",
+    "evals_run": [0, 1, 2],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "vllm-article",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 142.3,
+        "tokens": 23457,
+        "tool_calls": 10,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "도입부에 산업 트렌드/문제 제기가 있는가", "passed": true, "evidence": "'회사 서버에 LLM 추론 엔드포인트를 올려야 한다 — GPT API 비용·보안 이슈' 현실 문제 제기"},
+        {"text": "구체적 수치(tokens/s, 메모리 등)가 본문에 등장하는가", "passed": true, "evidence": "처리량 표 54.3~502.1 tokens/s, TTFT 표, GPU 메모리 분포, transformers 대비 7.6배"},
+        {"text": "완전한 코드 블록이 있는가", "passed": true, "evidence": "pip 설치, docker-compose.yml(주석 포함), Python 클라이언트, curl — 모두 복사-붙여넣기 가능"},
+        {"text": "공식 문서/출처 링크가 최소 1개 이상 있는가", "passed": true, "evidence": "5개 링크 (vLLM 공식, PagedAttention 논문, GitHub, HuggingFace, Docker Hub)"},
+        {"text": "article-style-checker 검토 결과가 포함되는가", "passed": true, "evidence": "style_check.md에 7/7 통과 상세 결과"},
+        {"text": "Hugo 프런트매터(title, date, categories, draft: false)가 있는가", "passed": true, "evidence": "draft: false, categories: open-source-analysis, date: 2026-06-11T21:56:06+09:00"}
+      ]
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "vllm-article",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 3,
+        "failed": 3,
+        "total": 6,
+        "time_seconds": 89.1,
+        "tokens": 15812,
+        "tool_calls": 5,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "도입부에 산업 트렌드/문제 제기가 있는가", "passed": true, "evidence": "'LLM을 프로덕션에 배포할 때 가장 먼저 맞닥뜨리는 문제는 추론 속도' 있음"},
+        {"text": "구체적 수치(tokens/s, 메모리 등)가 본문에 등장하는가", "passed": true, "evidence": "배치별 처리량 표, TTFT 표, VRAM 표 있음"},
+        {"text": "완전한 코드 블록이 있는가", "passed": false, "evidence": "docker run 커맨드만 있고 docker-compose.yml 없음. 코드 주석 미흡"},
+        {"text": "공식 문서/출처 링크가 최소 1개 이상 있는가", "passed": true, "evidence": "4개 링크 있음"},
+        {"text": "article-style-checker 검토 결과가 포함되는가", "passed": false, "evidence": "스타일 검토 미수행"},
+        {"text": "Hugo 프런트매터(title, date, categories, draft: false)가 있는가", "passed": false, "evidence": "draft: true. date가 자정 임의값"}
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "hls-segment-tradeoff",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.8,
+        "passed": 4,
+        "failed": 1,
+        "total": 5,
+        "time_seconds": 125.4,
+        "tokens": 20503,
+        "tool_calls": 6,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "도입부에 HLS/스트리밍 현실 문제 제기가 있는가", "passed": true, "evidence": "'라이브 스트리밍 서비스를 처음 구성할 때 흔히 넘어가는 설정값' — 실무 맥락 훅"},
+        {"text": "세그먼트 크기 비교 표(Table)가 있는가", "passed": true, "evidence": "6개 지표 2초/6초/10초 비교 표"},
+        {"text": "지연시간, 버퍼링, CPU 등 구체적 수치가 있는가", "passed": true, "evidence": "7.2/18/38초 지연, 4.1/1.8/1.1회/분 재버퍼링, 300/100/60회 CDN 요청"},
+        {"text": "각 세그먼트 크기의 장단점이 모두 다뤄지는가", "passed": true, "evidence": "2초/6초/10초 각각 장점·단점·언제 쓸까 섹션. GOP 정렬 심화까지"},
+        {"text": "Hugo 프런트매터(title, date, categories, draft: false)가 있는가", "passed": false, "evidence": "draft: true. date가 임의의 T10:00:00 값"}
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "hls-segment-tradeoff",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5,
+        "time_seconds": 77.1,
+        "tokens": 15142,
+        "tool_calls": 7,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "도입부에 HLS/스트리밍 현실 문제 제기가 있는가", "passed": false, "evidence": "개념 설명으로 바로 시작 — 훅 없음"},
+        {"text": "세그먼트 크기 비교 표(Table)가 있는가", "passed": false, "evidence": "비교 표 없음. 수치가 각 섹션에 산재"},
+        {"text": "지연시간, 버퍼링, CPU 등 구체적 수치가 있는가", "passed": true, "evidence": "8~12초/18~25초/30~45초 지연, Origin 요청 수 등"},
+        {"text": "각 세그먼트 크기의 장단점이 모두 다뤄지는가", "passed": true, "evidence": "각 세그먼트별 장단점과 용도별 권장값 포함"},
+        {"text": "Hugo 프런트매터(title, date, categories, draft: false)가 있는가", "passed": false, "evidence": "draft: true"}
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "docker-multistage-build",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.833,
+        "passed": 5,
+        "failed": 1,
+        "total": 6,
+        "time_seconds": 119.5,
+        "tokens": 20475,
+        "tool_calls": 7,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "도입부에 큰 이미지 문제/배포 속도 문제 제기가 있는가", "passed": true, "evidence": "'컨테이너 이미지가 커질수록 배포가 느려진다' + 보안 취약점 attack surface 이중 문제 제기"},
+        {"text": "멀티스테이지 Dockerfile이 완전하게 포함되는가", "passed": true, "evidence": "builder + production 스테이지 완전 제공, 각 라인 한국어 주석"},
+        {"text": "before/after 이미지 크기(숫자)가 명시되어 있는가", "passed": true, "evidence": "1.07GB → 119MB (-89%). docker image ls 출력까지 포함"},
+        {"text": "Dockerfile의 핵심 라인에 주석이 달려 있는가", "passed": true, "evidence": "USER node, COPY --from, npm ci --omit=dev 등 핵심 라인 전부 주석"},
+        {"text": "결론이 도입 문제에 직접 답하는가", "passed": true, "evidence": "'1.07GB → 119MB(89% 감소)' + 핵심 3가지 정리"},
+        {"text": "Hugo 프런트매터(title, date, categories, draft: false)가 있는가", "passed": false, "evidence": "draft: false는 맞으나 date가 T10:00:00 임의값"}
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "docker-multistage-build",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.667,
+        "passed": 4,
+        "failed": 2,
+        "total": 6,
+        "time_seconds": 62.8,
+        "tokens": 12512,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "도입부에 큰 이미지 문제/배포 속도 문제 제기가 있는가", "passed": true, "evidence": "문제 진단 섹션 존재"},
+        {"text": "멀티스테이지 Dockerfile이 완전하게 포함되는가", "passed": true, "evidence": "3단계 Dockerfile 코드 포함"},
+        {"text": "before/after 이미지 크기(숫자)가 명시되어 있는가", "passed": true, "evidence": "1.1GB → 120MB, 단계별 중간 수치(580MB, 220MB)까지"},
+        {"text": "Dockerfile의 핵심 라인에 주석이 달려 있는가", "passed": false, "evidence": "코드 블록은 있으나 주석 유무 불명확"},
+        {"text": "결론이 도입 문제에 직접 답하는가", "passed": true, "evidence": "결론 있음"},
+        {"text": "Hugo 프런트매터(title, date, categories, draft: false)가 있는가", "passed": false, "evidence": "프런트매터 상태 불명확"}
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {"mean": 0.878, "stddev": 0.107, "min": 0.8, "max": 1.0},
+      "time_seconds": {"mean": 129.1, "stddev": 11.8, "min": 119.5, "max": 142.3},
+      "tokens": {"mean": 21478, "stddev": 1714, "min": 20475, "max": 23457}
+    },
+    "without_skill": {
+      "pass_rate": {"mean": 0.522, "stddev": 0.135, "min": 0.4, "max": 0.667},
+      "time_seconds": {"mean": 76.3, "stddev": 13.2, "min": 62.8, "max": 89.1},
+      "tokens": {"mean": 14489, "stddev": 1744, "min": 12512, "max": 15812}
+    },
+    "delta": {
+      "pass_rate": "+0.356",
+      "time_seconds": "+52.8",
+      "tokens": "+6989"
+    }
+  },
+  "notes": [
+    "공통 미통과: Hugo date를 실제 명령 실행 없이 임의값으로 설정 (with/without 공통)",
+    "with_skill 차별점: style-checker 검토 자동 수행, 코드 주석 일관성, 비교 표 생성",
+    "time 비용: with_skill +52.8초 — style-checker 단계 포함 감안 시 합리적 트레이드오프",
+    "draft: false 강제 명시 개선 필요 — SKILL.md에서 더 강하게 요청해야 함"
+  ]
+}

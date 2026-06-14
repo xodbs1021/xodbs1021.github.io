@@ -1,10 +1,13 @@
 {
   "last_updated": "2026-05-30",
-  "current_topic": "2-2",
-  "completed": [],
+  "current_topic": "2-4",
+  "completed": ["2-2"],
   "notes": {
     "skip": "레벨 1 (기초 개념)은 나중에 순서대로 돌아와서 채울 예정",
-    "today": "과제: HLS(2-2) + LL-HLS(2-4)"
+    "2-2": "HLS - TCP/HTTP 기반, 세그먼트+m3u8 구조, ABR, 라이브 CDN 캐시 원리, HoL Blocking, QUIC, OBS→치지직 파이프라인, HiPick 로컬 프록시 설계까지",
+    "2-4-status": "강의 완료, 퀴즈 미완료",
+    "2-4": "LL-HLS - Partial Segment, Blocking Playlist Reload, Preload Hint, .fmp4 필수 이유, 하위 호환, CDN 지원 문제, LL-HLS vs WebRTC 트레이드오프",
+    "2-4-notes-file": "_workspace/session_notes/2026-05-30-ll-hls.md"
   },
   "learner_profile": {
     "level": "완전 초보자",

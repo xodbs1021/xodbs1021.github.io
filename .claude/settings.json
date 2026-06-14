@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 15,
+            "command": "REPO=/Users/kty/tech-blog; CHANGED=$(git -C $REPO diff HEAD~1 HEAD --name-only 2>/dev/null | grep '^content/posts/.*\\.md$'); if [ -z \"$CHANGED\" ]; then exit 0; fi; OUT=\"=== 블로그 포스트 검증 ===\"; while IFS= read -r f; do FULL=\"$REPO/$f\"; OUT=\"$OUT\\n\\n--- $f ---\"; OUT=\"$OUT\\n$(grep -E '^(title:|date:|draft:|##)' $FULL 2>/dev/null | head -10)\"; IMGS=$(grep -oE '!\\[[^]]*\\]\\(/images/[^)]+\\)' $FULL 2>/dev/null | grep -oE '/images/[^)]+'); if [ -n \"$IMGS\" ]; then OUT=\"$OUT\\n[이미지 검증]\"; while IFS= read -r img; do [ -z \"$img\" ] && continue; IMGFILE=\"$REPO/static$img\"; if [ ! -f \"$IMGFILE\" ]; then OUT=\"$OUT\\n❌ 없음: $img\"; else SIZE=$(wc -c < $IMGFILE); OUT=\"$OUT\\n✅ $img (${SIZE} bytes)\"; fi; done <<< \"$IMGS\"; fi; done <<< \"$CHANGED\"; printf \"$OUT\\n\" | jq -Rs '{systemMessage: .}'"
+          }
+        ]
+      }
+    ]
+  }
+}

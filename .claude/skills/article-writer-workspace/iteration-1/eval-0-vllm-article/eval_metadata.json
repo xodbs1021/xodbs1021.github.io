@@ -1,0 +1,13 @@
+{
+  "eval_id": 0,
+  "eval_name": "vllm-article",
+  "prompt": "vLLM으로 LLM 추론 서버 세팅하는 방법 아티클 써줘. open-source-analysis 카테고리. 직접 로컬에서 테스트해봤고 RTX 4090 기준 벤치마크 수치 있어. 발행은 안 해도 되고 draft.md만 만들어줘.",
+  "assertions": [
+    {"id": "has-intro-hook", "description": "도입부에 산업 트렌드/문제 제기가 있는가"},
+    {"id": "has-concrete-metrics", "description": "구체적 수치(tokens/s, 메모리 등)가 본문에 등장하는가"},
+    {"id": "has-complete-code", "description": "완전한 코드 블록(docker-compose or pip install + 실행 커맨드)이 있는가"},
+    {"id": "has-source-links", "description": "공식 문서/출처 링크가 최소 1개 이상 있는가"},
+    {"id": "style-check-run", "description": "article-style-checker 검토 결과가 출력에 포함되는가"},
+    {"id": "hugo-frontmatter", "description": "Hugo 프런트매터(title, date, categories, draft: false)가 있는가"}
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "eval_id": 0,
+  "eval_name": "vllm-article",
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "도입부에 산업 트렌드/문제 제기가 있는가",
+      "passed": true,
+      "evidence": "'LLM을 프로덕션에 배포할 때 가장 먼저 맞닥뜨리는 문제는 추론 속도'로 도입 있음"
+    },
+    {
+      "text": "구체적 수치(tokens/s, 메모리 등)가 본문에 등장하는가",
+      "passed": true,
+      "evidence": "배치별 처리량 표(1,820~23,800 tokens/sec), TTFT 표, VRAM 사용량 표 있음"
+    },
+    {
+      "text": "완전한 코드 블록(docker-compose or pip install + 실행 커맨드)이 있는가",
+      "passed": false,
+      "evidence": "docker run 커맨드 있으나 docker-compose.yml 없음. 코드 주석 거의 없음. pip 설치 코드는 있으나 CUDA 버전별 분기 안내 없음"
+    },
+    {
+      "text": "공식 문서/출처 링크가 최소 1개 이상 있는가",
+      "passed": true,
+      "evidence": "vLLM 공식 문서, PagedAttention 논문, GitHub, 벤치마크 스크립트 — 4개"
+    },
+    {
+      "text": "article-style-checker 검토 결과가 출력에 포함되는가",
+      "passed": false,
+      "evidence": "style_check.md 없음. 스타일 검토 수행하지 않음"
+    },
+    {
+      "text": "Hugo 프런트매터(title, date, categories, draft: false)가 있는가",
+      "passed": false,
+      "evidence": "draft: true 로 설정됨. date가 2026-06-11T00:00:00+09:00으로 실제 시각이 아닌 자정 값"
+    }
+  ],
+  "pass_count": 3,
+  "total_count": 6,
+  "pass_rate": 0.5
+}

@@ -1,0 +1,22 @@
+[
+  {"query": "vLLM 추론 서버 세팅 아티클 써줘. RTX 4090 기준 벤치마크 수치 있고 open-source-analysis 카테고리로 올려줘", "should_trigger": true},
+  {"query": "HLS 세그먼트 크기 트레이드오프 Medium 스타일로 작성해줘. 2초/6초/10초 각각 실측 데이터 넣어서", "should_trigger": true},
+  {"query": "Docker 멀티스테이지 빌드 심층 분석 아티클 만들어줘. before/after 수치랑 완전한 Dockerfile 코드 포함해서", "should_trigger": true},
+  {"query": "오늘 WebRTC TURN 서버 공부했는데 제대로 된 기술 글로 정리해줘. 직접 구현해봤고 코드랑 수치 다 있어", "should_trigger": true},
+  {"query": "Kafka 컨슈머 그룹 리밸런싱 동작 원리 아티클로 써줘. 개념 설명부터 실제 코드 예시까지 깊이 있게", "should_trigger": true},
+  {"query": "Redis 클러스터 vs 센티넬 비교 아티클 작성해. 벤치마크 표랑 언제 뭘 써야 하는지 판단 기준 포함해서", "should_trigger": true},
+  {"query": "nginx rate limiting 설정하는 법 기술 아티클로 올려줘. config 파일 완전하게 주석 달아서", "should_trigger": true},
+  {"query": "FFmpeg HLS 패키징 과정 분석한 거 블로그에 올려줘. 직접 측정한 CPU/메모리 수치 있어", "should_trigger": true},
+  {"query": "오늘 공부한 TCP 혼잡 제어 알고리즘 블로그 써줘. tech-blurting으로", "should_trigger": false},
+  {"query": "이번 주 알고리즘 문제 풀이 정리해서 올려줘. 코딩테스트 카테고리로", "should_trigger": false},
+  {"query": "클린 아키텍처 읽었는데 독후감 써줘", "should_trigger": false},
+  {"query": "HLS가 뭔지 설명해줘", "should_trigger": false},
+  {"query": "vLLM 공식 문서 링크 알려줘", "should_trigger": false},
+  {"query": "지난번에 쓴 Kafka 글 draft 상태 확인해줘", "should_trigger": false},
+  {"query": "블로그에 올린 글 목록 보여줘", "should_trigger": false},
+  {"query": "WebRTC 공부 커리큘럼 짜줘", "should_trigger": false},
+  {"query": "streaming-tutor로 HLS 배우고 싶어", "should_trigger": false},
+  {"query": "Kubernetes pod 스케줄링 개념 빠르게 설명해줘. 기술 블로그에 올릴지는 모르겠는데 일단 이해부터", "should_trigger": false},
+  {"query": "FastAPI랑 Django 어떤 거 더 나아? 아티클로 비교 정리해서 블로그에 올려줘", "should_trigger": true},
+  {"query": "내가 만든 스트리밍 서버 구축기 0-to-1 카테고리로 올려줘. 트러블슈팅 과정이랑 최종 아키텍처 다이어그램 있어", "should_trigger": true}
+]

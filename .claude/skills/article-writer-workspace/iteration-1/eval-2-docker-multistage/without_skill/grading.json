@@ -1,0 +1,40 @@
+{
+  "eval_id": 2,
+  "eval_name": "docker-multistage-build",
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "도입부에 큰 이미지 문제/배포 속도 문제 제기가 있는가",
+      "passed": true,
+      "evidence": "결과 요약에 '문제 진단' 섹션 존재 — 배포 속도 문제 제기 있음"
+    },
+    {
+      "text": "멀티스테이지 Dockerfile이 완전하게(FROM...COPY...RUN 모두) 포함되는가",
+      "passed": true,
+      "evidence": "3단계 적용 과정(스테이지 분리→Alpine→최적화) 각각의 코드 포함"
+    },
+    {
+      "text": "before/after 이미지 크기(숫자)가 명시되어 있는가 (1GB→120MB 수준)",
+      "passed": true,
+      "evidence": "1.1GB → 120MB, 단계별 중간 수치(580MB, 220MB)까지 포함"
+    },
+    {
+      "text": "Dockerfile의 핵심 라인에 주석이 달려 있는가",
+      "passed": false,
+      "evidence": "결과 요약에 주석 언급 없음. 코드 블록은 있으나 주석 유무 불명확"
+    },
+    {
+      "text": "결론이 도입 문제(이미지 크기)에 직접 답하는가",
+      "passed": true,
+      "evidence": "결과 요약에 'Alpine native addon 이슈, .dockerignore 설정' 추가 실용 정보 포함 — 결론 있음으로 판단"
+    },
+    {
+      "text": "Hugo 프런트매터(title, date, categories, draft: false)가 있는가",
+      "passed": false,
+      "evidence": "결과 요약에 'Hugo front matter' 명시적 언급 없음. draft 상태 불명확"
+    }
+  ],
+  "pass_count": 4,
+  "total_count": 6,
+  "pass_rate": 0.667
+}
