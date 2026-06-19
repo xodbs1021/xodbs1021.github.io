@@ -1,0 +1,42 @@
+<aside class="search-sidebar">
+  <input type="search" id="search-input" placeholder="검색어 입력..." autocomplete="off">
+  <div id="search-results" class="search-results"></div>
+</aside>
+
+<script>
+(function() {
+  const input = document.getElementById('search-input');
+  const results = document.getElementById('search-results');
+  let fuse = null;
+
+  fetch('{{ "index.json" | absURL }}')
+    .then(r => r.json())
+    .then(data => {
+      fuse = new Fuse(data, {
+        keys: ['title', 'content', 'summary'],
+        threshold: 0.4,
+        distance: 1000,
+        minMatchCharLength: 1,
+        includeMatches: false,
+      });
+    });
+
+  function render(matches, query) {
+    if (!query) { results.innerHTML = ''; return; }
+    if (!matches.length) {
+      results.innerHTML = '<div class="no-results">결과 없음</div>';
+      return;
+    }
+    results.innerHTML = matches.slice(0, 15).map(m => {
+      const item = m.item || m;
+      return `<a href="${item.permalink}">${item.title}</a>`;
+    }).join('');
+  }
+
+  input.addEventListener('input', e => {
+    const q = e.target.value.trim();
+    if (!fuse || !q) { results.innerHTML = ''; return; }
+    render(fuse.search(q), q);
+  });
+})();
+</script>
