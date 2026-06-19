@@ -5,14 +5,41 @@
 <script src="/pagefind/pagefind-ui.js" defer></script>
 
 <style>
-/* 1. 헤더 상단 네비게이션 메뉴 제거 */
+/* ============================================
+   1. 헤더 — 블로그 제목 좌측 벽 밀착 (전체 페이지 공통)
+   ============================================ */
+.header {
+  max-width: 100% !important;
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.header-nav {
+  max-width: 100% !important;
+  padding-left: 0.8rem !important;
+  padding-right: 1rem !important;
+  width: 100% !important;
+  box-sizing: border-box;
+}
+.logo {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+.logo a {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* 상단 네비게이션 메뉴 제거 */
 #menu,
 ul#menu,
 nav.nav #menu {
   display: none !important;
 }
 
-/* 2. 메인 컨테이너 max-width 풀기 */
+/* ============================================
+   2. 메인 컨테이너 max-width 풀기
+   ============================================ */
 .main {
   max-width: 100% !important;
   padding-left: 0 !important;
@@ -20,7 +47,9 @@ nav.nav #menu {
   width: 100% !important;
 }
 
-/* 3. 3단 그리드 — position: relative + z-index 명확 */
+/* ============================================
+   3. 3단 그리드 — 기본 (홈 / 카테고리) 비율 유지
+   ============================================ */
 .layout-three-col {
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr) 320px;
@@ -31,8 +60,6 @@ nav.nav #menu {
   box-sizing: border-box;
   position: relative;
 }
-
-/* 중앙 메인 컬럼 — 사이드바보다 낮은 stack level, 클릭 차단 안 함 */
 .layout-three-col .main-column {
   min-width: 0;
   max-width: 920px;
@@ -42,7 +69,38 @@ nav.nav #menu {
   z-index: 1;
 }
 
-/* 4. 좌측 카테고리 사이드바 — 클릭 가능 보장 */
+/* ============================================
+   3-1. Single 페이지 전용 — 좌측 축소 / 중앙 확장 / 우측 유지
+   ============================================ */
+.layout-three-col.single {
+  grid-template-columns: 150px minmax(0, 1fr) 320px;
+  gap: 1.5rem;
+}
+.layout-three-col.single .main-column {
+  max-width: none;
+  margin: 0;
+}
+.layout-three-col.single .single-column .post-single {
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+/* 이미지가 원본 비율로 시원하게 보이도록 */
+.layout-three-col.single .post-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1.5rem auto;
+  border-radius: 6px;
+}
+.layout-three-col.single .post-content pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* ============================================
+   4. 좌측 카테고리 사이드바
+   ============================================ */
 .cat-sidebar {
   position: sticky;
   top: 80px;
@@ -87,7 +145,18 @@ nav.nav #menu {
   font-weight: 600;
 }
 
-/* 5. 우측 검색 사이드바 — 결과 드롭다운 보호 */
+/* Single 페이지의 좁아진 좌측 — 폰트/패딩 살짝 축소 */
+.layout-three-col.single .cat-sidebar a {
+  padding: 0.45rem 0.55rem;
+  font-size: 13px;
+}
+.layout-three-col.single .cat-sidebar h3 {
+  font-size: 10px;
+}
+
+/* ============================================
+   5. 우측 검색 사이드바
+   ============================================ */
 .search-sidebar {
   position: sticky;
   top: 80px;
@@ -118,7 +187,9 @@ nav.nav #menu {
   border-bottom: 1px solid var(--border);
 }
 
-/* 6. 중앙 페이지 타이틀 */
+/* ============================================
+   6. 중앙 페이지 타이틀
+   ============================================ */
 .main-column .page-header.center-title {
   margin: 0.5rem 0 2rem 0;
   padding: 0 0 1.2rem 0;
@@ -134,30 +205,9 @@ nav.nav #menu {
   color: var(--primary);
 }
 
-/* 7. 개별 글(single page) — 본문 읽기 좋게 760px 제한 */
-.single-column {
-  max-width: 100% !important;
-}
-.single-column .post-single {
-  max-width: 760px;
-  margin: 0 auto;
-  width: 100%;
-}
-.single-column .post-content {
-  font-size: 1rem;
-  line-height: 1.75;
-}
-.single-column .post-content img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 6px;
-}
-.single-column .post-content pre {
-  max-width: 100%;
-  overflow-x: auto;
-}
-
-/* 8. 빈 상태 — 영역 폭 안에서만 */
+/* ============================================
+   7. 빈 상태 / 404
+   ============================================ */
 .empty-state {
   text-align: center;
   padding: 4rem 1rem;
@@ -167,8 +217,6 @@ nav.nav #menu {
   border-radius: 8px;
   max-width: 100%;
 }
-
-/* 9. 404 페이지 */
 .not-found {
   text-align: center;
   padding: 4rem 1rem;
@@ -201,7 +249,9 @@ nav.nav #menu {
   background: var(--tertiary);
 }
 
-/* 10. 더 보기 버튼 */
+/* ============================================
+   8. 더 보기 버튼
+   ============================================ */
 .more-wrap {
   text-align: center;
   margin: 2rem 0;
@@ -220,7 +270,9 @@ nav.nav #menu {
   background: var(--tertiary);
 }
 
-/* 11. 분류 목록 */
+/* ============================================
+   9. 분류 목록 (taxonomy)
+   ============================================ */
 .taxonomy-list {
   list-style: none;
   padding: 0;
@@ -241,15 +293,21 @@ nav.nav #menu {
   margin-left: 0.5rem;
 }
 
-/* 12. 반응형 */
+/* ============================================
+   10. 반응형
+   ============================================ */
 @media (max-width: 1200px) {
   .layout-three-col {
     grid-template-columns: 200px minmax(0, 1fr) 280px;
     gap: 1.5rem;
   }
+  .layout-three-col.single {
+    grid-template-columns: 140px minmax(0, 1fr) 280px;
+  }
 }
 @media (max-width: 1000px) {
-  .layout-three-col {
+  .layout-three-col,
+  .layout-three-col.single {
     grid-template-columns: 180px minmax(0, 1fr);
     grid-template-areas:
       "search search"
@@ -265,7 +323,8 @@ nav.nav #menu {
   }
 }
 @media (max-width: 700px) {
-  .layout-three-col {
+  .layout-three-col,
+  .layout-three-col.single {
     grid-template-columns: 1fr;
     grid-template-areas:
       "search"
