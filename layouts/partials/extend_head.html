@@ -5,20 +5,47 @@
 <script src="/pagefind/pagefind-ui.js" defer></script>
 
 <style>
+/* 1. 헤더 상단 네비게이션 메뉴 제거 */
+#menu,
+ul#menu,
+nav.nav #menu {
+  display: none !important;
+}
+
+/* 2. PaperMod 메인 컨테이너의 max-width 풀기 (viewport 전체 활용) */
+.main {
+  max-width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  width: 100% !important;
+}
+
+/* 3. 3단 그리드: 좌(카테고리) | 중앙(글) | 우(검색) */
 .layout-three-col {
   display: grid;
-  grid-template-columns: 200px 1fr 280px;
+  grid-template-columns: 220px minmax(0, 1fr) 320px;
   gap: 2rem;
+  padding: 0 1.5rem;
   align-items: start;
+  width: 100%;
+  box-sizing: border-box;
 }
 .layout-three-col .main-column {
   min-width: 0;
+  /* 중앙 글 박스 시인성 극대화 */
+  max-width: 920px;
+  margin: 0 auto;
+  width: 100%;
 }
 
+/* 4. 좌측 카테고리 사이드바 — 화면 왼쪽 벽 밀착 */
 .cat-sidebar {
   position: sticky;
   top: 80px;
-  padding-top: 0.4rem;
+  align-self: start;
+  padding: 0.4rem 0 0 0.5rem;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
 }
 .cat-sidebar h3 {
   font-size: 11px;
@@ -38,7 +65,7 @@
 }
 .cat-sidebar a {
   display: block;
-  padding: 0.5rem 0.7rem;
+  padding: 0.55rem 0.75rem;
   border-radius: 6px;
   color: var(--primary);
   text-decoration: none;
@@ -53,9 +80,18 @@
   font-weight: 600;
 }
 
+/* 5. 우측 검색 사이드바 — 화면 오른쪽 벽 밀착 + 결과 드롭다운 보호 */
 .search-sidebar {
   position: sticky;
   top: 80px;
+  align-self: start;
+  padding: 0.4rem 0.5rem 0 0;
+  z-index: 50;
+  /* 검색 결과가 길어지면 사이드바 안에서 스크롤 */
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  /* 결과 드롭다운이 다른 콘텐츠 위로 떠 보이게 */
+  isolation: isolate;
 }
 .search-sidebar .pagefind-ui {
   --pagefind-ui-scale: 0.8;
@@ -68,24 +104,51 @@
   --pagefind-ui-border-radius: 6px;
   --pagefind-ui-font: inherit;
 }
+/* 검색 결과 영역 z-index 보호 (오른쪽 끝에서 잘리지 않도록) */
+.search-sidebar .pagefind-ui__results-area {
+  position: relative;
+  z-index: 51;
+}
+.search-sidebar .pagefind-ui__result {
+  border-bottom: 1px solid var(--border);
+}
 
-@media (max-width: 1100px) {
+/* 6. 반응형 — 좁은 화면 대응 */
+@media (max-width: 1200px) {
   .layout-three-col {
-    grid-template-columns: 180px 1fr;
-  }
-  .search-sidebar {
-    grid-column: 1 / -1;
-    position: static;
-    margin-bottom: 1.5rem;
-    order: -1;
+    grid-template-columns: 200px minmax(0, 1fr) 280px;
+    gap: 1.5rem;
   }
 }
-@media (max-width: 768px) {
+@media (max-width: 1000px) {
+  .layout-three-col {
+    grid-template-columns: 180px minmax(0, 1fr);
+    grid-template-areas:
+      "search search"
+      "cat main";
+  }
+  .cat-sidebar { grid-area: cat; }
+  .main-column { grid-area: main; }
+  .search-sidebar {
+    grid-area: search;
+    position: static;
+    max-height: none;
+    margin-bottom: 1rem;
+  }
+}
+@media (max-width: 700px) {
   .layout-three-col {
     grid-template-columns: 1fr;
+    grid-template-areas:
+      "search"
+      "cat"
+      "main";
+    padding: 0 1rem;
   }
   .cat-sidebar {
     position: static;
+    max-height: none;
+    padding: 0;
   }
 }
 </style>
