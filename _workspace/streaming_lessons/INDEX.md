@@ -101,8 +101,44 @@
 - [2강: 코덱 트랜스코딩 비용 — 실무 계산](3-6-2.md)
 - [3강: 코덱 진단과 디버깅 — 실전 문제 해결](3-6-3.md)
 
+## 레벨 4: 트랜스코딩
+
+### 4-1. FFmpeg 기초
+- [1강: FFmpeg의 정체 — 파이프라인으로 이해하기](4-1-1.md)
+- [2강: 입력/출력 옵션 — 컨테이너와 스트림 다루기](4-1-2.md)
+- [3강: 비디오 인코딩 옵션 — preset, CRF, 비트레이트 제어](4-1-3.md)
+- [4강: 오디오 처리와 필터 그래프](4-1-4.md)
+- [5강: HLS / DASH 패키징](4-1-5.md)
+
+### 4-2. ABR Ladder 설계
+- [1강: ABR Ladder 기본 원리와 표준 사다리](4-2-1.md)
+- [2강: Per-Title Encoding — Netflix의 비용 혁명](4-2-2.md)
+- [3강: ABR Ladder 실전 구성 — FFmpeg과 Shaka Packager](4-2-3.md)
+- [4강: ABR 운영 — 비용 최적화와 화질 모니터링](4-2-4.md)
+
+### 4-3. NVENC / GPU 트랜스코딩
+- [1강: NVENC가 왜 필요한가 — x264로는 안 되는 이유](4-3-1.md)
+- [2강: NVENC 옵션 깊이 — 화질을 짜내는 튜닝](4-3-2.md)
+- [3강: NVENC 외 하드웨어 인코더 — QSV, AMF, VideoToolbox](4-3-3.md)
+- [4강: GPU 트랜스코딩 인프라 설계](4-3-4.md)
+
+### 4-4. CMAF 심화
+- [1강: CMAF가 왜 만들어졌나 — HLS/DASH의 분열을 끝내려는 시도](4-4-1.md)
+- [2강: fMP4 박스 구조 깊이 분석](4-4-2.md)
+- [3강: Chunked CMAF — 저지연 라이브의 기반](4-4-3.md)
+- [4강: CMAF 실전 — DRM, 광고 삽입, 운영](4-4-4.md)
+
+### 4-5. 트랜스코딩 인프라 운영
+- [1강: 트랜스코딩 클러스터 아키텍처 — 전체 그림](4-5-1.md)
+- [2강: 트랜스코딩 스케줄러와 큐 시스템](4-5-2.md)
+- [3강: 장애 처리와 자동 복구](4-5-3.md)
+- [4강: 비용 최적화 종합 — 라이브 인프라의 진짜 ROI](4-5-4.md)
+
 ## 다음 진행 예정
-- 레벨 4 (트랜스코딩): FFmpeg, ABR ladder, NVENC, CMAF
+- 레벨 5 (플레이어): video.js, hls.js, Shaka Player
+- 레벨 6 (관리형 SDK): AWS IVS, LiveKit, Agora
+- 레벨 7 (심화): WebRTC ICE/STUN/TURN, 미디어 서버
+- 레벨 8 (AI + 스트리밍): 하이라이트 감지, 채팅 분석
 - 레벨 5 (플레이어): video.js, hls.js, Shaka Player
 - 레벨 6 (관리형 SDK): AWS IVS, LiveKit, Agora
 - 레벨 7 (심화): WebRTC ICE/STUN/TURN, 미디어 서버
