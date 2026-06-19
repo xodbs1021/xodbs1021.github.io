@@ -44,6 +44,14 @@ jobs:
       - name: Build Hugo
         run: hugo --minify
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Pagefind
+        run: npx -y pagefind --site public
+
       - name: Commit post and deploy
         run: |
           git config user.name "github-actions[bot]"

@@ -1,42 +1,29 @@
 <aside class="search-sidebar">
-  <input type="search" id="search-input" placeholder="검색어 입력..." autocomplete="off">
-  <div id="search-results" class="search-results"></div>
+  <div id="search"></div>
 </aside>
 
 <script>
-(function() {
-  const input = document.getElementById('search-input');
-  const results = document.getElementById('search-results');
-  let fuse = null;
-
-  fetch('{{ "index.json" | absURL }}')
-    .then(r => r.json())
-    .then(data => {
-      fuse = new Fuse(data, {
-        keys: ['title', 'content', 'summary'],
-        threshold: 0.4,
-        distance: 1000,
-        minMatchCharLength: 1,
-        includeMatches: false,
-      });
-    });
-
-  function render(matches, query) {
-    if (!query) { results.innerHTML = ''; return; }
-    if (!matches.length) {
-      results.innerHTML = '<div class="no-results">결과 없음</div>';
-      return;
+window.addEventListener('DOMContentLoaded', () => {
+  if (typeof PagefindUI === 'undefined') return;
+  new PagefindUI({
+    element: "#search",
+    showSubResults: false,
+    showImages: false,
+    resetStyles: false,
+    placeholder: "검색...",
+    translations: {
+      placeholder: "검색...",
+      clear_search: "지우기",
+      load_more: "더 보기",
+      search_label: "검색",
+      filters_label: "필터",
+      zero_results: "결과 없음: [SEARCH_TERM]",
+      many_results: "[COUNT]개 결과: [SEARCH_TERM]",
+      one_result: "1개 결과: [SEARCH_TERM]",
+      alt_search: "결과 없음: [SEARCH_TERM]. 다음 결과 표시: [DIFFERENT_TERM]",
+      search_suggestion: "결과 없음: [SEARCH_TERM]. 다음 시도: [DIFFERENT_TERM]",
+      searching: "검색 중: [SEARCH_TERM]..."
     }
-    results.innerHTML = matches.slice(0, 15).map(m => {
-      const item = m.item || m;
-      return `<a href="${item.permalink}">${item.title}</a>`;
-    }).join('');
-  }
-
-  input.addEventListener('input', e => {
-    const q = e.target.value.trim();
-    if (!fuse || !q) { results.innerHTML = ''; return; }
-    render(fuse.search(q), q);
   });
-})();
+});
 </script>

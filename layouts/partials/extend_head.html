@@ -1,71 +1,91 @@
 <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
 <script>mermaid.initialize({startOnLoad:true, theme:'default'});</script>
-<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
+
+<link href="/pagefind/pagefind-ui.css" rel="stylesheet">
+<script src="/pagefind/pagefind-ui.js" defer></script>
 
 <style>
-.layout-with-search {
+.layout-three-col {
   display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: 2.5rem;
+  grid-template-columns: 200px 1fr 280px;
+  gap: 2rem;
   align-items: start;
 }
-.layout-with-search .main-column {
+.layout-three-col .main-column {
   min-width: 0;
 }
+
+.cat-sidebar {
+  position: sticky;
+  top: 80px;
+  padding-top: 0.4rem;
+}
+.cat-sidebar h3 {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--secondary);
+  margin: 0 0 0.8rem 0;
+}
+.cat-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.cat-sidebar li {
+  margin-bottom: 0.3rem;
+}
+.cat-sidebar a {
+  display: block;
+  padding: 0.5rem 0.7rem;
+  border-radius: 6px;
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 14px;
+  transition: background 0.15s;
+}
+.cat-sidebar a:hover {
+  background: var(--code-bg);
+}
+.cat-sidebar a.active {
+  background: var(--code-bg);
+  font-weight: 600;
+}
+
 .search-sidebar {
   position: sticky;
   top: 80px;
 }
-.search-sidebar input {
-  width: 100%;
-  padding: 0.6rem 0.8rem;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--code-bg);
-  color: var(--primary);
-  font-size: 14px;
-  box-sizing: border-box;
+.search-sidebar .pagefind-ui {
+  --pagefind-ui-scale: 0.8;
+  --pagefind-ui-primary: var(--primary);
+  --pagefind-ui-text: var(--primary);
+  --pagefind-ui-background: var(--theme);
+  --pagefind-ui-border: var(--border);
+  --pagefind-ui-tag: var(--code-bg);
+  --pagefind-ui-border-width: 1px;
+  --pagefind-ui-border-radius: 6px;
+  --pagefind-ui-font: inherit;
 }
-.search-sidebar input:focus {
-  outline: none;
-  border-color: var(--primary);
-}
-.search-results {
-  margin-top: 0.8rem;
-  max-height: 70vh;
-  overflow-y: auto;
-}
-.search-results a {
-  display: block;
-  padding: 0.6rem 0.8rem;
-  margin-bottom: 0.4rem;
-  border-radius: 6px;
-  background: var(--code-bg);
-  color: var(--primary);
-  text-decoration: none;
-  font-size: 13px;
-  line-height: 1.4;
-  transition: background 0.15s;
-}
-.search-results a:hover {
-  background: var(--tertiary);
-}
-.search-results .no-results {
-  padding: 0.6rem 0.8rem;
-  color: var(--secondary);
-  font-size: 13px;
-}
-@media (max-width: 900px) {
-  .layout-with-search {
-    grid-template-columns: 1fr;
+
+@media (max-width: 1100px) {
+  .layout-three-col {
+    grid-template-columns: 180px 1fr;
   }
   .search-sidebar {
+    grid-column: 1 / -1;
     position: static;
-    order: -1;
     margin-bottom: 1.5rem;
+    order: -1;
   }
-  .search-results {
-    max-height: 40vh;
+}
+@media (max-width: 768px) {
+  .layout-three-col {
+    grid-template-columns: 1fr;
+  }
+  .cat-sidebar {
+    position: static;
   }
 }
 </style>

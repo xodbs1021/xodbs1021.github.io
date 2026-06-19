@@ -6,7 +6,9 @@
   <h1>{{ .Title }}</h1>
 </header>
 
-<div class="layout-with-search">
+<div class="layout-three-col">
+  {{- partial "categories_sidebar.html" . }}
+
   <div class="main-column">
     {{- range $pages }}
     <article class="post-entry">

@@ -1,0 +1,11 @@
+<aside class="cat-sidebar">
+  <h3>Categories</h3>
+  <ul>
+    {{- $current := .RelPermalink }}
+    {{- range site.Menus.main }}
+    <li>
+      <a href="{{ .URL }}"{{ if eq $current .URL }} class="active"{{ end }}>{{ .Name }}</a>
+    </li>
+    {{- end }}
+  </ul>
+</aside>

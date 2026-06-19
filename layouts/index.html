@@ -2,7 +2,9 @@
 {{- $pages := where site.RegularPages "Section" "posts" }}
 {{- $pages = sort $pages "Date" "desc" }}
 
-<div class="layout-with-search">
+<div class="layout-three-col">
+  {{- partial "categories_sidebar.html" . }}
+
   <div class="main-column">
     {{- range first 4 $pages }}
     <article class="post-entry">
