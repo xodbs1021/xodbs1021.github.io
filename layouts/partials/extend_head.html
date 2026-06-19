@@ -1,326 +1,344 @@
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+
+<link href="/pagefind/pagefind-ui.css" rel="stylesheet">
+<script src="/pagefind/pagefind-ui.js" defer></script>
+
 <style>
 /* ============================================
-   1. 헤더 — 블로그 제목 좌측 벽 밀착 (전체 페이지 공통)
-   ============================================ */
+   1. 헤더 — 블로그 제목 좌측 벽 밀착 (전체 페이지 공통)
+   ============================================ */
 .header {
-  max-width: 100% !important;
-  width: 100% !important;
-  padding: 0 !important;
-  margin: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 .header-nav {
-  max-width: 100% !important;
-  padding-left: 0.8rem !important;
-  padding-right: 1rem !important;
-  width: 100% !important;
-  box-sizing: border-box;
+  max-width: 100% !important;
+  padding-left: 0.8rem !important;
+  padding-right: 1rem !important;
+  width: 100% !important;
+  box-sizing: border-box;
 }
 .logo {
-  padding-left: 0 !important;
-  margin-left: 0 !important;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
 }
 .logo a {
-  padding-left: 0 !important;
-  margin-left: 0 !important;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
 }
 
 /* 상단 네비게이션 메뉴 제거 */
 #menu,
 ul#menu,
 nav.nav #menu {
-  display: none !important;
+  display: none !important;
 }
 
 /* ============================================
-   2. 메인 컨테이너 max-width 풀기
-   ============================================ */
+   2. 메인 컨테이너 max-width 풀기
+   ============================================ */
 .main {
-  max-width: 100% !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-  width: 100% !important;
+  max-width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  width: 100% !important;
 }
 
 /* ============================================
-   3. 3단 그리드 — 기본 (홈 / 카테고리) 비율 유지
-   ============================================ */
+   3. 3단 그리드 — 기본 (홈 / 카테고리) 비율 유지
+   ============================================ */
 .layout-three-col {
-  display: grid;
-  grid-template-columns: 220px minmax(0, 1fr) 320px;
-  gap: 2rem;
-  padding: 0 1.5rem;
-  align-items: start;
-  width: 100%;
-  box-sizing: border-box;
-  position: relative;
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 320px;
+  gap: 2rem;
+  padding: 0 1.5rem;
+  align-items: start;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
 }
 .layout-three-col .main-column {
-  min-width: 0;
-  max-width: 920px;
-  margin: 0 auto;
-  width: 100%;
-  position: relative;
-  z-index: 1;
+  min-width: 0;
+  max-width: 920px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 /* ============================================
-   3-1. Single 페이지 전용 — 좌우측 절대 고정 / 중앙만 확장
-   ============================================ */
+   3-1. Single 페이지 전용 — 좌측 축소 / 중앙 확장 / 우측 유지
+   ============================================ */
 .layout-three-col.single {
-  grid-template-columns: 220px minmax(0, 1fr) 320px; /* 메인과 동일하게 고정 */
-  gap: 2rem; /* 메인과 동일하게 고정 */
+  grid-template-columns: 150px minmax(0, 1fr) 320px;
+  gap: 1.5rem;
 }
 .layout-three-col.single .main-column {
-  max-width: none;
-  margin: 0;
+  max-width: none;
+  margin: 0;
 }
 .layout-three-col.single .single-column .post-single {
-  max-width: 1100px;
-  margin: 0 auto;
-  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
 }
 /* 이미지가 원본 비율로 시원하게 보이도록 */
 .layout-three-col.single .post-content img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin: 1.5rem auto;
-  border-radius: 6px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1.5rem auto;
+  border-radius: 6px;
 }
 .layout-three-col.single .post-content pre {
-  max-width: 100%;
-  overflow-x: auto;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 /* ============================================
-   4. 좌측 카테고리 사이드바
-   ============================================ */
+   4. 좌측 카테고리 사이드바
+   ============================================ */
 .cat-sidebar {
-  position: sticky;
-  top: 80px;
-  align-self: start;
-  padding: 0.4rem 0 0 0.5rem;
-  max-height: calc(100vh - 100px);
-  overflow-y: auto;
-  z-index: 40;
-  pointer-events: auto;
+  position: sticky;
+  top: 80px;
+  align-self: start;
+  padding: 0.4rem 0 0 0.5rem;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  z-index: 40;
+  pointer-events: auto;
 }
 .cat-sidebar h3 {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--secondary);
-  margin: 0 0 0.8rem 0;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--secondary);
+  margin: 0 0 0.8rem 0;
 }
 .cat-sidebar ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 .cat-sidebar li {
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.3rem;
 }
 .cat-sidebar a {
-  display: block;
-  padding: 0.55rem 0.75rem;
-  border-radius: 6px;
-  color: var(--primary);
-  text-decoration: none;
-  font-size: 14px;
-  transition: background 0.15s;
-  pointer-events: auto;
+  display: block;
+  padding: 0.55rem 0.75rem;
+  border-radius: 6px;
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 14px;
+  transition: background 0.15s;
+  pointer-events: auto;
 }
 .cat-sidebar a:hover {
-  background: var(--code-bg);
+  background: var(--code-bg);
 }
 .cat-sidebar a.active {
-  background: var(--code-bg);
-  font-weight: 600;
+  background: var(--code-bg);
+  font-weight: 600;
+}
+
+/* Single 페이지의 좁아진 좌측 — 폰트/패딩 살짝 축소 */
+.layout-three-col.single .cat-sidebar a {
+  padding: 0.45rem 0.55rem;
+  font-size: 13px;
+}
+.layout-three-col.single .cat-sidebar h3 {
+  font-size: 10px;
 }
 
 /* ============================================
-   5. 우측 검색 사이드바
-   ============================================ */
+   5. 우측 검색 사이드바
+   ============================================ */
 .search-sidebar {
-  position: sticky;
-  top: 80px;
-  align-self: start;
-  padding: 0.4rem 0.5rem 0 0;
-  z-index: 40;
-  max-height: calc(100vh - 100px);
-  overflow-y: auto;
-  isolation: isolate;
-  pointer-events: auto;
+  position: sticky;
+  top: 80px;
+  align-self: start;
+  padding: 0.4rem 0.5rem 0 0;
+  z-index: 40;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  isolation: isolate;
+  pointer-events: auto;
 }
 .search-sidebar .pagefind-ui {
-  --pagefind-ui-scale: 0.8;
-  --pagefind-ui-primary: var(--primary);
-  --pagefind-ui-text: var(--primary);
-  --pagefind-ui-background: var(--theme);
-  --pagefind-ui-border: var(--border);
-  --pagefind-ui-tag: var(--code-bg);
-  --pagefind-ui-border-width: 1px;
-  --pagefind-ui-border-radius: 6px;
-  --pagefind-ui-font: inherit;
+  --pagefind-ui-scale: 0.8;
+  --pagefind-ui-primary: var(--primary);
+  --pagefind-ui-text: var(--primary);
+  --pagefind-ui-background: var(--theme);
+  --pagefind-ui-border: var(--border);
+  --pagefind-ui-tag: var(--code-bg);
+  --pagefind-ui-border-width: 1px;
+  --pagefind-ui-border-radius: 6px;
+  --pagefind-ui-font: inherit;
 }
 .search-sidebar .pagefind-ui__results-area {
-  position: relative;
-  z-index: 41;
+  position: relative;
+  z-index: 41;
 }
 .search-sidebar .pagefind-ui__result {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 /* ============================================
-   6. 중앙 페이지 타이틀
-   ============================================ */
+   6. 중앙 페이지 타이틀
+   ============================================ */
 .main-column .page-header.center-title {
-  margin: 0.5rem 0 2rem 0;
-  padding: 0 0 1.2rem 0;
-  border-bottom: 1px solid var(--border);
-  text-align: left;
+  margin: 0.5rem 0 2rem 0;
+  padding: 0 0 1.2rem 0;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
 }
 .main-column .page-header.center-title h1 {
-  font-size: 2.2rem;
-  font-weight: 800;
-  margin: 0;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-  color: var(--primary);
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--primary);
 }
 
 /* ============================================
-   7. 빈 상태 / 404
-   ============================================ */
+   7. 빈 상태 / 404
+   ============================================ */
 .empty-state {
-  text-align: center;
-  padding: 4rem 1rem;
-  color: var(--secondary);
-  font-size: 1rem;
-  background: var(--code-bg);
-  border-radius: 8px;
-  max-width: 100%;
+  text-align: center;
+  padding: 4rem 1rem;
+  color: var(--secondary);
+  font-size: 1rem;
+  background: var(--code-bg);
+  border-radius: 8px;
+  max-width: 100%;
 }
 .not-found {
-  text-align: center;
-  padding: 4rem 1rem;
-  max-width: 100%;
+  text-align: center;
+  padding: 4rem 1rem;
+  max-width: 100%;
 }
 .not-found h1 {
-  font-size: 5rem;
-  font-weight: 800;
-  margin: 0 0 0.5rem 0;
-  color: var(--primary);
-  letter-spacing: -0.04em;
+  font-size: 5rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem 0;
+  color: var(--primary);
+  letter-spacing: -0.04em;
 }
 .not-found p {
-  font-size: 1.1rem;
-  color: var(--secondary);
-  margin: 0 0 2rem 0;
+  font-size: 1.1rem;
+  color: var(--secondary);
+  margin: 0 0 2rem 0;
 }
 .not-found-home {
-  display: inline-block;
-  padding: 0.7rem 1.5rem;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--code-bg);
-  color: var(--primary);
-  text-decoration: none;
-  font-size: 14px;
-  transition: background 0.15s;
+  display: inline-block;
+  padding: 0.7rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--code-bg);
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 14px;
+  transition: background 0.15s;
 }
 .not-found-home:hover {
-  background: var(--tertiary);
+  background: var(--tertiary);
 }
 
 /* ============================================
-   8. 더 보기 버튼
-   ============================================ */
+   8. 더 보기 버튼
+   ============================================ */
 .more-wrap {
-  text-align: center;
-  margin: 2rem 0;
+  text-align: center;
+  margin: 2rem 0;
 }
 #load-more-btn {
-  padding: 0.6rem 1.8rem;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--code-bg);
-  color: var(--primary);
-  cursor: pointer;
-  font-size: 14px;
-  transition: background 0.15s;
+  padding: 0.6rem 1.8rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--code-bg);
+  color: var(--primary);
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.15s;
 }
 #load-more-btn:hover {
-  background: var(--tertiary);
+  background: var(--tertiary);
 }
 
 /* ============================================
-   9. 분류 목록 (taxonomy)
-   ============================================ */
+   9. 분류 목록 (taxonomy)
+   ============================================ */
 .taxonomy-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 .taxonomy-list li {
-  padding: 0.8rem 0;
-  border-bottom: 1px solid var(--border);
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--border);
 }
 .taxonomy-list a {
-  color: var(--primary);
-  text-decoration: none;
-  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
 }
 .taxonomy-count {
-  color: var(--secondary);
-  font-size: 0.9rem;
-  margin-left: 0.5rem;
+  color: var(--secondary);
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
 }
 
 /* ============================================
-   10. 반응형
-   ============================================ */
+   10. 반응형
+   ============================================ */
 @media (max-width: 1200px) {
-  .layout-three-col {
-    grid-template-columns: 200px minmax(0, 1fr) 280px;
-    gap: 1.5rem;
-  }
+  .layout-three-col {
+    grid-template-columns: 200px minmax(0, 1fr) 280px;
+    gap: 1.5rem;
+  }
+  .layout-three-col.single {
+    grid-template-columns: 140px minmax(0, 1fr) 280px;
+  }
 }
 @media (max-width: 1000px) {
-  .layout-three-col,
-  .layout-three-col.single {
-    grid-template-columns: 180px minmax(0, 1fr);
-    grid-template-areas:
-      "search search"
-      "cat main";
-  }
-  .cat-sidebar { grid-area: cat; }
-  .main-column { grid-area: main; }
-  .search-sidebar {
-    grid-area: search;
-    position: static;
-    max-height: none;
-    margin-bottom: 1rem;
-  }
+  .layout-three-col,
+  .layout-three-col.single {
+    grid-template-columns: 180px minmax(0, 1fr);
+    grid-template-areas:
+      "search search"
+      "cat main";
+  }
+  .cat-sidebar { grid-area: cat; }
+  .main-column { grid-area: main; }
+  .search-sidebar {
+    grid-area: search;
+    position: static;
+    max-height: none;
+    margin-bottom: 1rem;
+  }
 }
 @media (max-width: 700px) {
-  .layout-three-col,
-  .layout-three-col.single {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "search"
-      "cat"
-      "main";
-    padding: 0 1rem;
-  }
-  .cat-sidebar {
-    position: static;
-    max-height: none;
-    padding: 0;
-  }
-  .main-column .page-header.center-title h1 {
-    font-size: 1.8rem;
-  }
+  .layout-three-col,
+  .layout-three-col.single {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "search"
+      "cat"
+      "main";
+    padding: 0 1rem;
+  }
+  .cat-sidebar {
+    position: static;
+    max-height: none;
+    padding: 0;
+  }
+  .main-column .page-header.center-title h1 {
+    font-size: 1.8rem;
+  }
 }
 </style>
