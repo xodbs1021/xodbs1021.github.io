@@ -4,10 +4,22 @@ timeZone = "Asia/Seoul"
 title = "태형이 따라잡기"
 theme = "PaperMod"
 
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+
 [params]
   showFullContent = false
   showReadingTime = false
   showPostsOnHomePage = true
+
+  [params.fuseOpts]
+    isCaseSensitive = false
+    shouldSort = true
+    location = 0
+    distance = 1000
+    threshold = 0.4
+    minMatchCharLength = 0
+    keys = ["title", "permalink", "summary", "content"]
 
 [markup]
   [markup.goldmark]
@@ -38,3 +50,8 @@ theme = "PaperMod"
   name = "Book Review"
   url = "/categories/book-review"
   weight = 5
+
+[[menus.main]]
+  name = "Search"
+  url = "/search/"
+  weight = 6
