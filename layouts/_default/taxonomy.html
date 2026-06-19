@@ -1,0 +1,29 @@
+{{- define "main" }}
+<div class="layout-three-col">
+  {{- partial "categories_sidebar.html" . }}
+
+  <div class="main-column">
+    <header class="page-header center-title">
+      <h1>{{ .Title }}</h1>
+    </header>
+
+    {{- $terms := .Data.Terms.Alphabetical }}
+    {{- if eq (len $terms) 0 }}
+    <div class="empty-state">
+      <p>분류가 없습니다.</p>
+    </div>
+    {{- else }}
+    <ul class="taxonomy-list">
+      {{- range $terms }}
+      <li>
+        <a href="{{ .Page.Permalink }}">{{ .Page.Title }}</a>
+        <span class="taxonomy-count">({{ .Count }})</span>
+      </li>
+      {{- end }}
+    </ul>
+    {{- end }}
+  </div>
+
+  {{- partial "search_sidebar.html" . }}
+</div>
+{{- end }}
