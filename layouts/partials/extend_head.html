@@ -12,7 +12,7 @@ nav.nav #menu {
   display: none !important;
 }
 
-/* 2. 메인 컨테이너 max-width 풀기 (viewport 전체 활용) */
+/* 2. 메인 컨테이너 max-width 풀기 */
 .main {
   max-width: 100% !important;
   padding-left: 0 !important;
@@ -20,7 +20,7 @@ nav.nav #menu {
   width: 100% !important;
 }
 
-/* 3. 3단 그리드: 좌(카테고리) | 중앙(글) | 우(검색) */
+/* 3. 3단 그리드 — position: relative + z-index 명확 */
 .layout-three-col {
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr) 320px;
@@ -29,15 +29,20 @@ nav.nav #menu {
   align-items: start;
   width: 100%;
   box-sizing: border-box;
+  position: relative;
 }
+
+/* 중앙 메인 컬럼 — 사이드바보다 낮은 stack level, 클릭 차단 안 함 */
 .layout-three-col .main-column {
   min-width: 0;
   max-width: 920px;
   margin: 0 auto;
   width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
-/* 4. 좌측 카테고리 사이드바 — 왼쪽 벽 밀착 */
+/* 4. 좌측 카테고리 사이드바 — 클릭 가능 보장 */
 .cat-sidebar {
   position: sticky;
   top: 80px;
@@ -45,6 +50,8 @@ nav.nav #menu {
   padding: 0.4rem 0 0 0.5rem;
   max-height: calc(100vh - 100px);
   overflow-y: auto;
+  z-index: 40;
+  pointer-events: auto;
 }
 .cat-sidebar h3 {
   font-size: 11px;
@@ -70,6 +77,7 @@ nav.nav #menu {
   text-decoration: none;
   font-size: 14px;
   transition: background 0.15s;
+  pointer-events: auto;
 }
 .cat-sidebar a:hover {
   background: var(--code-bg);
@@ -79,16 +87,17 @@ nav.nav #menu {
   font-weight: 600;
 }
 
-/* 5. 우측 검색 사이드바 — 오른쪽 벽 밀착 + 결과 보호 */
+/* 5. 우측 검색 사이드바 — 결과 드롭다운 보호 */
 .search-sidebar {
   position: sticky;
   top: 80px;
   align-self: start;
   padding: 0.4rem 0.5rem 0 0;
-  z-index: 50;
+  z-index: 40;
   max-height: calc(100vh - 100px);
   overflow-y: auto;
   isolation: isolate;
+  pointer-events: auto;
 }
 .search-sidebar .pagefind-ui {
   --pagefind-ui-scale: 0.8;
@@ -103,13 +112,13 @@ nav.nav #menu {
 }
 .search-sidebar .pagefind-ui__results-area {
   position: relative;
-  z-index: 51;
+  z-index: 41;
 }
 .search-sidebar .pagefind-ui__result {
   border-bottom: 1px solid var(--border);
 }
 
-/* 6. 중앙 페이지 타이틀 — 큼직하게, bold */
+/* 6. 중앙 페이지 타이틀 */
 .main-column .page-header.center-title {
   margin: 0.5rem 0 2rem 0;
   padding: 0 0 1.2rem 0;
@@ -125,7 +134,30 @@ nav.nav #menu {
   color: var(--primary);
 }
 
-/* 7. 빈 상태 (글 없음) */
+/* 7. 개별 글(single page) — 본문 읽기 좋게 760px 제한 */
+.single-column {
+  max-width: 100% !important;
+}
+.single-column .post-single {
+  max-width: 760px;
+  margin: 0 auto;
+  width: 100%;
+}
+.single-column .post-content {
+  font-size: 1rem;
+  line-height: 1.75;
+}
+.single-column .post-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+.single-column .post-content pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* 8. 빈 상태 — 영역 폭 안에서만 */
 .empty-state {
   text-align: center;
   padding: 4rem 1rem;
@@ -133,12 +165,14 @@ nav.nav #menu {
   font-size: 1rem;
   background: var(--code-bg);
   border-radius: 8px;
+  max-width: 100%;
 }
 
-/* 8. 404 페이지 */
+/* 9. 404 페이지 */
 .not-found {
   text-align: center;
   padding: 4rem 1rem;
+  max-width: 100%;
 }
 .not-found h1 {
   font-size: 5rem;
@@ -167,7 +201,7 @@ nav.nav #menu {
   background: var(--tertiary);
 }
 
-/* 9. 더 보기 버튼 (홈/카테고리 공통) */
+/* 10. 더 보기 버튼 */
 .more-wrap {
   text-align: center;
   margin: 2rem 0;
@@ -186,7 +220,7 @@ nav.nav #menu {
   background: var(--tertiary);
 }
 
-/* 10. 분류 목록 (taxonomy) */
+/* 11. 분류 목록 */
 .taxonomy-list {
   list-style: none;
   padding: 0;
@@ -207,7 +241,7 @@ nav.nav #menu {
   margin-left: 0.5rem;
 }
 
-/* 11. 반응형 */
+/* 12. 반응형 */
 @media (max-width: 1200px) {
   .layout-three-col {
     grid-template-columns: 200px minmax(0, 1fr) 280px;

@@ -19,63 +19,70 @@
 {{- end }}
 {{- $catIndex := $.Scratch.Get "catIndex" }}
 
-<article class="post-single">
-  <header class="post-header">
-    {{- partial "breadcrumbs.html" . }}
-    <h1 class="post-title">{{- .Title }}</h1>
-    <div class="post-meta">
-      {{- partial "post_meta.html" . }}
-    </div>
-  </header>
-  <div class="post-content">
-    {{- .Content }}
+<div class="layout-three-col">
+  {{- partial "categories_sidebar.html" . }}
+
+  <div class="main-column single-column">
+    <article class="post-single">
+      <header class="post-header">
+        {{- partial "breadcrumbs.html" . }}
+        <h1 class="post-title">{{- .Title }}</h1>
+        <div class="post-meta">
+          {{- partial "post_meta.html" . }}
+        </div>
+      </header>
+      <div class="post-content">
+        {{- .Content }}
+      </div>
+      <footer class="post-footer">
+
+        <nav class="paginav" id="global-nav">
+          {{- if lt $currentIndex (sub (len $allPages) 1) }}
+            {{- $prev := index $allPages (add $currentIndex 1) }}
+            <a class="prev" href="{{ $prev.RelPermalink }}">
+              <span class="title">« 이전 글</span><br>
+              <span>{{ $prev.Title }}</span>
+            </a>
+          {{- end }}
+          {{- if gt $currentIndex 0 }}
+            {{- $next := index $allPages (sub $currentIndex 1) }}
+            <a class="next" href="{{ $next.RelPermalink }}">
+              <span class="title">다음 글 »</span><br>
+              <span>{{ $next.Title }}</span>
+            </a>
+          {{- end }}
+        </nav>
+
+        <nav class="paginav" id="cat-nav" style="display:none">
+          {{- if lt $catIndex (sub (len $catPages) 1) }}
+            {{- $prev := index $catPages (add $catIndex 1) }}
+            <a class="prev" href="{{ $prev.RelPermalink }}?from={{ $cat }}">
+              <span class="title">« 이전 글</span><br>
+              <span>{{ $prev.Title }}</span>
+            </a>
+          {{- end }}
+          {{- if gt $catIndex 0 }}
+            {{- $next := index $catPages (sub $catIndex 1) }}
+            <a class="next" href="{{ $next.RelPermalink }}?from={{ $cat }}">
+              <span class="title">다음 글 »</span><br>
+              <span>{{ $next.Title }}</span>
+            </a>
+          {{- end }}
+        </nav>
+
+      </footer>
+    </article>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const from = params.get('from');
+      if (from) {
+        document.getElementById('global-nav').style.display = 'none';
+        document.getElementById('cat-nav').style.display = 'block';
+      }
+    </script>
   </div>
-  <footer class="post-footer">
 
-    <nav class="paginav" id="global-nav">
-      {{- if lt $currentIndex (sub (len $allPages) 1) }}
-        {{- $prev := index $allPages (add $currentIndex 1) }}
-        <a class="prev" href="{{ $prev.RelPermalink }}">
-          <span class="title">« 이전 글</span><br>
-          <span>{{ $prev.Title }}</span>
-        </a>
-      {{- end }}
-      {{- if gt $currentIndex 0 }}
-        {{- $next := index $allPages (sub $currentIndex 1) }}
-        <a class="next" href="{{ $next.RelPermalink }}">
-          <span class="title">다음 글 »</span><br>
-          <span>{{ $next.Title }}</span>
-        </a>
-      {{- end }}
-    </nav>
-
-    <nav class="paginav" id="cat-nav" style="display:none">
-      {{- if lt $catIndex (sub (len $catPages) 1) }}
-        {{- $prev := index $catPages (add $catIndex 1) }}
-        <a class="prev" href="{{ $prev.RelPermalink }}?from={{ $cat }}">
-          <span class="title">« 이전 글</span><br>
-          <span>{{ $prev.Title }}</span>
-        </a>
-      {{- end }}
-      {{- if gt $catIndex 0 }}
-        {{- $next := index $catPages (sub $catIndex 1) }}
-        <a class="next" href="{{ $next.RelPermalink }}?from={{ $cat }}">
-          <span class="title">다음 글 »</span><br>
-          <span>{{ $next.Title }}</span>
-        </a>
-      {{- end }}
-    </nav>
-
-  </footer>
-</article>
-
-<script>
-  const params = new URLSearchParams(window.location.search);
-  const from = params.get('from');
-  if (from) {
-    document.getElementById('global-nav').style.display = 'none';
-    document.getElementById('cat-nav').style.display = 'block';
-  }
-</script>
-
+  {{- partial "search_sidebar.html" . }}
+</div>
 {{- end }}

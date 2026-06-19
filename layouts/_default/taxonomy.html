@@ -7,22 +7,78 @@
       <h1>{{ .Title }}</h1>
     </header>
 
-    {{- with .Data.Terms }}
-      {{- $terms := .Alphabetical }}
-      {{- if gt (len $terms) 0 }}
-      <ul class="taxonomy-list">
-        {{- range $terms }}
-        <li>
-          <a href="{{ .Page.Permalink }}">{{ .Page.Title }}</a>
-          <span class="taxonomy-count">({{ .Count }})</span>
-        </li>
-        {{- end }}
-      </ul>
+    {{- if eq .Kind "term" }}
+      {{- /* term page (e.g., /categories/tech-blurting/) — show post list */ -}}
+      {{- $term := path.Base .RelPermalink }}
+      {{- $pages := where site.RegularPages "Params.categories" "intersect" (slice $term) }}
+      {{- $pages = sort $pages "Date" "desc" }}
+
+      {{- if eq (len $pages) 0 }}
+      <div class="empty-state">
+        <p>아직 글이 없습니다.</p>
+      </div>
       {{- else }}
-      <div class="empty-state"><p>분류가 없습니다.</p></div>
+        {{- range first 4 $pages }}
+        <article class="post-entry">
+          <header class="entry-header">
+            <h2 class="entry-hint-parent">{{ .Title }}</h2>
+          </header>
+          <div class="entry-content">
+            <p>{{ .Summary | plainify | htmlUnescape }}{{ if .Truncated }}...{{ end }}</p>
+          </div>
+          <footer class="entry-footer">
+            {{- partial "post_meta.html" . -}}
+          </footer>
+          <a class="entry-link" aria-label="post link to {{ .Title | plainify }}"
+             href="{{ .Permalink }}?from={{ $term }}"></a>
+        </article>
+        {{- end }}
+
+        {{- if gt (len $pages) 4 }}
+        <div id="more-posts" style="display:none">
+          {{- range after 4 $pages }}
+          <article class="post-entry">
+            <header class="entry-header">
+              <h2 class="entry-hint-parent">{{ .Title }}</h2>
+            </header>
+            <div class="entry-content">
+              <p>{{ .Summary | plainify | htmlUnescape }}{{ if .Truncated }}...{{ end }}</p>
+            </div>
+            <footer class="entry-footer">
+              {{- partial "post_meta.html" . -}}
+            </footer>
+            <a class="entry-link" aria-label="post link to {{ .Title | plainify }}"
+               href="{{ .Permalink }}?from={{ $term }}"></a>
+          </article>
+          {{- end }}
+        </div>
+        <div class="more-wrap">
+          <button id="load-more-btn" onclick="document.getElementById('more-posts').style.display='block'; this.style.display='none';">
+            더 보기
+          </button>
+        </div>
+        {{- end }}
       {{- end }}
+
     {{- else }}
-      <div class="empty-state"><p>아직 글이 없습니다.</p></div>
+      {{- /* taxonomy index page (e.g., /categories/) — show terms */ -}}
+      {{- with .Data.Terms }}
+        {{- $terms := .Alphabetical }}
+        {{- if gt (len $terms) 0 }}
+        <ul class="taxonomy-list">
+          {{- range $terms }}
+          <li>
+            <a href="{{ .Page.Permalink }}">{{ .Page.Title }}</a>
+            <span class="taxonomy-count">({{ .Count }})</span>
+          </li>
+          {{- end }}
+        </ul>
+        {{- else }}
+        <div class="empty-state"><p>분류가 없습니다.</p></div>
+        {{- end }}
+      {{- else }}
+        <div class="empty-state"><p>아직 글이 없습니다.</p></div>
+      {{- end }}
     {{- end }}
   </div>
 

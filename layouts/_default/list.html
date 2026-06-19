@@ -1,5 +1,5 @@
 {{- define "main" }}
-{{- $pages := .Pages }}
+{{- $pages := .RegularPages }}
 {{- $pages = sort $pages "Date" "desc" }}
 
 <div class="layout-three-col">
@@ -27,7 +27,7 @@
           {{- partial "post_meta.html" . -}}
         </footer>
         <a class="entry-link" aria-label="post link to {{ .Title | plainify }}"
-           href="{{ .Permalink }}?from={{ index .Params.categories 0 }}"></a>
+           href="{{ .Permalink }}{{ with index .Params.categories 0 }}?from={{ . }}{{ end }}"></a>
       </article>
       {{- end }}
 
@@ -45,7 +45,7 @@
             {{- partial "post_meta.html" . -}}
           </footer>
           <a class="entry-link" aria-label="post link to {{ .Title | plainify }}"
-             href="{{ .Permalink }}?from={{ index .Params.categories 0 }}"></a>
+             href="{{ .Permalink }}{{ with index .Params.categories 0 }}?from={{ . }}{{ end }}"></a>
         </article>
         {{- end }}
       </div>
