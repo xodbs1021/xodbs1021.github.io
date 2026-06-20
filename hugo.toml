@@ -13,6 +13,8 @@ theme = "PaperMod"
   [markup.goldmark]
     [markup.goldmark.renderer]
       unsafe = true
+    [markup.goldmark.extensions]
+      strikethrough = false
   [markup.highlight]
     style = "github"
     noClasses = true
