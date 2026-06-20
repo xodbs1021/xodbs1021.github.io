@@ -416,7 +416,7 @@ nav.nav #menu {
    ============================================ */
 .post-content table,
 .main-column table {
-  width: 100%;
+  width: 100% !important;
   margin: 2rem 0;
   border-collapse: separate;
   border-spacing: 0;
@@ -426,6 +426,21 @@ nav.nav #menu {
   font-size: 14px;
   background: var(--theme);
   box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  table-layout: auto;
+}
+/* 핵심: 첫 컬럼만 콘텐츠 폭, 나머지 컬럼이 남는 공간 균등 분배 */
+.post-content table thead th:first-child,
+.post-content table tbody td:first-child,
+.main-column table thead th:first-child,
+.main-column table tbody td:first-child {
+  width: 1%;
+  white-space: nowrap;
+}
+.post-content table thead th:not(:first-child),
+.post-content table tbody td:not(:first-child),
+.main-column table thead th:not(:first-child),
+.main-column table tbody td:not(:first-child) {
+  width: auto;
 }
 .post-content table thead,
 .main-column table thead {
