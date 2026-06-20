@@ -412,6 +412,85 @@ nav.nav #menu {
 }
 
 /* ============================================
+   8-3. 마크다운 표 — 모던 디자인
+   ============================================ */
+.post-content table,
+.main-column table {
+  width: 100%;
+  margin: 2rem 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 14px;
+  background: var(--theme);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.post-content table thead,
+.main-column table thead {
+  background: linear-gradient(180deg, var(--code-bg) 0%, var(--code-bg) 100%);
+}
+.post-content table thead th,
+.main-column table thead th {
+  padding: 0.85rem 1.1rem;
+  text-align: left;
+  font-weight: 700;
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--primary);
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+.post-content table tbody td,
+.main-column table tbody td {
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--primary);
+  vertical-align: top;
+  line-height: 1.55;
+}
+.post-content table tbody tr:last-child td,
+.main-column table tbody tr:last-child td {
+  border-bottom: none;
+}
+/* 줄무늬 + hover */
+.post-content table tbody tr:nth-child(even),
+.main-column table tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--code-bg) 40%, transparent);
+}
+.post-content table tbody tr:hover,
+.main-column table tbody tr:hover {
+  background: color-mix(in srgb, var(--code-bg) 80%, transparent);
+}
+/* 첫 컬럼 강조 (보통 분류/항목 이름) */
+.post-content table tbody td:first-child,
+.main-column table tbody td:first-child {
+  font-weight: 600;
+  color: var(--primary);
+  white-space: nowrap;
+}
+/* 코드 인라인이 표 안에서 답답하지 않게 */
+.post-content table code,
+.main-column table code {
+  padding: 0.15rem 0.4rem;
+  font-size: 0.88em;
+  background: var(--code-bg);
+  border-radius: 4px;
+}
+/* 모바일에서 가로 스크롤 */
+@media (max-width: 700px) {
+  .post-content table,
+  .main-column table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+}
+
+/* ============================================
    9. 분류 목록 (taxonomy)
    ============================================ */
 .taxonomy-list {
