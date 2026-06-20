@@ -274,12 +274,12 @@ mediaSource.addEventListener('sourceopen', () => {
 
 MSE는 **fMP4만 받는다**. MPEG-TS는 못 받는다.
 
-### hls.js의 핵심 — 트랜스먹싱
+### hls.js의 핵심 — transmuxing
 
 hls.js가 하는 일:
 1. `.m3u8` 받기
 2. `.ts` 파일 받기
-3. **MPEG-TS → fMP4 트랜스먹싱** (디코딩 없이 컨테이너만 변환)
+3. **MPEG-TS → fMP4 transmuxing** (디코딩 없이 컨테이너만 변환)
 4. fMP4를 MSE의 SourceBuffer에 넣기
 5. video 태그가 자동 재생
 
@@ -287,7 +287,7 @@ hls.js가 하는 일:
 .ts (MPEG-TS) → hls.js → fMP4 (메모리) → MSE → <video>
 ```
 
-핵심은 **트랜스먹싱**. 압축된 H.264 NAL units을 그대로 두고 컨테이너만 바꿈. 디코딩 안 함. 그래서 빠름.
+핵심은 **transmuxing**. 압축된 H.264 NAL units을 그대로 두고 컨테이너만 바꿈. 디코딩 안 함. 그래서 빠름.
 
 ### ABR Controller — 화질 자동 선택
 
@@ -400,7 +400,7 @@ HLS는 기술의 승리가 아니라 **발상의 승리**다.
 2. **구조** — .m3u8 (텍스트 목차) + .ts (바이너리 영상), Master + Media 두 단계
 3. **MPEG-TS** — 188바이트 패킷 + PAT/PMT/PES 3단 계층, 첫 패킷이 항상 PAT
 4. **타임스탬프** — PTS (표시) + DTS (디코딩), B-frame 때문에 둘이 다름
-5. **브라우저 재생** — Chrome은 네이티브 미지원, hls.js가 트랜스먹싱 + MSE로 처리
+5. **브라우저 재생** — Chrome은 네이티브 미지원, hls.js가 transmuxing + MSE로 처리
 6. **운영** — Origin + CDN + Signed URL + Beacon으로 QoE 측정
 7. **한계** — 18~25초 지연, LL-HLS가 해결책
 

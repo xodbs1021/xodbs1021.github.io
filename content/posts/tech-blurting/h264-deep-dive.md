@@ -312,7 +312,7 @@ Start Code               Start Code
 [Length 4byte] [NAL Unit 1] [Length 4byte] [NAL Unit 2] ...
 ```
 
-HLS의 .ts는 Annex B, fMP4는 AVCC. **hls.js의 트랜스먹싱이 이 변환을 한다**.
+HLS의 .ts는 Annex B, fMP4는 AVCC. **hls.js의 transmuxing이 이 변환을 한다**.
 
 ---
 
