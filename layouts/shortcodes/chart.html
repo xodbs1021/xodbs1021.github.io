@@ -1,0 +1,36 @@
+{{- $id := printf "chart-%s" (.Inner | hash.XxHash) -}}
+<figure class="chart-figure" style="margin: 2rem auto; max-width: 760px;">
+  <div style="position: relative; height: {{ .Get "height" | default "340px" }};">
+    <canvas id="{{ $id }}"></canvas>
+  </div>
+  {{- with .Get "caption" }}
+  <figcaption style="text-align:center; color: var(--secondary); font-size: 13px; margin-top: 0.6rem;">{{ . }}</figcaption>
+  {{- end }}
+</figure>
+<script>
+(function() {
+  function init() {
+    if (typeof Chart === 'undefined') { setTimeout(init, 100); return; }
+    const cfg = {{ .Inner | safeJS }};
+    const ctx = document.getElementById('{{ $id }}').getContext('2d');
+    const isDark = document.documentElement.dataset.theme === 'dark'
+      || (document.documentElement.dataset.theme === 'auto'
+          && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const txt = isDark ? '#dadadb' : '#1d1e20';
+    const grid = isDark ? '#333333' : '#e5e5e5';
+    cfg.options = Object.assign({
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: txt } } },
+      scales: {
+        x: { ticks: { color: txt }, grid: { color: grid } },
+        y: { ticks: { color: txt }, grid: { color: grid } }
+      }
+    }, cfg.options || {});
+    new Chart(ctx, cfg);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else { init(); }
+})();
+</script>
