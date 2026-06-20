@@ -567,6 +567,32 @@ nav.nav #menu {
   font-size: 0.88em;
 }
 
+/* 다크 모드: chroma syntax highlighter의 plain text가 #272822(거의 검정)로 출력돼
+   어두운 배경에 안 보이는 문제 — 인라인 style을 attribute selector로 강제 override */
+html[data-theme="dark"] .post-content pre [style*="color:#272822"],
+html[data-theme="dark"] .main-column pre [style*="color:#272822"] {
+  color: #e8e8e3 !important;
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .post-content pre [style*="color:#272822"],
+  html:not([data-theme="light"]) .main-column pre [style*="color:#272822"] {
+    color: #e8e8e3 !important;
+  }
+}
+/* 코드 블록 배경을 좀 더 어둡게 해서 syntax color 채도가 명확하게 보이도록 */
+html[data-theme="dark"] .post-content pre,
+html[data-theme="dark"] .main-column pre {
+  background: #1a1a1d;
+  border-color: #2a2a30;
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .post-content pre,
+  html:not([data-theme="light"]) .main-column pre {
+    background: #1a1a1d;
+    border-color: #2a2a30;
+  }
+}
+
 /* ============================================
    8-3. 마크다운 표 — 모던 디자인
    ============================================ */
