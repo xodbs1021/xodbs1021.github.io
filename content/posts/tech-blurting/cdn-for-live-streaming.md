@@ -24,7 +24,7 @@ CDN 처음 들으면 "시청자 가까운 곳에 서버 두는 거"라고 알게
 ```
 [Origin Server]            ← 콘텐츠 원본 1곳 (또는 소수)
         ↓
-[Origin Shield / Mid-tier] ← 5~10개. Origin 부하 줄이는 중간 캐시
+[Origin Shield / Mid-tier] ← 5–10개. Origin 부하 줄이는 중간 캐시
         ↓
 [Edge Server]              ← 수백~수천 개. 시청자가 실제 연결되는 곳
         ↓
@@ -147,7 +147,7 @@ CDN 엣지에서 같은 URL 요청이 동시에 오면 Origin으로는 **한 번
 ```
 [엣지 서버 A]
 요청 1: seg103.ts → 캐시 미스 → Origin 호출
-요청 2~10,000: seg103.ts → "기존 요청 대기"
+요청 2–10,000: seg103.ts → "기존 요청 대기"
 Origin 응답 도착 → 10,000개 요청에 동시 응답
 ```
 
@@ -161,8 +161,8 @@ Origin 응답 도착 → 10,000개 요청에 동시 응답
 Cache-Control: max-age=2, stale-while-revalidate=5
 ```
 
-- 0~2초: 캐시 응답
-- 2~7초: 캐시 응답 + 백그라운드로 Origin 호출해서 갱신
+- 0–2초: 캐시 응답
+- 2–7초: 캐시 응답 + 백그라운드로 Origin 호출해서 갱신
 - 7초~: 캐시 미스 → Origin 호출
 
 시청자는 항상 즉시 응답받고, Origin 호출 빈도는 확 떨어진다.
@@ -189,7 +189,7 @@ CloudFront 한국 → 한국: $0.12 / GB
 
 이래서 산업이 두 방향으로 움직인다.
 
-1. **효율적 코덱 도입** — H.265/AV1로 비트레이트 30~50% 절감 = 비용 그만큼 절감
+1. **효율적 코덱 도입** — H.265/AV1로 비트레이트 30–50% 절감 = 비용 그만큼 절감
 2. **CDN 비용 자체를 줄이는 구조 변경** — 다음 섹션
 
 ### CDN Purge는 비싸다
@@ -303,7 +303,7 @@ CDN 비용을 줄이는 또 다른 방법. 시청자끼리 세그먼트 공유.
 시청자 C: B에게 받음
 ```
 
-A만 CDN 부담, B/C는 P2P. **CDN 비용 30~70% 절감** 가능.
+A만 CDN 부담, B/C는 P2P. **CDN 비용 30–70% 절감** 가능.
 
 기술적으로는 WebRTC DataChannel로 브라우저끼리 직접 통신.
 
@@ -366,7 +366,7 @@ CDN 엣지에서 정적 캐시만이 아니라 **코드를 실행**하는 방향
 2. **Anycast vs GeoDNS** — Cloudflare는 BGP, Akamai/CloudFront는 DNS로 가까운 POP 라우팅
 3. **Cache-Control 분리** — 세그먼트는 24시간, 매니페스트는 2초, 인증은 Signed URL로 캐시 키 깨끗하게
 4. **Thundering Herd 대응** — Request Coalescing + Stale-While-Revalidate가 필수
-5. **비용 구조** — 인기 스트리머 한 명에 8천만원, AV1으로 30~50% 절감이 산업적 동기
+5. **비용 구조** — 인기 스트리머 한 명에 8천만원, AV1으로 30–50% 절감이 산업적 동기
 6. **멀티 CDN** — 장애 대응 + 협상력 + 지역 최적화
 7. **차세대 배포** — 자체 CDN(Open Connect), P2P CDN, Edge Compute가 비용 절감의 미래
 
