@@ -1,11 +1,11 @@
 ---
 title: "라이브 인프라의 90%가 이 한 도구 위에서 굴러간다 — FFmpeg"
-date: 2026-06-21T03:50:32+09:00
+date: 2026-06-21T04:18:25+09:00
 categories: ["tech-blurting"]
 draft: false
 ---
 
-치지직, Twitch, Netflix의 라이브/VOD 인프라를 뜯어보면 공통점이 있다. **모두 FFmpeg 위에서 굴러간다**. 그리고 그건 인프라뿐이 아니다.
+치지직, Twitch, Netflix의 라이브/VOD 인프라를 뜯어보면 공통점이 있다. **모두 FFmpeg 위에서 굴러간다**. 그것도 인프라만이 아니다.
 
 ```
 [FFmpeg가 쓰이는 곳]
@@ -17,9 +17,9 @@ draft: false
 - 라이브 → VOD 자동 변환
 ```
 
-**FFmpeg 모르면 라이브 인프라 일을 못한다.** 그런데 옵션이 100개가 넘고, `-ss`를 `-i` 앞에 두는지 뒤에 두는지에 따라 인코딩 시간이 10배 차이 난다. `-c copy` 한 줄 차이가 CPU 100% vs 1%.
+**FFmpeg 모르면 라이브 인프라 일을 못한다.** 그런데 옵션이 100개가 넘는다. `-ss`를 `-i` 앞에 두는지 뒤에 두는지에 따라 인코딩 시간이 10배 차이 난다. `-c copy` 한 줄 차이가 CPU 100% vs 1%를 만든다.
 
-[지난 글](../codec-decision-and-debugging/)에서 코덱 선택을 봤다면, 이번 글은 그 모든 인프라의 기반인 **FFmpeg**를 정리한 노트다. 파이프라인 구조부터 라이브 인제스트 표준 명령, HLS 패키징, CMAF 통합 옵션까지.
+[지난 글](../av1-vp9-deep-dive/)까지 영상/오디오 코덱을 봤다면, 이번 글은 그 모든 인프라의 기반인 **FFmpeg**의 파이프라인 구조부터 라이브 인제스트 표준 명령, HLS 패키징, CMAF 통합 옵션까지 정리한 노트다.
 
 ---
 
@@ -42,13 +42,13 @@ CLI 도구:
 - ffplay: 재생 (테스트용)
 ```
 
-**OBS, VLC, Chrome, Plex가 내부적으로 libav* 사용**. `ffmpeg` CLI는 그 위에 얹힌 한 사용 방식.
+**OBS, VLC, Chrome, Plex가 내부적으로 libav\* 사용**. `ffmpeg` CLI는 그 위에 얹힌 한 사용 방식.
 
 ---
 
 ## 2. FFmpeg 파이프라인 — 5단계
 
-`ffmpeg` 명령어 하나는 내부적으로 5단계.
+`ffmpeg` 명령어 하나는 내부적으로 5단계를 거친다.
 
 ```mermaid
 flowchart LR
@@ -77,9 +77,9 @@ ffmpeg -i input.mp4 -c copy output.mkv
 
 **Decoder/Encoder 건너뜀**. demux → 그대로 → mux. CPU 거의 안 씀. **1시간 영상을 1분에 처리**.
 
-라이브 인제스트의 표준 패턴 — RTMP 받아서 HLS로 패키징할 때 코덱은 그대로 두고 컨테이너만 MPEG-TS로.
+라이브 인제스트의 표준 패턴 — RTMP 받아서 HLS로 패키징할 때 코덱은 그대로 두고 컨테이너만 MPEG-TS로 바꾸는 게 핵심.
 
-### Filter는 반드시 재인코딩 동반
+### Filter는 무조건 재인코딩 동반
 
 ```bash
 # 1080p → 720p
@@ -115,17 +115,17 @@ ffmpeg -ss 55 -i input.mp4 -ss 5 -t 30 -c:v libx264 clip.mp4
 
 ---
 
-## 4. -map / -map_metadata / -shortest
+## 4. `-map` / `-map_metadata` / `-shortest`
 
 ### `-map` — 스트림 명시 선택
 
-기본은 "비디오 1개 + 오디오 1개". 멀티 트랙 있으면 명시 필수.
+기본은 "비디오 1개 + 오디오 1개"만 자동 선택. 멀티 트랙 있으면 명시 필수.
 
 ```bash
 # 모든 스트림 포함
 ffmpeg -i input.mkv -map 0 -c copy output.mp4
 
-# 비디오 + 모든 오디오 (PokeClip 멀티 트랙)
+# 비디오 + 모든 오디오
 ffmpeg -i input.mkv -map 0:v -map 0:a -c copy output.mp4
 
 # 두 파일 합성: 첫째에서 비디오, 둘째에서 오디오 (음원 교체)
@@ -133,7 +133,7 @@ ffmpeg -i video.mp4 -i audio.aac \
   -map 0:v:0 -map 1:a:0 -c copy output.mp4
 ```
 
-문법: `0:v:0` = 입력 0번 파일의 비디오 스트림 0번.
+문법: `0:v:0` = 입력 0번 파일의 비디오 스트림 0번. PokeClip 같은 멀티 오디오 분석 파이프라인에서 `-map`을 정확히 알아야 한다.
 
 ### `-map_metadata` — 메타데이터 처리
 
@@ -145,7 +145,7 @@ ffmpeg -i input.mp4 -map_metadata -1 -c copy clean.mp4
 ffmpeg -i video.mp4 -i meta.mp4 -map_metadata 1 -c copy output.mp4
 ```
 
-라이브 인제스트에서 자주 — 스트리머 OBS의 비표준 태그가 CDN에서 문제 될 수 있어 정리.
+라이브 인제스트에서 자주 사용 — 스트리머 OBS의 비표준 태그가 CDN에서 문제 될 수 있어 정리.
 
 ### `-shortest` — 가장 짧은 입력에 맞춰 종료
 
@@ -159,7 +159,7 @@ ffmpeg \
   podcast.mp4
 ```
 
-이미지 `-loop 1`로 무한 반복, 음악 끝나면 `-shortest`로 같이 끝남.
+이미지 `-loop 1`로 무한 반복, 음악 끝나면 `-shortest`로 같이 끝남. 음원 게시판용 영상 만들 때 표준 패턴.
 
 ---
 
@@ -167,7 +167,7 @@ ffmpeg \
 
 ### `-re` — 실시간 속도로 입력
 
-기본 FFmpeg는 입력을 최대 속도로 읽음. 1시간 영상을 5분에 다 읽음. 라이브 송출 시뮬레이션에 문제.
+기본 FFmpeg는 입력을 최대 속도로 읽음. 1시간 영상을 5분에 다 읽음. 라이브 송출 시뮬레이션엔 문제.
 
 ```bash
 # 파일을 라이브처럼 송출
@@ -212,6 +212,17 @@ RTMP/MPEG-TS 받다 가끔 PTS가 음수거나 점프함. 인제스트 단에서
 | SRT | `mpegts` |
 
 RTMP의 컨테이너 이름이 `flv`라는 게 헷갈리는 부분.
+
+```bash
+# stdout으로 출력 (파이프 연결)
+ffmpeg -i input.mp4 -c copy -f mpegts pipe:1 | nc server 9000
+
+# 두 ffmpeg 연결 (분산 트랜스코딩)
+ffmpeg -i input.mp4 -c:v libx264 -f mpegts - | \
+  ffmpeg -i - -c copy output.ts
+```
+
+분산 트랜스코딩 파이프라인에서 자주 사용.
 
 ---
 
@@ -268,17 +279,37 @@ ffmpeg -fflags +genpts -i input.flv ...
 placebo > veryslow > slower > slow > medium > fast > faster > veryfast > superfast > ultrafast
 ```
 
-같은 화질 기준 인코딩 시간:
+{{< chart caption="x264 preset별 인코딩 시간 (medium = 1x 기준)" >}}
+{
+  "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
+  "grid": { "left": "20%", "right": "10%", "bottom": "12%", "top": "8%" },
+  "xAxis": { "type": "log", "name": "시간 배수 (log)", "min": 0.05 },
+  "yAxis": {
+    "type": "category",
+    "data": ["ultrafast", "veryfast (라이브)", "fast", "medium (기준)", "slow", "veryslow", "placebo"]
+  },
+  "series": [{
+    "type": "bar",
+    "data": [
+      { "value": 0.1, "itemStyle": { "color": "#10b981" } },
+      { "value": 0.4, "itemStyle": { "color": "#10b981" } },
+      { "value": 0.7, "itemStyle": { "color": "#3b82f6" } },
+      { "value": 1, "itemStyle": { "color": "#94a3b8" } },
+      { "value": 3, "itemStyle": { "color": "#f59e0b" } },
+      { "value": 10, "itemStyle": { "color": "#ef4444" } },
+      { "value": 100, "itemStyle": { "color": "#7f1d1d" } }
+    ],
+    "label": { "show": true, "position": "right", "formatter": "{c}x" }
+  }]
+}
+{{< /chart >}}
 
-| preset | 시간 (medium=1x) | 용도 |
-|---|---|---|
-| placebo | 100x | 실용 불가 |
-| veryslow | 10x | VOD 아카이브 |
-| slow | 3x | VOD |
-| medium | 1x | 기준, YouTube 업로드 |
-| fast | 0.7x | 균형 |
-| veryfast | 0.4x | **라이브 표준** |
-| ultrafast | 0.1x | 긴급 (파일 30% 큼) |
+| 용도 | preset |
+|---|---|
+| VOD 아카이브 (한 번 + 영원) | `slow` / `slower` |
+| YouTube 업로드 | `medium` / `fast` |
+| **라이브 스트리밍** | **`veryfast` / `superfast`** |
+| 긴급 처리 | `ultrafast` (파일 30% 큼) |
 
 라이브에서 `medium`은 못 씀. 1080p60을 medium으로 인코딩하면 0.5x speed.
 
@@ -308,7 +339,7 @@ placebo > veryslow > slower > slow > medium > fast > faster > veryfast > superfa
 | **CBR** | `-b:v 5000k -minrate 5000k -maxrate 5000k -bufsize 10000k` | **라이브** (비트레이트 일정) |
 | **VBR** | `-b:v 5000k -maxrate 8000k -bufsize 16000k` | VOD 다운로드 |
 
-CRF 값:
+CRF 값 가이드:
 - 18 이하: 시각적 무손실
 - 23: 표준
 - 28: 보이는 저하 시작
@@ -326,9 +357,9 @@ ffmpeg -i input \
   output.flv
 ```
 
-`-b:v 5000k`만으로는 진짜 CBR이 아님. x264는 약간 변동 허용. `-minrate`를 추가해야 진짜 고정. CDN/ISP가 대역폭 예측해야 하니 필요.
+`-b:v 5000k`만으로는 진짜 CBR이 아님. x264는 약간 변동 허용. `-minrate`를 추가해야 진짜 고정 (NAL filler로 빈 비트 채움). CDN/ISP가 대역폭 예측해야 하니 필요.
 
-`bufsize` 작을수록 비트가 균일하게 분배되지만 화질 떨어짐.
+`bufsize` 작을수록 비트가 균일하지만 화질 떨어짐.
 
 ### GOP 정렬 — `-g`, `-keyint_min`, `-sc_threshold 0`
 
@@ -353,7 +384,7 @@ HLS 6초 세그먼트:
 60fps: -g 360 -keyint_min 360
 ```
 
-**ABR ladder의 모든 화질이 같은 GOP 설정이어야 세그먼트 경계 정렬**. 이게 ABR 부드러운 전환의 비밀.
+**ABR ladder의 모든 화질이 같은 GOP 설정이어야 세그먼트 경계 정렬**. ABR 부드러운 전환의 비밀 — [지난 글](../video-quality-bitrate-abr/)에서 시각화로 다뤘다.
 
 ### Profile / Level
 
@@ -366,11 +397,14 @@ high:     가장 효율 (현대 디바이스)
 라이브 플랫폼 표준: `-profile:v high -level 4.0` (1080p30) 또는 `4.2` (1080p60).
 
 레벨 = 해상도/비트레이트 상한:
-```
-4.0: 1920x1080 @ 30fps
-4.2: 1920x1080 @ 60fps
-5.1: 4K @ 60fps
-```
+
+| Level | 최대 해상도 | 최대 FPS |
+|---|---|---|
+| 4.0 | 1920x1080 | 30 |
+| 4.1 | 1920x1080 | 30 (50Mbps) |
+| 4.2 | 1920x1080 | 60 |
+| 5.0 | 4K | 30 |
+| 5.1 | 4K | 60 |
 
 ### pix_fmt
 
@@ -451,13 +485,17 @@ ffmpeg -i input.mp4 \
 
 ### AAC 인코더 선택
 
-| 인코더 | 음질 | 라이센스 |
-|---|---|---|
-| `aac` (FFmpeg 내장) | 보통 | LGPL, 어디서나 |
-| `libfdk_aac` (Fraunhofer) | **최고** | 비-LGPL, 별도 빌드 |
-| `libfaac` | 낮음 | deprecated |
+| 인코더 | 음질 | 라이센스 | 비고 |
+|---|---|---|---|
+| `aac` (FFmpeg 내장) | 보통 | LGPL | 어디서나 동작 |
+| `libfdk_aac` (Fraunhofer) | **최고** | 비-LGPL | 별도 빌드 필요 |
+| `libfaac` | 낮음 | deprecated | 안 씀 |
 
 ```bash
+# 일반 (내장)
+ffmpeg -i input -c:a aac -b:a 128k output.m4a
+
+# 더 좋은 음질
 ffmpeg -i input -c:a libfdk_aac -b:a 128k output.m4a
 ```
 
@@ -490,9 +528,24 @@ ffmpeg -i input -af "loudnorm=I=-16:LRA=11:TP=-1.5" output.m4a
 -af "agate=threshold=0.05"                        # 노이즈 게이트
 ```
 
+### 오디오 추출
+
+```bash
+# AAC 추출 (재인코딩 없이)
+ffmpeg -i video.mp4 -vn -c:a copy audio.aac
+
+# WAV로 추출 (PCM)
+ffmpeg -i video.mp4 -vn -c:a pcm_s16le -ar 48000 audio.wav
+
+# MP3 변환
+ffmpeg -i video.mp4 -vn -c:a libmp3lame -b:a 192k audio.mp3
+```
+
+`-vn` = video none. `-c:a copy`는 컨테이너만 바꾸니 무손실 + 빠름.
+
 ---
 
-## 9. -filter_complex — 멀티 입력/출력
+## 9. `-filter_complex` — 멀티 입력/출력
 
 `-vf`/`-af`는 단일 입력/출력만. 복잡한 처리는 `-filter_complex`.
 
@@ -536,7 +589,12 @@ ffmpeg -i game.wav -i mic.wav \
   -map "[a]" mixed.wav
 ```
 
-`weights`로 각 입력 비중. OBS에서 게임 + 마이크 + 디스코드 + BGM 다 `amix`.
+`amix` 옵션:
+- `duration=longest`: 가장 긴 입력에 맞춤
+- `weights`: 각 입력 가중치 (게임 1, 마이크 0.8)
+- `dropout_transition`: 끝날 때 페이드
+
+스트리머가 OBS에서 게임+마이크+디스코드+BGM 다 `amix`.
 
 ### AV 동기화 — `-itsoffset`
 
@@ -565,7 +623,7 @@ ffmpeg -i video.mp4 -i logo.png \
   -c:a copy output.mp4
 ```
 
-`overlay=W-w-20:20`: 우상단에서 20px 안쪽. `W`=영상 너비, `w`=로고 너비.
+`overlay=W-w-20:20`: 우상단에서 20px 안쪽. `W`=영상 너비, `w`=로고 너비. 플랫폼 로고는 트랜스코딩 단계에서 박는다. 원본은 깨끗하게 보관.
 
 ### `drawtext` — 라이브 지연 측정
 
@@ -603,24 +661,34 @@ ffmpeg \
     -f flv rtmp://output/480
 ```
 
+```mermaid
+flowchart LR
+  IN[RTMP 입력] --> DEC[Decode 1번]
+  LOGO[로고 PNG] --> OVL[Overlay]
+  DEC --> OVL
+  OVL --> SP[Split 3]
+  SP --> E1[Encode 1080p<br/>6000k]
+  SP --> E2[Scale 720 + Encode<br/>3000k]
+  SP --> E3[Scale 480 + Encode<br/>1500k]
+  E1 --> O1[RTMP 1080]
+  E2 --> O2[RTMP 720]
+  E3 --> O3[RTMP 480]
+```
+
 이게 라이브 트랜스코딩 서버 한 인스턴스가 하는 일. `split=3`이 디코딩 결과를 3개로 분기. **디코딩 1번 + 인코딩 3번**.
 
-근데 1080p60+720p+480p CPU로 동시 처리면 32코어 서버도 부담. NVENC 같은 GPU 인코더 필요 → 다음 글.
+근데 1080p60+720p+480p를 CPU(x264)로 동시 처리면 32코어 서버도 부담. NVENC 같은 GPU 인코더 필요 → 다음 글.
 
 ---
 
 ## 10. HLS 패키징 — 인코딩과 별개의 단계
-
-많은 사람이 헷갈리는 부분.
 
 ```
 인코딩: raw → H.264 비트스트림
 패키징: H.264 → HLS .ts + .m3u8 / DASH .m4s + .mpd
 ```
 
-x264가 만든 H.264 비트스트림을 그대로 시청자에게 줄 수 없음. **HLS 규격에 맞게 잘라서 컨테이너에 담아야**.
-
-FFmpeg는 한 번에 처리하지만, 대규모는 보통 분리 (인코딩 = 무거운 GPU 작업, 패키징 = 가벼운 CPU 작업).
+x264가 만든 H.264 비트스트림을 그대로 시청자에게 줄 수 없음. **HLS 규격에 맞게 잘라서 컨테이너에 담아야**. 매니페스트 구조는 [hls-just-files 글](../hls-just-files/)에서 자세히.
 
 ### HLS 옵션 총정리
 
@@ -648,6 +716,7 @@ ffmpeg -i input.mp4 \
 | `-hls_list_size` | 매니페스트 유지 세그먼트 수 | 5 (sliding) / 0 (VOD 무제한) |
 | `-hls_segment_type` | 컨테이너 | `mpegts` (전통), `fmp4` (CMAF) |
 | `-hls_playlist_type` | 타입 | `event` (라이브→VOD), `vod` |
+| `-hls_allow_cache` | 캐시 허용 | 0 (라이브, CDN 통제) |
 
 ### `-hls_time` × GOP 정렬
 
@@ -660,11 +729,14 @@ GOP 2초, -hls_time 6 → 6초 근처 (다음 키프레임까지 기다림)
 
 ### `-hls_flags` 주요 플래그
 
-- `delete_segments`: sliding window에서 빠진 `.ts` 자동 삭제 (디스크 관리)
-- `independent_segments`: 각 세그먼트가 키프레임으로 시작 (ABR 보장)
-- `program_date_time`: `#EXT-X-PROGRAM-DATE-TIME` 태그 (시간 동기화)
-- `append_list`: 기존 플레이리스트 이어 쓰기 (재시작 시)
-- `omit_endlist`: VOD 모드여도 ENDLIST 안 박음
+| 플래그 | 의미 |
+|---|---|
+| `delete_segments` | sliding window에서 빠진 `.ts` 자동 삭제 (디스크 관리) |
+| `independent_segments` | 각 세그먼트가 키프레임으로 시작 (ABR 보장) |
+| `program_date_time` | `#EXT-X-PROGRAM-DATE-TIME` 태그 (시간 동기화) |
+| `append_list` | 기존 플레이리스트 이어 쓰기 (재시작 시) |
+| `discont_start` | 첫 세그먼트에 discontinuity 마커 |
+| `omit_endlist` | VOD 모드여도 ENDLIST 안 박음 |
 
 라이브 표준: `delete_segments+independent_segments+program_date_time`
 
@@ -683,7 +755,7 @@ ffmpeg -re -i rtmp://input \
 echo "#EXT-X-ENDLIST" >> /var/www/hls/live.m3u8
 ```
 
-같은 매니페스트가 **라이브에서 VOD로 자연 전환**. 시청자는 다시보기로 그대로 봄.
+같은 매니페스트가 **라이브에서 VOD로 자연 전환**. 시청자는 다시보기로 그대로 봄. 다시보기 자동 생성하는 라이브 플랫폼이 자주 사용.
 
 ---
 
@@ -724,9 +796,9 @@ ffmpeg -i input.mkv \
   -c:v libx264 -c:a aac \
   -f hls -hls_time 6 \
   -var_stream_map "v:0,name:video \
-    a:0,agroup:audio,name:ko,language:ko \
-    a:1,agroup:audio,name:en,language:en \
-    a:2,agroup:audio,name:ja,language:ja" \
+    a:0,agroup:audio,language:ko,name:Korean,default:yes \
+    a:1,agroup:audio,language:en,name:English \
+    a:2,agroup:audio,language:ja,name:Japanese" \
   -master_pl_name master.m3u8 \
   '%v/playlist.m3u8'
 ```
@@ -791,7 +863,8 @@ packager \
   --low_latency_dash_mode
 ```
 
-세그먼트 파일명:
+세그먼트 파일명 패턴:
+
 ```
 seg_%05d.ts        # 5자리 (seg_00000.ts)
 seg_%v_%05d.ts     # 스트림 + 숫자
@@ -805,19 +878,6 @@ DASH는 `$...$`, HLS는 `%...` — 헷갈리는 부분.
 
 ## 13. FFmpeg vs Shaka Packager — 분리 패턴
 
-```
-[FFmpeg 통합]
-인코딩 + 패키징 한 프로세스
-장점: 단순
-단점: 독립 스케일링 어려움
-
-[Shaka Packager 분리]
-인코딩: FFmpeg → MP4 출력
-패키징: Shaka가 .m4s + .m3u8 + .mpd 생성
-장점: 독립 스케일링, DRM 통합 쉬움, LL-HLS 완전 지원
-단점: 파이프라인 복잡
-```
-
 ```mermaid
 flowchart LR
   S[스트리머 RTMP] --> F[FFmpeg<br/>인코딩 only<br/>NVENC]
@@ -825,6 +885,13 @@ flowchart LR
   P --> O[Origin Storage]
   O --> CDN
 ```
+
+| 항목 | FFmpeg 통합 | Shaka Packager 분리 |
+|---|---|---|
+| 구조 | 인코딩 + 패키징 한 프로세스 | 인코딩(FFmpeg) + 패키징(Shaka) 분리 |
+| 장점 | 단순 | 독립 스케일링, DRM 통합, LL-HLS 완전 지원 |
+| 단점 | 스케일링 어려움 | 파이프라인 복잡 |
+| 적합 | 작은 라이브 서비스 | 대형 플랫폼 (치지직/Twitch) |
 
 ```bash
 # 분리 패턴 - 파이프
@@ -834,13 +901,9 @@ ffmpeg -i rtmp://input ... -f mp4 - | \
     --segment_duration 6
 ```
 
-치지직/Twitch 같은 대형 플랫폼은 분리. 작은 라이브 서비스는 FFmpeg 통합.
-
 ---
 
 ## 14. `-progress` — 라이브 트랜스코딩 모니터링
-
-서버에서 FFmpeg 돌고 있는지 확인.
 
 ```bash
 ffmpeg -i input.mp4 \
@@ -860,9 +923,15 @@ out_time_ms=20566000
 speed=1.95x
 ```
 
-`speed=1.95x`가 핵심 — 1.0x보다 크면 실시간보다 빠름. 0.5x면 라이브 못 따라감. **1.0x 이하 알람**이 라이브 인프라 표준.
+`speed=1.95x`가 핵심. 1.0x보다 크면 실시간보다 빠름. 0.5x면 라이브 못 따라감. **1.0x 이하 알람**이 라이브 인프라 표준.
 
-서버에서 FFmpeg 띄울 때 이 stdout 파싱해서 Prometheus로 노출.
+```mermaid
+flowchart LR
+  F[FFmpeg<br/>-progress pipe:1] --> P[Parser<br/>stdout 파싱]
+  P --> E[Prometheus<br/>Exporter]
+  E --> G[Grafana<br/>대시보드]
+  G --> A[알람<br/>speed &lt; 1.0]
+```
 
 ---
 
@@ -934,7 +1003,7 @@ spec:
           - h264_nvenc
 ```
 
-NVIDIA device plugin 설치 + `nvidia.com/gpu: 1`. 다음 글에서 NVENC 깊이 다룬다.
+NVIDIA device plugin 설치 + `nvidia.com/gpu: 1`로 GPU 할당. 다음 글에서 NVENC 깊이 다룬다.
 
 ### FFmpeg 빌드 옵션 확인
 
