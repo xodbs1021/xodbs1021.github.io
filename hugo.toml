@@ -13,6 +13,13 @@ theme = "PaperMod"
   [markup.goldmark]
     [markup.goldmark.renderer]
       unsafe = true
+  [markup.highlight]
+    style = "github"
+    noClasses = true
+    lineNos = false
+    codeFences = true
+    guessSyntax = false
+    tabWidth = 4
 
 [[menus.main]]
   name = "Tech Blurting"

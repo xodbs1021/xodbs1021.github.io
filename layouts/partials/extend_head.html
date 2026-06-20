@@ -567,19 +567,40 @@ nav.nav #menu {
   font-size: 0.88em;
 }
 
-/* chroma syntax highlighter의 plain text 인라인 색(#272822, 거의 검정)이
-   라이트/다크 모드 둘 다 어두운 코드 블록 배경 위에서 안 보이는 문제 보정.
-   PaperMod의 코드 블록 배경은 모드 무관하게 어둡기 때문에 무조건 적용. */
-.post-content pre [style*="color:#272822"],
-.main-column pre [style*="color:#272822"] {
-  color: #e8e8e3 !important;
-}
-/* 코드 블록 배경/테두리를 한 톤 더 정돈 (syntax color 대비 강화) */
+/* 코드 블록 — 사이트 테마와 일관 (라이트=연한 회색, 다크=어두운 회색) */
 .post-content pre,
 .main-column pre {
-  background: #1a1a1d;
-  border-color: #2a2a30;
-  color: #e8e8e3;
+  background: #f6f8fa;
+  color: #1f2328;
+  border: 1px solid #d0d7de;
+}
+/* 다크 모드용 */
+html[data-theme="dark"] .post-content pre,
+html[data-theme="dark"] .main-column pre {
+  background: #161b22;
+  color: #e6edf3;
+  border-color: #30363d;
+}
+/* 다크 모드에서 chroma github 라이트 색을 밝게 보정 (인라인 style override) */
+html[data-theme="dark"] .post-content pre [style*="color:#24292"],
+html[data-theme="dark"] .post-content pre [style*="color:#1f2328"],
+html[data-theme="dark"] .main-column pre [style*="color:#24292"],
+html[data-theme="dark"] .main-column pre [style*="color:#1f2328"] {
+  color: #e6edf3 !important;
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .post-content pre,
+  html:not([data-theme="light"]) .main-column pre {
+    background: #161b22;
+    color: #e6edf3;
+    border-color: #30363d;
+  }
+  html:not([data-theme="light"]) .post-content pre [style*="color:#24292"],
+  html:not([data-theme="light"]) .post-content pre [style*="color:#1f2328"],
+  html:not([data-theme="light"]) .main-column pre [style*="color:#24292"],
+  html:not([data-theme="light"]) .main-column pre [style*="color:#1f2328"] {
+    color: #e6edf3 !important;
+  }
 }
 
 /* ============================================
