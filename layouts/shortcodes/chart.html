@@ -1,33 +1,38 @@
-{{- $id := printf "chart-%s" (.Inner | hash.XxHash) -}}
+{{- $id := printf "echart-%s" (.Inner | hash.XxHash) -}}
 <figure class="chart-figure" style="margin: 2rem auto; max-width: 760px;">
-  <div style="position: relative; height: {{ .Get "height" | default "340px" }};">
-    <canvas id="{{ $id }}"></canvas>
-  </div>
+  <div id="{{ $id }}" style="width: 100%; height: {{ .Get "height" | default "360px" }};"></div>
   {{- with .Get "caption" }}
   <figcaption style="text-align:center; color: var(--secondary); font-size: 13px; margin-top: 0.6rem;">{{ . }}</figcaption>
   {{- end }}
 </figure>
 <script>
 (function() {
+  function getTheme() {
+    const t = document.documentElement.dataset.theme;
+    if (t === 'dark') return 'dark';
+    if (t === 'light') return null;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : null;
+  }
+  let chart;
   function init() {
-    if (typeof Chart === 'undefined') { setTimeout(init, 100); return; }
-    const cfg = {{ .Inner | safeJS }};
-    const ctx = document.getElementById('{{ $id }}').getContext('2d');
-    const isDark = document.documentElement.dataset.theme === 'dark'
-      || (document.documentElement.dataset.theme === 'auto'
-          && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    const txt = isDark ? '#dadadb' : '#1d1e20';
-    const grid = isDark ? '#333333' : '#e5e5e5';
-    cfg.options = Object.assign({
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: txt } } },
-      scales: {
-        x: { ticks: { color: txt }, grid: { color: grid } },
-        y: { ticks: { color: txt }, grid: { color: grid } }
-      }
-    }, cfg.options || {});
-    new Chart(ctx, cfg);
+    if (typeof echarts === 'undefined') { setTimeout(init, 100); return; }
+    const el = document.getElementById('{{ $id }}');
+    if (!el) return;
+    const option = {{ .Inner | safeJS }};
+    const baseTextStyle = { fontFamily: 'inherit' };
+    option.textStyle = Object.assign(baseTextStyle, option.textStyle || {});
+    chart = echarts.init(el, getTheme(), { renderer: 'canvas' });
+    chart.setOption(option);
+    window.addEventListener('resize', () => chart && chart.resize());
+    // Re-render on theme toggle
+    const observer = new MutationObserver(() => {
+      if (!chart) return;
+      const opt = chart.getOption();
+      chart.dispose();
+      chart = echarts.init(el, getTheme(), { renderer: 'canvas' });
+      chart.setOption(opt);
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

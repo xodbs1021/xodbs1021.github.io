@@ -64,44 +64,38 @@ seq:3 손실 → NAK (Negative ACK) 즉시 발송
 
 {{< chart caption="SRT latency 설정에 따른 손실 복구율 vs 지연 트레이드오프 (개념적 추정치)" >}}
 {
-  "type": "line",
-  "data": {
-    "labels": ["50ms", "120ms", "250ms", "500ms", "1000ms", "2000ms"],
-    "datasets": [
-      {
-        "label": "손실 복구 가능률 (%)",
-        "data": [55, 80, 92, 97, 99, 99.5],
-        "borderColor": "#10b981",
-        "backgroundColor": "rgba(16, 185, 129, 0.1)",
-        "tension": 0.4,
-        "yAxisID": "y"
-      },
-      {
-        "label": "총 송출 지연 (ms)",
-        "data": [80, 150, 280, 530, 1030, 2030],
-        "borderColor": "#ef4444",
-        "backgroundColor": "rgba(239, 68, 68, 0.1)",
-        "tension": 0.4,
-        "yAxisID": "y1"
-      }
-    ]
+  "tooltip": { "trigger": "axis" },
+  "legend": { "data": ["손실 복구 가능률 (%)", "총 송출 지연 (ms)"], "top": 0 },
+  "grid": { "left": "12%", "right": "12%", "bottom": "12%", "top": "18%" },
+  "xAxis": {
+    "type": "category",
+    "data": ["50ms", "120ms", "250ms", "500ms", "1000ms", "2000ms"],
+    "name": "latency 설정"
   },
-  "options": {
-    "scales": {
-      "y": {
-        "type": "linear",
-        "position": "left",
-        "title": { "display": true, "text": "손실 복구율 (%)" },
-        "min": 50, "max": 100
-      },
-      "y1": {
-        "type": "linear",
-        "position": "right",
-        "title": { "display": true, "text": "지연 (ms)" },
-        "grid": { "drawOnChartArea": false }
-      }
+  "yAxis": [
+    { "type": "value", "name": "복구율 (%)", "min": 50, "max": 100, "position": "left" },
+    { "type": "value", "name": "지연 (ms)", "position": "right" }
+  ],
+  "series": [
+    {
+      "name": "손실 복구 가능률 (%)",
+      "type": "line",
+      "smooth": true,
+      "yAxisIndex": 0,
+      "itemStyle": { "color": "#10b981" },
+      "areaStyle": { "opacity": 0.15 },
+      "data": [55, 80, 92, 97, 99, 99.5]
+    },
+    {
+      "name": "총 송출 지연 (ms)",
+      "type": "line",
+      "smooth": true,
+      "yAxisIndex": 1,
+      "itemStyle": { "color": "#ef4444" },
+      "areaStyle": { "opacity": 0.15 },
+      "data": [80, 150, 280, 530, 1030, 2030]
     }
-  }
+  ]
 }
 {{< /chart >}}
 
@@ -202,21 +196,25 @@ SRT가 방송 차량에서 결정적인 이유. **여러 인터넷 회선을 묶
 
 각자 다른 강점.
 
-{{< chart caption="인제스트 프로토콜별 일반적 지연 (ms)" >}}
+{{< chart caption="인제스트 프로토콜별 일반적 지연 (ms, 로그 스케일)" >}}
 {
-  "type": "bar",
-  "data": {
-    "labels": ["RTMP (TCP)", "SRT (120ms latency)", "SRT (500ms latency)", "WHIP (WebRTC)"],
-    "datasets": [{
-      "label": "총 지연 (ms)",
-      "data": [2500, 200, 600, 100],
-      "backgroundColor": ["#94a3b8", "#10b981", "#3b82f6", "#f59e0b"]
-    }]
+  "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
+  "grid": { "left": "22%", "right": "8%", "bottom": "12%", "top": "8%" },
+  "xAxis": { "type": "log", "name": "지연 (ms)", "min": 50 },
+  "yAxis": {
+    "type": "category",
+    "data": ["WHIP (WebRTC)", "SRT (120ms latency)", "SRT (500ms latency)", "RTMP (TCP)"]
   },
-  "options": {
-    "indexAxis": "y",
-    "plugins": { "legend": { "display": false } }
-  }
+  "series": [{
+    "type": "bar",
+    "data": [
+      { "value": 100, "itemStyle": { "color": "#f59e0b" } },
+      { "value": 200, "itemStyle": { "color": "#10b981" } },
+      { "value": 600, "itemStyle": { "color": "#3b82f6" } },
+      { "value": 2500, "itemStyle": { "color": "#94a3b8" } }
+    ],
+    "label": { "show": true, "position": "right", "formatter": "{c}ms" }
+  }]
 }
 {{< /chart >}}
 
