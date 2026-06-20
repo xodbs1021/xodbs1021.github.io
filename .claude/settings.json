@@ -1,5 +1,17 @@
 {
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 5,
+            "command": "INPUT=$(cat); FILE=$(echo \"$INPUT\" | jq -r '.tool_input.file_path // empty'); if echo \"$FILE\" | grep -qE '_workspace/streaming_lessons/'; then printf '{\"decision\":\"block\",\"reason\":\"강의 파일(_workspace/streaming_lessons/)은 Read 도구 금지. 반드시 Bash의 cat으로 한 번에 읽을 것 (토큰 효율 정책 + 사용자 메모리 feedback_lesson_output.md). 명령 예시: cat /Users/kty/tech-blog/_workspace/streaming_lessons/4-1-1.md /Users/kty/tech-blog/_workspace/streaming_lessons/4-1-2.md ...\"}'; exit 0; fi; exit 0"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
