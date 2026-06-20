@@ -1,5 +1,71 @@
 <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-<script>mermaid.initialize({startOnLoad:true, theme:'default'});</script>
+<script>
+(function() {
+  function isDark() {
+    const t = document.documentElement.dataset.theme;
+    if (t === 'dark') return true;
+    if (t === 'light') return false;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function buildConfig() {
+    const dark = isDark();
+    const c = dark ? {
+      bg: '#1d1e20', node: '#2e2e33', node2: '#373840', node3: '#41424d',
+      text: '#dadadb', border: '#52525b', line: '#9b9c9d',
+      noteBg: '#3a3b30', noteBorder: '#a78a4a'
+    } : {
+      bg: '#ffffff', node: '#ffffff', node2: '#f3f4f6', node3: '#f9fafb',
+      text: '#1d1e20', border: '#d1d5db', line: '#6b7280',
+      noteBg: '#fef3c7', noteBorder: '#fcd34d'
+    };
+    return {
+      startOnLoad: false,
+      theme: 'base',
+      fontFamily: 'inherit',
+      themeVariables: {
+        fontFamily: 'inherit',
+        fontSize: '14px',
+        primaryColor: c.node, primaryTextColor: c.text, primaryBorderColor: c.border,
+        secondaryColor: c.node2, tertiaryColor: c.node3,
+        lineColor: c.line, textColor: c.text,
+        background: c.bg, mainBkg: c.node, secondBkg: c.node2,
+        clusterBkg: c.node3, clusterBorder: c.border,
+        // sequence
+        actorBkg: c.node2, actorBorder: c.border, actorTextColor: c.text,
+        actorLineColor: c.line,
+        signalColor: c.text, signalTextColor: c.text,
+        labelBoxBkgColor: c.node3, labelBoxBorderColor: c.border, labelTextColor: c.text,
+        loopTextColor: c.text,
+        noteBkgColor: c.noteBg, noteBorderColor: c.noteBorder, noteTextColor: c.text,
+        activationBkgColor: c.node3, activationBorderColor: c.line,
+        sequenceNumberColor: c.text,
+        // flowchart/state
+        nodeBorder: c.border, edgeLabelBackground: c.node2,
+        // gantt
+        gridColor: c.border, sectionBkgColor: c.node2,
+        // git
+        git0: '#3b82f6', git1: '#10b981', git2: '#f59e0b', git3: '#ef4444'
+      }
+    };
+  }
+  function render() {
+    mermaid.initialize(buildConfig());
+    document.querySelectorAll('.mermaid').forEach((el) => {
+      if (el.dataset.source) el.innerHTML = el.dataset.source;
+      else el.dataset.source = el.innerHTML;
+      el.removeAttribute('data-processed');
+    });
+    mermaid.run({ querySelector: '.mermaid' }).catch(() => {});
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', render);
+  } else { render(); }
+  // Re-render on theme toggle
+  new MutationObserver(render).observe(document.documentElement, {
+    attributes: true, attributeFilter: ['data-theme']
+  });
+})();
+</script>
 
 <!-- Apache ECharts for inline data visualizations (Sankey, Heatmap, Treemap, Network, etc.) -->
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js" defer></script>
