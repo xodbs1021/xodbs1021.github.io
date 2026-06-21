@@ -1,71 +1,107 @@
 ---
 name: image-prompt-curator
-description: 블로그 글 마크다운에서 진짜 필요한 이미지를 정직하게 식별하고 영어 프롬프트로 출력. 갯수 패턴화 금지. 강의 시리즈 작성 흐름에서 글 작성 직전에 호출.
+description: 블로그 글 작성 직전에 호출. image-need-judge로 이미지 필요 여부 먼저 판단(0~N개 정직 판단), 필요할 때만 image-prompt-generator로 영어 프롬프트 작성. 갯수 패턴화 절대 금지.
 ---
 
-# 블로그 이미지 프롬프트 큐레이터
+# 블로그 이미지 큐레이터
 
-블로그 글을 쓰기 전 또는 직후에 호출. 글 내용을 분석하고 **진짜 정적 이미지가 필요한 곳만** 식별해 영어 프롬프트로 출력한다.
+블로그 글에 이미지가 진짜 필요한지 먼저 판단하고, 필요할 때만 영어 프롬프트로 출력.
+
+## 제1규칙 — 패턴화 절대 금지
+
+**이미지 갯수든, 필요 여부든, 어떤 종류든 패턴화 절대 금지.**
+
+```
+❌ "최근 글이 0개였으니 이번도 0개"
+❌ "최근 글이 3개였으니 이번도 3개"
+❌ "최근 2개 글 패턴 그대로 따라가기"
+✅ 글마다 백지에서 다시 판단
+```
 
 ## 트리거
 
-다음 상황에서 이 스킬을 사용한다:
 - 사용자가 "글 내용 보고 프롬프트 줘", "이미지 프롬프트 줘", "필요한 이미지 알려줘" 요청
-- 블로그 글 초안 작성 후 이미지 결정 단계
-- 사용자가 강의 X-Y의 N강 분석 후 글 쓸 때 이미지 결정
+- 블로그 글 초안 작성 직전 (강의 cat 후 글 쓰기 전)
+- 사용자가 강의 X-Y의 N강 분석 후 글 쓸 때
 
-## 호출 흐름
+## 협업 흐름 (2단계 에이전트)
 
-1. **컨텍스트 수집**
-   - 블로그 글 마크다운이 이미 있으면 Read 도구로 읽기
-   - 강의 시리즈 글 작성 중이면 강의 파일을 `cat`(Bash)으로 읽어 컨텍스트 확보
-     - **중요**: 강의 파일은 절대 Read 도구로 읽지 말 것. Hook이 차단함.
-     - 명령 예: `cat /Users/kty/tech-blog/_workspace/streaming_lessons/4-1-1.md ...`
-2. **image-prompt-generator 에이전트 호출**
-   - Agent 도구로 `subagent_type: image-prompt-generator` 지정
-   - 글 경로 또는 컨텍스트 요약을 prompt로 전달
-   - "정직하게 0개일 수도, 5개일 수도 있다"고 명시
-3. **에이전트 결과 사용자에게 그대로 전달**
-   - 검토했지만 안 쓴 후보 (정직 보고) + 진짜 요청할 N개 영어 프롬프트
-   - 사용자가 다운로드 받을 수 있게 갯수 명시
+### 단계 1: 이미지 필요 여부 판단
 
-## 절대 원칙
+**`image-need-judge` 에이전트 호출**
+- Agent 도구로 `subagent_type: image-need-judge`
+- 글 마크다운 경로 또는 강의 cat 결과를 prompt로 전달
+- 출력: 시각적 후보 전부 분류 + 이번 글에 필요한 N개 (0개 OK, 5~7개 OK)
+- **N은 글이 결정하지 습관이 결정하지 않는다**
 
-- **갯수 패턴화 금지**: 직전 글이 3개였다고 다음 글도 3개 만들지 말 것. 0개일 수도 있다.
-- **영어 프롬프트 필수**: 사용자 메모리 `feedback_image_prompts.md`
-- **다른 도구 우선 검토**:
-  - 수치 비교 → ECharts
-  - 시퀀스/플로우 → Mermaid
-  - 매트릭스/스펙 비교 → 마크다운 표
-  - 코드/설정 → 코드 박스
-  - 이 셋으로 표현 가능하면 이미지 요청 금지
-- **이전 글에서 다룬 시각적 주제**는 cross-link로 재사용. 같은 이미지 또 만들지 말 것.
+### 단계 2: 영어 프롬프트 작성 (N > 0인 경우만)
 
-## 사용자 선호 반영
+**`image-prompt-generator` 에이전트 호출**
+- N > 0인 경우만 진행
+- Agent 도구로 `subagent_type: image-prompt-generator`
+- image-need-judge가 분류한 N개 항목을 prompt로 전달
+- 출력: 각 이미지의 영어 프롬프트
 
-- `feedback_streaming_lesson_style.md` — 개발자 실무 위주, 알고리즘 수학 제외
-- `feedback_article_style.md` — Medium 기술 아티클 스타일
-- `feedback_lesson_output.md` — 강의 파일은 cat 한 번만
-- 사용자가 "패턴 아니지?" 의심하면 정직하게 답할 것
+### 단계 3: 사용자 보고
+
+- 시각적 후보 분류 결과 (정직 보고)
+- 이미지로 가는 N개 + 영어 프롬프트
+- 표/Mermaid/ECharts/cross-link로 처리할 후보들도 명시
+
+## 강의 파일 처리
+
+강의 시리즈 글이면 강의 파일을 컨텍스트로 확보:
+
+- **반드시 cat 사용 (Bash)** — Read 도구 금지 (Hook이 차단)
+- 명령 예: `cat /Users/kty/tech-blog/_workspace/streaming_lessons/4-2-1.md ...`
+- 사용자 메모리: `feedback_lesson_output.md`
+
+## 사용자 메모리 정합
+
+- **`feedback_image_prompts.md`** — 이미지 프롬프트는 반드시 영어
+- **`feedback_echarts_usage.md`** — 수치 비교는 ECharts (이미지 아님)
+- **`feedback_streaming_lesson_style.md`** — 개발자 실무 위주, 수학 제외
+- **`feedback_lesson_output.md`** — 강의 파일은 cat만
+- **`feedback_internal_terms.md`** — "레벨 N" 표기 금지
+- **`feedback_markdown_range.md`** — 숫자~숫자 OK
+- **`feedback_english_terms.md`** — 어색한 음차(transmuxing 등)는 영어 원문
 
 ## 출력 예시
 
 ```
-[이미지 필요 2개 판단]
+[이미지 필요 여부 판단]
 
-요약: 4-3 NVENC 글. 시각적 본질은 GPU 인코더 칩 구조와 동시 채널 처리량 한계. 두 개만 진짜 가치 있음.
+이번 글 주제: ABR Ladder 설계
+시각적 후보 15개 검토:
+- Convex Hull 그래프 → ECharts scatter+line
+- Per-Title 영상 분류 → 이미지 가치 큼 (친근 인포그래픽)
+- Shot-Based Encoding 타임라인 → 이미지 가치 큼 (시간축 시각화)
+- 라이브 트랜스코딩 인프라 → Mermaid 충분
+- ABR Ladder 단계 → 이전 글 cross-link
+- 시청자 화질 분포 → ECharts donut
+- ...
 
-검토했지만 이미지 안 만들기로 결정한 후보들:
-- preset별 속도/화질 → ECharts 이중 축 차트가 더 정확
-- 코덱별 처리량 → 마크다운 표
-- NVENC 세션 한계 → 텍스트 + 표
-- AV1/H.265/H.264 인코딩 시간 → ECharts 로그 스케일
+이미지로 가는 2개:
+1. per-title-encoding-flow.png — 콘텐츠별 다른 사다리 (시각적 본질)
+2. shot-based-encoding.png — 영상 시간축 비트레이트 변화 (텍스트 표현 불가)
 
-이미지로 요청할 2개:
+패턴화 자기 점검:
+- 이전 5개 글의 갯수: 0, 0, 1, 0, 0
+- 이번 글: 2개 — 패턴 깨고 정직 판단함 ✅
 
-**1. `nvenc-asic-architecture.png` — NVENC가 CUDA와 별개인 이유**
 [영어 프롬프트]
-
-**2. `nvenc-vs-x264-throughput.png` — 같은 서버에서 GPU vs CPU 채널 처리량**
-[영어 프롬프트]
+(image-prompt-generator 결과 첨부)
 ```
+
+## 협업 시점
+
+블로그 글 작성 흐름:
+
+1. (사용자) "X-Y 강의 분석하고 프롬프트 줘"
+2. (메인 클로드) 강의 cat — 컨텍스트 확보
+3. (메인 클로드) 이 스킬 호출
+4. (스킬) image-need-judge 호출 → 필요 N개 판단
+5. (스킬) N > 0이면 image-prompt-generator 호출 → 영어 프롬프트
+6. (메인 클로드) 사용자에게 보고
+7. (사용자) 이미지 N개 다운로드해 전달 (또는 0개면 바로 다음 단계)
+8. (메인 클로드) 글 작성
