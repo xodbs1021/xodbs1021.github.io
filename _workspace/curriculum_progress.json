@@ -1,0 +1,287 @@
+{
+  "project": "PokéClip",
+  "started_at": null,
+  "last_updated": "2026-06-22",
+  "learner_profile_summary": "AI 전공 실전 0, Python/Linux/Git CLI/AWS/Docker 백지, 영상 4-1~4-5 완료, 9to9 풀타임, 강의 무제한",
+  "policies": {
+    "lesson_count_per_series": "unlimited",
+    "track_progress": "partial_parallel",
+    "validation_threshold": 90,
+    "validation_retries_max": 2,
+    "blog_mapping": "one_per_track_level"
+  },
+  "completed_video_tracks": [
+    "4-1", "4-2", "4-3", "4-4", "4-5"
+  ],
+  "tracks": {
+    "A_tools": {
+      "name": "개발 도구 기초",
+      "depends_on": [],
+      "series": {
+        "A-1": { "name": "터미널 + zsh 입문", "status": "pending", "lessons": [] },
+        "A-2": { "name": "Linux 명령어 일상", "status": "pending", "lessons": [] },
+        "A-3": { "name": "Bash 셸 스크립팅", "status": "pending", "lessons": [] },
+        "A-4": { "name": "Git CLI 깊이", "status": "pending", "lessons": [] },
+        "A-5": { "name": "GitHub 협업", "status": "pending", "lessons": [] },
+        "A-6": { "name": "에디터 환경 셋업", "status": "pending", "lessons": [] }
+      }
+    },
+    "B_python": {
+      "name": "Python 입문~심화",
+      "depends_on": ["A"],
+      "series": {
+        "B-1": { "name": "Python 입문", "status": "pending", "lessons": [] },
+        "B-2": { "name": "함수/모듈/패키지/가상환경", "status": "pending", "lessons": [] },
+        "B-3": { "name": "표준 라이브러리 깊이", "status": "pending", "lessons": [] },
+        "B-4": { "name": "객체지향 + 매직 메서드", "status": "pending", "lessons": [] },
+        "B-5": { "name": "에러 처리 + 디버깅", "status": "pending", "lessons": [] },
+        "B-6": { "name": "파일 처리 + 정규식", "status": "pending", "lessons": [] },
+        "B-7": { "name": "동시성", "status": "pending", "lessons": [] },
+        "B-8": { "name": "asyncio + 이벤트 루프", "status": "pending", "lessons": [] },
+        "B-9": { "name": "타입 힌트 + pydantic", "status": "pending", "lessons": [] },
+        "B-10": { "name": "pytest 테스팅", "status": "pending", "lessons": [] },
+        "B-11": { "name": "패키지 배포", "status": "pending", "lessons": [] }
+      }
+    },
+    "C_ai_intro": {
+      "name": "AI/ML 입문",
+      "depends_on": ["B"],
+      "series": {
+        "C-1": { "name": "AI/ML 큰 그림", "status": "pending", "lessons": [] },
+        "C-2": { "name": "NumPy + 텐서 기초", "status": "pending", "lessons": [] },
+        "C-3": { "name": "PyTorch 입문", "status": "pending", "lessons": [] },
+        "C-4": { "name": "신경망 기초", "status": "pending", "lessons": [] },
+        "C-5": { "name": "학습 루프 + 최적화", "status": "pending", "lessons": [] },
+        "C-6": { "name": "데이터 로더 + 전처리", "status": "pending", "lessons": [] },
+        "C-7": { "name": "평가 지표", "status": "pending", "lessons": [] },
+        "C-8": { "name": "사전학습 모델 활용", "status": "pending", "lessons": [] },
+        "C-9": { "name": "Hugging Face 생태계", "status": "pending", "lessons": [] },
+        "C-10": { "name": "LLM API 활용", "status": "pending", "lessons": [] }
+      }
+    },
+    "D_ai_advanced": {
+      "name": "AI 깊이",
+      "depends_on": ["C"],
+      "series": {
+        "D-1": { "name": "Computer Vision 깊이", "status": "pending", "lessons": [] },
+        "D-2": { "name": "YOLO 아키텍처 + 학습", "status": "pending", "lessons": [] },
+        "D-3": { "name": "데이터 라벨링", "status": "pending", "lessons": [] },
+        "D-4": { "name": "도메인 특화 YOLO 파인튜닝 (LoL)", "status": "pending", "lessons": [] },
+        "D-5": { "name": "모델 평가 + 디버깅", "status": "pending", "lessons": [] },
+        "D-6": { "name": "Whisper STT 활용 + 파인튜닝", "status": "pending", "lessons": [] },
+        "D-7": { "name": "음성 효과음 패턴 매칭", "status": "pending", "lessons": [] },
+        "D-8": { "name": "LLM 프롬프트 엔지니어링", "status": "pending", "lessons": [] },
+        "D-9": { "name": "멀티모달 LLM", "status": "pending", "lessons": [] },
+        "D-10": { "name": "모델 경량화", "status": "pending", "lessons": [] },
+        "D-11": { "name": "GPU 활용 (CUDA / MPS)", "status": "pending", "lessons": [] },
+        "D-12": { "name": "MLOps 입문", "status": "pending", "lessons": [] },
+        "D-13": { "name": "추론 최적화", "status": "pending", "lessons": [] },
+        "D-14": { "name": "자체 분석 함수 설계", "status": "pending", "lessons": [] }
+      }
+    },
+    "E_backend": {
+      "name": "백엔드 아키텍처",
+      "depends_on": ["B", "F"],
+      "series": {
+        "E-1": { "name": "HTTP 기초", "status": "pending", "lessons": [] },
+        "E-2": { "name": "REST API 설계", "status": "pending", "lessons": [] },
+        "E-3": { "name": "WebSocket 깊이", "status": "pending", "lessons": [] },
+        "E-4": { "name": "FastAPI 입문", "status": "pending", "lessons": [] },
+        "E-5": { "name": "의존성 주입 + 미들웨어", "status": "pending", "lessons": [] },
+        "E-6": { "name": "비동기 백엔드", "status": "pending", "lessons": [] },
+        "E-7": { "name": "메시지 큐 입문 (Redis Pub/Sub)", "status": "pending", "lessons": [] },
+        "E-8": { "name": "Redis Streams 깊이", "status": "pending", "lessons": [] },
+        "E-9": { "name": "Apache Kafka 입문", "status": "pending", "lessons": [] },
+        "E-10": { "name": "마이크로서비스 vs 모놀리스", "status": "pending", "lessons": [] },
+        "E-11": { "name": "분석 파이프라인 설계", "status": "pending", "lessons": [] },
+        "E-12": { "name": "백프레셔 + 큐 깊이 관리", "status": "pending", "lessons": [] }
+      }
+    },
+    "F_database": {
+      "name": "데이터베이스",
+      "depends_on": ["B"],
+      "series": {
+        "F-1": { "name": "관계형 DB 기초", "status": "pending", "lessons": [] },
+        "F-2": { "name": "SQL 깊이", "status": "pending", "lessons": [] },
+        "F-3": { "name": "인덱스 + 쿼리 최적화", "status": "pending", "lessons": [] },
+        "F-4": { "name": "트랜잭션 + 격리 수준", "status": "pending", "lessons": [] },
+        "F-5": { "name": "SQLAlchemy ORM", "status": "pending", "lessons": [] },
+        "F-6": { "name": "NoSQL 입문", "status": "pending", "lessons": [] },
+        "F-7": { "name": "DynamoDB 키 설계", "status": "pending", "lessons": [] },
+        "F-8": { "name": "시계열 DB", "status": "pending", "lessons": [] },
+        "F-9": { "name": "캐싱 + Redis 활용", "status": "pending", "lessons": [] },
+        "F-10": { "name": "데이터 모델링", "status": "pending", "lessons": [] }
+      }
+    },
+    "G_aws": {
+      "name": "AWS 인프라",
+      "depends_on": ["A"],
+      "series": {
+        "G-1": { "name": "AWS 콘솔/CLI/IAM 기초", "status": "pending", "lessons": [] },
+        "G-2": { "name": "EC2 입문", "status": "pending", "lessons": [] },
+        "G-3": { "name": "EC2 GPU 인스턴스", "status": "pending", "lessons": [] },
+        "G-4": { "name": "S3 + 라이프사이클", "status": "pending", "lessons": [] },
+        "G-5": { "name": "Lambda 기초", "status": "pending", "lessons": [] },
+        "G-6": { "name": "Lambda + DynamoDB", "status": "pending", "lessons": [] },
+        "G-7": { "name": "API Gateway + Lambda", "status": "pending", "lessons": [] },
+        "G-8": { "name": "VPC 기초", "status": "pending", "lessons": [] },
+        "G-9": { "name": "VPC 깊이", "status": "pending", "lessons": [] },
+        "G-10": { "name": "CloudWatch 모니터링", "status": "pending", "lessons": [] },
+        "G-11": { "name": "Auto-scaling", "status": "pending", "lessons": [] },
+        "G-12": { "name": "비용 최적화", "status": "pending", "lessons": [] }
+      }
+    },
+    "H_devops": {
+      "name": "DevOps",
+      "depends_on": ["G"],
+      "series": {
+        "H-1": { "name": "Docker 개념 + 첫 컨테이너", "status": "pending", "lessons": [] },
+        "H-2": { "name": "Dockerfile 작성", "status": "pending", "lessons": [] },
+        "H-3": { "name": "Docker Compose", "status": "pending", "lessons": [] },
+        "H-4": { "name": "컨테이너 레지스트리 (ECR)", "status": "pending", "lessons": [] },
+        "H-5": { "name": "GitHub Actions CI/CD", "status": "pending", "lessons": [] },
+        "H-6": { "name": "AWS ECS / EKS 입문", "status": "pending", "lessons": [] },
+        "H-7": { "name": "Prometheus + Grafana", "status": "pending", "lessons": [] },
+        "H-8": { "name": "ELK 로깅", "status": "pending", "lessons": [] },
+        "H-9": { "name": "알람 (PagerDuty / Slack)", "status": "pending", "lessons": [] },
+        "H-10": { "name": "Terraform 입문", "status": "pending", "lessons": [] },
+        "H-11": { "name": "무중단 배포", "status": "pending", "lessons": [] }
+      }
+    },
+    "I_algorithm": {
+      "name": "점수/신호 알고리즘",
+      "depends_on": ["B"],
+      "series": {
+        "I-1": { "name": "신호 처리 기초", "status": "pending", "lessons": [] },
+        "I-2": { "name": "슬라이딩 윈도우 + 통계", "status": "pending", "lessons": [] },
+        "I-3": { "name": "이동 평균 + 스무딩", "status": "pending", "lessons": [] },
+        "I-4": { "name": "Peak Detection", "status": "pending", "lessons": [] },
+        "I-5": { "name": "임계값 결정 + 정규화", "status": "pending", "lessons": [] },
+        "I-6": { "name": "가중치 설계 + 신호 융합", "status": "pending", "lessons": [] },
+        "I-7": { "name": "자체 점수 통합 함수 (E Hybrid)", "status": "pending", "lessons": [] },
+        "I-8": { "name": "클립 경계 추출 알고리즘", "status": "pending", "lessons": [] },
+        "I-9": { "name": "이상 탐지 입문", "status": "pending", "lessons": [] },
+        "I-10": { "name": "A/B 테스트 + 통계적 유의성", "status": "pending", "lessons": [] }
+      }
+    },
+    "J_system_design": {
+      "name": "시스템 디자인",
+      "depends_on": ["E", "F", "G", "H"],
+      "series": {
+        "J-1": { "name": "시스템 디자인 기초", "status": "pending", "lessons": [] },
+        "J-2": { "name": "URL Shortener 설계", "status": "pending", "lessons": [] },
+        "J-3": { "name": "채팅 서비스 설계", "status": "pending", "lessons": [] },
+        "J-4": { "name": "Twitch 클론 설계", "status": "pending", "lessons": [] },
+        "J-5": { "name": "추천 시스템 설계", "status": "pending", "lessons": [] },
+        "J-6": { "name": "PokéClip 자체 설계", "status": "pending", "lessons": [] },
+        "J-7": { "name": "면접 답변 패턴", "status": "pending", "lessons": [] }
+      }
+    },
+    "K_distributed": {
+      "name": "분산 시스템",
+      "depends_on": ["N", "O"],
+      "series": {
+        "K-1": { "name": "분산 시스템 기초", "status": "pending", "lessons": [] },
+        "K-2": { "name": "일관성 모델", "status": "pending", "lessons": [] },
+        "K-3": { "name": "합의 알고리즘 (Raft)", "status": "pending", "lessons": [] },
+        "K-4": { "name": "이벤트 소싱 + CQRS", "status": "pending", "lessons": [] },
+        "K-5": { "name": "분산 트랜잭션 (Saga)", "status": "pending", "lessons": [] },
+        "K-6": { "name": "실시간 처리 (Kafka Streams)", "status": "pending", "lessons": [] }
+      }
+    },
+    "L_security": {
+      "name": "보안/인증",
+      "depends_on": ["E"],
+      "series": {
+        "L-1": { "name": "HTTPS + TLS 기초", "status": "pending", "lessons": [] },
+        "L-2": { "name": "세션 vs JWT", "status": "pending", "lessons": [] },
+        "L-3": { "name": "OAuth 2.0 + OIDC", "status": "pending", "lessons": [] },
+        "L-4": { "name": "토큰 관리", "status": "pending", "lessons": [] },
+        "L-5": { "name": "PokéClip stream key 발급/검증", "status": "pending", "lessons": [] },
+        "L-6": { "name": "API 보안", "status": "pending", "lessons": [] },
+        "L-7": { "name": "비밀 관리", "status": "pending", "lessons": [] }
+      }
+    },
+    "M_pokeclip": {
+      "name": "PokéClip 종합 (코드 구현)",
+      "depends_on": ["A", "B", "C", "D", "E", "F", "G", "I", "L"],
+      "series": {
+        "M-1": { "name": "프로젝트 구조 + 모노레포 설계", "status": "pending", "lessons": [] },
+        "M-2": { "name": "SRT 수신 서버 구현 (Python)", "status": "pending", "lessons": [] },
+        "M-3": { "name": "FFmpeg Python 바인딩", "status": "pending", "lessons": [] },
+        "M-4": { "name": "멀티 오디오 트랙 디멀티플렉싱", "status": "pending", "lessons": [] },
+        "M-5": { "name": "트랙 라우터 구현", "status": "pending", "lessons": [] },
+        "M-6": { "name": "YOLO 분석 엔진 (LoL)", "status": "pending", "lessons": [] },
+        "M-7": { "name": "Whisper STT 통합", "status": "pending", "lessons": [] },
+        "M-8": { "name": "효과음 패턴 매칭 구현", "status": "pending", "lessons": [] },
+        "M-9": { "name": "치지직 채팅 수집", "status": "pending", "lessons": [] },
+        "M-10": { "name": "채팅 점수 4신호 구현", "status": "pending", "lessons": [] },
+        "M-11": { "name": "점수 통합 + E Hybrid", "status": "pending", "lessons": [] },
+        "M-12": { "name": "클립 경계 추출", "status": "pending", "lessons": [] },
+        "M-13": { "name": "DynamoDB 저장 + S3 영상 보관", "status": "pending", "lessons": [] },
+        "M-14": { "name": "EDL/XML 내보내기", "status": "pending", "lessons": [] },
+        "M-15": { "name": "웹 대시보드 (React + FastAPI)", "status": "pending", "lessons": [] },
+        "M-16": { "name": "인증 (스트림 키 / 세션)", "status": "pending", "lessons": [] },
+        "M-17": { "name": "모니터링 + 알람", "status": "pending", "lessons": [] },
+        "M-18": { "name": "배포 (EC2 + Auto-scaling)", "status": "pending", "lessons": [] },
+        "M-19": { "name": "베타 운영 + 피드백 루프", "status": "pending", "lessons": [] }
+      }
+    },
+    "N_os": {
+      "name": "운영체제",
+      "depends_on": [],
+      "series": {
+        "N-1": { "name": "프로세스 + 스레드", "status": "pending", "lessons": [] },
+        "N-2": { "name": "메모리 관리", "status": "pending", "lessons": [] },
+        "N-3": { "name": "스케줄링", "status": "pending", "lessons": [] },
+        "N-4": { "name": "동기화 + 락", "status": "pending", "lessons": [] },
+        "N-5": { "name": "파일 시스템", "status": "pending", "lessons": [] },
+        "N-6": { "name": "I/O + epoll/kqueue", "status": "pending", "lessons": [] }
+      }
+    },
+    "O_network": {
+      "name": "네트워크 깊이",
+      "depends_on": [],
+      "series": {
+        "O-1": { "name": "OSI 7계층 다시 보기", "status": "pending", "lessons": [] },
+        "O-2": { "name": "TCP 깊이", "status": "pending", "lessons": [] },
+        "O-3": { "name": "UDP + QUIC", "status": "pending", "lessons": [] },
+        "O-4": { "name": "HTTP/1.1 → /2 → /3", "status": "pending", "lessons": [] },
+        "O-5": { "name": "WebSocket 프로토콜", "status": "pending", "lessons": [] },
+        "O-6": { "name": "DNS + CDN 보강", "status": "pending", "lessons": [] },
+        "O-7": { "name": "로드 밸런서 + 프록시", "status": "pending", "lessons": [] },
+        "O-8": { "name": "네트워크 보안 기초", "status": "pending", "lessons": [] }
+      }
+    },
+    "P_arch": {
+      "name": "컴퓨터 구조",
+      "depends_on": [],
+      "series": {
+        "P-1": { "name": "CPU 구조 (파이프라인 / 캐시)", "status": "pending", "lessons": [] },
+        "P-2": { "name": "메모리 계층", "status": "pending", "lessons": [] },
+        "P-3": { "name": "GPU 구조 + CUDA", "status": "pending", "lessons": [] },
+        "P-4": { "name": "디스크 + SSD", "status": "pending", "lessons": [] },
+        "P-5": { "name": "NUMA + 멀티코어", "status": "pending", "lessons": [] }
+      }
+    },
+    "Q_dsa": {
+      "name": "자료구조/알고리즘 (면접용)",
+      "depends_on": ["B"],
+      "series": {
+        "Q-1": { "name": "배열 + 링크드 리스트", "status": "pending", "lessons": [] },
+        "Q-2": { "name": "스택 + 큐 + 덱", "status": "pending", "lessons": [] },
+        "Q-3": { "name": "해시 테이블 깊이", "status": "pending", "lessons": [] },
+        "Q-4": { "name": "트리", "status": "pending", "lessons": [] },
+        "Q-5": { "name": "힙 + 우선순위 큐", "status": "pending", "lessons": [] },
+        "Q-6": { "name": "그래프 + 탐색", "status": "pending", "lessons": [] },
+        "Q-7": { "name": "정렬 알고리즘", "status": "pending", "lessons": [] },
+        "Q-8": { "name": "동적 계획법", "status": "pending", "lessons": [] },
+        "Q-9": { "name": "그리디 + 분할정복", "status": "pending", "lessons": [] },
+        "Q-10": { "name": "알고리즘 복잡도 분석", "status": "pending", "lessons": [] }
+      }
+    }
+  },
+  "week_1_target_series": [
+    "A-1", "A-4", "B-1", "G-1", "G-2", "M-1", "M-2"
+  ]
+}

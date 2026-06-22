@@ -6,11 +6,25 @@
 
 **트리거:** "HLS 배워줘", "오늘 뭐 공부해", "WebRTC 가르쳐줘", "FFmpeg 실습", "스트리밍 공부", "다음 주제" 등 스트리밍 학습 요청 시 `streaming-tutor` 스킬을 사용하라. 단순 질문은 직접 응답 가능.
 
-## 하네스: 강의 시리즈 작성
+## 하네스: 강의 시리즈 작성 (PokéClip 커리큘럼)
 
-**목표:** 새 강의 시리즈(예: "5-1")를 시리즈 설계 → 각 강의 본문 작성 → `_workspace/streaming_lessons/N-M-K.md` 저장까지 자동화
+**목표:** PokéClip 프로젝트 구현 + 치지직 백엔드/AI 입사 대비. 17개 트랙(A~Q) × 각 트랙 레벨 분할 강의를 작성 → 검증 → 저장.
 
-**트리거:** "5-1 강의 만들어", "레벨 5 다음 시리즈", "<주제> 강의 시리즈 작성" 등 새 강의 시리즈 작성 요청 시 `lesson-series-writer` 스킬을 사용하라. `lesson-planner`(계획)과 `lesson-author`(본문) 두 에이전트를 순차 호출.
+**트리거:** "B-1 강의 만들어", "A 트랙 시작", "AWS 기초 강의 시리즈" 등 트랙-레벨 식별자 또는 주제로 강의 작성 요청 시 `lesson-series-writer` 스킬을 사용하라.
+
+**필수 컨텍스트 (모든 강의 작성 시 cat 의무):**
+- `_workspace/pokeclip_context.md` — PokéClip 기술 사양 + 학습자 진단
+- `_workspace/curriculum_master.md` — 17개 트랙 윤곽 + 의존 그래프
+- `_workspace/curriculum_progress.json` — 진도 추적
+
+**에이전트 체인:**
+1. `lesson-planner` (계획)
+2. `lesson-author` (본문 작성, 위 3개 파일 cat 의무)
+3. `lesson-quality-guard` (90/100 검증, NEEDS_REVISION 시 lesson-author 재호출 max 2회)
+
+**저장 위치:** `_workspace/lessons/<TRACK>_<이름>/<TRACK>-L-K.md` (예: `_workspace/lessons/B_python/B-1-3.md`)
+
+**영상 트랙(4-1~4-5)은 봉인.** 새 도메인 트랙(A~Q)이 메인.
 
 ## 하네스: 블로그 글쓰기
 
@@ -28,3 +42,4 @@
 | 2026-05-30 | image-manager 에이전트 추가 | agents/image-manager.md, skills/blog-writer/scripts/image_manager.py | Unsplash 스톡 + Gemini(나노바나나) 이미지 자동화 |
 | 2026-05-30 | 정렬 버그 수정 | layouts/_default/list.html, layouts/list.html | weight 정렬 → date 역순 정렬로 수정 |
 | 2026-06-22 | lesson-series-writer 하네스 추가 | agents/lesson-planner.md, agents/lesson-author.md, skills/lesson-series-writer | 강의 시리즈 작성 자동화 (계획 → 본문 → 저장) |
+| 2026-06-22 | PokéClip 커리큘럼 + 검증 인프라 | agents/lesson-quality-guard.md, _workspace/pokeclip_context.md, _workspace/curriculum_master.md, _workspace/curriculum_progress.json, 전역 메모리 project_pokeclip.md | 17개 트랙 마스터플랜 + 검증 루프 + 휘발 방지 다층 백업 |
