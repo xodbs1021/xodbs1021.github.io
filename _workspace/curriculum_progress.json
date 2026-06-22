@@ -1,37 +1,51 @@
 {
   "project": "PokéClip",
   "started_at": null,
-  "last_updated": "2026-06-22",
-  "learner_profile_summary": "AI 전공 실전 0, Python/Linux/Git CLI/AWS/Docker 백지, 영상 4-1~4-5 완료, 9to9 풀타임, 강의/시리즈 무제한",
+  "last_updated": "2026-06-23",
+  "design_version": "v2-ai-era",
+  "learner_profile_summary": "AI 전공 실전 0, Python/Linux/Git CLI/AWS/Docker 백지. AI 시대 학습 — 사람은 아키텍처/판단/검증, AI는 코딩. 9to9 풀타임, 강의/시리즈 무제한",
   "policies": {
     "lesson_count_per_series": "unlimited",
     "series_count_per_track": "unlimited",
     "track_progress": "partial_parallel",
     "validation_threshold_master": 36,
     "validation_threshold_plan": 18,
+    "validation_threshold_lesson": 90,
     "validation_retries_max": 2,
-    "blog_mapping": "one_per_track_level"
+    "blog_mapping": "one_per_track_level",
+    "interview_section_conditional": true
   },
   "completed_video_tracks": ["4-1", "4-2", "4-3", "4-4", "4-5"],
-  "total_series": 155,
+  "total_series": 137,
+  "design_principle": "AI 시대 — 도구 사용법/syntax는 슬림, 시스템 디자인/트레이드오프/모델 평가는 강화. M 트랙(프로젝트 코드 구현) 제거.",
   "tracks": {
-    "A_tools": { "name": "개발 도구 기초", "series_count": 5, "depends_on": [] },
-    "B_python": { "name": "Python 입문~심화", "series_count": 15, "depends_on": ["A"] },
-    "C_ai_intro": { "name": "AI/ML 입문", "series_count": 8, "depends_on": ["B"] },
-    "D_ai_advanced": { "name": "AI 깊이", "series_count": 22, "depends_on": ["C"] },
-    "E_backend": { "name": "백엔드 아키텍처", "series_count": 13, "depends_on": ["B", "F"] },
-    "F_database": { "name": "데이터베이스", "series_count": 12, "depends_on": ["B"] },
-    "G_aws": { "name": "AWS 인프라", "series_count": 17, "depends_on": ["A"] },
-    "H_devops": { "name": "DevOps", "series_count": 11, "depends_on": ["G"] },
-    "I_algorithm": { "name": "점수/신호 알고리즘", "series_count": 8, "depends_on": ["B"] },
-    "J_system_design": { "name": "시스템 디자인", "series_count": 7, "depends_on": ["E", "F", "G", "H"] },
-    "K_distributed": { "name": "분산 시스템", "series_count": 5, "depends_on": ["N", "O"] },
-    "L_security": { "name": "보안/인증", "series_count": 6, "depends_on": ["E"] },
-    "N_os": { "name": "운영체제", "series_count": 6, "depends_on": [] },
-    "O_network": { "name": "네트워크 깊이", "series_count": 9, "depends_on": [] },
-    "P_arch": { "name": "컴퓨터 구조", "series_count": 3, "depends_on": [] },
-    "Q_dsa": { "name": "자료구조/알고리즘 (면접용)", "series_count": 8, "depends_on": ["B"] }
+    "A_tools": { "name": "개발 도구 기초", "series_count": 2, "depends_on": [], "priority": "low" },
+    "B_python": { "name": "Python", "series_count": 8, "depends_on": ["A"], "priority": "mid" },
+    "C_ai_intro": { "name": "AI 입문", "series_count": 8, "depends_on": ["B"], "priority": "high" },
+    "D_ai_advanced": { "name": "AI 깊이", "series_count": 22, "depends_on": ["C"], "priority": "very_high" },
+    "E_backend": { "name": "백엔드 아키텍처", "series_count": 10, "depends_on": ["B", "F"], "priority": "high" },
+    "F_database": { "name": "데이터베이스", "series_count": 12, "depends_on": ["B"], "priority": "high" },
+    "G_aws": { "name": "AWS 인프라", "series_count": 13, "depends_on": ["A"], "priority": "mid" },
+    "H_devops": { "name": "DevOps", "series_count": 9, "depends_on": ["G"], "priority": "mid" },
+    "I_algorithm": { "name": "점수/신호 알고리즘", "series_count": 8, "depends_on": ["B"], "priority": "very_high" },
+    "J_system_design": { "name": "시스템 디자인", "series_count": 12, "depends_on": ["E", "F", "G", "H"], "priority": "very_high_reinforced" },
+    "K_distributed": { "name": "분산 시스템", "series_count": 7, "depends_on": ["N", "O"], "priority": "high" },
+    "L_security": { "name": "보안/인증", "series_count": 6, "depends_on": ["E"], "priority": "high" },
+    "N_os": { "name": "운영체제", "series_count": 6, "depends_on": [], "priority": "mid" },
+    "O_network": { "name": "네트워크 깊이", "series_count": 7, "depends_on": [], "priority": "mid" },
+    "P_arch": { "name": "컴퓨터 구조", "series_count": 2, "depends_on": [], "priority": "low" },
+    "Q_dsa": { "name": "자료구조/알고리즘 (면접용)", "series_count": 5, "depends_on": ["B"], "priority": "mid" }
   },
-  "series_status_note": "각 시리즈의 강의 수 / 상세 항목은 curriculum_master.md에 명시. 시리즈별 진도는 첫 호출 시 자동 확장됨.",
-  "week_1_target_series": ["A-1", "A-4", "B-1", "G-1"]
+  "series_detail_location": "curriculum_tracks/<TRACK>.md (강의 작성 시 자기 트랙만 cat — 토큰 절감)",
+  "week_1_target_series": ["A-1", "A-2", "B-1", "G-1"],
+  "in_progress": {
+    "A-1": {
+      "status": "lesson_1_pass",
+      "lessons": {
+        "A-1-1": { "status": "PASS", "score": 98, "lines": 327, "path": "_workspace/lessons/A_tools/A-1-1.md" }
+      },
+      "plan_file": "_workspace/lessons/A_tools/PLAN_A-1.md",
+      "plan_score": 19
+    }
+  }
 }

@@ -31,59 +31,61 @@
 
 ---
 
-## 2. 16개 트랙 인덱스
+## 2. 16개 트랙 인덱스 (AI 시대 재설계)
+
+**AI 시대 학습 원칙**: 사람은 **아키텍처/판단/검증**을 하고, AI는 **코딩/syntax**를 한다. 도구 사용법 / syntax / 보일러플레이트는 슬림화, 시스템 디자인 / 트레이드오프 / 모델 평가는 강화.
 
 각 트랙의 시리즈 상세는 **`_workspace/curriculum_tracks/<TRACK>.md`** 파일에 있다. 강의 작성/검증 시 자기 트랙 파일만 cat (전체 마스터 cat 안 함 — 토큰 절감).
 
-| 트랙 | 이름 | 시리즈 수 | 상세 파일 |
-|---|---|---|---|
-| A | 개발 도구 기초 | 5 | `curriculum_tracks/A.md` |
-| B | Python | 15 | `curriculum_tracks/B.md` |
-| C | AI 입문 | 8 | `curriculum_tracks/C.md` |
-| D | AI 깊이 | 22 | `curriculum_tracks/D.md` |
-| E | 백엔드 아키텍처 | 13 | `curriculum_tracks/E.md` |
-| F | 데이터베이스 | 12 | `curriculum_tracks/F.md` |
-| G | AWS 인프라 | 17 | `curriculum_tracks/G.md` |
-| H | DevOps | 11 | `curriculum_tracks/H.md` |
-| I | 점수/신호 알고리즘 | 8 | `curriculum_tracks/I.md` |
-| J | 시스템 디자인 | 7 | `curriculum_tracks/J.md` |
-| K | 분산 시스템 | 5 | `curriculum_tracks/K.md` |
-| L | 보안/인증 | 6 | `curriculum_tracks/L.md` |
-| N | 운영체제 | 6 | `curriculum_tracks/N.md` |
-| O | 네트워크 깊이 | 9 | `curriculum_tracks/O.md` |
-| P | 컴퓨터 구조 | 3 | `curriculum_tracks/P.md` |
-| Q | 자료구조/알고리즘 (면접용) | 8 | `curriculum_tracks/Q.md` |
+| 트랙 | 이름 | 시리즈 수 | 우선순위 | 상세 파일 |
+|---|---|---|---|---|
+| A | 개발 도구 기초 | 2 | 약함 (AI 도구 사용) | `curriculum_tracks/A.md` |
+| B | Python | 8 | 중간 (syntax는 AI, 개념은 사람) | `curriculum_tracks/B.md` |
+| C | AI 입문 | 8 | 높음 | `curriculum_tracks/C.md` |
+| D | AI 깊이 | 22 | **매우 높음** (사람 판단 영역) | `curriculum_tracks/D.md` |
+| E | 백엔드 아키텍처 | 10 | 높음 | `curriculum_tracks/E.md` |
+| F | 데이터베이스 | 12 | 높음 | `curriculum_tracks/F.md` |
+| G | AWS 인프라 | 13 | 중간 | `curriculum_tracks/G.md` |
+| H | DevOps | 9 | 중간 | `curriculum_tracks/H.md` |
+| I | 점수/신호 알고리즘 | 8 | **매우 높음** (자체 함수 설계) | `curriculum_tracks/I.md` |
+| **J** | **시스템 디자인** | **12** | **매우 높음 ↑↑ (아키텍처 시대 핵심)** | `curriculum_tracks/J.md` |
+| K | 분산 시스템 | 7 | 높음 | `curriculum_tracks/K.md` |
+| L | 보안/인증 | 6 | 높음 | `curriculum_tracks/L.md` |
+| N | 운영체제 | 6 | 중간 (면접 기반) | `curriculum_tracks/N.md` |
+| O | 네트워크 깊이 | 7 | 중간 (면접 기반) | `curriculum_tracks/O.md` |
+| P | 컴퓨터 구조 | 2 | 낮음 (보조) | `curriculum_tracks/P.md` |
+| Q | 자료구조/알고리즘 (면접용) | 5 | 중간 (코테는 별도) | `curriculum_tracks/Q.md` |
 
-총 16 트랙 / 155 시리즈.
+총 16 트랙 / **137 시리즈** (이전 155에서 18 슬림).
 
 각 트랙 파일 구조 (정형):
 - 트랙 헤더: 이름 + 갯수 + 갯수 근거 (패턴화 자기 점검)
 - 각 시리즈: hook / 핵심 항목 5+개 / 다루지 않는 것 / PokéClip 적용 / 면접 답변 주제
 
-## 3. 트랙별 시리즈 분포 자기 점검
+## 3. 트랙별 시리즈 분포 자기 점검 (AI 시대 재설계)
 
 | 트랙 | 갯수 | 본질 점검 |
 |---|---|---|
-| A | 5 | 일상 도구 5개 ✓ |
-| B | 15 | Python 전 영역 ✓ |
-| C | 8 | AI 입문 흐름 ✓ |
-| D | 22 | PokéClip 핵심 + 입사 ✓ |
-| E | 13 | 백엔드 전 영역 ✓ |
-| F | 12 | DB 전 영역 ✓ |
-| G | 17 | AWS 광범 ✓ |
-| H | 11 | DevOps 표준 ✓ |
-| I | 8 | 신호+점수+클립 ✓ |
-| J | 7 | 면접 패턴 ✓ |
-| K | 5 | 분산 핵심만 ✓ |
-| L | 6 | 인증+보안 ✓ |
-| N | 6 | OS 면접 ✓ |
-| O | 9 | 네트워크 면접 ✓ |
-| P | 3 | 보조 ✓ |
-| Q | 8 | DSA 면접용 ✓ |
+| A | 2 | 도구 사용은 AI에 위임. Git+터미널 핵심만 ✓ |
+| B | 8 | Python syntax는 AI, 개념(비동기/타입/테스트)은 사람 ✓ |
+| C | 8 | AI 입문 흐름 (이론) ✓ |
+| D | 22 | PokéClip + 치지직 AI 입사 핵심. 모델 선택/평가/MLOps 사람 판단 ✓ |
+| E | 10 | 라우터 syntax 빼고 아키텍처/큐/파이프라인 ✓ |
+| F | 12 | 모델링/트랜잭션/인덱스는 사람 판단 ✓ |
+| G | 13 | 서비스 선택/비용 설계 사람. 콘솔 클릭 AI ✓ |
+| H | 9 | Dockerfile은 AI, 배포 전략/모니터링은 사람 ✓ |
+| I | 8 | 자체 점수 함수 설계 사람 몫 ✓ |
+| **J** | **12** | **아키텍처 시대 핵심 강화 (+5)** ✓ |
+| K | 7 | 분산 트레이드오프 케이스집 신규 ✓ |
+| L | 6 | 보안 정책 사람 결정 ✓ |
+| N | 6 | OS 면접 기반 ✓ |
+| O | 7 | DNS/CDN/LB 통합 ✓ |
+| P | 2 | 면접 비중 낮음, CPU+메모리/GPU+디스크 2개로 ✓ |
+| Q | 5 | 자료구조 통합, 코테는 사용자 직접 ✓ |
 
-분포 3~22. 5~14 박스 깨짐. 작은 트랙(P=3) / 큰 트랙(D=22) 자연 분포. 트랙마다 갯수 근거 명시.
+분포 2~22. 갯수 근거 모두 본문에 명시.
 
-총 155 시리즈.
+총 137 시리즈.
 
 ---
 

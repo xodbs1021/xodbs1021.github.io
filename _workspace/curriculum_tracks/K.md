@@ -1,6 +1,6 @@
-### K. 분산 시스템 (5 시리즈)
+### K. 분산 시스템 (7 시리즈)
 
-**갯수 근거**: 시니어 면접 영역. CAP+일관성+합의+이벤트소싱+분산트랜잭션 = 5개 핵심만. 더 가면 학술적.
+**갯수 근거**: 시니어 면접 영역. AI 시대 — 분산 트레이드오프 결정은 사람 몫. 5에서 7로 약간 강화 (실시간 처리 + 트레이드오프 케이스집 추가).
 
 #### K-1: 분산 시스템 기초 (CAP / FLP / 시계)
 - hook: 시니어 백엔드 필수
@@ -37,5 +37,16 @@
 - PokéClip 적용: 분석→저장→알림 트랜잭션
 - 면접 답변 주제: "Saga / 2PC 한계"
 
----
+#### K-6: 실시간 처리 (Kafka Streams / Flink)
+- hook: 스트리밍 데이터 처리. PokéClip 실시간 분석 후보
+- 핵심 항목: 스트림 처리 vs 배치 / Kafka Streams 개요 / Flink 개요 / Window 처리 (Tumbling/Sliding/Session) / Event time vs Processing time / Watermark / Exactly-once 처리 / State 관리 / Checkpoint
+- 다루지 않는 것: Spark Streaming
+- PokéClip 적용: 실시간 점수 스트림
+- 면접 답변 주제: "Stream Processing 패턴"
 
+#### K-7: 분산 트레이드오프 케이스집 (신규)
+- hook: 분산 시스템 결정의 실전 패턴
+- 핵심 항목: 멀티 리전 vs 단일 리전 / 동기 복제 vs 비동기 복제 / Leader vs Leaderless / 강일관성 비용 vs 최종일관성 복잡도 / 분산 캐시 일관성 / 분산 락 vs 큐 / 멀티 마스터 vs 싱글 마스터 / 실제 시스템 케이스 (Cassandra/DynamoDB/Spanner 비교)
+- 다루지 않는 것: 구체 알고리즘 (K-1~K-6)
+- PokéClip 적용: 멀티 리전 / 멀티 마스터 결정
+- 면접 답변 주제: "분산 시스템 결정 / 실제 시스템 비교"
