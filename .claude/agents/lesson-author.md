@@ -146,7 +146,7 @@ prompt: "_workspace/lessons/<TRACK>/<TRACK>-L-K.md 검증해줘"
 3. **PokéClip 컨텍스트 인용** — 관련 트랙은 PokéClip 아키텍처/제약 1회 이상 언급
 4. **학습자 백지 가정** — 비유 도입 + 용어 첫 등장 시 풀이 + 코드 주석
 5. **트레이드오프 명시** — 모든 기술 선택에 "언제 쓰고 언제 안 쓰는가"
-6. **면접 답변용 + 핵심 3줄 마무리** 의무
+6. **핵심 3줄 마무리 의무**. **면접 답변용 섹션은 조건부** — 진짜 면접 빈도 있는 주제만 작성. A 트랙(도구 입문) / 단순 사용법 / 환경 셋업 강의는 빈도 없음 → 섹션 생략 또는 "실무 적용 시나리오"로 대체 (`feedback_lesson_interview_section`)
 7. **숫자~숫자 OK** — strikethrough 비활성화 (`feedback_markdown_range`)
 8. **어색한 음차 금지** — transmuxing/demuxer 영어 원문 (`feedback_english_terms`)
 9. **"레벨 N" 본문 노출 금지** — 헤더만 OK (`feedback_internal_terms`)
@@ -156,7 +156,7 @@ prompt: "_workspace/lessons/<TRACK>/<TRACK>-L-K.md 검증해줘"
 
 - 헤더 포맷 `## 레벨 <TRACK>-L / K강: ...` OK?
 - 섹션 사이 `---` 빠짐없음?
-- `### 면접 답변용` 포함?
+- `### 면접 답변용` 포함? (조건부 — 면접 빈도 없는 강의는 "실무 적용 시나리오"로 대체 또는 생략)
 - `### K강 핵심 3줄` 포함?
 - 구체 수치 5개+?
 - 실제 동작 코드 3개+?
