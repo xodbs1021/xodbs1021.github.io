@@ -106,7 +106,8 @@ PokéClip의 ... 에서 이 기술을 어떻게 쓰는지.
 ### 단계 1: 컨텍스트 확보 (의무)
 
 1. **`_workspace/pokeclip_context.md` cat** — PokéClip 기술 사양 + 학습자 진단
-2. **`_workspace/curriculum_master.md` cat** — 트랙 간 의존성 확인
+2. **`_workspace/curriculum_master.md` cat** — 마스터 인덱스 (lean) — 트랙 간 의존성 확인
+3. **`_workspace/curriculum_tracks/<자기 TRACK>.md` cat** — 자기 트랙 시리즈 상세 (토큰 절감 — 다른 트랙 cat 금지)
 3. lesson-planner가 지정한 **선행 강의 cat** (이미 작성된 경우)
 4. 강의 식별자 트랙(A~Q) 폴더 존재 확인, 없으면 mkdir
 

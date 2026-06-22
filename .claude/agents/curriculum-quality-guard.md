@@ -39,8 +39,12 @@ cat /Users/kty/tech-blog/_workspace/pokeclip_context.md
 
 모드 1 추가:
 ```bash
-cat /Users/kty/tech-blog/_workspace/curriculum_master.md
+cat /Users/kty/tech-blog/_workspace/curriculum_master.md  # 인덱스 (lean)
+cat /Users/kty/tech-blog/_workspace/curriculum_tracks/<자기 TRACK>.md  # 모드 1에서 자기 트랙만
 cat /Users/kty/tech-blog/_workspace/curriculum_progress.json
+
+# 모드 2 (마스터 전체 검증) 시에만 트랙 파일 전체 cat:
+# cat /Users/kty/tech-blog/_workspace/curriculum_tracks/*.md
 cat <입력 PLAN 파일>
 ```
 

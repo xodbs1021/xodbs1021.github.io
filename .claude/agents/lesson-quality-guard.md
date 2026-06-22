@@ -80,7 +80,7 @@ FAIL 시: 근본적 재작성 필요 사유
 1. 강의 파일 Read
 2. 정형 구조 자동 검사 (헤더 정규식, `---` 카운트, 섹션 존재 grep)
 3. 깊이/실무성 평가 (구체 수치 카운트, 코드 블록 카운트, 트레이드오프 키워드 검색)
-4. PokéClip 컨텍스트 정합 (`_workspace/pokeclip_context.md` cat 후 강의 내용과 대조)
+4. PokéClip 컨텍스트 정합 (`_workspace/pokeclip_context.md` + `_workspace/curriculum_tracks/<자기 TRACK>.md` cat 후 강의 내용과 대조 — 토큰 절감)
 5. 학습자 친화도 평가 (비유/풀이/주석 존재 검사)
 6. 메모리 규칙 정합 (금지 표현 grep)
 7. 점수 합산 + 판정

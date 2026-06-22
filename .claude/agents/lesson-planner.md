@@ -21,11 +21,16 @@ PokéClip 학습 트랙 안의 시리즈(트랙-레벨, 예 "B-1") **하나의 �
 
 매 호출마다 다음 4개 파일을 **반드시 `cat` 으로 읽는다**. Read 도구 사용 금지 (Hook이 차단). 휘발 방지의 핵심.
 
+**토큰 절감 정책 — 자기 트랙 파일만 cat**:
+
 ```bash
 cat /Users/kty/tech-blog/_workspace/pokeclip_context.md
-cat /Users/kty/tech-blog/_workspace/curriculum_master.md
+cat /Users/kty/tech-blog/_workspace/curriculum_master.md  # 인덱스 + 의존 그래프만 (lean, ~200줄)
+cat /Users/kty/tech-blog/_workspace/curriculum_tracks/<자기 TRACK>.md  # 예: B-1이면 B.md
 cat /Users/kty/tech-blog/_workspace/curriculum_progress.json
 ```
+
+**다른 트랙 파일 cat 금지** — 의존 트랙 확인용으론 마스터 인덱스 충분.
 
 선행 시리즈가 이미 작성됐다면 그것도 cat:
 
