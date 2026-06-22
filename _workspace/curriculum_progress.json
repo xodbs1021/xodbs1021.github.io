@@ -76,7 +76,7 @@
         "D-11": { "name": "GPU 활용 (CUDA / MPS)", "status": "pending", "lessons": [] },
         "D-12": { "name": "MLOps 입문", "status": "pending", "lessons": [] },
         "D-13": { "name": "추론 최적화", "status": "pending", "lessons": [] },
-        "D-14": { "name": "자체 분석 함수 설계", "status": "pending", "lessons": [] }
+        "D-14": { "name": "실시간 추론 시스템 (스트리밍 입력 모델 서빙)", "status": "pending", "lessons": [] }
       }
     },
     "E_backend": {
@@ -173,7 +173,7 @@
         "J-3": { "name": "채팅 서비스 설계", "status": "pending", "lessons": [] },
         "J-4": { "name": "Twitch 클론 설계", "status": "pending", "lessons": [] },
         "J-5": { "name": "추천 시스템 설계", "status": "pending", "lessons": [] },
-        "J-6": { "name": "PokéClip 자체 설계", "status": "pending", "lessons": [] },
+        "J-6": { "name": "클립 추출 / 비디오 분석 파이프라인 설계", "status": "pending", "lessons": [] },
         "J-7": { "name": "면접 답변 패턴", "status": "pending", "lessons": [] }
       }
     },
@@ -197,34 +197,9 @@
         "L-2": { "name": "세션 vs JWT", "status": "pending", "lessons": [] },
         "L-3": { "name": "OAuth 2.0 + OIDC", "status": "pending", "lessons": [] },
         "L-4": { "name": "토큰 관리", "status": "pending", "lessons": [] },
-        "L-5": { "name": "PokéClip stream key 발급/검증", "status": "pending", "lessons": [] },
+        "L-5": { "name": "스트림 키 / API 키 발급·검증 패턴", "status": "pending", "lessons": [] },
         "L-6": { "name": "API 보안", "status": "pending", "lessons": [] },
         "L-7": { "name": "비밀 관리", "status": "pending", "lessons": [] }
-      }
-    },
-    "M_pokeclip": {
-      "name": "PokéClip 종합 (코드 구현)",
-      "depends_on": ["A", "B", "C", "D", "E", "F", "G", "I", "L"],
-      "series": {
-        "M-1": { "name": "프로젝트 구조 + 모노레포 설계", "status": "pending", "lessons": [] },
-        "M-2": { "name": "SRT 수신 서버 구현 (Python)", "status": "pending", "lessons": [] },
-        "M-3": { "name": "FFmpeg Python 바인딩", "status": "pending", "lessons": [] },
-        "M-4": { "name": "멀티 오디오 트랙 디멀티플렉싱", "status": "pending", "lessons": [] },
-        "M-5": { "name": "트랙 라우터 구현", "status": "pending", "lessons": [] },
-        "M-6": { "name": "YOLO 분석 엔진 (LoL)", "status": "pending", "lessons": [] },
-        "M-7": { "name": "Whisper STT 통합", "status": "pending", "lessons": [] },
-        "M-8": { "name": "효과음 패턴 매칭 구현", "status": "pending", "lessons": [] },
-        "M-9": { "name": "치지직 채팅 수집", "status": "pending", "lessons": [] },
-        "M-10": { "name": "채팅 점수 4신호 구현", "status": "pending", "lessons": [] },
-        "M-11": { "name": "점수 통합 + E Hybrid", "status": "pending", "lessons": [] },
-        "M-12": { "name": "클립 경계 추출", "status": "pending", "lessons": [] },
-        "M-13": { "name": "DynamoDB 저장 + S3 영상 보관", "status": "pending", "lessons": [] },
-        "M-14": { "name": "EDL/XML 내보내기", "status": "pending", "lessons": [] },
-        "M-15": { "name": "웹 대시보드 (React + FastAPI)", "status": "pending", "lessons": [] },
-        "M-16": { "name": "인증 (스트림 키 / 세션)", "status": "pending", "lessons": [] },
-        "M-17": { "name": "모니터링 + 알람", "status": "pending", "lessons": [] },
-        "M-18": { "name": "배포 (EC2 + Auto-scaling)", "status": "pending", "lessons": [] },
-        "M-19": { "name": "베타 운영 + 피드백 루프", "status": "pending", "lessons": [] }
       }
     },
     "N_os": {
@@ -282,6 +257,6 @@
     }
   },
   "week_1_target_series": [
-    "A-1", "A-4", "B-1", "G-1", "G-2", "M-1", "M-2"
+    "A-1", "A-4", "B-1", "G-1"
   ]
 }

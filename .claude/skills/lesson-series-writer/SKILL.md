@@ -28,6 +28,19 @@ PokéClip 학습 트랙(A~Q)의 시리즈를 처음부터 끝까지 생성하는
 4. lesson-planner가 `_workspace/lessons/<TRACK>/PLAN_<TRACK>-L.md` 저장 + 보고
 5. 사용자에게 계획 보고 — **확인 받음**
 
+### 단계 1.5: 시리즈 계획 검증 (의무)
+
+**`curriculum-quality-guard` 에이전트 호출** (Agent 도구, `subagent_type: curriculum-quality-guard`)
+- prompt: "_workspace/lessons/<TRACK>/PLAN_<TRACK>-L.md 모드 1 검증해줘"
+- 통과 기준: 18/20 이상
+
+판정 처리:
+- PASS → 단계 2 진행
+- NEEDS_REVISION → lesson-planner 재호출 (보완 지시 전달) → 재검증 (최대 2회)
+- FAIL → 사용자에게 보고, 사람 결정 대기
+
+상류 검증 — 잘못된 계획이 통과하면 하류 N개 강의 다 낭비.
+
 ### 단계 2: 사용자 검토
 
 사용자가 계획을 보고:
