@@ -191,6 +191,87 @@ cat <입력 master 파일>
 
 ---
 
+## G-Eval 패턴 — 정량 grep 단계 (점수 매기기 전 의무)
+
+**왜**: 검증자가 인상으로 점수 매기면 인플레이션. 단계 0 정량 측정을 강제 → 그 숫자에 *근거*해서 채점.
+
+### 모드 1 (PLAN 검증) — 정량 grep 단계 (정량 40% / 정성 60%)
+
+```bash
+PLAN=/Users/kty/tech-blog/_workspace/lessons/<TRACK_폴더>/PLAN_<TRACK>-L.md
+
+# 필수 섹션 존재
+HOOK_EXISTS=$(grep -c '^## 시리즈 한 줄 hook' "$PLAN")
+APPLICATION_EXISTS=$(grep -c '^## PokéClip 적용 영역\|^## 적용 영역' "$PLAN")
+PRECEDING_EXISTS=$(grep -c '^## 선행 시리즈' "$PLAN")
+NEXT_EXISTS=$(grep -c '^## 다음 시리즈' "$PLAN")
+RATIONALE_EXISTS=$(grep -c '^## 강의 수 결정 근거\|패턴화 자기 점검' "$PLAN")
+
+# 각 강의 항목 5+개 검사 — 항목 헤더 + 핵심 다룰 항목 카운트
+LESSON_HEADERS=$(grep -cE '^### [A-Q]-[0-9]+-[0-9]+:' "$PLAN")
+PER_LESSON_ITEMS=$(awk '/^### [A-Q]-[0-9]+-[0-9]+:/{c=0; next} /^- 핵심 다룰 항목:/{f=1; next} f && /^  - /{c++} f && /^[^ -]/{print c; f=0; c=0}' "$PLAN")
+TRADEOFF_PER_LESSON=$(grep -c '^- 트레이드오프' "$PLAN")
+INTERVIEW_PER_LESSON=$(grep -cE '^- 면접 답변|^- 실무 적용' "$PLAN")
+PROJECT_APPLY=$(grep -cE '^- PokéClip 적용 인용|^- 적용 인용' "$PLAN")
+
+cat <<METRICS
+[모드 1 정량 측정]
+필수 섹션:
+  hook: $HOOK_EXISTS (1이어야)
+  적용 영역: $APPLICATION_EXISTS (1이어야)
+  선행 시리즈: $PRECEDING_EXISTS (1이어야)
+  다음 시리즈: $NEXT_EXISTS (1이어야)
+  강의 수 근거: $RATIONALE_EXISTS (1이어야, 패턴화 방지)
+강의별:
+  강의 수: $LESSON_HEADERS
+  각 강의 핵심 항목 수 (5+이어야): $PER_LESSON_ITEMS
+  트레이드오프 명시 강의: $TRADEOFF_PER_LESSON
+  면접/실무 시나리오 강의: $INTERVIEW_PER_LESSON
+  PokéClip 적용 인용 강의: $PROJECT_APPLY (선택적 — 강제 X)
+METRICS
+```
+
+### 모드 2 (마스터 검증) — 정량 grep 단계 (정량 20% / 정성 80%)
+
+```bash
+MASTER=/Users/kty/tech-blog/_workspace/curriculum_master.md
+TRACKS_DIR=/Users/kty/tech-blog/_workspace/curriculum_tracks
+
+# 트랙 갯수 / 시리즈 갯수
+TRACK_FILES=$(ls $TRACKS_DIR/*.md | wc -l)
+TOTAL_SERIES=$(grep -hE '^#### [A-Q]-[0-9]+:' $TRACKS_DIR/*.md | wc -l)
+TRACK_DISTRIBUTION=$(for f in $TRACKS_DIR/*.md; do echo "$(basename $f .md): $(grep -cE '^#### [A-Q]-[0-9]+:' $f)"; done)
+
+# 각 트랙에 갯수 근거 명시 (패턴화 방지)
+RATIONALE_TRACKS=$(grep -lE '갯수 근거|패턴화|왜 N개' $TRACKS_DIR/*.md | wc -l)
+
+# 분포 수렴 점검 (가장 많은 트랙과 가장 적은 트랙 비율)
+MAX_SERIES=$(for f in $TRACKS_DIR/*.md; do grep -cE '^#### [A-Q]-[0-9]+:' $f; done | sort -n | tail -1)
+MIN_SERIES=$(for f in $TRACKS_DIR/*.md; do grep -cE '^#### [A-Q]-[0-9]+:' $f; done | sort -n | head -1)
+
+# 영상 트랙 봉인 / M 트랙 제거 확인
+M_TRACK_PRESENT=$(ls $TRACKS_DIR/M*.md 2>/dev/null | wc -l)
+
+cat <<METRICS
+[모드 2 정량 측정]
+트랙 갯수: $TRACK_FILES
+총 시리즈: $TOTAL_SERIES
+트랙별 분포:
+$TRACK_DISTRIBUTION
+최대/최소: $MAX_SERIES / $MIN_SERIES (분포 자연성 확인)
+갯수 근거 명시 트랙: $RATIONALE_TRACKS / $TRACK_FILES (모두여야 OK)
+M 트랙 제거 확인 (0이어야): $M_TRACK_PRESENT
+METRICS
+```
+
+### 채점 정책
+
+- **정량 측정 결과를 점수 산정의 *근거*로 인용 강제**
+- 모드 1: 정량 40% baseline + 정성 60% 조정 (±2점 범위)
+- 모드 2: 정량 20% baseline + 정성 80% 본질 판단 (트랙 선택/구성은 정성)
+- 정량 카테고리 (예: PLAN 필수 섹션 존재) → 0이면 즉시 -2점
+- 정성 카테고리 (예: 트랙 선택 합리성) → 단계 0 측정 후 본질 판단
+
 ## 입력 프로토콜
 
 ```yaml

@@ -77,15 +77,91 @@ FAIL 시: 근본적 재작성 필요 사유
 
 ---
 
-## 검증 절차
+## 검증 절차 (G-Eval 패턴 — 정량 grep 먼저, 정성 평가 후)
 
-1. 강의 파일 Read
-2. 정형 구조 자동 검사 (헤더 정규식, `---` 카운트, 섹션 존재 grep)
-3. 깊이/실무성 평가 (구체 수치 카운트, 코드 블록 카운트, 트레이드오프 키워드 검색)
-4. PokéClip 컨텍스트 정합 (`_workspace/pokeclip_context.md` + `_workspace/curriculum_tracks/<자기 TRACK>.md` cat 후 강의 내용과 대조 — 토큰 절감)
-5. 학습자 친화도 평가 (비유/풀이/주석 존재 검사)
-6. 메모리 규칙 정합 (금지 표현 grep)
-7. 점수 합산 + 판정
+**왜 G-Eval**: 검증자가 인상으로 점수 매기면 인플레이션. 점수 매기기 전 *정량 grep 측정*을 강제 → 그 숫자에 *근거*해서 채점.
+
+### 단계 0: 정량 사전 측정 (의무 — Bash로 자동)
+
+점수 매기기 전 다음을 *반드시 grep/wc/awk로 측정*하고 보고서에 명시:
+
+```bash
+FILE=/Users/kty/tech-blog/_workspace/lessons/<TRACK>/<TRACK>-L-K.md
+
+# 정형 구조 (A 카테고리 baseline)
+HEADER_MATCH=$(head -1 "$FILE" | grep -cE '^## 레벨 [A-Q]-[0-9]+ / [0-9]+강:')
+SEPARATOR_COUNT=$(grep -c '^---$' "$FILE")
+SECTION_COUNT=$(grep -c '^### ' "$FILE")
+INTERVIEW_OR_PRACTICAL=$(grep -cE '^### (면접 답변용|실무 적용 시나리오)' "$FILE")
+CORE3_EXISTS=$(grep -cE '^### .*핵심 3줄' "$FILE")
+
+# 깊이/실무성 (B 카테고리 baseline)
+CODE_BLOCKS=$(grep -c '^```' "$FILE")          # fence는 짝수 — /2가 실제 갯수
+TABLES=$(grep -c '^|' "$FILE")                 # 표 라인 카운트
+TRADEOFF_HITS=$(grep -ciE '트레이드오프|장단점|언제 쓰|언제 안 쓰' "$FILE")
+CONCRETE_NUMS=$(grep -oE '[0-9]+\.?[0-9]*\s*(K|M|GB|MB|ms|초|분|시간|개|회|%|배|kbps|fps|줄)' "$FILE" | wc -l)
+
+# 학습자 친화 (D 카테고리 baseline)
+ANALOGY_HITS=$(grep -ciE '비유|마치|같은|처럼' "$FILE")
+EXPLAIN_HITS=$(grep -ciE '\[설명\]|즉,|다시 말해|풀이하면' "$FILE")
+CROSS_LINK=$(grep -ciE 'A-[0-9]-[0-9]강|B-[0-9]-[0-9]강|선행|다음 강의|미리보기' "$FILE")
+
+# 메모리 규칙 정합 (E 카테고리 baseline)
+FORBIDDEN_TRANSLITERATION=$(grep -cE '트랜스먹싱|디먹서|먹서|먹스' "$FILE")
+LEVEL_N_IN_BODY=$(awk '/^## /{getline; next} /레벨 [A-Q]-[0-9]/' "$FILE" | wc -l)
+NUMBER_RANGE_OK=$(grep -cE '[0-9]+~[0-9]+' "$FILE")
+
+# 분량
+LINE_COUNT=$(wc -l < "$FILE")
+
+# 출력
+cat <<METRICS
+[정량 측정 결과]
+정형 구조:
+  헤더 포맷 매치: $HEADER_MATCH (1이어야 OK)
+  구분선 ---: $SEPARATOR_COUNT
+  ### 섹션 수: $SECTION_COUNT
+  면접/실무 시나리오 섹션: $INTERVIEW_OR_PRACTICAL (1이어야 OK)
+  핵심 3줄 섹션: $CORE3_EXISTS (1이어야 OK)
+깊이/실무성:
+  코드 블록 수: $((CODE_BLOCKS / 2))개
+  표 라인 수: $TABLES
+  트레이드오프 키워드 hit: $TRADEOFF_HITS
+  구체 수치 hit: $CONCRETE_NUMS
+학습자 친화:
+  비유 키워드 hit: $ANALOGY_HITS
+  풀이/[설명] hit: $EXPLAIN_HITS
+  Cross-link hit: $CROSS_LINK
+메모리 규칙:
+  어색한 음차 (0이어야 OK): $FORBIDDEN_TRANSLITERATION
+  "레벨 N" 본문 노출 (0이어야 OK): $LEVEL_N_IN_BODY
+  숫자~숫자 사용: $NUMBER_RANGE_OK
+분량: $LINE_COUNT 줄
+METRICS
+```
+
+### 단계 1: 컨텍스트 cat
+
+자기 트랙 파일만:
+- `cat /Users/kty/tech-blog/_workspace/pokeclip_context.md`
+- `cat /Users/kty/tech-blog/_workspace/curriculum_tracks/<자기 TRACK>.md`
+- `cat <강의 파일>`
+
+### 단계 2: 정성 평가 (단계 0 수치를 *근거*로)
+
+각 카테고리 채점 시 **단계 0 측정 결과를 점수 산정 근거로 인용 강제**:
+
+예: B 카테고리 "구체 수치 5개+" 항목 채점 시 → "정량 측정 결과 hit $CONCRETE_NUMS개" 인용 → 그 숫자 기반 점수.
+
+### 단계 3: 점수 합산 + 판정
+
+**점수 산정 정책 (정량 50% / 정성 50%)**:
+- 정량 측정으로 baseline 점수 산정 (예: 헤더 매치 0 → 즉시 -5점 / 코드 블록 3+ → 만점 / 음차 1+ → 즉시 -2점)
+- 정성 평가는 정량 baseline에 ±2 범위 내 조정만 (인상 점수 금지)
+
+### 단계 4: 보고서 작성 + 보완 지시
+
+판정 + 사각지대 + 보완 지시. 단계 0 측정 결과 *전부 포함*해서 객관성 보장.
 
 ## 출력 형식
 
