@@ -45,3 +45,4 @@
 | 2026-06-22 | PokéClip 커리큘럼 + 검증 인프라 | agents/lesson-quality-guard.md, _workspace/pokeclip_context.md, _workspace/curriculum_master.md, _workspace/curriculum_progress.json, 전역 메모리 project_pokeclip.md | 17개 트랙 마스터플랜 + 검증 루프 + 휘발 방지 다층 백업 |
 | 2026-06-22 | M 트랙 제거 (16 트랙) | _workspace/curriculum_master.md, curriculum_progress.json | 강의 = 기술/지식만, PokéClip 코드 구현(M)은 프로젝트 실행 영역으로 분리 |
 | 2026-06-22 | lesson-planner / curriculum-quality-guard 갈아엎음 | agents/lesson-planner.md, agents/curriculum-quality-guard.md | harness 스킬로 재생성 — 시리즈 범위 검증 책임 명확화. curriculum-quality-guard 모드 2에 F 항목(시리즈 범위 명시) 10점 신규 |
+| 2026-06-23 | token-cost-analyzer 에이전트 추가 | agents/token-cost-analyzer.md | 강의별 sub-agent 토큰 소모 측정·분석. 평균 대비 1.5x 초과 시 원인+개선안. harness 스킬로 생성 |
