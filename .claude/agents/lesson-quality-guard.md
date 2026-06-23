@@ -104,11 +104,54 @@ PRECEDING_SECTION=$(grep -c '^### 시작하기 전' "$FILE")          # 선행 �
 INTERVIEW_OR_PRACTICAL=$(grep -cE '^### (면접 답변용|실무 적용 시나리오)' "$FILE")
 CORE3_EXISTS=$(grep -cE '^### .*핵심 3줄' "$FILE")
 
-# 교육학 프레임워크 적용 (D 카테고리 baseline)
-BLOOM_VERBS=$(grep -ciE '식별|구분|적용|평가|디버깅|설계|분석|비교' "$FILE")  # 측정 가능 동사
-TOP_DOWN_HINT=$(grep -ciE '큰 그림|개요|왜 (이|중요)|어디 쓰' "$FILE")  # Top-down
-DIAGRAM_HINT=$(grep -cE '```\s*$|→|↓|━' "$FILE")  # 다이어그램/플로우 흔적
-WORKED_HINT=$(grep -ciE '단계 1|step 1|먼저|다음으로|마지막' "$FILE")  # Worked example 시퀀스
+# 교육학 프레임워크 적용 — 7개 references 기준
+# Bloom (01) — 측정 동사 + Bloom 단계 태그
+LO_AREA=$(awk '/^### 학습 목표/{f=1; next} /^---$/{f=0} f' "$FILE")
+LO_COUNT=$(echo "$LO_AREA" | grep -c '^[0-9]\+\. ')
+BLOOM_VERBS=$(echo "$LO_AREA" | grep -ciE '정의|나열|식별|설명|구분|요약|분류|비교|적용|구현|실행|사용|해결|분석|분해|구조화|평가|비판|정당화|선택|설계|구성|통합|작성')
+VAGUE_VERBS=$(echo "$LO_AREA" | grep -ciE '이해한다|안다|익숙|친해|감을 잡|배운다|익힌다')
+STAGE_TAGS=$(echo "$LO_AREA" | grep -cE '\[(기억|이해|적용|분석|평가|창조)\]')
+
+# Retrieval (02) — 회상 도구 형태
+RETRIEVAL_PROMPTS=$(grep -cE '회상 점검|덮고.*설명|덮고.*답|회상 시험|말로 설명 가능' "$FILE")
+CORE3_AREA=$(awk '/^### .*핵심 3줄/{f=1; next} /^---$|^## /{f=0} f' "$FILE")
+CORE3_AS_RECALL=$(echo "$CORE3_AREA" | grep -cE '회상|덮고|말로|설명 가능')
+PLAIN_SUMMARY=$(echo "$CORE3_AREA" | grep -cE '^[0-9]+\. .* (다뤘다|배웠다|있다)$')
+SPACED_RETRIEVAL=$(grep -cE '지난 강의.*답해|이전 강의.*회상|직전 강의' "$FILE")
+
+# Prior Knowledge (03) — 시작하기 전 4요소
+PRECEDING_AREA=$(awk '/^### 시작하기 전/{f=1; next} /^---$|^### /{f=0} f' "$FILE")
+HAS_PRECEDING=$(echo "$PRECEDING_AREA" | grep -cE '선행 강의|선행 시리즈|없음.*첫')
+HAS_ENVIRONMENT=$(echo "$PRECEDING_AREA" | grep -cE '환경|도구|버전')
+HAS_STUCK_HINT=$(echo "$PRECEDING_AREA" | grep -cE '막힐 때|돌아갈')
+HAS_AUTO_CHECK=$(echo "$PRECEDING_AREA" | grep -cE 'which |--version')
+VAGUE_FALLBACK=$(echo "$PRECEDING_AREA" | grep -cE '이전 강의 다시|모르면 찾아|어디든')
+
+# Cognitive Load (04) — 부하 관리
+DISTRACTING=$(grep -cE 'ㅋㅋ|ㄷㄷ|ㅎㅎ|😂|😅' "$FILE")
+LONG_LINES=$(awk 'length > 100' "$FILE" | wc -l)
+PRE_TRAINING=$(grep -cE '환기:|복습:|이전 강의에서|앞에서 다룬' "$FILE")
+SELF_EXPLAIN=$(grep -cE '자기 설명|자기 말로|스스로 설명' "$FILE")
+
+# Worked Examples (05) — 3단계 시퀀스
+WORKED_MARKERS=$(grep -cE 'Worked|완성 예제' "$FILE")
+FADED_MARKERS=$(grep -cE 'Faded|빈칸|추론' "$FILE")
+INDEPENDENT_MARKERS=$(grep -cE '독립 풀이|해보자|구성해보자' "$FILE")
+
+# Dual Coding + Mayer (06) — 시각 자료 + 12 원칙
+ASCII_DIAGRAMS=$(grep -cE '→|↓|┌|└|├|│|━' "$FILE")
+PERSONAL_TONE=$(grep -ciE '해보자|보자|찍어|쳐보자|우리|너' "$FILE")
+FORMAL_TONE=$(grep -cE '본 강의|학습한다|살펴본다' "$FILE")
+BOLD_SIGNALING=$(grep -cE '\*\*[^*]+\*\*' "$FILE")
+QUOTE_SIGNALING=$(grep -c '^>' "$FILE")
+TERMINOLOGY_PRE=$(grep -cE '용어|요소|핵심.*개념' "$FILE")
+
+# fast.ai Top-down (07) — 첫 섹션 작동 예제
+FIRST_SECTION_AREA=$(awk '/^### /{n++; if(n>1) exit} n>=1' "$FILE")
+FIRST_CODE_BLOCK=$(echo "$FIRST_SECTION_AREA" | grep -c '^```')
+FIRST_ABSTRACT=$(echo "$FIRST_SECTION_AREA" | grep -cE '정의|개념$|이론|역사적')
+TOP_DOWN_MARKERS=$(grep -cE '큰 그림|시나리오|작동하|결과부터|이 강의에서 만들' "$FILE")
+DECOMPOSITION_MARKERS=$(grep -cE '부분 분해|각 부분|쪼개|들여다보' "$FILE")
 
 # 깊이/실무성 (B 카테고리 baseline)
 CODE_BLOCKS=$(grep -c '^```' "$FILE")          # fence는 짝수 — /2가 실제 갯수
@@ -140,11 +183,45 @@ cat <<METRICS
   시작하기 전 섹션 (선행 지식): $PRECEDING_SECTION (1이어야 OK)
   면접/실무 시나리오 섹션: $INTERVIEW_OR_PRACTICAL (1이어야 OK)
   핵심 3줄 섹션: $CORE3_EXISTS (1이어야 OK)
-교육학 프레임워크:
-  Bloom 동사 hit: $BLOOM_VERBS
-  Top-down 큰 그림 hit: $TOP_DOWN_HINT
-  다이어그램/플로우 hit: $DIAGRAM_HINT
-  Worked example 시퀀스 hit: $WORKED_HINT
+교육학 프레임워크 (7 references 기준):
+Bloom (01):
+  학습 목표 갯수: $LO_COUNT (3~5 권장)
+  Bloom 동사 hit: $BLOOM_VERBS (≥ LO_COUNT 이어야)
+  모호 동사 (0이어야): $VAGUE_VERBS
+  Bloom 단계 태그 [...]: $STAGE_TAGS
+Retrieval (02):
+  회상 점검 마커: $RETRIEVAL_PROMPTS (긴 강의 1+)
+  핵심 3줄 회상 도구화: $CORE3_AS_RECALL (1+ 이어야)
+  단순 요약 (0이어야): $PLAIN_SUMMARY
+  직전 강의 회상 (Spaced): $SPACED_RETRIEVAL (2강 이상 1+)
+Prior Knowledge (03):
+  선행 강의 명시: $HAS_PRECEDING (1이어야)
+  환경/도구 명시: $HAS_ENVIRONMENT (1이어야)
+  막힐 때 안내: $HAS_STUCK_HINT (1이어야)
+  자동 체크 명령: $HAS_AUTO_CHECK (1+ 권장)
+  모호 안내 (0이어야): $VAGUE_FALLBACK
+Cognitive Load (04):
+  산만한 농담/이모지 (0이어야): $DISTRACTING
+  100자 초과 라인: $LONG_LINES
+  환기 마커 (사전 학습): $PRE_TRAINING (1+)
+  자기 설명 마커: $SELF_EXPLAIN (1+)
+Worked Examples (05):
+  Worked: $WORKED_MARKERS
+  Faded: $FADED_MARKERS
+  독립 풀이: $INDEPENDENT_MARKERS
+  3단계 완성도: 셋 다 1+이면 OK
+Dual Coding + Mayer (06):
+  ASCII 다이어그램: $ASCII_DIAGRAMS (1+)
+  대화체 (Personalization): $PERSONAL_TONE
+  학술체 (감점): $FORMAL_TONE
+  Signaling (강조): $BOLD_SIGNALING
+  Quote 강조: $QUOTE_SIGNALING
+  Pre-training 용어 명명: $TERMINOLOGY_PRE
+fast.ai Top-down (07):
+  첫 섹션 코드 블록: $FIRST_CODE_BLOCK (1+ 권장 — bottom-up 시작 X)
+  첫 섹션 순수 이론 (감점): $FIRST_ABSTRACT
+  Top-down 마커: $TOP_DOWN_MARKERS (1+)
+  분해 마커: $DECOMPOSITION_MARKERS
 깊이/실무성:
   코드 블록 수: $((CODE_BLOCKS / 2))개
   표 라인 수: $TABLES
@@ -162,12 +239,24 @@ cat <<METRICS
 METRICS
 ```
 
-### 단계 1: 컨텍스트 cat
+### 단계 1: 컨텍스트 cat (의무)
 
-자기 트랙 파일만:
-- `cat /Users/kty/tech-blog/_workspace/pokeclip_context.md`
-- `cat /Users/kty/tech-blog/_workspace/curriculum_tracks/<자기 TRACK>.md`
-- `cat <강의 파일>`
+자기 트랙 파일 + 교육학 references 7개:
+
+```bash
+cat /Users/kty/tech-blog/_workspace/pokeclip_context.md
+cat /Users/kty/tech-blog/_workspace/curriculum_tracks/<자기 TRACK>.md
+cat /Users/kty/tech-blog/.claude/agents/references/01-bloom-taxonomy.md
+cat /Users/kty/tech-blog/.claude/agents/references/02-retrieval-practice.md
+cat /Users/kty/tech-blog/.claude/agents/references/03-prior-knowledge.md
+cat /Users/kty/tech-blog/.claude/agents/references/04-cognitive-load.md
+cat /Users/kty/tech-blog/.claude/agents/references/05-worked-examples.md
+cat /Users/kty/tech-blog/.claude/agents/references/06-dual-coding-mayer.md
+cat /Users/kty/tech-blog/.claude/agents/references/07-fastai-top-down.md
+cat <강의 파일>
+```
+
+references는 *원리 기반 검증*에 사용. 형식만 grep 매치 X, 본질 부합 평가.
 
 ### 단계 2: 정성 평가 (단계 0 수치를 *근거*로)
 

@@ -169,11 +169,30 @@ ssh -i <키 경로> user@host
 
 ### 단계 1: 컨텍스트 확보 (의무)
 
-1. **`_workspace/pokeclip_context.md` cat** — PokéClip 기술 사양 + 학습자 진단
-2. **`_workspace/curriculum_master.md` cat** — 마스터 인덱스 (lean) — 트랙 간 의존성 확인
-3. **`_workspace/curriculum_tracks/<자기 TRACK>.md` cat** — 자기 트랙 시리즈 상세 (토큰 절감 — 다른 트랙 cat 금지)
-4. lesson-planner가 지정한 **선행 강의 cat** (이미 작성된 경우)
-5. 강의 식별자 트랙(A~Q) 폴더 존재 확인, 없으면 mkdir
+1. **`_workspace/pokeclip_context.md` cat** — 학습자 진단
+2. **`_workspace/curriculum_master.md` cat** — 마스터 인덱스 (lean) — 트랙 의존성 확인
+3. **`_workspace/curriculum_tracks/<자기 TRACK>.md` cat** — 자기 트랙만 (토큰 절감)
+4. lesson-planner가 지정한 **선행 강의 cat** (있다면)
+
+### 단계 1.5: 교육학 프레임워크 references cat (의무)
+
+작성 들어가기 전 다음 가이드 cat — 본문 작성 시 *원리 기반* 적용:
+
+```bash
+cat /Users/kty/tech-blog/.claude/agents/references/01-bloom-taxonomy.md      # 학습 목표 동사 강제
+cat /Users/kty/tech-blog/.claude/agents/references/02-retrieval-practice.md  # 핵심 3줄 = 회상 도구
+cat /Users/kty/tech-blog/.claude/agents/references/03-prior-knowledge.md     # 시작하기 전 섹션 4요소
+cat /Users/kty/tech-blog/.claude/agents/references/04-cognitive-load.md      # 인지 부하 관리
+cat /Users/kty/tech-blog/.claude/agents/references/05-worked-examples.md     # Worked→Faded→독립
+cat /Users/kty/tech-blog/.claude/agents/references/06-dual-coding-mayer.md   # 12 원칙 + 시각 자료
+cat /Users/kty/tech-blog/.claude/agents/references/07-fastai-top-down.md     # 큰 그림 먼저
+```
+
+이 7개 가이드의 *원리*를 본문 작성에 *내재화*. 형식만 따라하지 말 것.
+
+### 단계 2: 폴더 확인 + 본문 작성
+
+강의 식별자 트랙(A~Q) 폴더 확인, 없으면 mkdir.
 
 ### 단계 2: 본문 작성
 
