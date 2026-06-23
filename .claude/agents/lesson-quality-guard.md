@@ -36,44 +36,51 @@ FAIL 시: 근본적 재작성 필요 사유
 - **70~89%** = NEEDS_REVISION (보완 후 재검증)
 - **70% 미만** = FAIL (재작성)
 
-## 체크리스트 (총 20항목, 5점씩)
+## 체크리스트 (총 24항목, 약 4.2점씩 = 100점)
 
-### A. 정형 구조 (4항목 — 20점)
+### A. 정형 구조 (5항목 — 20점)
 
 - [ ] 헤더 `## 레벨 <TRACK>-L / K강: <제목> — <부제>` 포맷
 - [ ] 섹션 사이 `---` 구분선 빠짐없이
-- [ ] `### 면접 답변용` 또는 대체 섹션("실무 적용 시나리오" / "흔한 실수") 포함 — A 트랙 등 면접 빈도 없는 강의는 생략 OK (`feedback_lesson_interview_section`)
-- [ ] `### K강 핵심 3줄` 섹션 포함
+- [ ] **`### 학습 목표` 섹션 포함 (Bloom 동사 — 식별/구분/적용/평가/디버깅 등)**
+- [ ] **`### 시작하기 전` 섹션 포함 (선행 강의 / 환경 / 막힐 때 돌아갈 곳)**
+- [ ] `### 면접 답변용` 또는 대체 섹션 + `### K강 핵심 3줄` 모두 포함
 
-### B. 깊이/실무성 (5항목 — 25점)
+### B. 깊이/실무성 (5항목 — 20점)
 
 - [ ] 구체적 수치 최소 5개 (벤치마크/비용/성능/시간 등)
-- [ ] 실제 동작하는 코드 박스 최소 3개 (가짜 의사 코드 X)
-- [ ] 트레이드오프 명시 (장단점 + 언제 쓰고 언제 안 쓰는가)
-- [ ] 치지직 입사 수준 깊이 ("이게 뭔지" 아니라 "왜 이 선택을 했는가")
-- [ ] 대규모 서비스 관점 포함 (베타 10명 ~ 1000명 동시 시나리오)
+- [ ] 실제 동작하는 코드 박스 최소 3개
+- [ ] **Worked Example 시퀀스 적용 (새 도구/명령 첫 등장 시 완성→Faded→독립 흐름 권장)**
+- [ ] 트레이드오프 명시 (장단점 + 언제 쓰고 안 쓰는가)
+- [ ] 치지직 입사 수준 깊이 ("왜 이 선택을 했는가")
 
 ### C. 학습자 정합 (3항목 — 15점)
 
-**핵심 — PokéClip 인용 강제 X.** Claude는 PokéClip을 같이 만들지 않는다. 강의는 기술/지식 그 자체가 본질. PokéClip 인용은 *있어도 OK 없어도 OK* — 메트릭으로 강제 금지.
+**핵심 — PokéClip 인용 강제 X.** Claude는 PokéClip을 같이 만들지 않는다. 강의는 기술/지식 그 자체가 본질.
 
-- [ ] 학습자 진단(백지/AI 전공 실전 0/터미널 약함) 톤 부합 — 개념을 처음 듣는 사람도 따라올 수 있는 친절도
-- [ ] **기술/지식 자체가 본문 무게중심** — 특정 프로젝트(PokéClip 등) 적용 사례는 *선택적 보조 인용*만, 본문 무게중심으로 차지 X
-- [ ] 면접 답변용 작성 시 진짜 면접 빈도 있는 주제 (억지 면접 질문 ❌). 빈도 없는 강의는 "실무 적용 시나리오"로 대체했는지
+- [ ] 학습자 진단(백지/AI 전공 실전 0/터미널 약함) 톤 부합
+- [ ] **기술/지식 자체가 본문 무게중심** — 특정 프로젝트 적용은 선택적 보조만
+- [ ] 면접 답변용 작성 시 진짜 면접 빈도 있는 주제 (억지 X)
 
-### D. 학습자 친화도 (4항목 — 20점)
+### D. 교육학 프레임워크 적용 (5항목 — 25점) — 신규 강화
 
-- [ ] 비유로 시작 (일상생활/이미 아는 개념과 연결)
+- [ ] **학습 목표가 Bloom 동사 (측정 가능한 행위)** — "외워/이해" 같은 모호 동사 X
+- [ ] **Top-down 큰 그림 첫 섹션 (fast.ai)** — 디테일 전 큰 그림 한 단락
+- [ ] **인지 부하 관리 (Cognitive Load)** — 입문 강의는 한 섹션 새 개념 1~2개, 외재적 부하 차단
+- [ ] **Dual Coding (텍스트+시각)** — 표만 X, 다이어그램/플로우/ASCII 도형 1개 이상
+- [ ] **핵심 3줄이 Retrieval Practice 도구** — 학습자가 *덮고 말로* 설명 가능 (단순 요약 X)
+
+### E. 학습자 친화도 (3항목 — 12점)
+
+- [ ] 비유로 시작 (일상생활/이미 아는 개념)
 - [ ] 전문 용어 첫 등장 시 풀이 병기
 - [ ] 코드 박스 안에 한국어 주석 또는 `[설명]` 라인
-- [ ] 다음 강의/관련 강의 cross-link 또는 선행 강의 언급
 
-### E. 메모리 규칙 정합 (4항목 — 20점)
+### F. 메모리 규칙 정합 (3항목 — 8점)
 
-- [ ] 어색한 음차 없음 (transmuxing/demuxer 등 영어 원문 유지) — `feedback_english_terms`
-- [ ] "레벨 N" 같은 내부 분류 본문 노출 없음 (헤더만 OK) — `feedback_internal_terms`
-- [ ] `숫자~숫자` 표기 자유 사용 — `feedback_markdown_range`
-- [ ] 알고리즘 수학 트랙(Q/D)이 아니면 수학 깊이 자제 (실무 위주) — `feedback_streaming_lesson_style`
+- [ ] 어색한 음차 없음 (`feedback_english_terms`)
+- [ ] "레벨 N" 본문 노출 없음 (헤더만 OK, `feedback_internal_terms`)
+- [ ] `숫자~숫자` OK / 수학 깊이 Q·D 트랙만 (`feedback_streaming_lesson_style`)
 
 ---
 
@@ -88,12 +95,20 @@ FAIL 시: 근본적 재작성 필요 사유
 ```bash
 FILE=/Users/kty/tech-blog/_workspace/lessons/<TRACK>/<TRACK>-L-K.md
 
-# 정형 구조 (A 카테고리 baseline)
+# 정형 구조 (A 카테고리 baseline) + 신규 교육학 섹션
 HEADER_MATCH=$(head -1 "$FILE" | grep -cE '^## 레벨 [A-Q]-[0-9]+ / [0-9]+강:')
 SEPARATOR_COUNT=$(grep -c '^---$' "$FILE")
 SECTION_COUNT=$(grep -c '^### ' "$FILE")
+LEARNING_OBJECTIVES=$(grep -c '^### 학습 목표' "$FILE")          # Bloom 섹션
+PRECEDING_SECTION=$(grep -c '^### 시작하기 전' "$FILE")          # 선행 지식 섹션
 INTERVIEW_OR_PRACTICAL=$(grep -cE '^### (면접 답변용|실무 적용 시나리오)' "$FILE")
 CORE3_EXISTS=$(grep -cE '^### .*핵심 3줄' "$FILE")
+
+# 교육학 프레임워크 적용 (D 카테고리 baseline)
+BLOOM_VERBS=$(grep -ciE '식별|구분|적용|평가|디버깅|설계|분석|비교' "$FILE")  # 측정 가능 동사
+TOP_DOWN_HINT=$(grep -ciE '큰 그림|개요|왜 (이|중요)|어디 쓰' "$FILE")  # Top-down
+DIAGRAM_HINT=$(grep -cE '```\s*$|→|↓|━' "$FILE")  # 다이어그램/플로우 흔적
+WORKED_HINT=$(grep -ciE '단계 1|step 1|먼저|다음으로|마지막' "$FILE")  # Worked example 시퀀스
 
 # 깊이/실무성 (B 카테고리 baseline)
 CODE_BLOCKS=$(grep -c '^```' "$FILE")          # fence는 짝수 — /2가 실제 갯수
@@ -121,8 +136,15 @@ cat <<METRICS
   헤더 포맷 매치: $HEADER_MATCH (1이어야 OK)
   구분선 ---: $SEPARATOR_COUNT
   ### 섹션 수: $SECTION_COUNT
+  학습 목표 섹션 (Bloom): $LEARNING_OBJECTIVES (1이어야 OK)
+  시작하기 전 섹션 (선행 지식): $PRECEDING_SECTION (1이어야 OK)
   면접/실무 시나리오 섹션: $INTERVIEW_OR_PRACTICAL (1이어야 OK)
   핵심 3줄 섹션: $CORE3_EXISTS (1이어야 OK)
+교육학 프레임워크:
+  Bloom 동사 hit: $BLOOM_VERBS
+  Top-down 큰 그림 hit: $TOP_DOWN_HINT
+  다이어그램/플로우 hit: $DIAGRAM_HINT
+  Worked example 시퀀스 hit: $WORKED_HINT
 깊이/실무성:
   코드 블록 수: $((CODE_BLOCKS / 2))개
   표 라인 수: $TABLES
