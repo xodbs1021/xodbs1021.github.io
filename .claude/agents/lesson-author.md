@@ -101,44 +101,31 @@ PokéClip의 ... 에서 이 기술을 어떻게 쓰는지.
 3. <한 줄 요약>
 ```
 
-## 작업 흐름 (작성 → 검증 → 보완)
+## 작업 흐름 (작성만 — 검증은 lesson-series-writer 스킬이 독립 호출)
 
 ### 단계 1: 컨텍스트 확보 (의무)
 
 1. **`_workspace/pokeclip_context.md` cat** — PokéClip 기술 사양 + 학습자 진단
 2. **`_workspace/curriculum_master.md` cat** — 마스터 인덱스 (lean) — 트랙 간 의존성 확인
 3. **`_workspace/curriculum_tracks/<자기 TRACK>.md` cat** — 자기 트랙 시리즈 상세 (토큰 절감 — 다른 트랙 cat 금지)
-3. lesson-planner가 지정한 **선행 강의 cat** (이미 작성된 경우)
-4. 강의 식별자 트랙(A~Q) 폴더 존재 확인, 없으면 mkdir
+4. lesson-planner가 지정한 **선행 강의 cat** (이미 작성된 경우)
+5. 강의 식별자 트랙(A~Q) 폴더 존재 확인, 없으면 mkdir
 
 ### 단계 2: 본문 작성
 
 위 정형 스타일대로 작성. 사용자 진단(백지 + AI 전공 실전 0 + 터미널 약함) 반영:
 
-- 입문 트랙(레벨 1~2)은 친절하게 비유부터
-- 심화 트랙(레벨 3+)은 깊이 우선, 단 용어 풀이는 유지
+- 입문 트랙은 친절하게 비유부터
+- 심화 트랙은 깊이 우선, 단 용어 풀이는 유지
 - 모든 코드에 한국어 주석 또는 `[설명]` 라인 포함
-- PokéClip 실제 코드 작성 트랙(M)은 다른 트랙에서 배운 거 통합 적용
 
-### 단계 3: 저장
+### 단계 3: 저장 후 종료
 
-`Write` 도구로 `_workspace/lessons/<TRACK>/<TRACK>-L-K.md` 저장.
+`Write` 도구로 `_workspace/lessons/<TRACK>/<TRACK>-L-K.md` 저장 후 **즉시 종료**. 자체 검증/자기 점수 부여 금지.
 
-### 단계 4: 검증 (의무)
+**왜 자체 검증 안 하나**: 자기가 쓴 거 자기가 검증하면 **자기 사각지대 = 자기 검증 사각지대**. 점수도 인플레이션됨. 검증은 lesson-series-writer 스킬이 **독립 lesson-quality-guard 에이전트**로 호출 → 그게 단일 진실 원천.
 
-`lesson-quality-guard` 에이전트 호출 (Agent 도구, `subagent_type: lesson-quality-guard`):
-
-```
-prompt: "_workspace/lessons/<TRACK>/<TRACK>-L-K.md 검증해줘"
-```
-
-### 단계 5: 판정 처리
-
-- **PASS** → 보고 후 종료
-- **NEEDS_REVISION** → 보완 지시 반영해서 같은 파일 재작성 → 다시 lesson-quality-guard 호출 → 재검증
-- **FAIL** → 사용자에게 보고하고 사람 결정 대기
-
-재시도 최대 **2회**. 3차도 통과 못하면 사용자 호출.
+NEEDS_REVISION 받으면 lesson-series-writer가 다시 이 에이전트를 호출 (보완 지시 전달). 그때만 재작성.
 
 ## 작성 원칙
 
@@ -153,18 +140,15 @@ prompt: "_workspace/lessons/<TRACK>/<TRACK>-L-K.md 검증해줘"
 9. **"레벨 N" 본문 노출 금지** — 헤더만 OK (`feedback_internal_terms`)
 10. **수학/알고리즘 깊이** — Q 트랙(자료구조/알고리즘), D 트랙(AI 깊이)에서는 OK. 그 외 트랙은 실무 위주 (`feedback_streaming_lesson_style`)
 
-## 자기 점검 (저장 전 빠른 검토)
+## 저장 직전 형식 체크 (자기 점검 아님 — 단순 포맷 확인)
 
+저장 직전 다음 포맷 항목만 빠르게 확인:
 - 헤더 포맷 `## 레벨 <TRACK>-L / K강: ...` OK?
 - 섹션 사이 `---` 빠짐없음?
-- `### 면접 답변용` 포함? (조건부 — 면접 빈도 없는 강의는 "실무 적용 시나리오"로 대체 또는 생략)
 - `### K강 핵심 3줄` 포함?
-- 구체 수치 5개+?
-- 실제 동작 코드 3개+?
-- 음차 없음?
-- "레벨 N" 본문 노출 없음?
+- "레벨 N" 본문 노출 없음 (헤더만 OK)
 
-자기 점검은 빠른 사전 검증일 뿐, **공식 검증은 lesson-quality-guard**가 함.
+**점수 부여 / 품질 자체 평가는 금지.** 그건 lesson-quality-guard의 일.
 
 ## 사용자 메모리 정합
 
@@ -179,6 +163,8 @@ prompt: "_workspace/lessons/<TRACK>/<TRACK>-L-K.md 검증해줘"
 
 ## 출력 보고 형식
 
+작성 완료 후 다음만 보고. **점수/판정 자체 부여 금지** (검증은 lesson-quality-guard 일).
+
 ```
 [<TRACK>-L-K강 작성 완료]
 
@@ -186,14 +172,8 @@ prompt: "_workspace/lessons/<TRACK>/<TRACK>-L-K.md 검증해줘"
 파일: _workspace/lessons/<TRACK>/<TRACK>-L-K.md
 줄 수: XXX
 섹션 수: NN
-구체 수치: NN개
-코드 블록: NN개
+표 / 코드 블록 / 구체 수치 통계
+면접 답변용 또는 "실무 적용 시나리오" 선택 사유
 
-검증 결과 (lesson-quality-guard):
-- 점수: NN/100
-- 판정: PASS / NEEDS_REVISION → 재작성 N회 시도
-- 최종: PASS
-
-진도 파일 갱신:
-- _workspace/curriculum_progress.json 의 <TRACK>-L-K 상태: completed
+다음 단계: lesson-series-writer가 lesson-quality-guard 독립 검증 호출.
 ```

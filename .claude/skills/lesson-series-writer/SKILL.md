@@ -48,31 +48,34 @@ PokéClip 학습 트랙(A~Q)의 시리즈를 처음부터 끝까지 생성하는
 - "좋아 진행" 응답이면 다음 단계
 - 조정 요청이면 lesson-planner 재호출
 
-### 단계 3: 각 강의 순차 작성 + 검증 루프
+### 단계 3: 각 강의 순차 작성 + 독립 검증 루프
 
-확정된 계획의 각 강의를 **순차 작성**:
+확정된 계획의 각 강의를 **순차 작성**. **핵심 원칙: 작성과 검증은 별개 에이전트**. 작성자가 자체 검증하면 사각지대 = 자체 검증 사각지대 + 점수 인플레이션. 검증은 무조건 **lesson-quality-guard 독립 호출**.
 
 ```
 for K in 1..N:
   1. lesson-author 호출 (subagent_type: lesson-author)
      prompt: 강의 식별자 (<TRACK>-L-K) + 제목 + 핵심 항목 + 선행 강의
-     - 컨텍스트 cat (pokeclip_context.md, 선행 강의 등) 의무
+     - 컨텍스트 cat (pokeclip_context.md, 트랙 파일, 선행 강의)
      - 본문 작성
-     - _workspace/lessons/<TRACK>/<TRACK>-L-K.md 저장
+     - _workspace/lessons/<TRACK>/<TRACK>-L-K.md 저장 후 즉시 종료
+     - **자체 점수 부여 / 자체 검증 금지** (lesson-author 정의에 명시)
   
-  2. lesson-quality-guard 호출 (subagent_type: lesson-quality-guard)
+  2. lesson-quality-guard 호출 (subagent_type: lesson-quality-guard) — 독립 검증 의무
      prompt: "_workspace/lessons/<TRACK>/<TRACK>-L-K.md 검증해줘"
-     - 체크리스트 20항목 자동 검증
-     - 판정: PASS / NEEDS_REVISION / FAIL
+     - 100점 체크리스트 자동 검증
+     - 판정: PASS (90+) / NEEDS_REVISION (70~89) / FAIL (70 미만)
   
   3. 판정 처리:
      - PASS → 진도 파일 갱신 → 다음 강의 (K+1)
-     - NEEDS_REVISION → lesson-author 재호출 (보완 지시 전달) → 재검증
+     - NEEDS_REVISION → lesson-author 재호출 (보완 지시 전달) → 재 lesson-quality-guard 호출
        - 최대 2회 재시도
      - FAIL → 사용자에게 보고 + 사람 결정 대기
   
   4. PASS 확정 시 _workspace/curriculum_progress.json 갱신
 ```
+
+**왜 독립 호출 강제**: 작성자 자체 검증은 (a) 자기 사각지대 그대로 / (b) 점수 인플레이션 / (c) 토큰 절감 효과 미미 (둘 다 컨텍스트 cat). 독립 lesson-quality-guard만 단일 진실 원천.
 
 ### 단계 4: 전체 보고
 
