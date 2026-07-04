@@ -39,7 +39,26 @@ MSI T1 경기의 치지직 채팅을 수집해서 분석했다. 2세션 65분, 1
 - **티어 2:** 채팅 상위 20~25% 구간만 → 영상+음성 분석이 "넣을 가치"를 판정.
 - 그 밖 → 분석 안 함.
 
-![캐스케이드 비용 구조](/images/pokeclip-v4-cost.png)
+{{< chart caption="캐스케이드 적용 후 GPU 분석 대상 비중 (65분 방송 기준)" >}}
+{
+  "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" }, "valueFormatter": "function(v){return v + '%'}" },
+  "grid": { "left": "24%", "right": "12%", "bottom": "12%", "top": "8%" },
+  "xAxis": { "type": "value", "name": "방송 시간 비중 (%)", "max": 100 },
+  "yAxis": {
+    "type": "category",
+    "data": ["그 밖 (분석 안 함)", "티어 2 (영상+음성 분석)", "티어 1 (채팅만으로 즉시 확정)"]
+  },
+  "series": [{
+    "type": "bar",
+    "data": [
+      { "value": 70.3, "itemStyle": { "color": "#94a3b8" } },
+      { "value": 22.5, "itemStyle": { "color": "#3b82f6" } },
+      { "value": 7.2, "itemStyle": { "color": "#10b981" } }
+    ],
+    "label": { "show": true, "position": "right", "formatter": "{c}%" }
+  }]
+}
+{{< /chart >}}
 
 이러면 GPU가 볼 분량이 방송 전체의 20~25%로 준다. 심사가 지적한 비용 문제에 대한 답이면서, 실험이 시킨 설계이기도 하다.
 
@@ -54,7 +73,25 @@ MSI T1 경기의 치지직 채팅을 수집해서 분석했다. 2세션 65분, 1
 - **평균 기준선:** 폭발 빈들이 평균을 12 → 31로 끌어올린다. 트리플킬이 45개를 만들어도 45÷31 = 1.45배. 폭발 판정 실패. **하이라이트를 놓친다.**
 - **중앙값 기준선:** 24개 빈을 줄 세우면 가운데는 여전히 평상 빈이다. 기준선 12 유지, 45÷12 = 3.75배. **정상 확정.**
 
-![평균 vs 중앙값 기준선 - 실데이터](/images/pokeclip-v4-mean-median.png)
+{{< chart caption="평균 vs 중앙값 기준선 — 트리플킬 배율 판정 결과" >}}
+{
+  "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
+  "grid": { "left": "22%", "right": "10%", "bottom": "12%", "top": "8%" },
+  "xAxis": { "type": "value", "name": "배율 (평소 대비)" },
+  "yAxis": {
+    "type": "category",
+    "data": ["중앙값 기준선 (12 유지)", "평균 기준선 (12→31로 상승)"]
+  },
+  "series": [{
+    "type": "bar",
+    "data": [
+      { "value": 3.75, "itemStyle": { "color": "#10b981" } },
+      { "value": 1.45, "itemStyle": { "color": "#ef4444" } }
+    ],
+    "label": { "show": true, "position": "right", "formatter": "{c}배" }
+  }]
+}
+{{< /chart >}}
 
 중앙값은 크기가 아니라 순서상 가운데 자리만 보기 때문에, 폭발이 몇 개 끼어도 안 끌려간다. 연속 하이라이트가 밥 먹듯 나오는 게임 방송에서 이건 취향 문제가 아니라 정확도 문제였다.
 
@@ -62,7 +99,26 @@ MSI T1 경기의 치지직 채팅을 수집해서 분석했다. 2세션 65분, 1
 
 티어 2 게이트를 처음엔 "채팅량이 평균/중앙값 이상인 구간"으로 잡으려 했다. 실측을 돌려보니 함정이 있었다 — **중앙값 초과 구간은 정의상 방송의 절반이다.** 실제로 49~50%가 나왔다. 평균 초과도 29~36%. 이러면 방송의 3분의 1에서 절반이 GPU로 가서 비용 절감이 유명무실해진다.
 
-![게이트 백분위별 분석 분량](/images/pokeclip-v4-gate.png)
+{{< chart caption="게이트 기준별 GPU 분석 대상 비중 (실측)" >}}
+{
+  "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" }, "valueFormatter": "function(v){return v + '%'}" },
+  "grid": { "left": "26%", "right": "12%", "bottom": "12%", "top": "8%" },
+  "xAxis": { "type": "value", "name": "방송 시간 비중 (%)", "max": 60 },
+  "yAxis": {
+    "type": "category",
+    "data": ["채택: 상위 20~25% 백분위 게이트", "평균 초과 (기존 방식)", "중앙값 초과 (기존 방식)"]
+  },
+  "series": [{
+    "type": "bar",
+    "data": [
+      { "value": 22.5, "itemStyle": { "color": "#10b981" } },
+      { "value": 32.5, "itemStyle": { "color": "#f59e0b" } },
+      { "value": 49.5, "itemStyle": { "color": "#ef4444" } }
+    ],
+    "label": { "show": true, "position": "right", "formatter": "{c}%" }
+  }]
+}
+{{< /chart >}}
 
 그래서 게이트를 고정 통계량이 아니라 **백분위 노브**로 바꿨다. 최종 클립 10~15분에서 역산하면 — 영상·음성 판정에서 탈락할 분량을 1.5~2배수로 감안 — 상위 20~25%가 스위트스팟이다. 실측에서 상위 15~20%가 9.6~12.9분이었으니 딱 들어맞는다.
 
