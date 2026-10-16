@@ -19,7 +19,7 @@
 {{- end }}
 {{- $catIndex := $.Scratch.Get "catIndex" }}
 
-<div class="layout-three-col single">
+<div class="layout-three-col single{{ if .Params.portfolio_edition }} portfolio-layout{{ end }}">
   {{- partial "categories_sidebar.html" . }}
 
   <div class="main-column single-column">
@@ -31,6 +31,16 @@
           {{- partial "post_meta.html" . }}
         </div>
       </header>
+      {{- with .Params.portfolio_edition }}
+      <div class="portfolio-reading-guide">
+        <a href="/posts/0-to-1/portfolio-engineering-notes/">개발 사례 전체 모음</a>
+        <span> · 근거 확인 {{ replace . "-v2" "" }}</span>
+      </div>
+      <details class="portfolio-toc">
+        <summary>이 글의 순서</summary>
+        {{ $.TableOfContents }}
+      </details>
+      {{- end }}
       <div class="post-content">
         {{- .Content }}
       </div>

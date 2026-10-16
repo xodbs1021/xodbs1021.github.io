@@ -76,3 +76,30 @@
     text-align: right;
     margin-left: auto;
 }
+
+.portfolio-reading-guide {
+  color: var(--secondary);
+  font-size: 14px;
+  margin: 0 0 20px;
+}
+.portfolio-reading-guide a { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+.portfolio-toc {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 36px;
+  background: var(--code-bg);
+  font-size: 15px;
+}
+.portfolio-toc summary { cursor: pointer; font-weight: 600; }
+.portfolio-toc ul { padding-left: 20px; margin: 12px 0 0; }
+.portfolio-toc li { margin: 8px 0; }
+.portfolio-toc a:hover { text-decoration: underline; }
+.portfolio-layout .post-title { word-break: keep-all; overflow-wrap: anywhere; }
+@media (max-width: 700px) {
+  .portfolio-layout .cat-sidebar { padding: 0 0 12px; }
+  .portfolio-layout .cat-sidebar h3 { display: none; }
+  .portfolio-layout .cat-sidebar ul { display: flex; gap: 16px; overflow-x: auto; margin: 0; padding: 0 0 8px; }
+  .portfolio-layout .cat-sidebar li { flex-shrink: 0; margin: 0; }
+  .portfolio-layout .post-title { font-size: 30px; line-height: 1.4; }
+}
