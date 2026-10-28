@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="글 검색" noindex><div class="page-shell"><header class="page-heading"><h1>어떤 기록을 찾으세요?</h1><p>제목·태그·본문을 함께 검색합니다. 한글 일부나 영어 기술명을 입력해 보세요.</p></header><form id="search-form" role="search"><label for="query">검색어</label><div class="search-controls"><input id="query" type="search" name="q" placeholder="예: 녹화 복구, MediaMTX, 인증" autocomplete="off" maxlength="160"/><button type="submit">검색</button></div></form><p id="search-status" role="status" aria-live="polite">검색어를 입력해 주세요.</p><div id="search-results"></div><noscript><p>검색하려면 JavaScript를 켜 주세요. <a href="/posts/">전체 글 목록</a>에서도 글을 찾을 수 있습니다.</p></noscript></div></Base>
+<script>
+import {makeSearch} from '../lib/search.mjs';
+const input=document.querySelector<HTMLInputElement>('#query')!;
+const status=document.querySelector<HTMLElement>('#search-status')!;
+const results=document.querySelector<HTMLElement>('#search-results')!;
+let ready:Promise<ReturnType<typeof makeSearch>>|undefined;
+let generation=0,timer:ReturnType<typeof setTimeout>;
+async function run(){
+ const version=++generation;const query=input.value.trim();results.replaceChildren();
+ const url=new URL(location.href);if(query)url.searchParams.set('q',query);else url.searchParams.delete('q');history.replaceState({},'',url);
+ if(!query){status.textContent='검색어를 입력해 주세요.';return}status.textContent='글을 찾고 있어요…';
+ try{
+ ready??=fetch('/search-index.json').then(r=>{if(!r.ok)throw new Error('index');return r.json()}).then(makeSearch).catch(e=>{ready=undefined;throw e});
+ const search=await ready;if(version!==generation)return;const found=search(query);
+ status.textContent=found.length?`${found.length}편의 글을 찾았어요.`:'검색 결과가 없어요. 더 짧은 단어나 다른 기술명으로 찾아보세요.';
+ for(const item of found){const row=document.createElement('article');row.className='search-result';const meta=document.createElement('p');meta.className='category-label';meta.textContent=item.category+' · '+item.date;const title=document.createElement('h2');const link=document.createElement('a');link.href=item.url;link.textContent=item.title;title.append(link);const excerpt=document.createElement('p');excerpt.textContent=item.snippet;row.append(meta,title,excerpt);results.append(row)}
+ }catch{if(version===generation)status.textContent='검색 자료를 불러오지 못했어요. 잠시 뒤 다시 검색해 주세요.'}
+}
+input.value=new URLSearchParams(location.search).get('q')||'';
+input.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(run,180)});
+document.querySelector('#search-form')!.addEventListener('submit',e=>{e.preventDefault();clearTimeout(timer);run()});
+if(input.value)run();
+</script>

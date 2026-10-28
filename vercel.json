@@ -1,0 +1,76 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "installCommand": "npm ci",
+  "trailingSlash": true,
+  "functions": {
+    "api/views.mjs": {
+      "maxDuration": 5
+    }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://cdn.jsdelivr.net data:; img-src 'self' https: data: blob:; media-src 'self' https: blob:; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://player.vimeo.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+        }
+      ]
+    },
+    {
+      "source": "/_astro/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/categories/0-to-1/",
+      "destination": "/categories/projects/",
+      "permanent": true
+    },
+    {
+      "source": "/categories/open-source-analysis/",
+      "destination": "/categories/open-source/",
+      "permanent": true
+    },
+    {
+      "source": "/categories/tech-blurting/",
+      "destination": "/categories/technical-notes/",
+      "permanent": true
+    },
+    {
+      "source": "/categories/book-review/",
+      "destination": "/categories/notes/",
+      "permanent": true
+    },
+    {
+      "source": "/categories/coding-test/",
+      "destination": "/posts/",
+      "permanent": true
+    }
+  ]
+}

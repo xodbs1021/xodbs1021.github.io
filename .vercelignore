@@ -1,0 +1,14 @@
+/themes
+/layouts
+/assets
+/archetypes
+/_workspace
+/.claude
+/.github
+/CLAUDE.md
+/blurting-auto.py
+/hugo.toml
+/.hugo_build.lock
+/tests
+/.agents
+/skills-lock.json

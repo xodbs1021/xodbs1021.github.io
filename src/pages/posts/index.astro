@@ -1,0 +1,4 @@
+---
+import Base from '../../layouts/Base.astro';import PostList from '../../components/PostList.astro';import {posts,categories} from '../../lib/posts.mjs';
+---
+<Base title="전체 글"><div class="page-shell"><header class="page-heading"><h1>쌓아 온 기록</h1><p>문제의 시작부터 검증의 끝까지. 총 {posts.length}편의 글.</p></header><nav class="filters" aria-label="글 주제"><a href="/posts/" aria-current="page">전체</a>{Object.entries(categories).map(([id,c])=><a href={`/categories/${id}/`}>{c.title}</a>)}</nav><PostList posts={posts}/></div></Base>

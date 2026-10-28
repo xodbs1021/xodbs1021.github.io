@@ -1,0 +1,14 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostList from '../../components/PostList.astro';
+import {posts,categories,formatDate,site} from '../../lib/posts.mjs';
+export function getStaticPaths(){return posts.map(post=>({params:{slug:post.slug},props:{post}}))}
+const {post}=Astro.props;
+const related=posts.filter(p=>p.slug!==post.slug&&p.category===post.category).slice(0,3);
+const schema={ '@context':'https://schema.org','@type':'BlogPosting',headline:post.title,datePublished:post.date.toISOString(),dateModified:post.lastmod||post.date.toISOString(),author:{'@type':'Person',name:'김태윤',url:site+'/about/'},mainEntityOfPage:site+post.url,image:site+'/images/taeyun-og.png'};
+---
+<Base title={post.title} description={post.description} article><article class="article" data-pagefind-body><header class="article-header"><a class="category-label" href={`/categories/${post.category}/`}>{categories[post.category]?.title||post.category}</a><h1 data-pagefind-meta="title">{post.title}</h1><p class="article-description">{post.description}</p><div class="author-line"><span class="avatar">김</span><div><strong>김태윤</strong><div class="post-meta"><time datetime={post.date.toISOString()}>{formatDate(post.date)}</time>{post.lastmod&&<span>수정 {formatDate(post.lastmod)}</span>}<span>{post.minutes}분 읽기</span><span class="view-count" data-slug={post.slug} title="하루 동안 같은 네트워크에서 같은 글을 반복해서 읽으면 한 번만 집계합니다.">조회 <span id="views">—</span></span></div></div></div></header>
+<div class="article-layout"><div class="article-content prose" set:html={post.html}/><aside class="toc" data-pagefind-ignore><details open><summary>이 글의 순서</summary><nav aria-label="본문 목차">{post.headings.filter(h=>h.depth===2).map(h=><a href={`#${h.id}`}>{h.text}</a>)}</nav></details><a class="back-top" href="#main">맨 위로</a></aside></div><div class="article-end" data-pagefind-ignore><div class="tags">{post.tags.map(tag=><a href={`/tags/${encodeURIComponent(tag.toLowerCase().replaceAll(' ','-'))}/`}>{tag}</a>)}</div><p>이 글의 판단과 검증 범위는 본문에 적힌 시점을 기준으로 합니다.</p><button class="copy-url">글 주소 복사</button></div></article><section class="related"><div class="section-heading"><h2>함께 읽을 글</h2><a href="/posts/">전체 글</a></div><PostList posts={related}/></section><dialog id="image-dialog"><button aria-label="이미지 확대 닫기">닫기 ✕</button><img alt=""/></dialog><script type="application/ld+json" set:html={JSON.stringify(schema).replaceAll('<','\\u003c')}/>
+<script>
+import '../..//lib/article-client';
+</script></Base>

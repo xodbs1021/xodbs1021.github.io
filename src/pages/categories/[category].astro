@@ -1,0 +1,9 @@
+---
+import Base from '../../layouts/Base.astro';import PostList from '../../components/PostList.astro';import {posts,categories} from '../../lib/posts.mjs';import {legacyCategories} from '../../lib/taxonomy.mjs';
+export function getStaticPaths(){return [...Object.keys(categories),...Object.keys(legacyCategories)].map(category=>({params:{category},props:{category}}))}
+const {category}=Astro.props;
+const legacy=Object.hasOwn(legacyCategories,category);
+const destination=legacyCategories[category]?`/categories/${legacyCategories[category]}/`:'/posts/';
+const info=categories[category];
+---
+{legacy ? <html lang="ko"><head><meta charset="utf-8"/><title>주제 이동</title><link rel="canonical" href={`https://taeyun.blog${destination}`}/><meta http-equiv="refresh" content={`0;url=${destination}`}/></head><body><a href={destination}>새 주제에서 글 읽기</a></body></html> : <Base title={info.title} description={info.description}><div class="page-shell"><header class="page-heading"><h1>{info.title}</h1><p>{info.description}</p></header><nav class="filters" aria-label="글 주제"><a href="/posts/">전체</a>{Object.entries(categories).map(([id,c])=><a href={`/categories/${id}/`} aria-current={id===category?'page':undefined}>{c.title}</a>)}</nav><PostList posts={posts.filter(p=>p.category===category)}/></div></Base>}

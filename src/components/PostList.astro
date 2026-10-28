@@ -1,0 +1,6 @@
+---
+import Cover from './Cover.astro';
+import {categories,formatDate} from '../lib/posts.mjs';
+const {posts}=Astro.props;
+---
+<div class="post-list">{posts.map(p=><article class="post-row"><a class="post-row-link" href={p.url}><div class="post-row-copy"><span class="category-label">{categories[p.category]?.title||p.category}</span><h2>{p.title}</h2><p>{p.description}</p><div class="post-meta"><time datetime={p.date.toISOString()}>{formatDate(p.date)}</time><span>{p.minutes}분 읽기</span></div></div><Cover category={p.category} compact/></a></article>)}</div>

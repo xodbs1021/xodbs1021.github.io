@@ -1,0 +1,5 @@
+---
+import Base from '../layouts/Base.astro';import {posts} from '../lib/posts.mjs';
+const series=[{title:'PokeClip',tag:'PokeClip',description:'라이브 스트림을 받고, 저장하고, 다시 재생하기까지. 미디어 인프라의 설계와 복구 기록.'},{title:'MediaMTX',tag:'MediaMTX',description:'설정과 인증, 녹화와 종료 처리. 사용 중 만난 문제를 공개 기여로 연결한 과정.'},{title:'Shakedown',tag:'Shakedown',description:'분석 결과를 서비스의 배포와 복구로 연결한 해커톤 기록.'}];
+---
+<Base title="프로젝트 시리즈"><div class="page-shell"><header class="page-heading"><h1>하나의 프로젝트,<br/>여러 번의 선택.</h1><p>서로 이어지는 글을 프로젝트별로 모았습니다.</p></header><div class="series-grid">{series.map(s=><a class="series-card" href={`/tags/${s.tag.toLowerCase()}/`}><small>{posts.filter(p=>p.tags.includes(s.tag)).length}편의 기록</small><h2>{s.title}</h2><p>{s.description}</p><span class="text-link">시리즈 읽기 ↗</span></a>)}</div></div></Base>
