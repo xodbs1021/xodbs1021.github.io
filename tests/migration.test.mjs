@@ -3,7 +3,9 @@ import {posts,charts} from '../src/lib/posts.mjs';
 const legacyPaths=JSON.parse(fs.readFileSync('data/legacy-paths.json'));
 const files=dir=>fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.isDirectory()?files(path.join(dir,e.name)):[path.join(dir,e.name)]);
 test('all published articles and old listing routes remain available',()=>{
- assert.equal(posts.length,90);assert.equal(charts.size,58);
+ const baseline=Object.keys(JSON.parse(fs.readFileSync('data/legacy-heading-ids.json')));
+ assert.ok(posts.length>=90);assert.ok(charts.size>=58);
+ for(const slug of baseline)assert.ok(posts.some(p=>p.slug===slug),`missing original article: ${slug}`);
  for(const url of legacyPaths)assert.ok(fs.existsSync(`dist${decodeURI(url)}index.html`),url);
  for(const p of posts){const $=load(fs.readFileSync(`dist${p.url}index.html`,'utf8'));assert.equal($('link[rel=canonical]').attr('href'),`https://taeyun.blog${p.url}`);assert.equal($('[data-pagefind-meta=title]').text(),p.title);assert.equal($('.echart').length,(p.raw.match(/\{\{<\s*chart\s/g)||[]).length);assert.ok(!$('.article-content').text().includes('{{<'));}
 });
