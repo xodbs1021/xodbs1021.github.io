@@ -1,0 +1,4 @@
+---
+import Base from '../../layouts/Base.astro';import {categories} from '../../lib/posts.mjs';
+---
+<Base title="카테고리"><div class="page-shell"><h1>주제별 기록</h1><div class="series-grid">{Object.entries(categories).map(([id,c])=><a class="series-card" href={`/categories/${id}/`}><h2>{c.title}</h2><p>{c.description}</p></a>)}</div></div></Base>

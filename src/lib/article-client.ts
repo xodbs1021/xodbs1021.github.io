@@ -1,0 +1,20 @@
+import 'highlight.js/styles/github-dark.css';
+if(matchMedia('(max-width: 800px)').matches)document.querySelector('.toc details')?.removeAttribute('open');
+const chartElements=[...document.querySelectorAll<HTMLElement>('[data-chart]')];
+if(chartElements.length){
+  const observer=new IntersectionObserver(async entries=>{for(const entry of entries){if(!entry.isIntersecting)continue;observer.unobserve(entry.target);const el=entry.target as HTMLElement;try{const echarts=await import('echarts');const {default:option}=await import(/* @vite-ignore */ `/charts/${el.dataset.chart}.js`);let chart=echarts.init(el,document.documentElement.dataset.theme==='dark'?'dark':undefined);chart.setOption({...option,backgroundColor:'transparent'});new ResizeObserver(()=>chart.resize()).observe(el);window.addEventListener('themechange',()=>{chart.dispose();chart=echarts.init(el,document.documentElement.dataset.theme==='dark'?'dark':undefined);chart.setOption({...option,backgroundColor:'transparent'})});}catch{el.textContent='차트를 불러오지 못했습니다. 새로고침해 주세요.'}}},{rootMargin:'300px'});chartElements.forEach(el=>observer.observe(el));
+}
+const diagrams=[...document.querySelectorAll<HTMLElement>('.mermaid')];
+if(diagrams.length){try{const {default:mermaid}=await import('mermaid');const sources=diagrams.map(d=>d.textContent||'');const render=async()=>{mermaid.initialize({startOnLoad:false,securityLevel:'strict',theme:document.documentElement.dataset.theme==='dark'?'dark':'neutral',fontFamily:'inherit'});diagrams.forEach((d,i)=>{d.removeAttribute('data-processed');d.textContent=sources[i]});try{await mermaid.run({nodes:diagrams,suppressErrors:true})}catch{}};await render();window.addEventListener('themechange',render)}catch{}}
+document.querySelectorAll('pre:not(.mermaid)').forEach(pre=>{const button=document.createElement('button');button.className='copy-code';button.textContent='복사';button.setAttribute('aria-label','코드 복사');button.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(pre.querySelector('code')?.textContent||'');button.textContent='복사됨';setTimeout(()=>button.textContent='복사',1800)}catch{button.textContent='복사 실패'}});pre.append(button)});
+document.querySelector('.copy-url')?.addEventListener('click',async e=>{try{await navigator.clipboard.writeText(location.href);(e.target as HTMLElement).textContent='주소를 복사했어요'}catch{(e.target as HTMLElement).textContent='주소창에서 주소를 복사해 주세요'}});
+const dialog=document.querySelector<HTMLDialogElement>('#image-dialog');
+document.querySelectorAll<HTMLImageElement>('.prose img').forEach(img=>{img.loading='lazy';img.tabIndex=0;img.setAttribute('role','button');img.setAttribute('aria-label',`${img.alt||'이미지'} 확대`);const show=()=>{const large=dialog!.querySelector('img')!;large.src=img.currentSrc||img.src;large.alt=img.alt;dialog!.showModal()};img.addEventListener('click',show);img.addEventListener('keydown',e=>{if(e.key==='Enter')show()})});
+dialog?.addEventListener('click',e=>{if(e.target===dialog||(e.target as HTMLElement).tagName==='BUTTON')dialog.close()});
+const slug=document.querySelector<HTMLElement>('[data-slug]')?.dataset.slug;
+if(slug && location.hostname==='taeyun.blog'){
+ const key=`view:${slug}:${new Date().toISOString().slice(0,10)}`;
+ let seen=false;try{seen=!!localStorage.getItem(key)}catch{}
+ try{const response=await fetch(`/api/views/?slug=${encodeURIComponent(slug)}`,{method:seen?'GET':'POST',headers:seen?{}:{'Content-Type':'application/json'}});if(response.ok){const data=await response.json();document.querySelector('#views')!.textContent=Number(data.views).toLocaleString('ko-KR');if(!seen)try{localStorage.setItem(key,'1')}catch{}}}catch{}
+}
+const sectionObserver=new IntersectionObserver(entries=>{for(const entry of entries)if(entry.isIntersecting){document.querySelectorAll('.toc a').forEach(a=>a.classList.toggle('active',a.getAttribute('href')===`#${entry.target.id}`))}},{rootMargin:'-10% 0px -65% 0px'});document.querySelectorAll('.prose h2[id]').forEach(h=>sectionObserver.observe(h));

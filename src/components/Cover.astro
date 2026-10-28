@@ -1,0 +1,14 @@
+---
+const { category='projects', compact=false }=Astro.props;
+const source=category==='open-source';
+const tech=category==='technical-notes';
+---
+<div class:list={['cover', {compact,source,tech}]} aria-hidden="true">
+  <svg viewBox="0 0 620 350" fill="none"><defs><linearGradient id={`line-${category}`} x1="0" y1="0" x2="620" y2="350" gradientUnits="userSpaceOnUse"><stop stop-color="#54D4D0"/><stop offset="1" stop-color="#427EFF"/></linearGradient></defs>
+    <path d="M-20 270C90 270 90 90 200 90S310 270 420 270 530 90 640 90" stroke={`url(#line-${category})`} stroke-width="30"/>
+    <path d="M-20 310C90 310 90 130 200 130S310 310 420 310 530 130 640 130" stroke="currentColor" stroke-opacity=".16" stroke-width="2"/>
+    <path d="M-20 230C90 230 90 50 200 50S310 230 420 230 530 50 640 50" stroke="currentColor" stroke-opacity=".16" stroke-width="2"/>
+    <rect x="241" y="119" width="138" height="112" rx="22" fill="var(--cover-panel)" stroke="currentColor" stroke-opacity=".15"/>
+    {source ? <><path d="M286 153L268 175 286 197M334 153L352 175 334 197M317 149L303 201" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></> : tech ? <><circle cx="310" cy="175" r="30" stroke="currentColor" stroke-width="5"/><path d="M310 145V175L330 185" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></> : <path d="M299 151L333 175 299 199V151Z" fill="currentColor"/>}
+  </svg>
+</div>

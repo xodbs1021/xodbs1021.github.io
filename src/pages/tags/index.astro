@@ -1,0 +1,4 @@
+---
+import Base from '../../layouts/Base.astro';import {tags,posts} from '../../lib/posts.mjs';
+---
+<Base title="태그"><div class="page-shell"><h1>주제로 찾아보기</h1><div class="filters">{tags.map(tag=><a href={`/tags/${encodeURIComponent(tag.toLowerCase().replaceAll(' ','-'))}/`}>{tag} ({posts.filter(p=>p.tags.includes(tag)).length})</a>)}</div></div></Base>
