@@ -1,7 +1,7 @@
 ---
 title: "Close가 반환했는데 인증서 watcher는 살아 있었다"
 date: "2026-10-15T11:40:52+09:00"
-lastmod: "2026-10-16T15:28:18+09:00"
+lastmod: "2026-10-28T18:38:04+09:00"
 draft: false
 author: "김태윤"
 description: "종료 요청과 실제 완료를 분리하고 갱신 중간을 통제해 20/20 실패→20/20 통과를 확인한 MediaMTX #6261."
@@ -11,6 +11,8 @@ portfolio_cases: [42]
 portfolio_pages: [38]
 portfolio_edition: "2026-10-15-v2"
 ---
+
+> **2026년 10월 28일 상태 갱신:** #6261은 병합 없이 닫혔습니다. 아래 20/20 결과는 이 제안의 고정 커밋 실험 기록이며 상류 채택 성과가 아닙니다. 유지보수자의 별도 구현 [#6417](https://github.com/bluenviron/mediamtx/pull/6417) 이후 발견한 no-watch 종료 교착은 [후속 글: 시작되지 않은 watcher의 종료를 기다리던 문제](/posts/open-source-analysis/mediamtx-certloader-no-watcher-shutdown/)에서 다룹니다. 후속 수정 #6427과 이 제안의 코드·검증 결과를 구분합니다.
 
 MediaMTX의 `CertLoader.Close()`는 종료 신호를 보낸 뒤 반환했습니다. 그런데 이미 시작한 인증서 갱신 작업은 계속 실행돼, Close 이후에도 로그를 쓰거나 인증서를 다시 채울 수 있었습니다. 호출자는 정리가 끝났다고 생각하지만 그 객체를 쓰는 작업은 아직 남아 있는 순서였습니다.
 
