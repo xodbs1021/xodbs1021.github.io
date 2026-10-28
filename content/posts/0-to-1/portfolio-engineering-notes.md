@@ -11,23 +11,27 @@
     "Shakedown",
     "포트폴리오"
   ],
-  "description": "재포장 23.43→3.05ms, CDN 원본 요청 1,254→28건, MediaMTX 릴리스 4건을 만든 판단과 검증. 43사례와 후속 11편을 연결한 기술 글 모음.",
+  "description": "공통 DB 인증, nginx 요청 검증, DVR 발행과 복구, MediaMTX 기여를 만든 판단과 검증을 연결한 기술 글 모음.",
   "draft": false,
   "portfolio_edition": "2026-10-15-v2",
-  "lastmod": "2026-10-28T18:38:04+09:00"
+  "lastmod": "2026-10-28T19:27:14+09:00"
 }
 
 방송 파일을 만들었고 요청도 성공했는데, 브라우저가 인식한 재생 구간은 목록보다 **61.94초 짧았습니다.** 오류 수는 0이었습니다. 이 차이를 추적하며 성공 응답 다음에 무엇을 확인해야 하는지 배웠습니다. 파일의 시간축과 브라우저가 받아들인 구간을 대조해야 사용자가 놓친 장면을 찾을 수 있었습니다.
 
 저는 PokeClip의 미디어·인프라 구조와 서비스 간 계약을 정하고, 사용 중 발견한 결함을 MediaMTX의 공개 기여로 이어 왔습니다. SoftBank 해커톤 Shakedown에서는 분석 결과를 배포와 복구까지 연결했습니다. 각 글에는 제가 문제를 어떻게 해석하고 무엇을 선택했는지, 팀원과 AI가 구현·계측을 맡은 범위는 어디인지 함께 담았습니다.
 
-이 모음은 PokeClip 35건과 MediaMTX 8건의 **기존 43사례**, 의존성 갱신·사용자별 SRT 제안·Shakedown을 다룬 **후속 8편**, 총 51편에서 시작했습니다. **10월 28일에 공통 DB 인증·개발 하네스·no-watch 종료 교착 3편을 더해 총 54편**으로 확장했습니다. 기존 글의 기준일은 각 본문에 남기고, S3 발행·계정별 인증·인증서 watcher의 후속 상태를 갱신했습니다. 관심 있는 문제부터 읽을 수 있도록 아래에서는 결과와 그 결과를 만든 선택을 연결했습니다.
+이 모음은 PokeClip 35건과 MediaMTX 8건의 **기존 43사례**, 의존성 갱신·사용자별 SRT 제안·Shakedown을 다룬 **후속 8편**, 총 51편에서 시작했습니다. **10월 28일에 공통 DB 인증·개발 하네스·no-watch 종료 교착 3편을 더해 총 54편**으로 확장했습니다. 같은 날 nginx 요청 검증·Media 호스트 재시작·Live/DVR 분리 3편을 추가해 총 57편으로 확장했습니다. 기존 글의 기준일은 각 본문에 남기고, S3 발행·계정별 인증·인증서 watcher의 후속 상태를 갱신했습니다. 관심 있는 문제부터 읽을 수 있도록 아래에서는 결과와 그 결과를 만든 선택을 연결했습니다.
 
 ## 10월 28일 추가한 플랫폼 개발 기록
 
 - [DB 연결의 IAM·TLS 규칙을 공통 모듈로 모은 이유](/posts/0-to-1/pokeclip-shared-db-auth-iam-tls/): 두 서비스·세 연결 풀의 인증 정책과 실제 RDS 재접속 검증.
 - [작업 세션과 worktree의 검토 상태를 분리한 이유](/posts/0-to-1/harness-session-isolation-worktree-root/): 상태 누출 방지, 시작 위치 고정, 회귀·변이 검사의 범위.
 - [시작되지 않은 watcher의 종료를 기다리던 교착](/posts/open-source-analysis/mediamtx-certloader-no-watcher-shutdown/): MediaMTX #6427의 원인, 최소 수정과 재현 조건.
+
+- [MediaMTX 앞 nginx의 요청 대상 검증](/posts/0-to-1/pokeclip-nginx-playback-request-boundary/): 경로·쿼리 일치와 정규화 우회 차단.
+- [Media 호스트의 컨테이너·설정 파일 재시작 경계](/posts/0-to-1/pokeclip-media-host-restart-lifecycle/): 비정상 종료 시 수명 불일치와 복구 검증.
+- [Live와 DVR의 분리, 다시 이어 붙이는 조건](/posts/0-to-1/pokeclip-live-dvr-separation-handoff/): 완료한 발행·되감기 연동과 진행 중인 자동 전환 검증.
 
 ## 먼저 읽을 다섯 가지 판단
 
