@@ -2,8 +2,13 @@
 title: "코덱은 기술이 아니라 비즈니스 결정이다 — 시나리오/비용/디버깅 종합"
 date: 2026-06-21T12:33:24+09:00
 categories: ["tech-blurting"]
+illustrativeMetrics: true
+lastmod: 2026-10-29T09:00:00+09:00
 draft: false
 ---
+
+> **2026-10-29 정정** — 보편적 0.5% 로열티와 95% 도달률 기준을 수정했습니다. 비용·성능 비교 숫자는 운영 실적이 아닌 원자료 미확인 예시입니다.
+
 
 지금까지 H.264, AAC, H.265, Opus, AV1, VP9까지 코덱 6개를 봤다. 각각의 압축 원리와 라이센스 구조를 알아도, 실무 질문은 결국 하나로 모인다.
 
@@ -73,7 +78,7 @@ draft: false
 
 기본 비교부터.
 
-{{< chart caption="1080p60 H.264 트랜스코딩 — 서버 1대당 동시 채널 수" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 1080p60 H.264 트랜스코딩 — 서버 1대당 동시 채널 수" >}}
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "grid": { "left": "25%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -98,7 +103,7 @@ draft: false
 
 근데 자체 GPU 인프라 구축 vs 클라우드 매니지드의 비용 차이가 더 충격적.
 
-{{< chart caption="1000채널 1년 트랜스코딩 비용 (USD, 로그 스케일)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 1000채널 1년 트랜스코딩 비용 (USD, 로그 스케일)" >}}
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "grid": { "left": "30%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -129,7 +134,7 @@ draft: false
 
 ## 4. 코덱별 GPU 부하 — 같은 NVENC라도 다르다
 
-{{< chart caption="NVIDIA L40 1대 — 1080p60 인코딩 코덱별 동시 채널" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: NVIDIA L40 1대 — 1080p60 인코딩 코덱별 동시 채널" >}}
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "grid": { "left": "22%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -155,7 +160,7 @@ VP9은 GPU 인코더 자체가 없어서 CPU 강제. AV1은 RTX 4000+ / Ada Love
 
 ### ABR Ladder 한 채널이 GPU에 미치는 부담
 
-{{< chart caption="1채널 ABR Ladder (1080p/720p/480p/360p)의 NVENC GPU 부하 누적" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 1채널 ABR Ladder (1080p/720p/480p/360p)의 NVENC GPU 부하 누적" >}}
 {
   "tooltip": { "trigger": "axis" },
   "legend": { "data": ["1080p 6Mbps", "720p 3Mbps", "480p 1.5Mbps", "360p 0.6Mbps"], "top": 0 },
@@ -199,7 +204,7 @@ AV1 1080p 2 Mbps (66% 절감):
 
 ### 진짜 ROI 계산 — 라이센스 + 인프라 비용까지
 
-{{< chart caption="100만 디바이스 규모에서 코덱 마이그레이션 ROI (연 USD)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 100만 디바이스 규모에서 코덱 마이그레이션 ROI (연 USD)" >}}
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "legend": { "data": ["CDN 절감", "라이센스", "인코딩 추가 GPU", "호환성 폴백 운영", "순 절감"], "top": 0 },
@@ -511,8 +516,8 @@ flowchart LR
 "단순히 압축 효율 좋은 코덱이 정답이 아닙니다.
 6가지 요인을 우선순위로 두고 결정합니다:
 
-1. 호환성: 시청자 도달률 95% 미만이면 도입 불가
-2. 라이센스: 콘텐츠 매출 0.5% 로열티는 큰 부담
+1. 호환성: 허용할 도달률과 대체 코덱 정책을 정함; 95%는 이 글의 가정 기준
+2. 라이선스: 적용 제품·서비스 범위와 계약 조건을 확인; 공통 0.5% 요율로 계산하지 않음
 3. CDN 비용 절감: 월 시청 10 PB+ 규모에서 도입 가치
 4. 인코딩 인프라: GPU 보유 여부
 5. 지연: 라이브 / VOD / 통신

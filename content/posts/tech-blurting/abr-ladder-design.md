@@ -1,15 +1,20 @@
 ---
-title: "Netflix가 같은 영화를 50번 인코딩하는 이유 — ABR Ladder 설계"
+title: "콘텐츠마다 다른 화질 사다리 — ABR Ladder 설계"
 date: 2026-06-22T01:55:58+09:00
 categories: ["tech-blurting"]
+illustrativeMetrics: true
+lastmod: 2026-10-29T09:00:00+09:00
 draft: false
 ---
 
-Netflix는 영화 한 편당 약 50번 인코딩한다. 1080p 6Mbps 한 번이 아니라 4K부터 240p까지, 같은 해상도도 비트레이트 5단계씩, 코덱마다 (H.264/H.265/AV1) 따로. 합쳐서 약 50개의 인코딩 결과물이 한 영화에 딸려있다.
+> **2026-10-29 정정** — Netflix의 고정 50회 인코딩 주장을 제거했습니다. 이 글의 비트레이트·처리량·비용 그래프는 학습용 가정이며 실제 Netflix 설정이나 측정 결과가 아닙니다.
 
-게다가 영화마다 그 사다리가 다르다. 토크쇼는 1080p @ 2.5Mbps, 액션 영화는 1080p @ 8Mbps. **콘텐츠 복잡도에 맞춰 비트레이트를 정하는** 이걸 Per-Title Encoding이라고 부른다. Netflix가 2015년 도입한 후 산업 표준이 됐다.
 
-이번 글은 **ABR Ladder 설계**의 모든 것 — 표준 사다리, Per-Title, Shot-Based, FFmpeg/Shaka 구성, 비용 운영까지 — 정리한 노트다. [지난 글](../ffmpeg-deep-dive/)에서 FFmpeg 자체를 봤다면, 이번 글은 그 위에서 실제로 어떤 사다리를 만들지의 결정 가이드다.
+ABR은 같은 콘텐츠를 여러 해상도·비트레이트로 준비해 재생 조건에 맞게 선택하는 방식이다. 코덱까지 나누면 출력 개수가 더 늘어난다. 그러나 “Netflix는 모든 영화를 50번 인코딩한다”는 고정 숫자를 뒷받침할 근거는 없어 제거했다.
+
+콘텐츠의 복잡도에 맞춰 사다리를 고르는 것이 Per-Title Encoding이다. Netflix는 이 방식과 이후의 shot-based 최적화를 [기술 블로그](https://medium.com/netflix-techblog/optimized-shot-based-encodes-now-streaming-4b9464204830)에 설명했다. 토크쇼 2.5Mbps·액션 8Mbps 같은 숫자는 이 글의 예시 입력이며 Netflix 운영값이 아니다.
+
+이번 글은 사다리의 구성, 인코딩 명령과 비용 검토를 위한 학습 노트다. 실제 설계에서는 원본 영상과 대상 디바이스, 품질 평가 조건을 먼저 고정해야 한다.
 
 ---
 
@@ -98,7 +103,7 @@ Bits per Pixel (bpp) = 비트레이트 / (가로 × 세로 × fps)
 
 ## 4. 콘텐츠 타입별 비트레이트 — 같은 1080p60도 다르다
 
-{{< chart caption="콘텐츠 종류별 1080p60 권장 비트레이트 (Kbps)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 콘텐츠 종류별 1080p60 권장 비트레이트 (Kbps)" >}}
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "grid": { "left": "22%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -216,7 +221,7 @@ VMAF 92가 시청자 만족 임계점
 
 ### Per-Title 도입 ROI
 
-{{< chart caption="월 트래픽 규모별 Per-Title 도입 ROI (USD)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 월 트래픽 규모별 Per-Title 도입 ROI (USD)" >}}
 {
   "tooltip": { "trigger": "axis" },
   "legend": { "data": ["CDN 절감", "분석 + 운영 비용", "순 절감"], "top": 0 },
@@ -296,7 +301,7 @@ flowchart TB
 
 발로란트 1080p60 스트리머 기준.
 
-{{< chart caption="치지직 발로란트 1080p60 ABR Ladder (Kbps)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 치지직 발로란트 1080p60 ABR Ladder (Kbps)" >}}
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "grid": { "left": "20%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -447,7 +452,7 @@ packager 'in=1080p.mp4,stream=video,...' \
 
 ## 14. CPU vs GPU 트랜스코딩 비용 — ABR Ladder 1채널 기준
 
-{{< chart caption="1080p60 ABR Ladder 1채널 트랜스코딩 — 서버 1대 동시 채널" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 1080p60 ABR Ladder 1채널 트랜스코딩 — 서버 1대 동시 채널" >}}
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "grid": { "left": "25%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -479,7 +484,7 @@ packager 'in=1080p.mp4,stream=video,...' \
 
 ## 15. 사다리 단계 수의 비용 영향
 
-{{< chart caption="3단계 vs 5단계 사다리 — 인코딩 부하 + 스토리지 (1080p 기준)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 3단계 vs 5단계 사다리 — 인코딩 부하 + 스토리지 (1080p 기준)" >}}
 {
   "tooltip": { "trigger": "axis" },
   "legend": { "data": ["인코딩 부하 배수", "스토리지 GB/시간"], "top": 0 },
@@ -502,7 +507,7 @@ packager 'in=1080p.mp4,stream=video,...' \
 
 ## 16. 시청자 화질 분포 — 사다리 최적화의 근거
 
-{{< chart caption="치지직 추정 시청자 화질 분포 (%)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 치지직 추정 시청자 화질 분포 (%)" >}}
 {
   "tooltip": { "trigger": "item", "formatter": "{b}: {c}% ({d}%)" },
   "legend": { "orient": "vertical", "left": "left", "top": "middle" },
@@ -541,7 +546,7 @@ packager 'in=1080p.mp4,stream=video,...' \
 
 ## 17. 카테고리별 사다리 — 콘텐츠 카테고리에 맞춤
 
-{{< chart caption="카테고리별 1080p 비트레이트 차등 (Kbps)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 카테고리별 1080p 비트레이트 차등 (Kbps)" >}}
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "legend": { "data": ["1080p", "720p", "480p"], "top": 0 },
@@ -597,7 +602,7 @@ CPU는 살아있는데 출력 안 나오는 좀비 상태 감지. 10초 미생�
 
 새 사다리 도입 시 **2주 A/B 테스트**.
 
-{{< chart caption="A/B 테스트 결과 — 기존 vs 비트레이트 −20% 사다리 (가상 시나리오)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: A/B 테스트 결과 — 기존 vs 비트레이트 −20% 사다리 (가상 시나리오)" >}}
 {
   "tooltip": { "trigger": "axis" },
   "legend": { "data": ["A: 기존 사다리", "B: −20% 사다리"], "top": 0 },

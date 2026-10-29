@@ -1,13 +1,18 @@
 ---
-title: "치지직 한 명 방송 켜면 6.2초 안에 일어나는 일 — 라이브 트랜스코딩 인프라 종합"
+title: "방송 시작부터 재생까지 — 가정으로 살펴보는 라이브 트랜스코딩 인프라"
 date: 2026-06-22T15:38:47+09:00
 categories: ["tech-blurting"]
+illustrativeMetrics: true
+lastmod: 2026-10-29T09:00:00+09:00
 draft: false
 ---
 
-스트리머가 OBS에서 "방송 시작"을 누르는 순간부터 시청자 화면에 첫 프레임이 뜨기까지 **6.2초**. 그 안에 인제스트 인증, 트랜스코딩 노드 할당, NVENC 인코딩, ABR Ladder 5단계, CMAF 패키징, Origin 저장, CDN Pre-positioning, 엣지 캐시 워밍이 다 일어난다.
+> **2026-10-29 정정** — 치지직의 실제 구조·6.2초 측정값이라는 표현을 철회했습니다. 본문의 단계 시간·처리량·비용·할인·장애 복구 시간·A/B 결과는 검증된 실적이나 현재 가격이 아닌 설명용 가정입니다.
 
-이 6.2초의 뒷면엔 **7층 마이크로서비스 인프라**가 있다. 인제스트 / 트랜스코딩 / 패키저 / Origin / CDN / 관제 / 시청자 — 각 층이 다른 자원 패턴, 다른 인스턴스, 다른 스케일링 전략.
+
+이 글은 **가상의 라이브 파이프라인**을 구성해 책임과 비용을 비교하는 학습 노트다. 처음부터 등장하는 6.2초는 단계별 시간을 임의로 배정한 예시이며, 치지직이나 다른 서비스에서 측정한 시작 지연이 아니다.
+
+설명을 위해 **7개 층**으로 나누었다. 반드시 각각을 마이크로서비스로 배포해야 한다는 뜻은 아니다. 인제스트 / 트랜스코딩 / 패키저 / Origin / CDN / 관제 / 시청자 — 각 층이 다른 자원 패턴, 다른 인스턴스, 다른 스케일링 전략.
 
 이번 글은 [지난 글](../ffmpeg-deep-dive/)의 FFmpeg, [지난 글](../abr-ladder-design/)의 ABR Ladder, [지난 글](../nvenc-gpu-transcoding/)의 NVENC, [지난 글](../cmaf-deep-dive/)의 CMAF를 다 합쳐서 **라이브 트랜스코딩 인프라 운영의 모든 것** — 아키텍처 / 스케줄러 / 큐 / 장애 처리 / 비용 최적화 — 를 정리한 노트다.
 
@@ -29,17 +34,17 @@ draft: false
 | 6 | Origin Shield + CDN | 글로벌 분산 | Multi-CDN | 트래픽 비례 |
 | 7 | Viewer | Client | Player | - |
 
-**같은 노드에 다 묶으면 자원 효율 0.** GPU 강한 노드에 인제스트 묶으면 NIC가 놀고, 인제스트 강한 노드에 트랜스코딩 넣으면 GPU 모자람. 분리해야 인스턴스 타입 맞추기 가능.
+**같은 노드에 묶으면 병목을 함께 관리해야 한다.** GPU 강한 노드에 인제스트 묶으면 NIC가 놀고, 인제스트 강한 노드에 트랜스코딩 넣으면 GPU 모자람. 분리해야 인스턴스 타입 맞추기 가능.
 
 ---
 
-## 2. 한 방송의 0초~6.2초 여정
+## 2. 누적 시간을 6.2초로 가정한 예시
 
 ![한 방송 첫 6초 여정 — Start 클릭부터 첫 시청자까지](/images/live-stream-first-6sec-journey.png)
 
 각 단계 누적 지연을 ECharts로 분해.
 
-{{< chart caption="방송 시작 시 단계별 누적 지연 (ms)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 방송 시작 시 단계별 누적 지연 (ms)" >}}
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "grid": { "left": "25%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -65,13 +70,13 @@ draft: false
 }
 {{< /chart >}}
 
-5초까지는 인프라가 빠르고, 마지막 5초는 **6초 세그먼트 인코딩 대기**가 거의 전부. LL-HLS로 가면 이 5초가 1초로.
+이 예시에서 패키저 첫 출력은 1초, 첫 PUT은 6초이므로 두 점 사이를 5초로 배정했다. 이를 모든 서비스의 인코딩 대기로 해석할 수 없다. LL-HLS도 고정적으로 5초를 1초로 바꿔 주지 않는다. 아래 조작 모형에서 가정한 대기 예산을 따로 비교할 수 있다.
 
 ---
 
 ## 3. 비용 분배 — 어디서 절감해야 ROI 큰가
 
-{{< chart caption="라이브 플랫폼 월 비용 분배 (가상 100만 시청자 시간 기준)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 라이브 플랫폼 월 비용 분배 (가상 100만 시청자 시간 기준)" >}}
 {
   "tooltip": { "trigger": "item", "formatter": "{b}: {c}% ({d}%)" },
   "legend": { "orient": "vertical", "left": "left", "top": "middle" },
@@ -98,7 +103,7 @@ draft: false
 
 ## 4. 인스턴스 가격 vs 처리량 — GPU 선택의 진실
 
-{{< chart caption="인스턴스별 1080p60 ABR Ladder 동시 채널 / 월 가격" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 인스턴스별 1080p60 ABR Ladder 동시 채널 / 월 가격" >}}
 {
   "tooltip": { "trigger": "axis" },
   "legend": { "data": ["동시 채널", "월 가격 ($)"], "top": 0 },
@@ -235,7 +240,7 @@ CDN 한 곳 장애 시 즉시 가중치 0으로 만들어 차단. 다른 CDN으�
 
 ---
 
-## 10. Origin Shield — Origin 트래픽 90% 절감
+## 10. Origin Shield — 중간 캐시의 역할
 
 ![Origin Shield Funnel — Edge 100개 → Shield 5개 → Origin 1개](/images/origin-shield-funnel.png)
 
@@ -244,7 +249,7 @@ Edge 100개가 Origin 직접 Pull   →  Origin 트래픽 100배
 Edge 100개 → Shield 5개 → Origin → Origin 트래픽 1배
 ```
 
-Shield 노드의 hit rate 99%. **Origin egress 비용 -90%**. Multi-CDN 통합 Origin Shield가 정석.
+Shield의 hit rate와 Origin 바이트 절감률은 같은 지표가 아니다. 캐시 키·TTL·요청 분포·객체 크기를 측정해야 비용 효과를 판단할 수 있다.
 
 ---
 
@@ -277,7 +282,7 @@ flowchart TB
 
 ![Bin Packing 시각화 — 빈 노드 끄면 30% 절감](/images/bin-packing-vs-load-balancing.png)
 
-{{< chart caption="같은 워크로드 — 알고리즘별 노드 사용률 분포" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 같은 워크로드 — 알고리즘별 노드 사용률 분포" >}}
 {
   "tooltip": { "trigger": "axis" },
   "legend": { "data": ["Load Balancing", "Bin Packing"], "top": 0 },
@@ -307,7 +312,7 @@ def assign(stream):
 
 ![Tier 스케줄링 피라미드 — 인기 1%만 Premium A10](/images/tier-scheduling-pyramid.png)
 
-{{< chart caption="Tier 분배 (스트리머 수 vs 인프라 비용)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: Tier 분배 (스트리머 수 vs 인프라 비용)" >}}
 {
   "tooltip": { "trigger": "axis" },
   "legend": { "data": ["스트리머 수 (%)", "인프라 비용 비중 (%)"], "top": 0 },
@@ -374,7 +379,7 @@ flowchart LR
 
 **늘릴 땐 빨리, 줄일 땐 천천히** — 라이브 중인 방송 못 끔.
 
-{{< chart caption="HPA 비대칭 스케일링 — 시간축 노드 수" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: HPA 비대칭 스케일링 — 시간축 노드 수" >}}
 {
   "tooltip": { "trigger": "axis" },
   "grid": { "left": "10%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -421,7 +426,7 @@ flowchart LR
   CMP -->|충분| WAIT[유지]
 ```
 
-{{< chart caption="저녁 피크 대응 — 예측형 vs 반응형 (시청자 영향 ms)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 저녁 피크 대응 — 예측형 vs 반응형 (시청자 영향 ms)" >}}
 {
   "tooltip": { "trigger": "axis" },
   "legend": { "data": ["반응형 (HPA만)", "예측형 + HPA"], "top": 0 },
@@ -479,7 +484,7 @@ Spot 인스턴스 회수 시 미리 알람 받아 graceful drain.
 
 ## 19. 월간 장애 빈도 — 실제 운영 데이터
 
-{{< chart caption="라이브 인프라 월간 장애 종류별 빈도" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 라이브 인프라 월간 장애 종류별 빈도" >}}
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "grid": { "left": "30%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -536,7 +541,7 @@ flowchart TB
   S3 --> OK3[99% 누적 복구]
 ```
 
-{{< chart caption="GPU 복구 단계별 누적 성공률" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: GPU 복구 단계별 누적 성공률" >}}
 {
   "tooltip": { "trigger": "axis" },
   "grid": { "left": "10%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -618,7 +623,7 @@ flowchart LR
 | 적용 대상 | Top 1% 스트리머 | 일반 |
 | 인제스트 송출 | OBS 두 번 송신 | 한 번만 |
 
-{{< chart caption="Region 장애 시 끊김 시간 비교 (초)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: Region 장애 시 끊김 시간 비교 (초)" >}}
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "grid": { "left": "25%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -686,7 +691,7 @@ DNS TTL 30초로 짧게 → 빠른 전환.
 | **P1** | 1시간 이내 | Region 트랜스코딩 노드 일부 / VMAF 회귀 / Rebuffering 2%+ | 20건 이하 |
 | **P2** | 업무 시간 | 비용 예산 80% / 디스크 85% / 인증 지연 | 무제한 (대시보드) |
 
-{{< chart caption="알람 카테고리별 월 발생 빈도" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 알람 카테고리별 월 발생 빈도" >}}
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "grid": { "left": "10%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -801,7 +806,7 @@ flowchart LR
 
 ## 32. Reserved + On-Demand + Spot — 시간축 분배
 
-{{< chart caption="시간대별 인스턴스 분배 (Reserved / On-Demand / Spot)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 시간대별 인스턴스 분배 (Reserved / On-Demand / Spot)" >}}
 {
   "tooltip": { "trigger": "axis" },
   "legend": { "data": ["Reserved (80% 할인)", "On-Demand", "Spot (90% 할인)"], "top": 0 },
@@ -828,7 +833,7 @@ flowchart LR
 
 ## 33. CDN 비용 절감 Waterfall
 
-{{< chart caption="CDN 비용 — 절감 기법별 누적 효과" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: CDN 비용 — 절감 기법별 누적 효과" >}}
 {
   "tooltip": { "trigger": "axis" },
   "grid": { "left": "10%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -861,7 +866,7 @@ $45K → $22.7K로 약 50% 절감. 누적 기법 효과.
 
 ## 35. 코덱 라이센스 비용
 
-{{< chart caption="100만 디바이스 기준 연간 코덱 라이센스 (USD)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 100만 디바이스 기준 연간 코덱 라이센스 (USD)" >}}
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "grid": { "left": "12%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -887,7 +892,7 @@ $45K → $22.7K로 약 50% 절감. 누적 기법 효과.
 
 ## 36. Per-Title + 카테고리별 절감 효과
 
-{{< chart caption="카테고리별 1080p60 비트레이트 (Kbps)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 카테고리별 1080p60 비트레이트 (Kbps)" >}}
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "grid": { "left": "20%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -909,7 +914,7 @@ $45K → $22.7K로 약 50% 절감. 누적 기법 효과.
 
 ## 37. 채널당 단가 분포
 
-{{< chart caption="채널당 시간당 단가 (USD)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 채널당 시간당 단가 (USD)" >}}
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "grid": { "left": "25%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -934,7 +939,9 @@ $45K → $22.7K로 약 50% 절감. 누적 기법 효과.
 
 ---
 
-## 38. A/B 테스트 — 비용 절감의 매출 영향 검증
+## 38. A/B 테스트 — 가상의 비용·매출 비교 예시
+
+실제 수행한 A/B 테스트가 아니다. 아래 숫자는 계산 구조를 설명하려고 가정한 입력이며, 표본·분산·신뢰구간을 갖춘 결과가 아니다.
 
 | 지표 | A: 표준 (6000k) | B: 절감 (4500k) |
 |---|---|---|
@@ -944,7 +951,7 @@ $45K → $22.7K로 약 50% 절감. 누적 기법 효과.
 | 추정 매출 | $0.95 | $0.93 (-2%) |
 | **마진** | **$0.83** | **$0.84 (+1%)** |
 
-{{< chart caption="A/B 테스트 결과 — 비용 vs 매출 vs 마진 (USD)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: A/B 테스트 결과 — 비용 vs 매출 vs 마진 (USD)" >}}
 {
   "tooltip": { "trigger": "axis" },
   "legend": { "data": ["A: 표준", "B: 절감"], "top": 0 },
@@ -1027,7 +1034,7 @@ flowchart TB
 라이브 트랜스코딩 인프라는 **7층 마이크로서비스 + 자동 복구 + 비용 최적화**의 종합 운영이다.
 
 1. **7층 분리**가 정석 — 자원 패턴 달라 각 인스턴스 타입 맞춤
-2. **방송 시작 6.2초** — 마지막 5초가 세그먼트 인코딩 대기 (LL-HLS로 1초 단축 가능)
+2. **방송 시작 시간** — 본문의 6.2초는 설명용 입력이며 측정값이 아니다
 3. **CDN 45% + 트랜스코딩 25%** = 비용 70% → 절감 우선순위
 4. **A10이 가성비 정점** — T4 대비 처리량 2배, 가격 1.9배
 5. **Bin Packing**으로 빈 노드 종료 → 30~40% 절감
@@ -1046,7 +1053,7 @@ flowchart TB
 18. **Chaos Engineering** + Postmortem 사이클로 같은 장애 반복 방지
 19. **Pre-positioning**으로 Thundering Herd 차단
 20. **Reserved 50% + On-Demand 30% + Spot 20%** = 비용 30~40% 절감
-21. **Origin Shield 99% hit** = Origin egress -90%
+21. **Origin Shield** — 요청 hit rate와 Origin 전송 바이트를 구분해 측정한다
 22. **카테고리별 사다리** = 30% 비트 절감 → CDN + 트랜스코딩 동시
 23. **AV1/VP9 라이센스 0** — H.264 대비 $250K/년 절감 (디바이스 보급 따라 점진)
 24. **A/B 테스트로 비용 절감의 매출 영향 검증** — 마진 기준 결정

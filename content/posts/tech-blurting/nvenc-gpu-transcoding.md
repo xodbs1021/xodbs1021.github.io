@@ -1,15 +1,20 @@
 ---
-title: "x264로는 트랜스코딩 서버 300대, NVENC로는 50대 — GPU 인코더의 진실"
+title: "NVENC와 x264의 비용을 비교하려면 — GPU 트랜스코딩의 조건"
 date: 2026-06-22T02:22:28+09:00
 categories: ["tech-blurting"]
+illustrativeMetrics: true
+lastmod: 2026-10-29T09:00:00+09:00
 draft: false
 ---
 
-치지직이 동시 방송 1000개를 처리한다고 치자. 1080p60 한 채널을 x264 veryfast로 돌리면 32코어 서버 1대에 8채널. 1000채널 × ABR 5단계 = 200~300대 서버. 서버당 월 $500이면 트랜스코딩만 **월 1.5억원**.
+> **2026-10-29 정정** — 상충하는 서버 대수와 고정 비용 절감 주장을 철회했습니다. 남은 처리량·가격 그래프는 실측 원자료가 없으며 견적이나 용량 보장의 근거로 사용하지 않습니다.
 
-같은 일을 NVIDIA T4 GPU로 하면? T4 한 대당 ABR 통합 5~7채널. 서버 약 150~200대 → 월 $380 인스턴스. 비용 **40~60% 절감**. 거기다 GPU는 게임하면서도 인코딩이 된다. 왜? NVENC는 CUDA 코어를 안 쓰기 때문이다. 별도 칩이라서.
 
-이번 글은 [지난 글](../ffmpeg-deep-dive/)의 FFmpeg, [지난 글](../abr-ladder-design/)의 ABR Ladder 위에서 굴러가는 **GPU 트랜스코딩 인프라**의 전모 — NVENC 세대/옵션/대안 인코더/K8s 운영까지 — 정리한 노트다.
+NVENC의 비용을 x264와 비교하려면 **같은 입력·출력 사다리·화질 목표**에서 지속 처리량을 측정해야 한다. 동시 방송 1,000개와 5개 출력이 있다는 사실만으로 서버 대수를 결정할 수 없다. 5개 출력의 해상도와 처리 비용도 서로 다르다.
+
+기존 도입부의 “서버 300대 대 50대”는 본문의 150~200대와도 맞지 않았고 측정 자료가 없어 철회했다. 만약 단순히 5,000개 동일 비용 출력을 서버당 8개로 나누는 가정이라면 산술 결과는 625대다. 이것 역시 실제 ABR 용량 산정은 아니다.
+
+[NVIDIA Video Codec SDK](https://developer.nvidia.com/video-codec-sdk)는 NVENC를 전용 인코딩 엔진으로 설명한다. 그러나 스케일링·복사·디코딩까지 포함한 전체 파이프라인은 다른 자원도 쓴다. 아래 구성 예시는 GPU 모델·드라이버·SDK 조건을 확인하고 시험할 출발점이다.
 
 ---
 
@@ -30,7 +35,7 @@ ASIC이라서 GPU 사용률에 거의 영향 없음. **게임하면서 OBS NVENC
 
 ## 2. x264 vs NVENC — 채널 처리량 차이
 
-{{< chart caption="1080p60 H.264 인코딩 — 서버 1대 동시 채널" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 1080p60 H.264 인코딩 — 서버 1대 동시 채널" >}}
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "grid": { "left": "28%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -79,7 +84,7 @@ ASIC이라서 GPU 사용률에 거의 영향 없음. **게임하면서 OBS NVENC
 
 ## 4. NVENC 화질 — VMAF로 본 현실
 
-{{< chart caption="1080p60 게임 영상, 6000 Kbps 동일 — VMAF 점수" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 1080p60 게임 영상, 6000 Kbps 동일 — VMAF 점수" >}}
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "grid": { "left": "22%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -218,7 +223,7 @@ ffmpeg ... \
 
 ## 10. 지연 vs 화질 — 옵션 조합의 트레이드오프
 
-{{< chart caption="옵션 누적별 라이브 지연(ms) vs VMAF" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 옵션 누적별 라이브 지연(ms) vs VMAF" >}}
 {
   "tooltip": { "trigger": "axis" },
   "legend": { "data": ["지연 (ms)", "VMAF"], "top": 0 },
@@ -250,7 +255,7 @@ ffmpeg ... \
 
 같은 NVENC 칩으로 H.265, AV1까지 지원.
 
-{{< chart caption="동일 화질(VMAF 88) 기준 코덱별 비트레이트 절감 (1080p60)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 동일 화질(VMAF 88) 기준 코덱별 비트레이트 절감 (1080p60)" >}}
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "grid": { "left": "20%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -319,7 +324,7 @@ Intel Arc는 **AV1 인코딩에서 NVIDIA보다 먼저** 양산. Twitch가 비�
 
 ## 14. 자체 GPU 인프라 vs 클라우드 트랜스코딩 — 손익분기
 
-{{< chart caption="채널 규모별 월 비용 — 자체 vs AWS MediaLive" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 채널 규모별 월 비용 — 자체 vs AWS MediaLive" >}}
 {
   "tooltip": { "trigger": "axis" },
   "legend": { "data": ["자체 GPU 인프라", "AWS MediaLive"], "top": 0 },
@@ -431,7 +436,7 @@ spec:
 
 ## 18. 시간대별 트래픽 + Reserved/Spot 혼합
 
-{{< chart caption="치지직 추정 시간대별 채널 수 + 인스턴스 분배" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 치지직 추정 시간대별 채널 수 + 인스턴스 분배" >}}
 {
   "tooltip": { "trigger": "axis" },
   "legend": { "data": ["Reserved (상시)", "On-Demand (평균)", "Spot (피크)"], "top": 0 },
@@ -554,7 +559,7 @@ GPU 트랜스코딩은 **인코더 칩 이해 + FFmpeg 옵션 + 인프라 운영
 3. **Ada부터 AV1 NVENC** — 차세대 코덱 실시간
 4. **데이터센터 T4 = 채널당 $21** — CPU의 1/3
 5. **라이브 표준 옵션**: `p4 + ll + cbr_hq + no-scenecut 1 + bf 0`
-6. **전체 GPU 파이프라인**: `hwaccel cuda` + `scale_cuda` — CPU 5% 이하
+6. **전체 GPU 파이프라인**: `hwaccel cuda` + `scale_cuda` — CPU 사용률은 입출력·복사·필터 경로까지 측정
 7. **2-pass + lookahead + AQ + weighted_pred** — VMAF +5점, 지연 +500ms 트레이드오프
 8. **지연 vs 화질**: LL-HLS는 zerolatency만, 일반 HLS는 lookahead 32 권장
 9. **하드웨어 인코더 4진영**: NVIDIA 메인, Intel Arc AV1, Apple Silicon 클라이언트, AMD 비주류

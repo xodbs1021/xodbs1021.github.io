@@ -14,3 +14,7 @@ dist/
 
 .agents/
 skills-lock.json
+
+# Reproducible derivatives; original images are versioned.
+static/images/optimized/
+data/image-manifest.json
