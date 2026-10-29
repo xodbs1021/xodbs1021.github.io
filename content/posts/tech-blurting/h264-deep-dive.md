@@ -290,7 +290,7 @@ ffmpeg -c:v libx264 -b:v 6000k -maxrate 12000k -bufsize 24000k ...
 # VOD에서 가끔
 ```
 
-### 라이브 인코딩 표준 명령
+### 라이브 인코딩 구성 예시
 
 ```bash
 ffmpeg -i input \
