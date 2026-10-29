@@ -1,0 +1,83 @@
+{
+  "date": "2026-10-29",
+  "scope": "90 published posts scanned for numerical/title contradictions; targeted corrections to 13 technical notes. This is not a claim-by-claim certification of all posts or a rerun of project experiments.",
+  "corrected": [
+    {
+      "slug": "tech-blurting/live-transcoding-infrastructure",
+      "changes": "치지직의 실제 구조·6.2초 측정값이라는 표현을 철회했습니다. 본문의 단계 시간·처리량·비용·할인·장애 복구 시간·A/B 결과는 검증된 실적이나 현재 가격이 아닌 설명용 가정입니다.",
+      "unverifiedIllustrativeMetrics": true
+    },
+    {
+      "slug": "tech-blurting/cmaf-deep-dive",
+      "changes": "특정 기업의 40% 절감 및 항상 이중 인코딩한다는 주장을 철회했습니다. 남은 성능·가격·퍼널 그래프는 원자료 미확인 예시로 표시하며 운영 실적의 근거로 사용하지 않습니다.",
+      "unverifiedIllustrativeMetrics": true
+    },
+    {
+      "slug": "tech-blurting/nvenc-gpu-transcoding",
+      "changes": "상충하는 서버 대수와 고정 비용 절감 주장을 철회했습니다. 남은 처리량·가격 그래프는 실측 원자료가 없으며 견적이나 용량 보장의 근거로 사용하지 않습니다.",
+      "unverifiedIllustrativeMetrics": true
+    },
+    {
+      "slug": "tech-blurting/abr-ladder-design",
+      "changes": "Netflix의 고정 50회 인코딩 주장을 제거했습니다. 이 글의 비트레이트·처리량·비용 그래프는 학습용 가정이며 실제 Netflix 설정이나 측정 결과가 아닙니다.",
+      "unverifiedIllustrativeMetrics": true
+    },
+    {
+      "slug": "tech-blurting/codec-decision-and-debugging",
+      "changes": "보편적 0.5% 로열티와 95% 도달률 기준을 수정했습니다. 비용·성능 비교 숫자는 운영 실적이 아닌 원자료 미확인 예시입니다.",
+      "unverifiedIllustrativeMetrics": true
+    },
+    {
+      "slug": "tech-blurting/ffmpeg-deep-dive",
+      "changes": "근거 없는 FFmpeg·x264의 90% 점유율 표현을 제거했습니다. 명령 예시는 환경별로 검증해야 합니다.",
+      "unverifiedIllustrativeMetrics": false
+    },
+    {
+      "slug": "tech-blurting/av1-vp9-deep-dive",
+      "changes": "HEVC 공통 로열티와 모든 비용이 없다는 표현을 수정했습니다. 코덱별 절감률·보급률 표와 그래프에는 원자료가 없어 실제 성능·시장 점유율의 근거로 사용하지 않습니다.",
+      "unverifiedIllustrativeMetrics": true
+    },
+    {
+      "slug": "tech-blurting/h265-hdr-deep-dive",
+      "changes": "시장 점유율·디바이스 지원율·공통 0.5% 로열티·플랫폼별 채택 이유를 철회했습니다. 라이선스 프로그램의 현재 공식 안내를 연결했고, 남은 성능 그래프는 실측 근거 미확인으로 표시했습니다.",
+      "unverifiedIllustrativeMetrics": true
+    },
+    {
+      "slug": "tech-blurting/aac-and-friends",
+      "changes": "오디오 비중을 2.09%로 통일하고 MP3의 48kHz·표준화 설명을 수정했습니다. 이탈률 순위는 입증되지 않아 단정을 제거했습니다.",
+      "unverifiedIllustrativeMetrics": false
+    },
+    {
+      "slug": "tech-blurting/h264-deep-dive",
+      "changes": "raw 단위·압축 비율·매크로블록 올림·GOP 계산을 수정했습니다. 근거 없는 고정 화질·성능 수치는 철회하고 계산 예시와 측정이 필요한 항목을 구분했습니다.",
+      "unverifiedIllustrativeMetrics": false
+    },
+    {
+      "slug": "tech-blurting/cdn-for-live-streaming",
+      "changes": "치지직의 실제 8천만 원 비용이라는 주장을 철회했습니다. 명시한 가정에서는 540,000GB·$64,800입니다. URL 버전 변경과 접근 철회도 구분했습니다.",
+      "unverifiedIllustrativeMetrics": false
+    },
+    {
+      "slug": "tech-blurting/buffering-deep-dive",
+      "changes": "출처가 확인되지 않은 이탈·매출 수치를 철회했습니다. A/B 숫자는 실제 수행한 실험이 아닌 가상 예시로 표시했습니다.",
+      "unverifiedIllustrativeMetrics": false
+    },
+    {
+      "slug": "tech-blurting/streaming-basics-from-scratch",
+      "changes": "RGB 24비트·30fps·10진 단위로 raw 용량을 재계산했습니다. 유튜브 파일 크기의 상한, 고정 SRT 지연과 TCP 재전송 시간 단정을 제거했습니다.",
+      "unverifiedIllustrativeMetrics": false
+    }
+  ],
+  "sources": [
+    "https://www.itu.int/rec/T-REC-H.264",
+    "https://www.rfc-editor.org/rfc/rfc8216.html",
+    "https://ffmpeg.org/ffmpeg-codecs.html",
+    "https://github.com/Netflix/vmaf",
+    "https://developer.nvidia.com/video-codec-sdk",
+    "https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html",
+    "https://www.via-la.com/licensing-programs/hevc-vvc/",
+    "https://accessadvance.com/topic-what-do-we-license/",
+    "https://aomedia.org/license/patent-license/"
+  ],
+  "preservation": "Original publication dates, post URLs, heading IDs and static assets retained. Corrections have dated notices and lastmod. Original unsupported figures retained only with explicit evidence limitations, not treated as measured data."
+}

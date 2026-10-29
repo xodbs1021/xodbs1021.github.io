@@ -32,6 +32,21 @@ const md = new MarkdownIt({html:true, linkify:true, typographer:false, highlight
   if(lang && hljs.getLanguage(lang)) return hljs.highlight(code,{language:lang,ignoreIllegals:true}).value;
   return escape(code);
 }}).disable('strikethrough').use(attrs).use(anchor,{slugify});
+const imageManifestPath = path.join(root,'data/image-manifest.json');
+const imageManifest = fs.existsSync(imageManifestPath) ? JSON.parse(fs.readFileSync(imageManifestPath,'utf8')) : {};
+const renderImage = md.renderer.rules.image;
+md.renderer.rules.image = (tokens,idx,options,env,self) => {
+  const token=tokens[idx], src=token.attrGet('src');
+  const image=imageManifest[src];
+  token.attrSet('loading','lazy'); token.attrSet('decoding','async');
+  if(!image) return renderImage(tokens,idx,options,env,self);
+  token.attrSet('width',String(image.width)); token.attrSet('height',String(image.height));
+  token.attrSet('data-original',src);
+  const fallback=renderImage(tokens,idx,options,env,self);
+  const sizes='(max-width: 800px) calc(100vw - 40px), (max-width: 1200px) calc(100vw - 320px), 760px';
+  const sources=['avif','webp'].filter(f=>image.variants[f]).map(f=>`<source type="image/${f}" srcset="${image.variants[f].map(v=>`${v.src} ${v.width}w`).join(', ')}" sizes="${sizes}">`).join('');
+  return sources ? `<picture>${sources}${fallback}</picture>` : fallback;
+};
 const fence = md.renderer.rules.fence;
 md.renderer.rules.fence=(tokens,idx,options,env,self)=> {
   if(tokens[idx].info.trim()==='mermaid') return `<figure class="diagram"><pre class="mermaid">${escape(tokens[idx].content)}</pre><figcaption>구조와 흐름</figcaption></figure>`;
@@ -45,7 +60,7 @@ export const posts = files(path.join(root,'content/posts')).filter(p=>p.endsWith
     .replace(/\{\{<\s*chart\s*([^>]*?)>\}\}([\s\S]*?)\{\{<\s*\/chart\s*>\}\}/g,(_,args,source)=>{
       const id=createHash('sha256').update(source).digest('hex').slice(0,16);
       charts.set(id,source.trim());
-      const caption=args.match(/caption="([^"]*)"/)?.[1]||'실험 결과';
+      const caption=args.match(/caption="([^"]*)"/)?.[1]||'설명 자료';
       const height=args.match(/height="(\d+)px"/)?.[1]||360;
       return `\n<figure class="chart-figure"><div class="echart" data-chart="${id}" style="height:${Number(height)}px" role="img" aria-label="${escape(caption)}"></div><figcaption>${escape(caption)}</figcaption></figure>\n`;
     }).replace(/\{\{<\s*\/?rawhtml\s*>\}\}/g,'');
@@ -58,7 +73,7 @@ export const posts = files(path.join(root,'content/posts')).filter(p=>p.endsWith
   }
   const html=md.renderer.render(tokens,md.options,{});
   const plain=content.replace(/\{\{<[\s\S]*?>\}\}/g,'').replace(/<[^>]*>/g,'').replace(/[#*`\[\]]/g,'').replace(/\s+/g,' ').trim();
-  const lead=content.trim().split(/\n\s*\n/)[0].replace(/[#*`]/g,'').replace(/\s+/g,' ').trim();
+  const lead=(content.trim().split(/\n\s*\n/).find(p=>!p.startsWith('>')&&!p.startsWith('#')&&p!=='---')||'').replace(/[#*`]/g,'').replace(/\s+/g,' ').trim();
   return {...data,slug,url:`/posts/${slug}/`,html,headings,raw:content,file:path.relative(root,file),category:classify(slug,data.categories?.[0]||slug.split('/')[0]),tags:data.tags||[],date:new Date(data.date),description:data.description||(lead.length>180?lead.slice(0,177)+'…':lead),minutes:Math.max(1,Math.ceil(plain.length/650))};
 }).filter(p=>!p.draft && p.date <= new Date()).sort((a,b)=>b.date-a.date);
 export const formatDate = date => new Intl.DateTimeFormat('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit',timeZone:'Asia/Seoul'}).format(new Date(date));

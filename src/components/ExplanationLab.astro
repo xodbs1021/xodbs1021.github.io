@@ -1,0 +1,59 @@
+---
+import {labForSlug} from '../lib/explanation-models.mjs';
+const {slug}=Astro.props;
+const mode=labForSlug[slug];
+const titles={recovery:'이벤트가 없어도 인덱스를 채울 수 있을까?',authorization:'허용된 요청은 어디까지 도달할까?',latency:'대기 시간은 어디에 쌓일까?'};
+---
+{mode&&<section class="explanation-lab" data-lab={mode} aria-labelledby="lab-title" data-pagefind-ignore>
+  <header><span class="category-label">직접 바꿔보기 · 설명용 모형</span><h2 id="lab-title">{titles[mode]}</h2><p>아래 결과는 선택한 입력으로 계산합니다. 실제 서버에 요청하거나 본문의 실험을 재실행하지 않습니다.</p></header>
+  {mode==='recovery'&&<>
+    <p>디스크에는 8개 파일이 있고, DB에는 처음 4개만 등록되어 있다고 가정합니다. 이벤트를 놓친 뒤 재조정 작업을 실행해 보세요. 입력을 바꾸면 처음 상태로 돌아갑니다.</p>
+    <div class="lab-controls"><label>신규 파일 이벤트<select disabled data-control="events"><option value="missing">4개 모두 유실</option><option value="partial">2개만 도착</option><option value="all">4개 모두 도착</option></select></label><label class="lab-checkbox"><input disabled type="checkbox" data-control="absent"/> 8번 파일이 디스크에도 없음</label></div>
+    <div class="file-ledger"><div><strong>디스크</strong><div data-files="disk" class="file-cells">1 · 2 · 3 · 4 · 5 · 6 · 7 · 8</div></div><div><strong>DB 인덱스</strong><div data-files="index" class="file-cells">1 · 2 · 3 · 4</div></div></div>
+    <div class="lab-actions"><button type="button" data-action="events" disabled>1. 이벤트 처리</button><button type="button" data-action="reconcile" disabled>2. 디스크와 재조정</button><button type="button" data-action="reset" disabled>초기화</button></div>
+    <p class="lab-result" role="status" aria-live="polite" data-result>DB에 없는 파일을 디스크에서 찾아 등록합니다. 같은 목록을 다시 처리해도 중복 등록하지 않습니다.</p>
+    <p class="lab-limit">이 모형은 식별자 집합만 비교합니다. 디스크에서 사라진 영상 바이트를 복원하지 않으며, 동시성·DB 트랜잭션·실제 파일명의 규칙은 생략했습니다.</p>
+  </>}
+  {mode==='authorization'&&<>
+    <p>방송 A의 경로로 들어온 요청입니다. 앞단의 접근 허용 여부와 nginx의 대상 대조를 따로 확인합니다.</p>
+    <div class="lab-controls"><label>요청 유형<select disabled data-control="request"><option value="match">같은 방송 A</option><option value="mismatch">다른 방송 B</option><option value="missing">path 누락</option><option value="duplicate">중복 path</option><option value="encoded">인코딩된 키로 중복</option><option value="normalized">정규화되는 원문 경로</option></select></label><label class="lab-checkbox"><input disabled type="checkbox" data-control="access" checked/> 앞단에서 A 접근 허용</label></div>
+    <code class="lab-request" data-request>/A/list?path=A</code>
+    <ol class="request-stages"><li>① 앞단 접근 제어 <strong data-stage="access">허용</strong></li><li>② 원문·대상 대조 <strong data-stage="boundary">통과</strong></li><li>③ 재생 서버 호출 <strong data-stage="upstream">1회</strong></li></ol>
+    <p class="lab-result" role="status" aria-live="polite" data-result>path가 하나이고 경로의 A와 일치하면 전달합니다.</p><button type="button" data-action="reset" disabled>초기화</button>
+    <p class="lab-limit">본문의 요청 사례를 고정한 모형입니다. 완전한 URI 파서나 보안 검사기가 아니며, 통과 표시는 실제 서버 응답을 뜻하지 않습니다.</p>
+  </>}
+  {mode==='latency'&&<>
+    <div class="lab-controls lab-sliders"><label for="lab-segment">세그먼트 길이 <output aria-live="off" data-value="segment">2초</output><input disabled type="range" min="1" max="6" step="0.5" value="2" id="lab-segment" data-control="segment"/></label><label for="lab-buffer">버퍼에 더 쌓는 세그먼트 <output aria-live="off" data-value="buffer">2개</output><input disabled type="range" min="0" max="4" step="1" value="2" id="lab-buffer" data-control="buffer"/></label><label for="lab-encode">인코딩 시간 <output aria-live="off" data-value="encode">300ms</output><input disabled type="range" min="0" max="1000" step="50" value="300" id="lab-encode" data-control="encode"/></label><label for="lab-network">전송 시간 <output aria-live="off" data-value="network">200ms</output><input disabled type="range" min="0" max="1000" step="50" value="200" id="lab-network" data-control="network"/></label></div>
+    <div class="latency-track" data-track aria-hidden="true"></div><dl class="latency-parts" data-parts><div><dt>인코딩</dt><dd>0.30초</dd></div><div><dt>전송</dt><dd>0.20초</dd></div><div><dt>세그먼트 대기</dt><dd>1.00초</dd></div><div><dt>버퍼</dt><dd>4.00초</dd></div></dl>
+    <p class="lab-result" role="status" aria-live="polite" data-result>모형의 대기 예산: 5.50초</p><button type="button" data-action="reset" disabled>초기화</button>
+    <p class="lab-limit">계산식: 인코딩 + 전송 + 세그먼트 길이 ÷ 2 + 길이 × 추가 버퍼 개수. 도착 시점이 균일하고 각 대기를 순서대로 더한다는 가정입니다. 실제 HLS 지연의 예측치가 아니며, 단계의 중첩·지터·플레이어 정책·LL-HLS의 부분 세그먼트는 포함하지 않습니다.</p>
+  </>}
+  <noscript><p>JavaScript가 꺼져 있어 기본 예시를 표시합니다. 위 설명과 본문만으로도 조건과 한계를 읽을 수 있습니다.</p></noscript>
+</section>}
+<script>
+import {reconcile,playbackCases,playbackDecision,latencyBudget} from '../lib/explanation-models.mjs';
+for(const lab of document.querySelectorAll<HTMLElement>('[data-lab]')){
+  const control=(name:string)=>lab.querySelector<HTMLInputElement|HTMLSelectElement>(`[data-control="${name}"]`)!;
+  const result=lab.querySelector<HTMLElement>('[data-result]')!;
+  const reset=lab.querySelector<HTMLButtonElement>('[data-action="reset"]')!;
+  lab.querySelectorAll<HTMLButtonElement|HTMLInputElement|HTMLSelectElement>('button,input,select').forEach(control=>control.disabled=false);
+  if(lab.dataset.lab==='recovery'){
+    let index=[1,2,3,4];
+    const disk=()=>Array.from({length:(control('absent') as HTMLInputElement).checked?7:8},(_,i)=>i+1);
+    const render=()=>{for(const [name,ids] of [['disk',disk()],['index',index]] as const){const el=lab.querySelector(`[data-files="${name}"]`)!;el.replaceChildren(...Array.from({length:8},(_,i)=>{const cell=document.createElement('span');const exists=ids.includes(i+1);cell.textContent=String(i+1);cell.className=exists?'present':'absent';cell.setAttribute('aria-label',`${i+1}번 ${exists?'있음':'없음'}`);return cell}))}};
+    const start=()=>{index=[1,2,3,4];render();result.textContent='DB 4개 / 디스크 '+disk().length+'개. 신규 파일의 이벤트부터 처리해 보세요.'};
+    lab.querySelector('[data-action="events"]')!.addEventListener('click',()=>{const count=({missing:0,partial:2,all:4})[control('events').value];const added=reconcile(disk().filter(id=>id>4).slice(0,count),index);index=added.index;render();result.textContent=`이벤트로 ${added.added.length}개 등록. 디스크에 있지만 DB에 없는 파일: ${disk().filter(id=>!index.includes(id)).length}개.`});
+    lab.querySelector('[data-action="reconcile"]')!.addEventListener('click',()=>{const added=reconcile(disk(),index);index=added.index;render();result.textContent=`재조정으로 ${added.added.length}개 등록. DB ${index.length}개. 다시 실행해도 같은 파일은 추가되지 않습니다.${disk().length===7?' 디스크에도 없는 8번 파일은 복구할 수 없습니다.':''}`});
+    lab.querySelectorAll('input,select').forEach(el=>el.addEventListener('change',start));
+    reset.addEventListener('click',()=>{control('events').value='missing';(control('absent') as HTMLInputElement).checked=false;start()});start();
+  }
+  if(lab.dataset.lab==='authorization'){
+    const render=()=>{const access=(control('access') as HTMLInputElement).checked;const kind=control('request').value;const decision=playbackDecision(kind,access);lab.querySelector('[data-request]')!.textContent=playbackCases[kind].request;lab.querySelector('[data-stage="access"]')!.textContent=access?'허용':'거절';lab.querySelector('[data-stage="boundary"]')!.textContent=!access?'도달하지 않음':decision.allowed?'통과':'거절';lab.querySelector('[data-stage="upstream"]')!.textContent=`${decision.upstream}회`;result.textContent=decision.reason;lab.dataset.allowed=String(decision.allowed)};
+    lab.querySelectorAll('input,select').forEach(el=>el.addEventListener('change',render));reset.addEventListener('click',()=>{control('request').value='match';(control('access') as HTMLInputElement).checked=true;render()});render();
+  }
+  if(lab.dataset.lab==='latency'){
+    const render=()=>{const values=['segment','buffer','encode','network'].map(name=>Number(control(name).value));const units=['초','개','ms','ms'];['segment','buffer','encode','network'].forEach((name,i)=>{lab.querySelector(`[data-value="${name}"]`)!.textContent=values[i]+units[i];control(name).setAttribute('aria-valuetext',values[i]+units[i])});const budget=latencyBudget(...values as [number,number,number,number]);const track=lab.querySelector('[data-track]')!;const parts=lab.querySelector('[data-parts]')!;track.replaceChildren();parts.replaceChildren();budget.parts.forEach((part,i)=>{const bar=document.createElement('span');bar.style.flexGrow=String(part.seconds);bar.style.setProperty('--part-color',`var(--latency-${i})`);track.append(bar);const row=document.createElement('div');const term=document.createElement('dt');term.textContent=part.name;const value=document.createElement('dd');value.textContent=`${part.seconds.toFixed(2)}초`;row.append(term,value);parts.append(row)});result.textContent=`모형의 대기 예산: ${budget.total.toFixed(2)}초`};
+    lab.querySelectorAll('input').forEach(el=>el.addEventListener('input',render));reset.addEventListener('click',()=>{['segment','buffer','encode','network'].forEach((name,i)=>control(name).value=['2','2','300','200'][i]);render()});render();
+  }
+}
+</script>

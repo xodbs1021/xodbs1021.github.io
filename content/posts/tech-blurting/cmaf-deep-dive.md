@@ -1,17 +1,20 @@
 ---
-title: "Disney+가 인코딩 비용 40% 줄인 비결 — CMAF 완전 정복"
+title: "HLS와 DASH가 미디어 조각을 공유하는 방법 — CMAF"
 date: 2026-06-22T11:15:31+09:00
 categories: ["tech-blurting"]
+illustrativeMetrics: true
+lastmod: 2026-10-29T09:00:00+09:00
 draft: false
 ---
 
-2015년까지 OTT는 콘텐츠 한 편을 두 번 인코딩했다. iPhone 시청자를 위한 HLS용 `.ts` 한 번, Android·Smart TV용 DASH용 `.m4s` 한 번. **인코딩 2배, 스토리지 2배, CDN 캐시 2배.** Netflix·Disney+ 규모면 매년 수억 달러 낭비.
+> **2026-10-29 정정** — 특정 기업의 40% 절감 및 항상 이중 인코딩한다는 주장을 철회했습니다. 남은 성능·가격·퍼널 그래프는 원자료 미확인 예시로 표시하며 운영 실적의 근거로 사용하지 않습니다.
 
-2016년 Apple과 Microsoft가 공동 제안한 **CMAF (Common Media Application Format)**가 이 분열을 끝냈다. 같은 `.m4s` 파일을 HLS와 DASH가 공유. 매니페스트만 다르고 미디어는 하나. Disney+ 추정 인코딩 비용 **40% 절감**.
 
-거기다 CMAF가 없었으면 **LL-HLS (저지연 HLS)**도 불가능했다. 6초 세그먼트를 200ms 청크로 잘라서 점진 전송하는 chunked CMAF가 LL-HLS의 핵심 기반.
+HLS와 DASH는 서로 다른 매니페스트를 사용한다. 그렇다고 항상 영상을 두 번 인코딩해야 하는 것은 아니다. 같은 압축 비트스트림을 다른 컨테이너로 포장할 수 있기 때문이다.
 
-이번 글은 [지난 글](../hls-just-files/)에서 다룬 HLS, [지난 글](../dash-vs-hls/)의 DASH 분열 위에서 등장한 **CMAF의 모든 것** — 박스 구조, chunked CMAF, DRM 통합, 광고 삽입, 운영까지 — 정리한 노트다.
+CMAF는 조건이 맞으면 HLS와 DASH가 fragmented MP4 미디어를 공유하도록 돕는다. 코덱, 암호화 방식, 트랙 구성과 플레이어 지원이 맞아야 한다. **패키징 중복 감소와 인코딩 횟수 감소는 같은 주장이 아니다.** Disney+의 40% 비용 절감이라는 기존 주장은 근거를 확인하지 못해 철회했다.
+
+LL-HLS는 부분 세그먼트와 갱신·요청 규칙을 이용한다. 200ms는 가능한 구성 예시이지 필수 청크 길이가 아니다. [Apple HLS 작성 지침](https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html)을 함께 확인한다.
 
 ---
 
@@ -47,7 +50,7 @@ encoding/
 
 ## 2. CMAF 도입 효과 — 실제 절감 수치
 
-{{< chart caption="대형 OTT CMAF 도입 추정 효과 (Disney+ 기준)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 대형 OTT CMAF 도입 추정 효과 (Disney+ 기준)" >}}
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "grid": { "left": "22%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -192,7 +195,7 @@ baseMediaDecodeTime 7200000 → 80초
 
 | 항목 | MPEG-TS | fMP4 |
 |---|---|---|
-| 오버헤드 | 2% (188바이트 패킷 헤더) | 0.5% (moof 박스) |
+| 오버헤드 | TS 패킷·적응 필드·다중화 조건에 따라 변동 | 박스·샘플·fragment 구성에 따라 변동 |
 | 시킹 | 패킷 단위 파싱 | sidx 즉시 |
 | 메타데이터 | 단순 (PID) | 풍부 |
 | 오류 복구 | 패킷 단위 가능 | 박스 손상 시 fragment 전체 |
@@ -232,7 +235,7 @@ moof + mdat (청크 3, 400~600ms)
 
 ## 11. LL-HLS 지연 분해 — 1.9초의 정체
 
-{{< chart caption="LL-HLS 잘 튜닝된 라이브 — 단계별 지연 (ms)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: LL-HLS 잘 튜닝된 라이브 — 단계별 지연 (ms)" >}}
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "grid": { "left": "20%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -264,7 +267,7 @@ moof + mdat (청크 3, 400~600ms)
 
 ## 12. 프로토콜별 지연 비교
 
-{{< chart caption="라이브 프로토콜 지연 비교 (초)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 라이브 프로토콜 지연 비교 (초)" >}}
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "grid": { "left": "22%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -353,7 +356,7 @@ packager \
 
 ## 15. CDN 캐시 TTL — 매니페스트 vs 세그먼트 분리
 
-{{< chart caption="TTL 설정에 따른 CDN 캐시 히트율 (라이브)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: TTL 설정에 따른 CDN 캐시 히트율 (라이브)" >}}
 {
   "tooltip": { "trigger": "axis" },
   "legend": { "data": ["매니페스트", "세그먼트"], "top": 0 },
@@ -383,7 +386,7 @@ Cache-Control: max-age=86400
 
 ## 16. fMP4 vs MPEG-TS 오버헤드
 
-{{< chart caption="동일 H.264 콘텐츠 — 컨테이너 오버헤드 비교 (1080p60 6Mbps 기준)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 동일 H.264 콘텐츠 — 컨테이너 오버헤드 비교 (1080p60 6Mbps 기준)" >}}
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "grid": { "left": "20%", "right": "10%", "bottom": "12%", "top": "8%" },
@@ -400,7 +403,7 @@ Cache-Control: max-age=86400
 }
 {{< /chart >}}
 
-1000채널 트래픽 기준 1.5%p 차이가 월 수백만원. 작아 보여도 누적이 큼.
+오버헤드 차이를 비용으로 환산하려면 실제 파일 크기와 동일한 미디어 데이터량을 비교해야 한다. 고정된 1.5%p 절감으로 가정하지 않는다.
 
 ---
 
@@ -515,7 +518,7 @@ flowchart TB
 
 ## 22. 광고 비콘 — 시청 funnel
 
-{{< chart caption="광고 시청 완료율 funnel (일반 라이브 광고 기준)" >}}
+{{< chart caption="설명용 가정 · 실측 근거 미확인: 광고 시청 완료율 funnel (일반 라이브 광고 기준)" >}}
 {
   "tooltip": { "trigger": "item" },
   "series": [{
