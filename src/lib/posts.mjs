@@ -56,6 +56,7 @@ export const charts = new Map();
 export const posts = files(path.join(root,'content/posts')).filter(p=>p.endsWith('.md')&&!path.basename(p).startsWith('_')).map(file=>{
   const {data,content}=parse(fs.readFileSync(file,'utf8'));
   const slug=path.relative(path.join(root,'content/posts'),file).replace(/\.md$/,'').split(path.sep).join('/');
+  const rawBlocks=[];
   const body=content.replaceAll('https://xodbs1021.github.io','https://taeyun.blog')
     .replace(/\{\{<\s*chart\s*([^>]*?)>\}\}([\s\S]*?)\{\{<\s*\/chart\s*>\}\}/g,(_,args,source)=>{
       const id=createHash('sha256').update(source).digest('hex').slice(0,16);
@@ -63,7 +64,10 @@ export const posts = files(path.join(root,'content/posts')).filter(p=>p.endsWith
       const caption=args.match(/caption="([^"]*)"/)?.[1]||'설명 자료';
       const height=args.match(/height="(\d+)px"/)?.[1]||360;
       return `\n<figure class="chart-figure"><div class="chart-viewport" tabindex="0" role="region" aria-label="차트, 넓은 경우 좌우로 스크롤"><div class="echart" data-chart="${id}" style="height:${Number(height)}px" role="img" aria-label="${escape(caption)}"></div></div><figcaption>${escape(caption)}<span class="visual-scroll-hint">좌우로 스크롤하여 전체를 볼 수 있습니다.</span></figcaption></figure>\n`;
-    }).replace(/\{\{<\s*\/?rawhtml\s*>\}\}/g,'');
+    }).replace(/\{\{<\s*rawhtml\s*>\}\}([\s\S]*?)\{\{<\s*\/rawhtml\s*>\}\}/g,(_,html)=>{
+      rawBlocks.push(html);
+      return `\n\n<!--BLOG_RAW_HTML_${rawBlocks.length-1}-->\n\n`;
+    });
   const tokens=md.parse(body,{}), headings=[];
   let headingIndex=0;
   for(let i=0;i<tokens.length;i++) if(tokens[i].type==='heading_open') {
@@ -71,7 +75,9 @@ export const posts = files(path.join(root,'content/posts')).filter(p=>p.endsWith
     tokens[i].attrSet('id',id);
     headings.push({depth:Number(tokens[i].tag.slice(1)),id,text:tokens[i+1].children?.filter(t=>t.type==='text'||t.type==='code_inline').map(t=>t.content).join('')||tokens[i+1].content});
   }
-  const html=md.renderer.render(tokens,md.options,{}).replace(/<svg\b[\s\S]*?<\/svg>/g, svg=>{
+  const html=md.renderer.render(tokens,md.options,{})
+    .replace(/<!--BLOG_RAW_HTML_(\d+)-->/g,(_,index)=>rawBlocks[Number(index)])
+    .replace(/<svg\b[\s\S]*?<\/svg>/g, svg=>{
     const width=Number(svg.match(/viewBox="[\d.]+ [\d.]+ ([\d.]+) [\d.]+"/)?.[1])||720;
     return `<figure class="diagram static-diagram"><div class="diagram-viewport" tabindex="0" role="region" aria-label="다이어그램, 넓은 경우 좌우로 스크롤" style="--diagram-width:${width}px">${svg}</div><figcaption>구조와 흐름<span class="visual-scroll-hint">좌우로 스크롤하여 전체를 볼 수 있습니다.</span></figcaption></figure>`;
   });

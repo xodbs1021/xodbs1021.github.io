@@ -147,9 +147,10 @@ try {
               return contrast<4.5?[`${label.textContent.slice(0,40)} (${contrast.toFixed(2)}:1)`]:[];
             });
             const clipped=chart?[...chart.querySelectorAll('text')].filter(t=>{const r=t.getBoundingClientRect(),b=chart.getBoundingClientRect();return r.width&&r.height&&(r.left<b.left-2||r.right>b.right+2||r.top<b.top-2||r.bottom>b.bottom+2)}).map(t=>t.textContent):[];
-            return {contrastIssues,chartWidth:chart?.getBoundingClientRect().width,clipped,error:el.textContent.includes('차트를 불러오지 못했습니다')||!!el.querySelector('.error-icon'),width:el.clientWidth,svgScale:svg?.viewBox.baseVal.width?svg.getBoundingClientRect().width/svg.viewBox.baseVal.width:null};
+            return {emptyStatic:el.classList.contains('static-diagram')&&!el.querySelector('svg text'),contrastIssues,chartWidth:chart?.getBoundingClientRect().width,clipped,error:el.textContent.includes('차트를 불러오지 못했습니다')||!!el.querySelector('.error-icon'),width:el.clientWidth,svgScale:svg?.viewBox.baseVal.width?svg.getBoundingClientRect().width/svg.viewBox.baseVal.width:null};
           });
           if(sizes.error) fail(scope,'visual renderer error');
+          if(sizes.emptyStatic)fail(scope,'static SVG has no SVG text (HTML parser breakout)');
           if(sizes.contrastIssues.length)fail(scope,'diagram text contrast below 4.5:1: '+sizes.contrastIssues.join(', '));
           if(sizes.chartWidth&&sizes.chartWidth<700)fail(scope,'chart readable width lost (CSS import/cascade)');
           if(sizes.clipped.length)fail(scope,'chart text outside canvas: '+sizes.clipped.join(', '));
