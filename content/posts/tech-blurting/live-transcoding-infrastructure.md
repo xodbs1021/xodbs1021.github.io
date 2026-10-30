@@ -997,9 +997,9 @@ flowchart LR
   O --> P[Operate<br/>예산 알람, 변경 승인]
   P --> I
   
-  style I fill:#e0f2fe
-  style O fill:#dcfce7
-  style P fill:#fef3c7
+  style I fill:#e0f2fe,color:#172c40
+  style O fill:#dcfce7,color:#172c40
+  style P fill:#fef3c7,color:#172c40
 ```
 
 | 단계 | 활동 | KPI |

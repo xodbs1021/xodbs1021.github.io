@@ -132,10 +132,25 @@ try {
           const sizes=await figure.evaluate(el=>{
             const svg=el.querySelector('.mermaid svg,.diagram-viewport svg');
             const chart=el.querySelector('.echart svg');
+            const luminance=color=>{
+              const values=color.match(/[\d.]+/g)?.map(Number);
+              if(!values||values.length<3||values[3]===0)return null;
+              const rgb=values.slice(0,3).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4});
+              return rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722;
+            };
+            const contrastIssues=[...el.querySelectorAll('.mermaid .node')].flatMap(node=>{
+              const shape=node.querySelector('rect,polygon,circle,path'),label=node.querySelector('.nodeLabel');
+              if(!shape||!label)return [];
+              const a=luminance(getComputedStyle(shape).fill),b=luminance(getComputedStyle(label).color);
+              if(a===null||b===null)return [];
+              const contrast=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+              return contrast<4.5?[`${label.textContent.slice(0,40)} (${contrast.toFixed(2)}:1)`]:[];
+            });
             const clipped=chart?[...chart.querySelectorAll('text')].filter(t=>{const r=t.getBoundingClientRect(),b=chart.getBoundingClientRect();return r.width&&r.height&&(r.left<b.left-2||r.right>b.right+2||r.top<b.top-2||r.bottom>b.bottom+2)}).map(t=>t.textContent):[];
-            return {chartWidth:chart?.getBoundingClientRect().width,clipped,error:el.textContent.includes('차트를 불러오지 못했습니다')||!!el.querySelector('.error-icon'),width:el.clientWidth,svgScale:svg?.viewBox.baseVal.width?svg.getBoundingClientRect().width/svg.viewBox.baseVal.width:null};
+            return {contrastIssues,chartWidth:chart?.getBoundingClientRect().width,clipped,error:el.textContent.includes('차트를 불러오지 못했습니다')||!!el.querySelector('.error-icon'),width:el.clientWidth,svgScale:svg?.viewBox.baseVal.width?svg.getBoundingClientRect().width/svg.viewBox.baseVal.width:null};
           });
           if(sizes.error) fail(scope,'visual renderer error');
+          if(sizes.contrastIssues.length)fail(scope,'diagram text contrast below 4.5:1: '+sizes.contrastIssues.join(', '));
           if(sizes.chartWidth&&sizes.chartWidth<700)fail(scope,'chart readable width lost (CSS import/cascade)');
           if(sizes.clipped.length)fail(scope,'chart text outside canvas: '+sizes.clipped.join(', '));
           if(sizes.svgScale!==null&&sizes.svgScale<.85)fail(scope,`diagram text shrunk to ${sizes.svgScale.toFixed(2)}x`);
