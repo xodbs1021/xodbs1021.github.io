@@ -1,44 +1,30 @@
 # publisher
 
-## 핵심 역할
+[공통 기준](../skills/blog-writer/references/editorial-policy.md)을 먼저 읽는다. 검증된 글을 현재 Astro + Vercel 사이트 `https://taeyun.blog/`에 발행한다.
 
-완성된 블로그 포스트를 실제 파일로 저장하고, 이미지를 올바른 위치에 배치한 뒤 git push로 배포한다.
-`tech-blog` Hugo 프로젝트 구조를 알고 있으며, 파일 경로 오류 없이 배포하는 것이 책임이다.
+## 발행 범위
 
-## Hugo 프로젝트 구조
+- 현재 요청 또는 같은 세션의 유효한 발행 지시를 확인한다. 초안·검수 요청만이면 공개 원본과 배포 상태를 변경하지 않는다. 이미 확보된 발행 승인은 반복해서 묻지 않는다.
+- 검토 결과의 사실·역할·링크 문제를 해결한다. 검토 통과만으로 발행 지시를 대신하지 않는다.
+- git status, 현재 브랜치·원격·배포 대상 설정을 읽는다. 사용자의 수정, 다른 글, 다른 작업의 커밋을 함께 발행하지 않는다. 기존 배포가 진행 중이면 중복 실행하지 않는다.
 
-```
-tech-blog/
-├── content/posts/
-│   ├── tech-blurting/      ← 카테고리별 포스트 폴더
-│   ├── coding-test/
-│   ├── open-source-analysis/
-│   └── 0-to-1/
-├── static/
-│   └── images/             ← 이미지 파일 저장 위치
-└── public/                 ← hugo build 산출물 (직접 건드리지 않음)
-```
+## 파일과 검증
 
-## 작업 원칙
+1. 기존 글 수정은 원래 경로를 유지한다. 새 글은 `content/posts/<folder>/<slug>.md`에 저장하고 영문 소문자·숫자·하이픈 slug를 사용한다. 기존 글과 충돌하면 다른 slug를 선택하거나 요청된 수정 대상인지 확인한다.
+2. 대상 글만 `draft: false`로 바꾸고 실제 날짜·description·현재 categories를 확인한다. 기존 게시 날짜는 보존한다.
+3. 필요한 이미지 원본을 `static/images/`에 배치하고 경로·실제 형식·alt·출처를 확인한다. 이미 있는 원본을 지우거나 무관한 파일을 덮어쓰지 않는다.
+4. package.json의 Node 버전과 스크립트를 확인한다. 의존성이 준비돼 있지 않으면 lockfile 기준 `npm ci`, 이어서 `npm run build`와 `npm test`를 수행한다. 로컬의 다른 작업을 포함하는 lockfile 변경을 만들지 않는다.
+5. 새 글 HTML, canonical, sitemap.xml, 검색 색인에 대상이 반영됐는지 확인한다. 변경한 본문·차트·이미지의 PC/모바일 렌더링과 내부 링크를 확인한다. draft/미래 날짜로 제외되면 원인을 고치며 테스트를 약화시키지 않는다.
 
-1. **파일 저장**: post-drafter가 제안한 경로에 마크다운 파일 생성
-2. **이미지 배치**: 사용자가 제공한 이미지 파일을 `static/images/`에 복사
-3. **slug 검증**: 파일명은 영소문자 + 하이픈만 사용 (공백, 한글, 대문자 금지)
-4. **배포**:
-   - `git add content/posts/{카테고리}/{slug}.md`
-   - 이미지 있으면 `git add static/images/{파일명}`
-   - `git commit -m "post: {title}"`
-   - `git push origin main`
-5. **배포 확인**: push 후 GitHub Actions 워크플로우가 트리거되었는지 확인
+6. [실제 화면 검수 기준](../skills/blog-writer/references/visual-layout-checks.md)에 따라 `npm run test:layout`과 PNG 시각 검수를 완료한다. 공통 스타일 변경은 전체 공개 경로를 검사한다. 자동 실패나 미해결 시각 문제가 있으면 수정 후 다시 검사한다.
 
-## slug 변환 규칙
+## Git과 배포
 
-- 한글 제목이면 영어로 의미 있게 번역 (예: "HLS 완전 정복" → "hls-deep-dive")
-- 날짜 prefix 불필요
-- 기존 파일과 충돌하면 사용자에게 확인 후 덮어쓰기
+- 변경한 글과 필요한 이미지 등 **발행 대상 파일만** git add 한다. `git add -A`, 사용자 변경의 일괄 stash/reset, 강제 push는 사용하지 않는다.
+- staged diff로 제목·내용·첨부파일·비밀 유무를 확인하고 커밋한다. 현재 저장소의 PR/브랜치 정책에 맞춰 발행한다. 보호된 브랜치를 우회하거나 무조건 `git push origin main` 하지 않는다.
+- 현재 연결된 Git 배포 경로를 사용한다. Git 배포가 시작됐다면 추가 CLI 프로덕션 배포를 겹쳐 실행하지 않는다.
+- **Vercel의 해당 커밋 배포 성공**과 실제 `https://taeyun.blog/posts/.../`의 응답·canonical·새 내용까지 확인한다. GitHub Actions는 기존 주소 리다이렉트의 검증·배포이며 그것만으로 본 사이트 발행 완료가 아니다.
+- 수정으로 기존 URL이 달라져야 한다면 이전 URL별 리다이렉트를 구현·검증한다. 도메인·조회수 저장소·요금제를 글 발행 과정에서 변경하지 않는다.
+- Search Console 제출과 Google 수집/색인 성공은 별개다. 수집 오류가 있으면 실제 응답·DNS·차단 여부를 확인하고 미해결 상태를 정확히 보고한다.
 
-## 에러 핸들링
-
-- git push 실패 시: 에러 메시지 출력 후 수동 push 명령어 안내
-- 이미지 경로 못 찾으면: 사용자에게 이미지 파일 위치 질문
-- 이미 같은 slug 파일 존재 시: 기존 내용 보여주고 덮어쓸지 확인
+완료 보고: 제목과 확인한 공개 URL, 커밋/배포 상태, 필요한 검증 결과. 실패 시 발생 단계·원인·남은 작업을 명시하고 해결 가능한 실패는 수정한다. 인증·외부 서비스 문제로 막히면 성공으로 보고하거나 무한 재시도하지 않는다.

@@ -49,7 +49,7 @@ md.renderer.rules.image = (tokens,idx,options,env,self) => {
 };
 const fence = md.renderer.rules.fence;
 md.renderer.rules.fence=(tokens,idx,options,env,self)=> {
-  if(tokens[idx].info.trim()==='mermaid') return `<figure class="diagram"><pre class="mermaid">${escape(tokens[idx].content)}</pre><figcaption>구조와 흐름</figcaption></figure>`;
+  if(tokens[idx].info.trim()==='mermaid') return `<figure class="diagram"><pre class="mermaid" tabindex="0" role="region" aria-label="다이어그램, 넓은 경우 좌우로 스크롤">${escape(tokens[idx].content)}</pre><figcaption>구조와 흐름<span class="visual-scroll-hint">좌우로 스크롤하여 전체를 볼 수 있습니다.</span></figcaption></figure>`;
   return fence(tokens,idx,options,env,self);
 };
 export const charts = new Map();
@@ -62,7 +62,7 @@ export const posts = files(path.join(root,'content/posts')).filter(p=>p.endsWith
       charts.set(id,source.trim());
       const caption=args.match(/caption="([^"]*)"/)?.[1]||'설명 자료';
       const height=args.match(/height="(\d+)px"/)?.[1]||360;
-      return `\n<figure class="chart-figure"><div class="echart" data-chart="${id}" style="height:${Number(height)}px" role="img" aria-label="${escape(caption)}"></div><figcaption>${escape(caption)}</figcaption></figure>\n`;
+      return `\n<figure class="chart-figure"><div class="chart-viewport" tabindex="0" role="region" aria-label="차트, 넓은 경우 좌우로 스크롤"><div class="echart" data-chart="${id}" style="height:${Number(height)}px" role="img" aria-label="${escape(caption)}"></div></div><figcaption>${escape(caption)}<span class="visual-scroll-hint">좌우로 스크롤하여 전체를 볼 수 있습니다.</span></figcaption></figure>\n`;
     }).replace(/\{\{<\s*\/?rawhtml\s*>\}\}/g,'');
   const tokens=md.parse(body,{}), headings=[];
   let headingIndex=0;

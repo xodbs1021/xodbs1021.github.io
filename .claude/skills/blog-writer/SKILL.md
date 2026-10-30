@@ -1,98 +1,28 @@
 ---
 name: blog-writer
-description: "태형이 따라잡기 블로그 포스트 작성 오케스트레이터. 주제/메모 → 초안 → 품질 검토 → git push까지 완료한다. 기술 아티클(Medium 스타일)과 일반 포스트(학습 노트) 두 모드를 지원하며, 필요한 에이전트만 온디맨드로 로드한다. '블로그 써줘', '포스트 작성', '글 올려줘', '블로그 초안', '{주제} 블로그로 정리해줘', '오늘 공부한 거 블로그에', '이거 정리해서 올려줘', '블로그 발행', '이미지 넣어서 올려줘', '수정 후 다시 올려줘' 등 블로그 글쓰기/발행 요청 시 반드시 이 스킬을 사용할 것. 단, '아티클 써줘'처럼 명확히 아티클 스타일을 요청하면 article-writer 스킬을 우선 사용할 것."
+description: "블로그 메모·학습 기록을 초안으로 작성하거나 기존 글을 수정한다. 명시된 발행 요청은 검증·배포까지 수행한다. 심층 기술 아티클은 article-writer로 연결한다."
 ---
 
-# blog-writer 오케스트레이터
 
-## 에이전트 레지스트리
+# blog-writer
 
-요청 분석 후 이 테이블에서 **필요한 에이전트만** 식별하고, 해당 파일만 Read해서 사용한다.
-불필요한 에이전트는 로드하지 않는다.
+먼저 [공통 기준](references/editorial-policy.md)을 읽는다. 일반 블로그 글·학습 노트의 작성, 수정, 명시된 발행을 담당한다.
 
-| 에이전트 | 핵심 역할 | 언제 필요 | 파일 경로 |
-|---------|---------|---------|---------|
-| post-drafter | Hugo 마크다운 초안 생성 (일반 포스트) | 새 포스트 작성 | `.claude/agents/post-drafter.md` |
-| image-manager | Unsplash 검색 + Gemini 이미지 생성 | 이미지 필요 시 | `.claude/agents/image-manager.md` |
-| blog-quality-reviewer | 기술 정확성·구성·가독성 검토 | 초안 완성 후 | `.claude/agents/blog-quality-reviewer.md` |
-| article-style-checker | Medium 스타일 7개 기준 검토 | 아티클 스타일 글 작성 후 | `.claude/agents/article-style-checker.md` |
-| publisher | git add/commit/push 배포 | 발행 시 | `.claude/agents/publisher.md` |
+[실제 화면 검수 기준](references/visual-layout-checks.md)을 작성·수정·발행 시 함께 적용한다. 자동 검사와 실제 PNG 확인을 마치기 전에는 검수 완료로 표시하지 않는다.
 
-> **아티클 스타일 요청** ("아티클 써줘", "Medium 스타일", "심층 분석")은 `article-writer` 스킬이 별도로 있으므로 그쪽을 사용한다.
+## 진행
 
----
+1. 요청에서 주제, 자료, 초안/발행 범위, 기존 글 여부를 파악한다. 주제와 분류는 가능한 범위에서 판단하고 꼭 필요한 근거만 질문한다.
+2. 일반 글은 `.claude/agents/post-drafter.md`, 심층 아티클은 `../article-writer/SKILL.md`를 읽는다. 기존 글 수정은 해당 원본과 관련 근거부터 읽는다.
+3. `_workspace/blog/<slug>/`에 draft.md, evidence.md를 작성한다. 공개 글 수정도 우선 사본에서 진행한다. 기존 작업이 있으면 해당 작업을 이어간다.
+4. 시각화가 이해를 돕는 경우 `../visual-planner/SKILL.md`를 사용한다. 이미지 획득이 필요하면 `.claude/agents/image-manager.md`를 읽는다. 이미지가 없어도 이해되는 부분은 계속 진행하고 필수 자료의 누락만 명시한다.
+5. `.claude/agents/blog-quality-reviewer.md`로 검토해 review.md에 근거와 남은 문제를 기록한다. 아티클 문체 검토는 필요한 경우에만 추가한다.
+6. 초안 요청은 파일과 미확인 항목을 보고하고 끝낸다. 발행 지시가 있으면 `.claude/agents/publisher.md`로 필요한 검증과 배포까지 마친다.
 
-## Phase 0: 컨텍스트 확인
+에이전트 파일은 역할 지침이다. 실제 위임은 사용 가능한 도구·현재 권한에 맞춘다. 호출하지 않은 에이전트가 검토했다고 보고하지 않는다.
 
-기존 작업 여부 판단:
-- `_workspace/blog/` 존재 + "수정/다시/개선" 요청 → **부분 재실행** (해당 단계만)
-- 새 주제 제공 → **새 실행** (기존 있으면 `_workspace/blog_prev/`로 이동)
+## 결과
 
-## Phase 1: 요청 라우팅
-
-사용자 입력에서 추출한 뒤, 필요한 에이전트 목록을 결정한다:
-
-- **주제**: 명시 또는 메모에서 추론
-- **카테고리**: `tech-blurting` / `coding-test` / `open-source-analysis` / `0-to-1` / `book-review`
-  - 불명확하면 내용으로 추론 후 한 줄 확인
-- **이미지**: 사용자 파일 제공 / 명시 요청 / 주제상 필요 여부
-- **발행 여부**: "초안만" vs "발행까지"
-
-**필요 에이전트 결정 예시:**
-- 일반 tech-blurting → `post-drafter` + `blog-quality-reviewer` + (선택)`publisher`
-- 코딩테스트 풀이 → `post-drafter` + `blog-quality-reviewer` + (선택)`publisher`
-- 이미지 있는 포스트 → 위 + `image-manager`
-- book-review → `post-drafter` + `blog-quality-reviewer` (book-review-critic 기준 포함)
-
-결정한 에이전트 파일만 Read해서 컨텍스트에 로드한다.
-
-## Phase 2: 초안 생성
-
-로드한 `post-drafter.md` 지침에 따라 초안 작성.
-결과를 `_workspace/blog/draft.md`에 저장.
-
-## Phase 2.5: 이미지 처리 (필요 시)
-
-이미지가 필요한 경우에만: `image-manager.md` Read 후 실행.
-스크립트: `.claude/skills/blog-writer/scripts/image_manager.py`
-
-## Phase 3: 품질 검토
-
-로드한 `blog-quality-reviewer.md` 지침에 따라 초안 검토.
-결과를 `_workspace/blog/review.md`에 저장.
-
-**분기:**
-- 발행 가능 → Phase 4
-- 수정 후 발행 (non-blocking만) → post-drafter로 수정 후 Phase 4
-- blocking 이슈 → 사용자에게 검토 결과 보여주고 방향 확인
-
-## Phase 4: 발행
-
-발행 원하는 경우에만: `publisher.md` Read 후 git add → commit → push.
-초안만 요청이면 파일 저장 후 종료.
-
-## 최종 출력
-
-**발행 완료:**
-```
-✅ 발행 완료
-- 포스트: {제목}
-- 경로: content/posts/{카테고리}/{slug}.md
-- 카테고리: {카테고리}
-- 배포: https://xodbs1021.github.io/{permalink}
-- 사용 에이전트: {로드한 에이전트 목록}
-```
-
-**초안만:**
-```
-📝 초안 완성
-- 파일: _workspace/blog/draft.md
-- 발행하려면 "이 초안 올려줘"라고 하면 됩니다
-```
-
-## 에러 핸들링
-
-- post-drafter 실패 → 입력 내용으로 기본 포스트 생성 후 재시도
-- image-manager 실패 → "이미지 없이 진행할까요?" 확인 후 계속
-- quality-reviewer 실패 → 검토 없이 사용자 확인 후 진행
-- push 실패 → 에러 메시지 + 수동 push 명령어 안내
+- 초안: 파일 경로, 선택한 분류, 핵심 근거, 발행 전 남은 항목.
+- 발행: 제목, 실제 `https://taeyun.blog/posts/.../` URL, 검증 결과, 배포 상태.
+- 실패: 실패 단계와 구체적 이유. 단순 push 성공을 발행 완료로 표현하지 않는다.
