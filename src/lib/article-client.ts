@@ -69,3 +69,6 @@ if(slug && location.hostname==='taeyun.blog'){
  try{const response=await fetch(`/api/views/?slug=${encodeURIComponent(slug)}`,{method:seen?'GET':'POST',headers:seen?{}:{'Content-Type':'application/json'}});if(response.ok){const data=await response.json();document.querySelector('#views')!.textContent=Number(data.views).toLocaleString('ko-KR');if(!seen)try{localStorage.setItem(key,'1')}catch{}}}catch{}
 }
 const sectionObserver=new IntersectionObserver(entries=>{for(const entry of entries)if(entry.isIntersecting){document.querySelectorAll('.toc a').forEach(a=>a.classList.toggle('active',a.getAttribute('href')===`#${entry.target.id}`))}},{rootMargin:'-10% 0px -65% 0px'});document.querySelectorAll('.prose h2[id]').forEach(h=>sectionObserver.observe(h));
+
+// Screenshot/interaction readiness includes asynchronous diagram layout.
+document.documentElement.dataset.articleReady='true';

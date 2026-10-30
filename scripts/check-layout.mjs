@@ -82,6 +82,7 @@ async function open(page,url,width,theme='light'){
   const response=await page.goto(base+url,{waitUntil:'load'});
   if(!response?.ok()) throw new Error(`HTTP ${response?.status()}`);
   await page.evaluate(()=>document.fonts.ready);
+  if(await page.locator('.article-body').count())await page.waitForFunction(()=>document.documentElement.dataset.articleReady==='true');
   await page.addStyleTag({content:'html{scroll-behavior:auto!important}*,*::before,*::after{animation-duration:0s!important;transition-duration:0s!important}'});
   if(await page.locator('[data-lab]').count()) await page.waitForFunction(()=>![...document.querySelectorAll('[data-lab] button')].some(b=>b.disabled));
 }
@@ -96,7 +97,7 @@ async function screenshot(page,selector,name){
   return file;
 }
 try {
-  const queue=(process.env.LAYOUT_PHASE==='visuals'?[]:selected).flatMap(url=>widths.map(width=>({url,width})));
+  const queue=(['visuals','labs'].includes(process.env.LAYOUT_PHASE)?[]:selected).flatMap(url=>widths.map(width=>({url,width})));
   await Promise.all(Array.from({length:4},async()=>{
     const page=await browser.newPage();
     await page.route('**/api/views/**',r=>r.fulfill({status:200,contentType:'application/json',body:'{"views":0}'}));
@@ -114,7 +115,7 @@ try {
   // Every chart/diagram is rendered, captured and checked at both text extremes.
   // Images are not just loaded above the fold: visit each figure to trigger lazy rendering.
   const visualPosts=posts.filter(p=>selected.includes(p.url)&&/data-chart|class="mermaid"/.test(p.html));
-  for(const {width,theme} of (process.env.LAYOUT_PHASE==='pages'?[]:[{width:390,theme:'light'},{width:1440,theme:'light'},{width:390,theme:'dark'}])){
+  for(const {width,theme} of (['pages','labs'].includes(process.env.LAYOUT_PHASE)?[]:[{width:390,theme:'light'},{width:1440,theme:'light'},{width:390,theme:'dark'}])){
     const page=await browser.newPage();
     await page.route('**/api/views/**',r=>r.fulfill({status:200,contentType:'application/json',body:'{"views":0}'}));
     for(const post of visualPosts){
@@ -156,7 +157,7 @@ try {
     await page.close();
   }
   // Mutate actual inputs, not the result text. Inspect long states as well as defaults.
-  for(const [slug,mode] of Object.entries(process.env.LAYOUT_PHASE?{}:labForSlug)){
+  for(const [slug,mode] of Object.entries(['pages','visuals'].includes(process.env.LAYOUT_PHASE)?{}:labForSlug)){
     if(!selected.includes(`/posts/${slug}/`))continue;
     for(const width of [320,390,768,1440])for(const theme of ['light','dark']){
       const page=await browser.newPage();
@@ -195,10 +196,11 @@ try {
       await page.close();
     }
   }
-  if(!process.env.LAYOUT_PHASE)for(const [slug,mode] of Object.entries(labForSlug)){
+  if(!['pages','visuals'].includes(process.env.LAYOUT_PHASE))for(const [slug,mode] of Object.entries(labForSlug)){
     if(!selected.includes(`/posts/${slug}/`))continue;
     const page=await browser.newPage({javaScriptEnabled:false,viewport:{width:320,height:1000}});
     await page.goto(base+`/posts/${slug}/`);
+    await page.evaluate(()=>document.fonts.ready);
     if(await page.locator('[data-lab] input:enabled,[data-lab] select:enabled,[data-lab] button:enabled').count())fail(mode+'/no-js','inert controls appear enabled');
     if(!await page.locator('[data-lab] noscript').isVisible())fail(mode+'/no-js','static fallback missing');
     await screenshot(page,'[data-lab]',`lab-${slugName(slug)}-no-js`);
