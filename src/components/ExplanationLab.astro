@@ -1,4 +1,5 @@
 ---
+import '../styles/explanation-lab.css';
 import {labForSlug} from '../lib/explanation-models.mjs';
 const {slug}=Astro.props;
 const mode=labForSlug[slug];
@@ -9,7 +10,7 @@ const titles={recovery:'이벤트가 없어도 인덱스를 채울 수 있을까
   {mode==='recovery'&&<>
     <p>디스크에는 8개 파일이 있고, DB에는 처음 4개만 등록되어 있다고 가정합니다. 이벤트를 놓친 뒤 재조정 작업을 실행해 보세요. 입력을 바꾸면 처음 상태로 돌아갑니다.</p>
     <div class="lab-controls"><label>신규 파일 이벤트<select disabled data-control="events"><option value="missing">4개 모두 유실</option><option value="partial">2개만 도착</option><option value="all">4개 모두 도착</option></select></label><label class="lab-checkbox"><input disabled type="checkbox" data-control="absent"/> 8번 파일이 디스크에도 없음</label></div>
-    <div class="file-ledger"><div><strong>디스크</strong><div data-files="disk" class="file-cells">1 · 2 · 3 · 4 · 5 · 6 · 7 · 8</div></div><div><strong>DB 인덱스</strong><div data-files="index" class="file-cells">1 · 2 · 3 · 4</div></div></div>
+    <div class="file-ledger"><div><strong>디스크</strong><div data-files="disk" class="file-cells">{Array.from({length:8},(_,i)=><span class="present" aria-label={`${i+1}번 있음`}>{i+1}</span>)}</div></div><div><strong>DB 인덱스</strong><div data-files="index" class="file-cells">{Array.from({length:8},(_,i)=><span class={i<4?"present":"absent"} aria-label={`${i+1}번 ${i<4?"있음":"없음"}`}>{i+1}</span>)}</div></div></div>
     <div class="lab-actions"><button type="button" data-action="events" disabled>1. 이벤트 처리</button><button type="button" data-action="reconcile" disabled>2. 디스크와 재조정</button><button type="button" data-action="reset" disabled>초기화</button></div>
     <p class="lab-result" role="status" aria-live="polite" data-result>DB에 없는 파일을 디스크에서 찾아 등록합니다. 같은 목록을 다시 처리해도 중복 등록하지 않습니다.</p>
     <p class="lab-limit">이 모형은 식별자 집합만 비교합니다. 디스크에서 사라진 영상 바이트를 복원하지 않으며, 동시성·DB 트랜잭션·실제 파일명의 규칙은 생략했습니다.</p>
@@ -19,13 +20,15 @@ const titles={recovery:'이벤트가 없어도 인덱스를 채울 수 있을까
     <div class="lab-controls"><label>요청 유형<select disabled data-control="request"><option value="match">같은 방송 A</option><option value="mismatch">다른 방송 B</option><option value="missing">path 누락</option><option value="duplicate">중복 path</option><option value="encoded">인코딩된 키로 중복</option><option value="normalized">정규화되는 원문 경로</option></select></label><label class="lab-checkbox"><input disabled type="checkbox" data-control="access" checked/> 앞단에서 A 접근 허용</label></div>
     <code class="lab-request" data-request>/A/list?path=A</code>
     <ol class="request-stages"><li>① 앞단 접근 제어 <strong data-stage="access">허용</strong></li><li>② 원문·대상 대조 <strong data-stage="boundary">통과</strong></li><li>③ 재생 서버 호출 <strong data-stage="upstream">1회</strong></li></ol>
-    <p class="lab-result" role="status" aria-live="polite" data-result>path가 하나이고 경로의 A와 일치하면 전달합니다.</p><button type="button" data-action="reset" disabled>초기화</button>
+    <div class="lab-actions"><button type="button" data-action="reset" disabled>초기화</button></div>
+    <p class="lab-result" role="status" aria-live="polite" data-result>path가 하나이고 경로의 A와 일치하면 전달합니다.</p>
     <p class="lab-limit">본문의 요청 사례를 고정한 모형입니다. 완전한 URI 파서나 보안 검사기가 아니며, 통과 표시는 실제 서버 응답을 뜻하지 않습니다.</p>
   </>}
   {mode==='latency'&&<>
     <div class="lab-controls lab-sliders"><label for="lab-segment">세그먼트 길이 <output aria-live="off" data-value="segment">2초</output><input disabled type="range" min="1" max="6" step="0.5" value="2" id="lab-segment" data-control="segment"/></label><label for="lab-buffer">버퍼에 더 쌓는 세그먼트 <output aria-live="off" data-value="buffer">2개</output><input disabled type="range" min="0" max="4" step="1" value="2" id="lab-buffer" data-control="buffer"/></label><label for="lab-encode">인코딩 시간 <output aria-live="off" data-value="encode">300ms</output><input disabled type="range" min="0" max="1000" step="50" value="300" id="lab-encode" data-control="encode"/></label><label for="lab-network">전송 시간 <output aria-live="off" data-value="network">200ms</output><input disabled type="range" min="0" max="1000" step="50" value="200" id="lab-network" data-control="network"/></label></div>
     <div class="latency-track" data-track aria-hidden="true"></div><dl class="latency-parts" data-parts><div><dt>인코딩</dt><dd>0.30초</dd></div><div><dt>전송</dt><dd>0.20초</dd></div><div><dt>세그먼트 대기</dt><dd>1.00초</dd></div><div><dt>버퍼</dt><dd>4.00초</dd></div></dl>
-    <p class="lab-result" role="status" aria-live="polite" data-result>모형의 대기 예산: 5.50초</p><button type="button" data-action="reset" disabled>초기화</button>
+    <div class="lab-actions"><button type="button" data-action="reset" disabled>초기화</button></div>
+    <p class="lab-result" role="status" aria-live="polite" data-result>모형의 대기 예산: 5.50초</p>
     <p class="lab-limit">계산식: 인코딩 + 전송 + 세그먼트 길이 ÷ 2 + 길이 × 추가 버퍼 개수. 도착 시점이 균일하고 각 대기를 순서대로 더한다는 가정입니다. 실제 HLS 지연의 예측치가 아니며, 단계의 중첩·지터·플레이어 정책·LL-HLS의 부분 세그먼트는 포함하지 않습니다.</p>
   </>}
   <noscript><p>JavaScript가 꺼져 있어 기본 예시를 표시합니다. 위 설명과 본문만으로도 조건과 한계를 읽을 수 있습니다.</p></noscript>

@@ -590,8 +590,8 @@ CPU는 살아있는데 출력 안 나오는 좀비 상태 잡는 유일한 방�
 
 ```mermaid
 flowchart LR
-  D[스트림 중단 감지<br/>PTS 점프 또는 재시작] --> N[새 init.mp4 생성<br/>init_v(N+1).mp4]
-  N --> M[매니페스트 갱신<br/>#EXT-X-DISCONTINUITY<br/>#EXT-X-MAP:URI=init_v(N+1).mp4]
+  D[스트림 중단 감지<br/>PTS 점프 또는 재시작] --> N["새 init.mp4 생성<br/>init_v(N+1).mp4"]
+  N --> M["매니페스트 갱신<br/>#EXT-X-DISCONTINUITY<br/>#EXT-X-MAP:URI=init_v(N+1).mp4"]
   M --> S[시퀀스 +100 점프<br/>안전 마진]
   S --> P[플레이어 디코더 리셋<br/>~5초 끊김 후 정상]
 ```
@@ -997,9 +997,9 @@ flowchart LR
   O --> P[Operate<br/>예산 알람, 변경 승인]
   P --> I
   
-  style I fill:#e0f2fe
-  style O fill:#dcfce7
-  style P fill:#fef3c7
+  style I fill:#e0f2fe,color:#172c40
+  style O fill:#dcfce7,color:#172c40
+  style P fill:#fef3c7,color:#172c40
 ```
 
 | 단계 | 활동 | KPI |

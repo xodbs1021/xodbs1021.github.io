@@ -77,3 +77,11 @@ test('corrected numerical claims and explicit model boundaries survive publishin
   assert.ok($('.explanation-lab noscript').length);assert.ok($('.explanation-lab [role=status]').length);
  }
 });
+
+test('raw SVG stays in the SVG namespace across blank lines',()=>{
+ const post=posts.find(p=>p.slug==='0-to-1/github-pages-blog-automation');
+ const $=load(post.html);
+ assert.ok($('.static-diagram svg text').length>10);
+ assert.equal($('.diagram-viewport > p').length,0);
+ assert.ok(!post.html.includes('BLOG_RAW_HTML_'));
+});

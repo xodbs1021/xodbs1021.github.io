@@ -1,0 +1,24 @@
+/* Never shrink diagram text to fit a phone or crop chart labels at its edge. */
+.prose .chart-figure, .prose .diagram { overflow: visible; }
+.chart-viewport, .diagram-viewport, .prose .mermaid {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+.chart-viewport > .echart { min-width: 720px; }
+.prose .mermaid {
+  font-family: inherit;
+  margin: 0;
+  border-radius: 0;
+}
+.mermaid svg { max-width: none; display: block; margin: auto; }
+.prose .mermaid p { margin: 0; word-break: normal; }
+.visual-scroll-hint { display: none; margin-top: 6px; }
+[data-wide=true] > figcaption .visual-scroll-hint { display: block; }
+.chart-viewport:focus-visible, .mermaid:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.diagram-viewport svg { width: var(--diagram-width); max-width: none; display: block; }
+.diagram-viewport:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
