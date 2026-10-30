@@ -70,5 +70,9 @@ if(slug && location.hostname==='taeyun.blog'){
 }
 const sectionObserver=new IntersectionObserver(entries=>{for(const entry of entries)if(entry.isIntersecting){document.querySelectorAll('.toc a').forEach(a=>a.classList.toggle('active',a.getAttribute('href')===`#${entry.target.id}`))}},{rootMargin:'-10% 0px -65% 0px'});document.querySelectorAll('.prose h2[id]').forEach(h=>sectionObserver.observe(h));
 
+for(const el of document.querySelectorAll<HTMLElement>('.diagram-viewport')){
+  updateOverflow(el);
+  new ResizeObserver(()=>updateOverflow(el)).observe(el);
+}
 // Screenshot/interaction readiness includes asynchronous diagram layout.
 document.documentElement.dataset.articleReady='true';

@@ -1,6 +1,6 @@
 /* Never shrink diagram text to fit a phone or crop chart labels at its edge. */
 .prose .chart-figure, .prose .diagram { overflow: visible; }
-.chart-viewport, .prose .mermaid {
+.chart-viewport, .diagram-viewport, .prose .mermaid {
   max-width: 100%;
   overflow-x: auto;
   overscroll-behavior-x: contain;
@@ -19,3 +19,6 @@
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
+
+.diagram-viewport svg { width: var(--diagram-width); max-width: none; display: block; }
+.diagram-viewport:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }

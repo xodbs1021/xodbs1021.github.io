@@ -71,7 +71,10 @@ export const posts = files(path.join(root,'content/posts')).filter(p=>p.endsWith
     tokens[i].attrSet('id',id);
     headings.push({depth:Number(tokens[i].tag.slice(1)),id,text:tokens[i+1].children?.filter(t=>t.type==='text'||t.type==='code_inline').map(t=>t.content).join('')||tokens[i+1].content});
   }
-  const html=md.renderer.render(tokens,md.options,{});
+  const html=md.renderer.render(tokens,md.options,{}).replace(/<svg\b[\s\S]*?<\/svg>/g, svg=>{
+    const width=Number(svg.match(/viewBox="[\d.]+ [\d.]+ ([\d.]+) [\d.]+"/)?.[1])||720;
+    return `<figure class="diagram static-diagram"><div class="diagram-viewport" tabindex="0" role="region" aria-label="다이어그램, 넓은 경우 좌우로 스크롤" style="--diagram-width:${width}px">${svg}</div><figcaption>구조와 흐름<span class="visual-scroll-hint">좌우로 스크롤하여 전체를 볼 수 있습니다.</span></figcaption></figure>`;
+  });
   const plain=content.replace(/\{\{<[\s\S]*?>\}\}/g,'').replace(/<[^>]*>/g,'').replace(/[#*`\[\]]/g,'').replace(/\s+/g,' ').trim();
   const lead=(content.trim().split(/\n\s*\n/).find(p=>!p.startsWith('>')&&!p.startsWith('#')&&p!=='---')||'').replace(/[#*`]/g,'').replace(/\s+/g,' ').trim();
   return {...data,slug,url:`/posts/${slug}/`,html,headings,raw:content,file:path.relative(root,file),category:classify(slug,data.categories?.[0]||slug.split('/')[0]),tags:data.tags||[],date:new Date(data.date),description:data.description||(lead.length>180?lead.slice(0,177)+'…':lead),minutes:Math.max(1,Math.ceil(plain.length/650))};

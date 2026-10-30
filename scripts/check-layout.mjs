@@ -114,7 +114,7 @@ try {
   console.log(`Layout: ${report.pages.length} route/width checks, ${report.failures.length} issues`);
   // Every chart/diagram is rendered, captured and checked at both text extremes.
   // Images are not just loaded above the fold: visit each figure to trigger lazy rendering.
-  const visualPosts=posts.filter(p=>selected.includes(p.url)&&/data-chart|class="mermaid"/.test(p.html));
+  const visualPosts=posts.filter(p=>selected.includes(p.url)&&/data-chart|class="mermaid"|<svg/.test(p.html));
   for(const {width,theme} of (['pages','labs'].includes(process.env.LAYOUT_PHASE)?[]:[{width:390,theme:'light'},{width:1440,theme:'light'},{width:390,theme:'dark'}])){
     const page=await browser.newPage();
     await page.route('**/api/views/**',r=>r.fulfill({status:200,contentType:'application/json',body:'{"views":0}'}));
@@ -130,7 +130,7 @@ try {
           const file=`visual-${slugName(post.slug)}-${width}-${theme}-${i}.png`;
           await figure.screenshot({path:path.join(out,file),animations:'disabled'});
           const sizes=await figure.evaluate(el=>{
-            const svg=el.querySelector('.mermaid svg');
+            const svg=el.querySelector('.mermaid svg,.diagram-viewport svg');
             const chart=el.querySelector('.echart svg');
             const clipped=chart?[...chart.querySelectorAll('text')].filter(t=>{const r=t.getBoundingClientRect(),b=chart.getBoundingClientRect();return r.width&&r.height&&(r.left<b.left-2||r.right>b.right+2||r.top<b.top-2||r.bottom>b.bottom+2)}).map(t=>t.textContent):[];
             return {chartWidth:chart?.getBoundingClientRect().width,clipped,error:el.textContent.includes('차트를 불러오지 못했습니다')||!!el.querySelector('.error-icon'),width:el.clientWidth,svgScale:svg?.viewBox.baseVal.width?svg.getBoundingClientRect().width/svg.viewBox.baseVal.width:null};
@@ -139,10 +139,10 @@ try {
           if(sizes.chartWidth&&sizes.chartWidth<700)fail(scope,'chart readable width lost (CSS import/cascade)');
           if(sizes.clipped.length)fail(scope,'chart text outside canvas: '+sizes.clipped.join(', '));
           if(sizes.svgScale!==null&&sizes.svgScale<.85)fail(scope,`diagram text shrunk to ${sizes.svgScale.toFixed(2)}x`);
-          const detail=figure.locator('.echart,.mermaid svg').first();
+          const detail=figure.locator('.echart,.mermaid svg,.diagram-viewport svg').first();
           const detailFile=file.replace('.png','-detail.png');
           // Supplemental expanded image: real viewport capture above remains unchanged.
-          const scrollFrame=figure.locator('.chart-viewport,.mermaid').first();
+          const scrollFrame=figure.locator('.chart-viewport,.mermaid,.diagram-viewport').first();
           await scrollFrame.evaluate(el=>el.style.overflow='visible');
           await detail.screenshot({path:path.join(out,detailFile),animations:'disabled'});
           await scrollFrame.evaluate(el=>el.style.removeProperty('overflow'));
