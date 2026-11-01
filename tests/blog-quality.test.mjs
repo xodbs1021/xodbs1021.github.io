@@ -121,3 +121,25 @@ test('built posts render one section per declared model',()=>{
   assert.equal($('#lab-title').length,1);
  }
 });
+
+test('archify embeds stay unloaded in markup and only their own path may be framed',()=>{
+ const slug='projects/multicloud-migration-design';
+ const $=load(fs.readFileSync(`dist/posts/${slug}/index.html`,'utf8'));
+ const figures=$('.diagram-embed');
+ assert.equal(figures.length,2);
+ figures.each((_,el)=>{
+  const frame=$(el).find('iframe'),src=frame.attr('data-diagram-src');
+  assert.equal(frame.attr('src'),undefined,'frame must be loaded by script on wide screens only');
+  assert.ok(frame.attr('title'));assert.equal(frame.attr('loading'),'lazy');
+  assert.ok(fs.existsSync(`dist${src}index.html`),src);
+  assert.equal($(el).find('.diagram-open').attr('href'),src);
+  assert.ok($(el).find('p img').attr('alt'));
+ });
+ const rules=JSON.parse(fs.readFileSync('vercel.json','utf8')).headers;
+ const value=(rule,key)=>rule.headers.find(h=>h.key===key)?.value||'';
+ const site=rules.find(r=>r.source==='/((?!diagrams/).*)'),diagrams=rules.find(r=>r.source==='/diagrams/(.*)');
+ assert.equal(value(site,'X-Frame-Options'),'DENY');assert.match(value(site,'Content-Security-Policy'),/frame-ancestors 'none'/);
+ assert.equal(value(diagrams,'X-Frame-Options'),'SAMEORIGIN');assert.match(value(diagrams,'Content-Security-Policy'),/frame-ancestors 'self'/);
+ assert.match(value(site,'Content-Security-Policy'),/frame-src 'self'/);
+ assert.ok(!rules.some(r=>r.source==='/(.*)'),'no catch-all rule may re-add DENY to /diagrams/');
+});

@@ -32,3 +32,10 @@ compatibility / cutover — src/lib/explanation-models.mjs. 실제 판정·전�
 
 - 측정 항목 "CDC 적용 위치"의 출처: 공개 drawio 2쪽 "추가 측정: 대기 시간·p95/p99 지연·CDC 적용 위치·진행 중 트랜잭션·전환 소요 시간" (raw/multicloud-migration/2026-10-31-site-v2/published/assets/multicloud-migration.drawio).
 - "조용히 실패", "URL 형식과 만료 규칙이 달라집니다" 같은 단정은 원자료에 없어 "놓칠 수 있습니다", "달라질 수 있습니다"로 낮춤.
+
+## 인터랙티브 구성도 임베드 (2026-11-02)
+
+- `static/diagrams/multicloud-migration-architecture/index.html`, `static/diagrams/multicloud-migration-cutover/index.html` = migration.taeyun.blog 의 `architecture.html`, `cutover-states.html` 과 같은 바이트(archify 3.2.0 산출물). 원본 JSON: 볼트 `raw/multicloud-migration/2026-10-31-site-v2/04_cc_archify-platform-candidate_r1.json`, `05_cc_archify-cutover-candidate_r3.json`.
+- 구성도를 고칠 때: JSON 수정 → `archify finalize` 4관문 통과 → 두 사이트(migration-site/dist, 이 블로그 static/diagrams)에 같은 파일을 복사 → `npm run build && npm test && npm run test:layout`.
+- 넓은 화면(900px 이상)+JS: `?embed=1&theme=<블로그 테마>`로 iframe을 스크립트가 채움. 좁은 화면·JS 끔: 최적화 이미지와 「전체 화면으로 열기」만 표시하고 iframe은 받지 않음.
+- 보안 헤더: `/diagrams/`만 같은 출처 프레임 허용(X-Frame-Options SAMEORIGIN, frame-ancestors 'self'). 나머지 경로는 DENY · frame-ancestors 'none' 유지. 전역 frame-src 에 'self' 추가.

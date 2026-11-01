@@ -31,11 +31,17 @@ Export만 믿지 않는 이유는 단순합니다. 메시지 큐 호출처럼 **
 
 ## 전체 구조: 판단하는 쪽과 실행하는 쪽
 
+<figure class="diagram-embed">
+<iframe data-diagram-src="/diagrams/multicloud-migration-architecture/" title="플랫폼 전체 구성도 — 노드를 눌러 연결을 따라갈 수 있는 인터랙티브 화면" loading="lazy"></iframe>
+
 ![분석·적응 평면과 실행·전환 평면으로 나뉜 플랫폼 전체 구성도. 위쪽은 수집기, 의존성 모델, 호환성 판정, 4분류, 샌드박스 검증, 실행 관문으로 이어지고 아래쪽은 실행 제어기가 배포, DB 이전 어댑터, 트래픽 전환을 거쳐 원본과 대상 클라우드에 연결된다](/images/multicloud-migration-architecture.jpg)
+
+<figcaption>제 지시로 Claude Code가 archify로 그린 구성도입니다. <a class="diagram-open" href="/diagrams/multicloud-migration-architecture/" target="_blank" rel="noopener">전체 화면으로 열기 ↗</a></figcaption>
+</figure>
 
 플랫폼은 두 평면으로 나뉩니다. 위쪽 **분석·적응 평면**은 "옮길 수 있는가, 무엇을 바꿔야 하는가"를 판정합니다. 아래쪽 **실행·전환 평면**은 검증을 통과한 계획만 실제 환경에 적용합니다. 두 평면 사이에는 **실행 관문**이 있습니다. 필수 조건이 하나라도 해결되지 않으면 실행을 시작하지 않습니다.
 
-구성도는 제 지시로 Claude Code가 [archify](https://github.com/tt-a1i/archify)로 그린 것입니다. 노드를 눌러 연결을 따라가는 [인터랙티브 구성도](https://migration.taeyun.blog/architecture.html?theme=light)에서 각 단계의 입력과 출력을 볼 수 있습니다.
+넓은 화면에서는 위 구성도를 이 자리에서 바로 조작할 수 있습니다. 노드를 누르면 연결된 경로가 강조되고, 각 단계의 입력과 출력이 나옵니다. 휴대폰에서는 그림 아래 「전체 화면으로 열기」로 같은 구성도를 엽니다. 구성도는 [archify](https://github.com/tt-a1i/archify)로 만들었습니다.
 
 ## 같은 이름, 다른 동작: 호환성 4분류
 
@@ -60,9 +66,13 @@ Export만 믿지 않는 이유는 단순합니다. 메시지 큐 호출처럼 **
 
 전환에서 가장 위험한 순간은 DB입니다. 두 DB가 동시에 쓰기를 받으면 어느 쪽이 맞는 데이터인지 알 수 없게 됩니다. 그래서 **앱은 두 클라우드에서 동시에 돌 수 있게 허용하되, DB 쓰기는 언제나 한 곳에서만 받도록** 설계했습니다.
 
+<figure class="diagram-embed">
+<iframe data-diagram-src="/diagrams/multicloud-migration-cutover/" data-diagram-shape="wide" title="DB 전환 상태도 — 상태를 눌러 다음 상태와 조건을 볼 수 있는 인터랙티브 화면" loading="lazy"></iframe>
+
 ![DB 전환 상태도. 초기 복사와 CDC, 앱 동시 운영, 신규 쓰기 대기, 차단과 최종 확인, 대상 승격, 전환 완료로 이어지고 이전 중단, 전환 취소, 역동기화 검증 분기가 있다](/images/multicloud-migration-cutover-states.jpg)
 
-위 상태도도 제 지시로 Claude Code가 archify로 만든 것입니다.
+<figcaption>제 지시로 Claude Code가 archify로 만든 상태도입니다. <a class="diagram-open" href="/diagrams/multicloud-migration-cutover/" target="_blank" rel="noopener">전체 화면으로 열기 ↗</a></figcaption>
+</figure>
 
 | 단계 | 앱 | 쓰기를 받는 DB | 하는 일 |
 | --- | --- | --- | --- |

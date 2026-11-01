@@ -75,4 +75,22 @@ for(const el of document.querySelectorAll<HTMLElement>('.diagram-viewport')){
   new ResizeObserver(()=>updateOverflow(el)).observe(el);
 }
 // Screenshot/interaction readiness includes asynchronous diagram layout.
+// archify diagrams: live only on wide screens (the canvas is ~1560px wide); never fetched on mobile.
+const diagramFrames=[...document.querySelectorAll<HTMLIFrameElement>('iframe[data-diagram-src]')];
+if(diagramFrames.length){
+  const wide=matchMedia('(min-width: 900px)');
+  const syncDiagrams=()=>{
+    const theme=document.documentElement.dataset.theme==='dark'?'dark':'light';
+    for(const frame of diagramFrames){
+      const figure=frame.closest<HTMLElement>('.diagram-embed');
+      if(!wide.matches){figure?.classList.remove('is-live');continue;}
+      const src=`${frame.dataset.diagramSrc}?embed=1&theme=${theme}`;
+      if(frame.getAttribute('src')!==src)frame.src=src;
+      figure?.classList.add('is-live');
+    }
+  };
+  syncDiagrams();
+  wide.addEventListener('change',syncDiagrams);
+  window.addEventListener('themechange',syncDiagrams);
+}
 document.documentElement.dataset.articleReady='true';
