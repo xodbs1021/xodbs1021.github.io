@@ -22,3 +22,14 @@
 
 .diagram-viewport svg { width: var(--diagram-width); max-width: none; display: block; }
 .diagram-viewport:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* Interactive diagrams (archify) — desktop with JS: live iframe; mobile or no JS: image + open link. */
+.prose .diagram-embed{margin:32px 0}
+.prose .diagram-embed iframe{display:none;width:100%;aspect-ratio:16/10;min-height:440px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.prose .diagram-embed iframe[data-diagram-shape=wide]{aspect-ratio:23/10;min-height:300px}
+.prose .diagram-embed.is-live iframe{display:block}
+.prose .diagram-embed.is-live>p{display:none}
+.prose .diagram-embed>p{margin:0}
+.prose .diagram-embed>p img{margin:0 auto}
+.prose .diagram-embed figcaption{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px 12px}
+.prose .diagram-open{display:inline-flex;align-items:center;min-height:44px;padding:0 4px;font-weight:650;font-size:13px}

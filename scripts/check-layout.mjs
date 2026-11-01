@@ -251,6 +251,57 @@ try {
     await screenshot(zoom,labSelector,`${labName}-zoom-200`);
     await zoom.close();
   }
+  // archify embeds: wide screens get the live frame (loaded, themed); narrow screens and no-JS
+  // keep the optimized image and an open link, and must never fetch the ~0.9MB frame.
+  const embedPosts=['pages','visuals','labs'].includes(process.env.LAYOUT_PHASE)?[]:posts.filter(p=>selected.includes(p.url)&&p.html.includes('data-diagram-src'));
+  for(const post of embedPosts){
+    for(const {width,theme} of [{width:1440,theme:'light'},{width:1440,theme:'dark'},{width:1024,theme:'light'},{width:390,theme:'light'},{width:390,theme:'dark'}]){
+      const page=await browser.newPage();
+      await page.route('**/api/views/**',r=>r.fulfill({status:200,contentType:'application/json',body:'{"views":0}'}));
+      await open(page,post.url,width,theme);
+      const figures=page.locator('.diagram-embed');
+      for(let i=0;i<await figures.count();i++){
+        const figure=figures.nth(i),frame=figure.locator('iframe'),scope=`embed-${i}@${width}/${theme}`;
+        await figure.scrollIntoViewIfNeeded();
+        if(width>=900){
+          if(!await frame.isVisible())fail(scope,'live frame hidden on a wide screen');
+          if(!(await frame.getAttribute('src')||'').includes(`theme=${theme}`))fail(scope,'frame theme does not follow the page');
+          if(await figure.locator('p img').isVisible())fail(scope,'fallback image still visible beside the live frame');
+          const content=await (await frame.elementHandle()).contentFrame();
+          await content.waitForLoadState('load');
+          // Toolbar icons are SVG too; count rendered diagram nodes instead.
+          if(!await content.locator('[data-node-id]').count())fail(scope,'diagram nodes did not render inside the frame');
+          if(width===1440&&theme==='light'){
+            await content.locator('[data-node-id]').nth(3).click();
+            if(!await content.waitForFunction(()=>location.hash.includes('focus='),null,{timeout:5000}).then(()=>true,()=>false))fail(scope,'node click did not focus inside the frame');
+          }
+        }else{
+          if(await frame.isVisible())fail(scope,'live frame shown on a narrow screen');
+          if(await frame.getAttribute('src'))fail(scope,'narrow screen fetched the frame');
+          if(!await figure.locator('p img').isVisible())fail(scope,'fallback image hidden on a narrow screen');
+        }
+        const open=figure.locator('.diagram-open');
+        if(!await open.isVisible())fail(scope,'open link missing');
+        else if((await open.boundingBox()).height<44)fail(scope,'open link target below 44px');
+        const file=await screenshot(page,`.diagram-embed >> nth=${i}`,`embed-${slugName(post.slug)}-${i}-${width}-${theme}`);
+        report.states.push({slug:post.slug,mode:'embed',width,theme,state:String(i),file});
+      }
+      if(width===1440&&theme==='light'){
+        await page.locator('#theme-toggle').click();
+        await page.waitForFunction(()=>[...document.querySelectorAll('iframe[data-diagram-src]')].every(f=>(f.getAttribute('src')||'').includes('theme=dark')));
+      }
+      await page.close();
+    }
+    const noJs=await browser.newPage({javaScriptEnabled:false,viewport:{width:1440,height:1000}});
+    await noJs.goto(base+post.url);
+    for(let i=0;i<await noJs.locator('.diagram-embed').count();i++){
+      const figure=noJs.locator('.diagram-embed').nth(i);
+      if(await figure.locator('iframe').isVisible())fail(`embed-${i}/no-js`,'frame shown without JavaScript');
+      if(!await figure.locator('p img').isVisible())fail(`embed-${i}/no-js`,'fallback image hidden without JavaScript');
+    }
+    await screenshot(noJs,'.diagram-embed >> nth=0',`embed-${slugName(post.slug)}-no-js`);
+    await noJs.close();
+  }
 } finally {
   await fs.writeFile(path.join(out,'report.json'),JSON.stringify(report,null,2));
   await browser.close();
