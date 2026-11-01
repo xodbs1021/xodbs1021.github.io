@@ -5,7 +5,7 @@ import {load} from 'cheerio';
 import sharp from 'sharp';
 import {posts} from '../src/lib/posts.mjs';
 import {readingPaths,readingContext} from '../src/lib/reading-paths.mjs';
-import {reconcile,playbackCases,playbackDecision,latencyBudget} from '../src/lib/explanation-models.mjs';
+import {reconcile,playbackCases,playbackDecision,latencyBudget,labForSlug,labsForSlug,compatibilityCategories,compatibilityCategory,cutoverStages,cutoverStage} from '../src/lib/explanation-models.mjs';
 
 test('missed events converge without duplicates, but missing bytes are not restored',()=>{
  const disk=[1,2,3,4,5,6,7];
@@ -84,4 +84,40 @@ test('raw SVG stays in the SVG namespace across blank lines',()=>{
  assert.ok($('.static-diagram svg text').length>10);
  assert.equal($('.diagram-viewport > p').length,0);
  assert.ok(!post.html.includes('BLOG_RAW_HTML_'));
+});
+
+test('a post can carry several explanation models, each a known mode',()=>{
+ const known=new Set(['recovery','authorization','latency','compatibility','cutover']);
+ for(const slug of Object.keys(labForSlug)){
+  const modes=labsForSlug(slug);
+  assert.ok(modes.length>=1);assert.equal(new Set(modes).size,modes.length);
+  for(const mode of modes)assert.ok(known.has(mode),`${slug}: ${mode}`);
+ }
+ assert.deepEqual(labsForSlug('tech-blurting/hls-just-files'),['latency']);
+ assert.deepEqual(labsForSlug('projects/multicloud-migration-design'),['compatibility','cutover']);
+ assert.deepEqual(labsForSlug('no/such-post'),[]);
+});
+test('cutover model never lets two databases accept writes',()=>{
+ const stages=cutoverStages.map((_,i)=>cutoverStage(i));
+ for(const stage of stages)assert.ok(stage.writable.length<=1,stage.key);
+ assert.deepEqual(stages.map(s=>s.writable[0]??null),['원본 DB','원본 DB',null,'대상 DB']);
+ assert.match(stages[2].summary,/없음/);
+ assert.throws(()=>cutoverStage(4));assert.throws(()=>cutoverStage(-1));
+});
+test('compatibility model covers the four classifications with an explicit next step',()=>{
+ assert.equal(compatibilityCategories.length,4);
+ for(const [i,c] of compatibilityCategories.entries()){
+  for(const field of ['label','hint','title','body','example','next'])assert.ok(c[field],`${c.key}.${field}`);
+  assert.equal(compatibilityCategory(i),c);
+ }
+ assert.throws(()=>compatibilityCategory(4));
+});
+test('built posts render one section per declared model',()=>{
+ for(const slug of Object.keys(labForSlug)){
+  const file=`dist/posts/${slug}/index.html`;
+  if(!fs.existsSync(file))continue; // drafts and future posts are not built
+  const $=load(fs.readFileSync(file,'utf8'));
+  assert.deepEqual($('[data-lab]').map((_,el)=>$(el).attr('data-lab')).get(),labsForSlug(slug));
+  assert.equal($('#lab-title').length,1);
+ }
 });

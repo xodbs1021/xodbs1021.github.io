@@ -3,7 +3,7 @@ import path from 'node:path';
 import http from 'node:http';
 import {chromium} from 'playwright';
 import {posts} from '../src/lib/posts.mjs';
-import {labForSlug} from '../src/lib/explanation-models.mjs';
+import {labForSlug,labsForSlug} from '../src/lib/explanation-models.mjs';
 
 // Inspect the built site, including its actual cascade and client-side renderers.
 // LAYOUT_URL is also used after deployment; never increment public view counters.
@@ -59,12 +59,12 @@ const metrics = () => {
   if(header&&body&&end) {
     if(Math.abs(rect(header).left-rect(body).left)>1||Math.abs(rect(header).width-rect(body).width)>1||Math.abs(rect(end).left-rect(body).left)>1) issues.push('article header/body/footer columns do not align');
   }
-  const lab=document.querySelector('[data-lab]');
   let gap;
-  if(lab){
+  for(const lab of document.querySelectorAll('[data-lab]')){
     const actions=lab.querySelector('.lab-actions'),result=lab.querySelector('.lab-result');
-    gap=rect(result).top-rect(actions).bottom;
-    if(gap<11.5) issues.push(`actions/result gap ${gap}px (minimum 12px)`);
+    const labGap=rect(result).top-rect(actions).bottom;
+    gap??=labGap;
+    if(labGap<11.5) issues.push(`${lab.dataset.lab}: actions/result gap ${labGap}px (minimum 12px)`);
     for(const label of lab.querySelectorAll('.lab-checkbox')){
       const input=label.querySelector('input'),r=rect(input),l=rect(label);
       if(Math.abs((r.top+r.bottom-l.top-l.bottom)/2)>1) issues.push('checkbox is not vertically centered');
@@ -173,59 +173,82 @@ try {
     await page.close();
   }
   // Mutate actual inputs, not the result text. Inspect long states as well as defaults.
-  for(const [slug,mode] of Object.entries(['pages','visuals'].includes(process.env.LAYOUT_PHASE)?{}:labForSlug)){
+  const labRuns=Object.keys(['pages','visuals'].includes(process.env.LAYOUT_PHASE)?{}:labForSlug).flatMap(slug=>labsForSlug(slug).map(mode=>({slug,mode,multi:labsForSlug(slug).length>1})));
+  for(const {slug,mode,multi} of labRuns){
     if(!selected.includes(`/posts/${slug}/`))continue;
+    const labSelector=`[data-lab="${mode}"]`,labName=`lab-${slugName(slug)}${multi?'-'+mode:''}`;
     for(const width of [320,390,768,1440])for(const theme of ['light','dark']){
       const page=await browser.newPage();
       await page.route('**/api/views/**',r=>r.fulfill({status:200,contentType:'application/json',body:'{"views":0}'}));
       await open(page,`/posts/${slug}/`,width,theme);
       const scope=`${mode}@${width}/${theme}`;
+      const lab=page.locator(labSelector);
       const capture=async state=>{
         const result=await check(page,scope+'/'+state);
-        const file=await screenshot(page,'[data-lab]',`lab-${slugName(slug)}-${width}-${theme}-${state}`);
+        const file=await screenshot(page,labSelector,`${labName}-${width}-${theme}-${state}`);
         report.states.push({slug,mode,width,theme,state,file,...result});
       };
       await capture('initial');
       if(mode==='recovery'){
-        await page.locator('[data-control=absent]').check();
-        await page.locator('[data-action=reconcile]').click();
-        if(!await page.locator('[data-result]').textContent().then(t=>t.includes('DB 7개')))fail(scope,'recovery action did not run');
+        await lab.locator('[data-control=absent]').check();
+        await lab.locator('[data-action=reconcile]').click();
+        if(!await lab.locator('[data-result]').textContent().then(t=>t.includes('DB 7개')))fail(scope,'recovery action did not run');
         await capture('reconciled');
       }else if(mode==='authorization'){
         for(const value of ['mismatch','missing','duplicate','encoded','normalized']){
-          await page.locator('[data-control=request]').selectOption(value);
+          await lab.locator('[data-control=request]').selectOption(value);
           await capture(value);
         }
-        await page.locator('[data-control=access]').uncheck();
+        await lab.locator('[data-control=access]').uncheck();
         await capture('denied');
+      }else if(mode==='compatibility'){
+        for(const index of [1,2,3]){
+          await lab.locator(`[data-choice="${index}"]`).click();
+          if(await lab.getAttribute('data-selected')!==String(index))fail(scope,`category ${index} not selected`);
+          await capture('category-'+index);
+        }
+        await lab.locator('[data-choice="3"]').focus();await page.keyboard.press('ArrowRight');
+        if(await lab.locator('[data-choice="0"]').getAttribute('aria-pressed')!=='true')fail(scope,'arrow key did not wrap to the first category');
+      }else if(mode==='cutover'){
+        await lab.locator('[data-choice="2"]').click();
+        if(!await lab.locator('[data-result]').textContent().then(t=>t.includes('없음')))fail(scope,'switch stage still reports a writer');
+        await capture('switch');
+        await lab.locator('[data-action=reset]').click();
+        for(let i=0;i<3;i++){await lab.locator('[data-action=next]').focus();await page.keyboard.press('Enter');}
+        if(!await lab.locator('[data-result]').textContent().then(t=>t.includes('대상 DB 하나')))fail(scope,'next button did not reach the final stage');
+        if(!await lab.locator('[data-action=next]').isDisabled())fail(scope,'next stays enabled on the final stage');
+        await capture('done');
       }else{
-        for(const input of await page.locator('input[type=range]').all()){
+        for(const input of await lab.locator('input[type=range]').all()){
           await input.focus();await page.keyboard.press('End');
         }
         await capture('maximum');
       }
-      await page.locator('[data-action=reset]').focus();await page.keyboard.press('Enter');
+      await lab.locator('[data-action=reset]').focus();await page.keyboard.press('Enter');
       await capture('reset');
-      if(mode==='authorization'&&!await page.locator('[data-stage=upstream]').textContent().then(t=>t==='1회'))fail(scope,'keyboard reset failed');
-      if(mode==='latency'&&!await page.locator('[data-result]').textContent().then(t=>t.includes('5.50초')))fail(scope,'keyboard reset failed');
-      if(mode==='recovery'&&!await page.locator('[data-result]').textContent().then(t=>t.includes('DB 4개 / 디스크 8개')))fail(scope,'keyboard reset failed');
+      if(mode==='authorization'&&!await lab.locator('[data-stage=upstream]').textContent().then(t=>t==='1회'))fail(scope,'keyboard reset failed');
+      if(mode==='latency'&&!await lab.locator('[data-result]').textContent().then(t=>t.includes('5.50초')))fail(scope,'keyboard reset failed');
+      if(mode==='recovery'&&!await lab.locator('[data-result]').textContent().then(t=>t.includes('DB 4개 / 디스크 8개')))fail(scope,'keyboard reset failed');
+      if(mode==='compatibility'&&await lab.getAttribute('data-selected')!=='0')fail(scope,'keyboard reset failed');
+      if(mode==='cutover'&&!await lab.locator('[data-result]').textContent().then(t=>t.includes('원본 DB 하나')))fail(scope,'keyboard reset failed');
       await page.close();
     }
   }
-  if(!['pages','visuals'].includes(process.env.LAYOUT_PHASE))for(const [slug,mode] of Object.entries(labForSlug)){
+  if(!['pages','visuals'].includes(process.env.LAYOUT_PHASE))for(const {slug,mode,multi} of labRuns){
     if(!selected.includes(`/posts/${slug}/`))continue;
+    const labSelector=`[data-lab="${mode}"]`,labName=`lab-${slugName(slug)}${multi?'-'+mode:''}`;
     const page=await browser.newPage({javaScriptEnabled:false,viewport:{width:320,height:1000}});
     await page.goto(base+`/posts/${slug}/`);
     await page.evaluate(()=>document.fonts.ready);
-    if(await page.locator('[data-lab] input:enabled,[data-lab] select:enabled,[data-lab] button:enabled').count())fail(mode+'/no-js','inert controls appear enabled');
-    if(!await page.locator('[data-lab] noscript').isVisible())fail(mode+'/no-js','static fallback missing');
-    await screenshot(page,'[data-lab]',`lab-${slugName(slug)}-no-js`);
+    if(await page.locator(`${labSelector} input:enabled,${labSelector} select:enabled,${labSelector} button:enabled`).count())fail(mode+'/no-js','inert controls appear enabled');
+    if(!await page.locator(`${labSelector} noscript`).isVisible())fail(mode+'/no-js','static fallback missing');
+    await screenshot(page,labSelector,`${labName}-no-js`);
     await page.close();
     const zoom=await browser.newPage({viewport:{width:1440,height:1000}});
     await open(zoom,`/posts/${slug}/`,1440);
     await zoom.evaluate(()=>document.documentElement.style.zoom='2');
     await check(zoom,mode+'/css-zoom-200');
-    await screenshot(zoom,'[data-lab]',`lab-${slugName(slug)}-zoom-200`);
+    await screenshot(zoom,labSelector,`${labName}-zoom-200`);
     await zoom.close();
   }
 } finally {
