@@ -1,12 +1,14 @@
 ---
 import '../styles/explanation-lab.css';
-import {labForSlug} from '../lib/explanation-models.mjs';
+import {labsForSlug,compatibilityCategories,cutoverStages,cutoverStage} from '../lib/explanation-models.mjs';
 const {slug}=Astro.props;
-const mode=labForSlug[slug];
-const titles={recovery:'이벤트가 없어도 인덱스를 채울 수 있을까?',authorization:'허용된 요청은 어디까지 도달할까?',latency:'대기 시간은 어디에 쌓일까?'};
+const modes=labsForSlug(slug);
+const firstCategory=compatibilityCategories[0];
+const firstStage=cutoverStage(0);
+const titles={recovery:'이벤트가 없어도 인덱스를 채울 수 있을까?',authorization:'허용된 요청은 어디까지 도달할까?',latency:'대기 시간은 어디에 쌓일까?',compatibility:'대체 리소스가 있으면 같은 동작일까?',cutover:'앱이 두 곳에서 돌 때 쓰기는 어디로 갈까?'};
 ---
-{mode&&<section class="explanation-lab" data-lab={mode} aria-labelledby="lab-title" data-pagefind-ignore>
-  <header><span class="category-label">직접 바꿔보기 · 설명용 모형</span><h2 id="lab-title">{titles[mode]}</h2><p>아래 결과는 선택한 입력으로 계산합니다. 실제 서버에 요청하거나 본문의 실험을 재실행하지 않습니다.</p></header>
+{modes.map((mode,i)=>{const titleId=i===0?'lab-title':`lab-title-${mode}`;return <section class="explanation-lab" data-lab={mode} aria-labelledby={titleId} data-pagefind-ignore>
+  <header><span class="category-label">직접 바꿔보기 · 설명용 모형</span><h2 id={titleId}>{titles[mode]}</h2><p>아래 결과는 선택한 입력으로 계산합니다. 실제 서버에 요청하거나 본문의 실험을 재실행하지 않습니다.</p></header>
   {mode==='recovery'&&<>
     <p>디스크에는 8개 파일이 있고, DB에는 처음 4개만 등록되어 있다고 가정합니다. 이벤트를 놓친 뒤 재조정 작업을 실행해 보세요. 입력을 바꾸면 처음 상태로 돌아갑니다.</p>
     <div class="lab-controls"><label>신규 파일 이벤트<select disabled data-control="events"><option value="missing">4개 모두 유실</option><option value="partial">2개만 도착</option><option value="all">4개 모두 도착</option></select></label><label class="lab-checkbox"><input disabled type="checkbox" data-control="absent"/> 8번 파일이 디스크에도 없음</label></div>
@@ -31,10 +33,31 @@ const titles={recovery:'이벤트가 없어도 인덱스를 채울 수 있을까
     <p class="lab-result" role="status" aria-live="polite" data-result>모형의 대기 예산: 5.50초</p>
     <p class="lab-limit">계산식: 인코딩 + 전송 + 세그먼트 길이 ÷ 2 + 길이 × 추가 버퍼 개수. 도착 시점이 균일하고 각 대기를 순서대로 더한다는 가정입니다. 실제 HLS 지연의 예측치가 아니며, 단계의 중첩·지터·플레이어 정책·LL-HLS의 부분 세그먼트는 포함하지 않습니다.</p>
   </>}
+  {mode==='compatibility'&&<>
+    <p>리소스 이름이 비슷하다고 같은 동작은 아닙니다. 분류를 골라 각 분류에서 무엇을 확인하고 다음에 무엇을 하는지 보세요. 방향키로도 옮길 수 있습니다.</p>
+    <div class="lab-choices" role="group" aria-label="호환성 분류">{compatibilityCategories.map((category,j)=><button type="button" disabled data-choice={j} aria-pressed={j===0?'true':'false'}><strong>{category.label}</strong><span>{category.hint}</span></button>)}</div>
+    <div class="lab-panel"><h3 data-panel="title">{firstCategory.title}</h3><p data-panel="body">{firstCategory.body}</p><p class="lab-example" data-panel="example">{firstCategory.example}</p></div>
+    <div class="lab-actions"><button type="button" data-action="reset" disabled>초기화</button></div>
+    <p class="lab-result" role="status" aria-live="polite" data-result>{`${firstCategory.label} → 다음 단계: ${firstCategory.next}`}</p>
+    <p class="lab-limit">분류 예시는 판정 방식을 설명하기 위한 것입니다. 실제 판정은 엔진·버전·사용 기능·권한을 수집한 뒤 공식 문서를 근거로 하며, 이 모형은 어떤 리소스도 판정하지 않습니다.</p>
+  </>}
+  {mode==='cutover'&&<>
+    <p>앱은 두 클라우드에서 동시에 돌 수 있지만, DB 쓰기는 한 곳에서만 받습니다. 단계를 고르거나 「다음 단계」를 눌러 연결과 쓰기 주체가 어떻게 바뀌는지 보세요.</p>
+    <div class="lab-choices lab-steps" role="group" aria-label="전환 단계">{cutoverStages.map((stage,j)=><button type="button" disabled data-choice={j} aria-pressed={j===0?'true':'false'}>{stage.label}</button>)}</div>
+    <div class="lab-panel"><h3 data-panel="title">{firstStage.title}</h3><p data-panel="copy">{firstStage.copy}</p></div>
+    <div class="cutover-board" data-writer={firstStage.writer}>
+      <div class="cutover-side" data-side="source"><strong>원본 클라우드</strong><dl><div><dt>앱</dt><dd data-field="sourceApp">{firstStage.sourceApp}</dd></div><div><dt>DB</dt><dd data-field="sourceDb">{firstStage.sourceDb}</dd></div></dl></div>
+      <div class="cutover-side" data-side="target"><strong>대상 클라우드</strong><dl><div><dt>앱</dt><dd data-field="targetApp">{firstStage.targetApp}</dd></div><div><dt>DB</dt><dd data-field="targetDb">{firstStage.targetDb}</dd></div></dl></div>
+      <dl class="cutover-flow"><div><dt>앱 연결</dt><dd data-field="connection">{firstStage.connection}</dd></div><div><dt>복제</dt><dd data-field="replication">{firstStage.replication}</dd></div><div><dt>넘어가는 조건</dt><dd data-field="gate">{firstStage.gate}</dd></div></dl>
+    </div>
+    <div class="lab-actions"><button type="button" data-action="next" disabled>다음 단계</button><button type="button" data-action="reset" disabled>초기화</button></div>
+    <p class="lab-result" role="status" aria-live="polite" data-result>{`${firstStage.stage} · ${firstStage.summary}`}</p>
+    <p class="lab-limit">설명용 모형입니다. 실제 CDC·전환·롤백은 아직 구현·측정하지 않았고, 요청 실패·쓰기 유실·중복 처리 0건은 합의한 목표일 뿐 결과가 아닙니다.</p>
+  </>}
   <noscript><p>JavaScript가 꺼져 있어 기본 예시를 표시합니다. 위 설명과 본문만으로도 조건과 한계를 읽을 수 있습니다.</p></noscript>
-</section>}
+</section>})}
 <script>
-import {reconcile,playbackCases,playbackDecision,latencyBudget} from '../lib/explanation-models.mjs';
+import {reconcile,playbackCases,playbackDecision,latencyBudget,compatibilityCategory,compatibilityCategories,cutoverStage,cutoverStages} from '../lib/explanation-models.mjs';
 for(const lab of document.querySelectorAll<HTMLElement>('[data-lab]')){
   const control=(name:string)=>lab.querySelector<HTMLInputElement|HTMLSelectElement>(`[data-control="${name}"]`)!;
   const result=lab.querySelector<HTMLElement>('[data-result]')!;
@@ -57,6 +80,40 @@ for(const lab of document.querySelectorAll<HTMLElement>('[data-lab]')){
   if(lab.dataset.lab==='latency'){
     const render=()=>{const values=['segment','buffer','encode','network'].map(name=>Number(control(name).value));const units=['초','개','ms','ms'];['segment','buffer','encode','network'].forEach((name,i)=>{lab.querySelector(`[data-value="${name}"]`)!.textContent=values[i]+units[i];control(name).setAttribute('aria-valuetext',values[i]+units[i])});const budget=latencyBudget(...values as [number,number,number,number]);const track=lab.querySelector('[data-track]')!;const parts=lab.querySelector('[data-parts]')!;track.replaceChildren();parts.replaceChildren();budget.parts.forEach((part,i)=>{const bar=document.createElement('span');bar.style.flexGrow=String(part.seconds);bar.style.setProperty('--part-color',`var(--latency-${i})`);track.append(bar);const row=document.createElement('div');const term=document.createElement('dt');term.textContent=part.name;const value=document.createElement('dd');value.textContent=`${part.seconds.toFixed(2)}초`;row.append(term,value);parts.append(row)});result.textContent=`모형의 대기 예산: ${budget.total.toFixed(2)}초`};
     lab.querySelectorAll('input').forEach(el=>el.addEventListener('input',render));reset.addEventListener('click',()=>{['segment','buffer','encode','network'].forEach((name,i)=>control(name).value=['2','2','300','200'][i]);render()});render();
+  }
+  if(lab.dataset.lab==='compatibility'||lab.dataset.lab==='cutover'){
+    const isCutover=lab.dataset.lab==='cutover';
+    const choices=[...lab.querySelectorAll<HTMLButtonElement>('[data-choice]')];
+    const next=lab.querySelector<HTMLButtonElement>('[data-action="next"]');
+    const panel=(name:string)=>lab.querySelector<HTMLElement>(`[data-panel="${name}"]`)!;
+    const render=(i:number)=>{
+      choices.forEach((button,j)=>button.setAttribute('aria-pressed',String(j===i)));
+      lab.dataset.selected=String(i);
+      if(isCutover){
+        const stage=cutoverStage(i);
+        panel('title').textContent=stage.title;panel('copy').textContent=stage.copy;
+        for(const field of ['sourceApp','targetApp','sourceDb','targetDb','connection','replication','gate'] as const)lab.querySelector(`[data-field="${field}"]`)!.textContent=stage[field];
+        lab.querySelector<HTMLElement>('.cutover-board')!.dataset.writer=stage.writer??'none';
+        result.textContent=`${stage.stage} · ${stage.summary}`;
+        next!.disabled=i===cutoverStages.length-1;
+      }else{
+        const category=compatibilityCategory(i);
+        panel('title').textContent=category.title;panel('body').textContent=category.body;panel('example').textContent=category.example;
+        result.textContent=`${category.label} → 다음 단계: ${category.next}`;
+      }
+    };
+    const count=isCutover?cutoverStages.length:compatibilityCategories.length;
+    choices.forEach((button,j)=>{
+      button.addEventListener('click',()=>render(j));
+      button.addEventListener('keydown',event=>{
+        if(event.key!=='ArrowRight'&&event.key!=='ArrowLeft')return;
+        event.preventDefault();
+        const to=(j+(event.key==='ArrowRight'?1:count-1))%count;
+        render(to);choices[to].focus();
+      });
+    });
+    next?.addEventListener('click',()=>render(Math.min(Number(lab.dataset.selected)+1,count-1)));
+    reset.addEventListener('click',()=>render(0));render(0);
   }
 }
 </script>
