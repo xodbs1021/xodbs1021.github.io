@@ -139,6 +139,9 @@ const renderAll = async (scenes, compositions, serveUrl) => {
 };
 
 const main = async () => {
+  // Remotion 은 렌더용 Chrome 을 「현재 폴더에서 가장 가까운 package.json 옆 node_modules/.remotion」 에서 찾는다.
+  // 저장소 루트에서 실행하면 루트에 Chrome(약 570MB)을 새로 받으므로, 먼저 motion/ 으로 옮긴다.
+  process.chdir(MOTION);
   const registry = loadRegistry();
   const { checkOnly, scenes } = pick(process.argv.slice(2), registry);
 

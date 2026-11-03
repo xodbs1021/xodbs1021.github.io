@@ -30,4 +30,5 @@ export const COLOR = {
 // 글자는 TEXT.small(36px) 이상 — 휴대폰에서는 작으므로 핵심은 캡션 문장이 다시 말한다(스킬 규약).
 export const VIDEO = { width: 1920, height: 1080, fps: 30 } as const;
 export const TEXT = { title: 52, label: 42, small: 36 } as const;
-export const SAFE = { x: 120, y: 96 } as const;
+// bottom: 영상은 브라우저 재생 컨트롤과 그 위 그림자가 아래 약 20% 를 덮는다(포스터 상태에서 늘 보임) — 핵심은 이 위에 둔다.
+export const SAFE = { x: 120, y: 96, bottom: 840 } as const;

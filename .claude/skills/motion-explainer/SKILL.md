@@ -22,9 +22,10 @@ description: "블로그 글의 시간·흐름 개념(창이 밀린다, 한쪽이
 ## 위치
 
 - 프로젝트: `motion/` (Remotion 4.0.539 · React 19). 배포 제외(`.vercelignore`). `node_modules` · `out/` · `public/`(설치 때 복사되는 글꼴)는 git 제외 — 루트 `.gitignore` 의 `public/` 규칙이 `motion/public/` 전체를 빼므로, 커밋할 장면 자산은 `public/` 에 두지 않는다.
-- 공통 부품: `motion/src/components/Timeline.tsx` — `SegmentCell`(조각 칸: live · gone · error) · `WindowBand`(창 띠) · `Playhead`(재생점) · `Tag`(둥근 이름표) · `Label`(글자) · `Arrow`(화살표).
+- 공통 부품: `motion/src/components/Timeline.tsx` — `SegmentCell`(조각 칸: live · gone · error) · `WindowBand`(창 띠) · `Playhead`(재생점) · `Tag`(둥근 이름표) · `Label`(글자) · `Arrow`(화살표). `motion/src/components/Flow.tsx` — `Node`(상자) · `Wire`(꺾은선 화살표). 흐름도는 보통 Mermaid 로 충분하지만, 시간축 그림과 나란히 견줘야 할 때만 이 부품으로 그린다. 상자는 `height` 를 정해 두고 연결선은 상자 가장자리에서 계산한다(글자 길이로 높이가 바뀌면 선이 어긋난다). `Tag` · `Label` 은 절대 위치라 flex 줄 안에서 자리를 차지하지 않는다.
 - 서체 · 색: `motion/src/theme.ts` — 블로그와 같은 Pretendard · 팔레트(`COLOR`) · 글자 크기(`TEXT`).
 - 보조 함수: `motion/src/lib/motion.ts` — `progress(frame, start, duration)` · `visibleBetween` · `bob`.
+- 이어지는 장면(앞 장면의 끝에서 시작하는 장면)은 좌표 상수를 `motion/src/scenes/<글 slug>/layout.ts` 로 함께 쓴다. 공유 상수를 고친 뒤에는 앞 장면을 다시 렌더해 `git diff --stat static/` 이 0 인지(바이트가 같은지)로 회귀를 확인한다. 그 장면을 일부러 바꾼 경우는 바뀐 장면을 다시 눈으로 확인한다.
 - 장면: `motion/src/scenes/<글 slug>/<Id>.tsx`, 목록은 `motion/src/scenes/registry.json`, 등록은 `motion/src/Root.tsx`. 둘의 id 가 다르면 `render.mjs --check` 가 실패한다.
 - 파일 이름: `<name>` = `<글 slug>-<id 의 kebab-case>`(예: 글 `rewind-missing-segment` 의 `RewindFallout` → `rewind-missing-segment-rewind-fallout`). id 는 PascalCase 로, 약어도 `HlsDemo` 처럼 쓴다(`HLSDemo` 는 `hlsdemo` 가 된다).
 - 산출: 영상 `static/videos/<name>.mp4` + 포스터 `static/images/<name>-poster.jpg`, 정지 그림 `static/images/<name>.png`. 하위 폴더를 쓰지 않는다 — 이미지 최적화(`scripts/optimize-images.mjs`)가 `static/images` 바로 아래만 읽어서, 하위 폴더 그림은 크기 정보 · WebP/AVIF 파생본을 받지 못한다.
@@ -32,11 +33,11 @@ description: "블로그 글의 시간·흐름 개념(창이 밀린다, 한쪽이
 ## 절차
 
 1. **콘티.** 글의 작업 폴더(`_workspace/blog/<slug>/storyboard.md`)에 장면마다 「무엇이 · 어떤 순서로 · 몇 초에」 와 끝 프레임의 모습을 적는다. 끝 프레임은 포스터이므로 혼자서도 뜻이 통해야 한다.
-2. **설치(처음 한 번).** `cd motion && npm install`. postinstall 이 Pretendard(SIL OFL) 를 `public/fonts/` 로 복사한다. 첫 렌더 때 Remotion 이 렌더용 Chrome 을 내려받는다.
+2. **설치(처음 한 번).** `cd motion && npm install`. postinstall 이 Pretendard(SIL OFL) 를 `public/fonts/` 로 복사한다. 첫 렌더 때 Remotion 이 렌더용 Chrome(약 570MB)을 「현재 폴더에서 가장 가까운 package.json 옆 `node_modules/.remotion`」 에 내려받는다 — `render.mjs` 는 먼저 `motion/` 으로 옮겨 가므로 `motion/node_modules/.remotion` 하나만 생긴다. `npx remotion …` CLI 를 직접 쓸 때는 반드시 `motion/` 안에서 실행한다.
 3. **장면 작성.** 공통 부품과 `theme.ts` 를 쓴다. 장면 파일 머리에 콘티 위치를 적는다. 새 장면은 `Root.tsx` 에 등록하고 `registry.json` 에 `id · post · kind(video|still) · posterFrame(영상만) · alt` 를 넣는다.
 4. **검사.** `cd motion && npm run lint` — eslint · tsc 와 `render.mjs --check`(registry 항목 · Root 와의 id 일치 · posterFrame 범위 · 글꼴 파일).
 5. **눈으로 확인.** 영상은 시작 · 중간 · 끝 프레임을 `npx remotion still src/index.ts <id> out/check/f<N>.jpg --frame=<N>` 으로 뽑아 이미지로 열어 본다. 정지 그림은 렌더 결과를 연다. 볼 것: 글자 · 선 · 이름표 겹침, 가려진 숫자, 화면 밖으로 나간 글자, 콘티와 다른 움직임. 제목 글자가 Pretendard 인지도 본다 — 글꼴이 안 실리면 맥 기본 글꼴(Apple SD Gothic Neo)로 대신 그려지므로, 이미 있는 그림(예: `static/images/rewind-missing-segment-edge-lags-playlist.png` 의 제목)과 글자 모양을 견준다. 끝으로 본문 폭에서 본다 — 그림을 760px · 390px 폭으로 줄여 열어(또는 초안을 로컬 빌드해 휴대폰 폭으로) 핵심 이름표가 읽히는지 확인한다. 고치고 다시 본다.
-6. **렌더.** `node motion/scripts/render.mjs <id>` 또는 `--post <slug>`(어느 폴더에서 실행해도 된다). 렌더 전에 `--check` 와 같은 검사를 하고, 결과는 `out/tmp` 에 만든 뒤 전부 성공해야 최종 위치로 옮기고, 옮기다 실패하면 이전 판으로 되돌린다. 번들 임시 폴더도 끝나면 지운다.
+6. **렌더.** `node motion/scripts/render.mjs <id>` 또는 `--post <slug>`(스크립트가 `motion/` 으로 옮겨 가서 실행하므로 어느 폴더에서 불러도 된다). 렌더 전에 `--check` 와 같은 검사를 하고, 결과는 `out/tmp` 에 만든 뒤 전부 성공해야 최종 위치로 옮기고, 옮기다 실패하면 이전 판으로 되돌린다. 번들 임시 폴더도 끝나면 지운다.
 7. **글에 넣기.** 아래 마크업. alt 는 `registry.json` 의 문장을 쓴다. 캡션에 그림의 핵심을 한 문장으로 다시 말하고 「설명용 그림 · 실제 화면(측정) 아님」 을 밝힌다.
 8. **정리.** 확인용 프레임을 뽑았으면 `motion/out/` 를 지운다. 렌더 중간물을 남기지 않는다. 장면 코드 오류로 번들 단계에서 실패했으면 시스템 임시 폴더(`node -e "console.log(require('os').tmpdir())"`)에 `remotion-webpack-bundle-*` 가 남으니 그것도 지운다(`npx remotion still` 처럼 CLI 를 직접 쓴 경우도 같다).
 
@@ -44,6 +45,7 @@ description: "블로그 글의 시간·흐름 개념(창이 밀린다, 한쪽이
 
 ## 규약
 
+- 영상은 아래 약 20%(y > `SAFE.bottom` = 840)를 비운다. 포스터 상태에서는 브라우저 재생 컨트롤과 그 위 그림자가 늘 그 자리를 덮는다. 정지 그림(png)은 덮이지 않는다.
 - 캔버스 1920×1080, 30fps. 움직이는 그림은 6–12초(2프레임 이상 — 1프레임짜리는 `render.mjs` 가 정지 그림으로 본다).
 - 글자는 `TEXT.small`(36px) 이상. 데스크톱 본문(760px)에서 약 14px 이지만 390px 폭 휴대폰에서는 약 6px 로 줄어 읽기 어렵다(영상은 눌러 키울 수 없다). 그래서 ① 그림 안 글자는 이름표 몇 개로 줄이고, ② 그림의 핵심은 캡션 · 본문 문장이 다시 말해 그림 글자를 못 읽어도 뜻이 통하게 한다. 휴대폰 전용 세로 그림은 만들지 않는다(한계).
 - 색은 `COLOR` 만 쓴다. 정상 = ink, 창 · 안전 = accent, 오류 · 막힘 = danger, 지워짐 · 보조 = muted.
