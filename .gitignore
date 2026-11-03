@@ -21,3 +21,6 @@ data/image-manifest.json
 
 # Browser layout audit artifacts
 test-results/
+
+# motion-explainer (Remotion) — 렌더 중간물. motion/public/(설치 때 복사되는 글꼴)은 위 public/ 규칙이 이미 뺀다.
+motion/out/

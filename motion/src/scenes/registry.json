@@ -1,0 +1,15 @@
+[
+  {
+    "id": "RewindFallout",
+    "post": "rewind-missing-segment",
+    "kind": "video",
+    "posterFrame": 269,
+    "alt": "되감기 창이 시간에 따라 오른쪽으로 밀리고, 일시정지한 재생점이 창 밖으로 떨어져 다음 조각 요청이 404 를 받는 장면"
+  },
+  {
+    "id": "EdgeLagsPlaylist",
+    "post": "rewind-missing-segment",
+    "kind": "still",
+    "alt": "재생 목록의 첫 조각이 5분마다 계단처럼 오르고, 엣지 하한이 같은 계단을 최대 약 2분 늦게 따라와 방금 받은 목록의 첫 조각은 막히지 않음을 보여 주는 그래프"
+  }
+]
