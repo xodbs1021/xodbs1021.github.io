@@ -30,5 +30,12 @@
     "post": "rewind-missing-segment",
     "kind": "still",
     "alt": "왼쪽은 404 뒤 제어면에 묻고 답에 따라 다섯 갈래로 나뉘며 그중 셋에 리뷰에서 나온 버그 다섯 개가 찍힌 나무, 오른쪽은 404, 받기 멈춤, 같은 주소로 목록 다시 받기, 목록 기준 이어 재생의 한 줄 흐름과 옆으로 빠지는 회색 출구 셋을 견준 그림"
+  },
+  {
+    "id": "IamConnectionLifetime",
+    "post": "pokeclip-shared-db-auth-iam-tls",
+    "kind": "video",
+    "posterFrame": 359,
+    "alt": "로그인 토큰이 만료된 뒤에도 기존 DB 연결 A는 쿼리를 계속하고, 새 연결 B는 만료 토큰 재사용이 거부된 뒤 새 토큰으로 로그인하는 설명용 시간 흐름"
   }
 ]

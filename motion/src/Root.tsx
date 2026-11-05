@@ -1,3 +1,4 @@
+import { IAM_CONNECTION_LIFETIME_FRAMES, IamConnectionLifetime } from "./scenes/pokeclip-shared-db-auth-iam-tls/IamConnectionLifetime";
 import { Composition, Still } from "remotion";
 import { BranchTreeVsLine } from "./scenes/rewind-missing-segment/BranchTreeVsLine";
 import { EdgeLagsPlaylist } from "./scenes/rewind-missing-segment/EdgeLagsPlaylist";
@@ -9,6 +10,7 @@ import { VIDEO } from "./theme";
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
   <>
+    <Composition id="IamConnectionLifetime" component={IamConnectionLifetime} durationInFrames={IAM_CONNECTION_LIFETIME_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
     <Composition
       id="RewindFallout"
       component={RewindFallout}
