@@ -46,16 +46,16 @@ Output: <아래 둘 중 하나>
 
 ```sh
 bash .claude/skills/gpt-image/scripts/gen.sh <slug> <name>          # 한 장
-ls _workspace/blog/<slug>/art/prompts | sed 's/\.txt$//' \
+for f in _workspace/blog/<slug>/art/prompts/*.txt; do basename "$f" .txt; done \
   | xargs -P 4 -I{} bash .claude/skills/gpt-image/scripts/gen.sh <slug> {}   # 여러 장(4개 병렬)
 ```
 
-스크립트는 저장소 루트에서 `codex exec` 로 내장 `image_gen` 을 한 번 부르고, 결과 PNG 를 `_workspace/blog/<slug>/art/<name>.png` 로 복사시킨다(생성 원본은 `~/.codex/generated_images/<세션>/` 에 남는다). 한 장에 약 40초(2026-10-31 실측, 5개 병렬 10장 약 2분). 같은 이름의 PNG 가 이미 있으면 덮지 않고 멈춘다 — 다시 만들려면 `<name>-v2` 처럼 새 이름을 쓴다. 로그는 같은 폴더의 `<name>.log`.
+스크립트는 저장소 루트에서 `codex exec` 로 내장 `image_gen` 을 한 번 부르고, 결과를 임시 이름 `<name>.part.png` 로 받아 비어 있지 않은 PNG 인지 확인한 뒤에만 `_workspace/blog/<slug>/art/<name>.png` 로 옮긴다(생성 원본은 `~/.codex/generated_images/<세션>/` 에 남는다). 출력 첫 단어로 결과를 안다: `OK`(새로 만듦) · `SKIP`(이미 있어 건너뜀 — 덮어쓰지 않는다, 다시 만들려면 `<name>-v2`) · `FAIL`(codex 실패 · 유효한 PNG 없음 · 같은 이름이 실행 중). 이름은 kebab-case 만 받는다. 한 장에 약 40초(2026-10-31 실측, 5개 병렬 10장 약 2분). 로그는 같은 폴더의 `<name>.log`.
 
 ## 검사
 
 1. 그림을 열어 본다(Read 도구로 이미지 열기). 볼 것: 글자 · 숫자 · 로고가 끼었는지, 팔레트 밖 색, 대상이 프롬프트와 같은지, 잘린 가장자리.
-2. 투명 소재는 알파를 확인한다: `sips -g hasAlpha <파일>` 이 `yes`. 내장 경로에서 투명 배경이 실제로 나온 실측이 있지만(2026-10-31, 8/8장) 시기 · 모델에 따라 바뀔 수 있으니 매번 본다. `no` 면 프롬프트의 Output 줄을 확인하고 한 번 다시 생성한다.
+2. 투명 소재는 실제로 투명한지 확인한다: `node .claude/skills/gpt-image/scripts/check-alpha.mjs <파일>...` 이 `OK`(네 모서리 알파 0 · 투명 20% 이상). `sips -g hasAlpha` 의 `yes` 는 알파 채널이 있다는 뜻일 뿐이라 모두 불투명한 RGBA 도 통과한다 — 그것으로 판정하지 않는다. 내장 경로에서 투명 배경이 실제로 나온 실측이 있지만(2026-10-31, 8/8장) 시기 · 모델에 따라 바뀔 수 있으니 매번 본다. `no` 면 프롬프트의 Output 줄을 확인하고 한 번 다시 생성한다.
 3. 고칠 때는 한 번에 한 가지만 바꿔 다시 생성하고 다시 본다.
 
 ## 배치

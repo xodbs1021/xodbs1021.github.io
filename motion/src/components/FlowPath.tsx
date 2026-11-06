@@ -14,8 +14,11 @@ const TANGENT_STEP = 2;
 
 type Point = { readonly x: number; readonly y: number };
 
-/** getPointAtLength 는 빈 경로에서 null 을 돌려준다 — (0,0) 으로 대신해 호출부를 단순하게 둔다. */
-const pointAt = (d: string, length: number): Point => getPointAtLength(d, length) ?? { x: 0, y: 0 };
+/** getPointAtLength 는 경로에 따라 null 이나 NaN 좌표를 돌려준다(길이 0 곡선) — (0,0) 으로 대신한다. */
+const pointAt = (d: string, length: number): Point => {
+  const p = getPointAtLength(d, length);
+  return p && Number.isFinite(p.x) && Number.isFinite(p.y) ? p : { x: 0, y: 0 };
+};
 
 type FlowPathProps = {
   readonly d: string;
@@ -56,9 +59,14 @@ export const FlowPath: React.FC<FlowPathProps> = ({
   arrow = false,
 }) => {
   const frame = useCurrentFrame();
+  // 빈 경로 · 길이 0 경로는 그리지 않는다 — getLength · evolvePath 가 던지거나 NaN 을 낸다.
+  const length = d.trim() === "" ? 0 : getLength(d);
+  if (!Number.isFinite(length) || length <= 0) {
+    return null;
+  }
   const drawn = progress(frame, start, drawFrames);
   const { strokeDasharray, strokeDashoffset } = evolvePath(drawn, d);
-  const length = getLength(d);
+  const cycle = Math.max(1, cycleFrames);
   const flowStart = packetsFrom ?? start + drawFrames;
   const flowing = frame >= flowStart && frame < packetsUntil;
   const end = pointAt(d, length);
@@ -92,7 +100,7 @@ export const FlowPath: React.FC<FlowPathProps> = ({
       ) : null}
       {flowing
         ? Array.from({ length: packets }, (_, i) => {
-            const t = ((((frame - flowStart) / cycleFrames + i / packets) % 1) + 1) % 1;
+            const t = ((((frame - flowStart) / cycle + i / packets) % 1) + 1) % 1;
             const p = pointAt(d, t * length);
             const fade = Math.min(1, t * 6, (1 - t) * 6);
             return (

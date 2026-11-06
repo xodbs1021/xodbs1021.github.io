@@ -103,5 +103,5 @@ description: 블로그 글 작성 직전에 호출. image-need-judge로 이미�
 4. (스킬) image-need-judge 호출 → 필요 N개 판단
 5. (스킬) N > 0이면 image-prompt-generator 호출 → 영어 프롬프트
 6. (메인 클로드) 사용자에게 보고
-7. (사용자 승인 뒤 메인 클로드) 프롬프트를 `_workspace/blog/<slug>/art/prompts/`에 넣고 `../gpt-image/SKILL.md`로 생성 · 검사 · 배치 (0개면 바로 다음 단계). 프롬프트 형식(STYLE 블록 · Output 줄)은 gpt-image 를 따른다.
+7. (사용자 승인 뒤 메인 클로드) 갈래를 나눈다 — **비유 일러스트 · 모션그래픽 소재만** 생성으로 보낸다: 프롬프트 끝에 gpt-image 의 STYLE 블록과 Output 줄을 붙여 `_workspace/blog/<slug>/art/prompts/<kebab 이름>.txt` 로 저장하고 `../gpt-image/SKILL.md`로 생성 · 검사 · 배치한다. 실제 화질 · 포맷 비교(HDR/SDR · AVIF/JPEG 등)는 원본 · 캡처로, 정확한 구조 · 픽셀 배치는 코드 · 도식(Mermaid · motion-explainer)으로 만든다 — 생성 이미지로 대신하지 않는다. 0개면 바로 다음 단계.
 8. (메인 클로드) 글 작성
