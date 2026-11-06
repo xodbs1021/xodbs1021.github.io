@@ -106,7 +106,7 @@ IAM 쓰기는 AI 쪽에서 실행하지 못했다. Claude Code의 자동 모드 
 나는 AI가 추천한 environment 방식을 택했다. AI가 `dev-deploy` environment를 만들고 배포 브랜치를 develop 하나로 제한했다. 같은 작업에서 두 가지를 더 정리했다.
 
 - `id-token: write`를 워크플로 맨 위에서 배포 잡으로 내렸다. 같은 파일에 잡이 추가돼도 그 잡이 역할을 자동으로 받지 않게 하려는 것이다.
-- 역할 정책에서 쓰지 않던 `ssm:ListCommandInvocations`를 뺐다. 앞에서 말한 리전 단위 결과 목록 조회 권한이다.
+- 역할 정책에서 쓰지 않던 `ssm:ListCommandInvocations`를 뺐다. 앞에서 말한, 대상이 `*`인 결과 목록 조회 권한이다.
 
 <figure>
 <video controls playsinline preload="none" poster="/images/pokeclip-github-oidc-immutable-subject-ref-vs-environment-poster.jpg" width="1920" height="1080" aria-label="신뢰 조건이 develop ref일 때는 배포 잡뿐 아니라 Claude Code 잡도 같은 sub라 신뢰 조건상 검문을 통과할 수 있지만, 조건을 environment dev-deploy로 좁히자 배포 잡만 통과하고 Claude Code 잡은 검문 앞에서 막히는 장면">
