@@ -42,7 +42,7 @@
 
 ## 2. 운영 첫 기동 점검 (2026-11-03)
 
-운영 미디어 서버 첫 기동 때 런북 `infra/terraform/runbooks/media-swap.md` 의 기동 판정(`MEDIA START`)이 통과했다. 판정 항목 가운데 DB 연결은 `SIDECAR_DB`(사이드카 indexer 풀의 `db_connected` 줄 — IAM · `verify-full` · 실제 TLS) 1 이상, `JANITOR_DB`(janitor 풀의 `db_connected` 줄 — IAM · `verify-full` · 실제 TLS) 1 이상이다. 5분 관찰(`MEDIA WATCH`)도 같은 프로세스로 통과했다.
+운영 미디어 서버 첫 기동 때 런북 `infra/terraform/runbooks/media-swap.md` 의 기동 판정(`MEDIA START`)이 통과했다. 판정 항목 가운데 DB 연결은 `SIDECAR_DB`(사이드카 indexer 풀의 `db_connected` 줄 — IAM · `verify-full` · 실제 TLS) 1 이상, `JANITOR_DB`(janitor 풀의 `db_connected` 줄 — IAM · `verify-full` · 실제 TLS) 1 이상이다. 5분 관찰(`MEDIA WATCH`)도 재시작 없이(같은 MainPID) 통과했다.
 
 ## 3. Java 앱 서버 스파이크 (팀원, 2026-10-23)
 

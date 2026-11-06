@@ -12,7 +12,7 @@ PokéClip의 미디어 서버에는 PostgreSQL(RDS)에 붙는 Go 프로그램이
 
 대신 RDS IAM 인증을 썼다. 서버가 가진 AWS 역할로 짧게 사는 로그인 토큰을 서명해 비밀번호 자리에 넣는 방식이다. 그런데 IAM 정책 한 줄로 끝나지는 않았다. 토큰을 언제 만들지, 그 토큰을 누구에게 건넬지, 로그인한 뒤 무엇까지 할 수 있게 할지, 실제로 그렇게 붙었는지를 무엇으로 판정할지를 각각 정해야 했다. 네 가지를 정하는 동안 AWS가 말하는 토큰 수명(15분)과 실제 RDS가 받아 준 시간이 달랐고, 그 차이가 시험과 판단을 바꿨다.
 
-역할부터 밝힌다. IAM 전환, TLS 검증 강도, CA 인증서를 싣는 방식, 실제 RDS로 검증할 범위는 내가 정했다. 미디어 쪽 구현·시험 실행·리뷰는 AI 에이전트(Claude Code와 Codex)가 했다. Java 앱 서버 쪽 구현은 그 서버들을 맡은 팀원이 했다. 미디어 IAM·TLS 코드는 공개 저장소 [`3K-PokeClip/PokeClip-mono#314`](https://github.com/3K-PokeClip/PokeClip-mono/pull/314)의 병합 커밋 `7f99ccd1`(2026년 10월 23일), 실험 수치는 10월 22일 실험 RDS에서 에이전트가 잰 값이다(AWS 자원을 만들고 지우는 쓰기는 내가 승인했다). 그 뒤의 가로채기 차단(10월 24일)·권한 개정(10월 26일)·운영 첫 기동(11월 3일)은 해당 문단에 링크한 PR·문서를 기준으로 했다. Java 쪽은 11월 6일 develop `33f7ae1f`의 코드와 팀원의 10월 23일 스파이크 기록을 기준으로 했다.
+IAM 전환, TLS 검증 강도, CA 인증서를 싣는 방식, 실제 RDS로 검증할 범위는 내가 정했다. 미디어 쪽 구현·시험 실행·리뷰는 AI 에이전트(Claude Code와 Codex)가 했다. Java 앱 서버 쪽 구현은 그 서버들을 맡은 팀원이 했다. 미디어 IAM·TLS 코드는 공개 저장소 [`3K-PokeClip/PokeClip-mono#314`](https://github.com/3K-PokeClip/PokeClip-mono/pull/314)의 병합 커밋 `7f99ccd1`(2026년 10월 23일), 실험 수치는 10월 22일 실험 RDS에서 에이전트가 잰 값이다(AWS 자원을 만들고 지우는 쓰기는 내가 승인했다). Java 쪽은 11월 6일 develop `33f7ae1f`의 코드와 팀원의 10월 23일 스파이크 기록을 기준으로 했다.
 
 ![짧게 사는 출입증을 든 작은 로봇이 유리 자료실로 걸어가고, 문 옆의 금고는 열린 채 비어 있는 그림](/images/pokeclip-shared-db-auth-iam-tls-hero-access.png)
 
@@ -170,7 +170,7 @@ IAM 토큰은 "누가 로그인하는가"를 정한다. 로그인한 뒤 무엇�
 
 권한 목록은 한 번 정하면 끝나는 것이 아니었다. 사흘 뒤(10월 26일) 만료된 조각을 정리하는 일을 사이드카가 맡게 되면서 `stream_segments` 등 만료 대상 표에 DELETE를(컷오프 표에는 UPDATE·DELETE도) 줬다([ADR-0006 개정 노트](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/docs/decisions/2026-10-26-media-indexer-m6-delete-grants.md)). DELETE를 주면 지운 조각의 순번(seq)을 다시 쓸 위험이 생긴다. 다시 쓰면 같은 영구 URL에 다른 조각이 실려, CDN에 1년 동안 캐시된 사본과 영원히 어긋난다. 그래서 삭제된 조각의 최대 순번에 1을 더한 값을 스트림별 "다음 순번의 하한"으로 보존하는 표와, 그 하한을 올리고 새 순번이 하한 아래면 거부하는 트리거를 뒀다. 하한을 올리는 함수는 소유자(`media_owner`)의 권한으로 실행되는 함수(SECURITY DEFINER)였는데, 커밋별 검수에서 **아무 계정이나 이 함수를 자기 표의 트리거로 붙일 수 있다**(PUBLIC에 실행 권한이 열려 있었다)는 문제가 짚였다([PR #440](https://github.com/3K-PokeClip/PokeClip-mono/pull/440)). 권한 없는 계정이 임시 표에 트리거를 걸어 남의 스트림 하한을 오염시킬 수 있었다. 그 함수의 PUBLIC 실행 권한을 회수하고, 함수 안에서도 대상 표가 맞는지 확인하게 했다.
 
-공유 DB에서는 이름 찾기도 권한 문제였다. 운영 런타임 PR의 리뷰에서 에이전트가, 앱 서버 계정이 `public` 스키마에 함수를 만들 수 있으면 사이드카의 잠금 호출을 가로채 **`media_indexer` 신분으로 실행시킬 수 있다**는 것을 실측으로 확인했다. 내장 `pg_advisory_xact_lock`은 bigint를 받는데 사이드카는 integer 값을 넘긴다. `public`에 integer를 받는 같은 이름의 함수가 있으면, 형 변환이 필요 없는 그 함수가 더 잘 맞는 후보로 골라진다. `pg_catalog`가 먼저 검색되는데도 가로채지는 이유다([함수 선택 규칙](https://www.postgresql.org/docs/17/typeconv-func.html), 같은 유형을 다룬 [CVE-2018-1058 안내](https://wiki.postgresql.org/wiki/A_Guide_to_CVE-2018-1058:_Protect_Your_Search_Path)). 사이드카·janitor·운영 SQL의 내장 함수 호출을 `pg_catalog`로 못 박고, 가로채기 함수(덫)를 심어 두고 사이드카·janitor가 그 덫을 한 번도 부르지 않는지 보는 시험을 붙였다([PR #365](https://github.com/3K-PokeClip/PokeClip-mono/pull/365)). 그 PR에서는 호출 쪽을 막고, 앱 표를 서버별 스키마로 옮기는 근본 정리는 따로 하기로 내가 정했다([ADR-0007](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/docs/decisions/2026-10-24-app-schemas.md)).
+공유 DB에서는 이름 찾기도 권한 문제였다. 운영 런타임 PR의 리뷰(10월 24일)에서 에이전트가, 앱 서버 계정이 `public` 스키마에 함수를 만들 수 있으면 사이드카의 잠금 호출을 가로채 **`media_indexer` 신분으로 실행시킬 수 있다**는 것을 실측으로 확인했다. 내장 `pg_advisory_xact_lock`은 bigint를 받는데 사이드카는 integer 값을 넘긴다. `public`에 integer를 받는 같은 이름의 함수가 있으면, 형 변환이 필요 없는 그 함수가 더 잘 맞는 후보로 골라진다. `pg_catalog`가 먼저 검색되는데도 가로채지는 이유다([함수 선택 규칙](https://www.postgresql.org/docs/17/typeconv-func.html), 같은 유형을 다룬 [CVE-2018-1058 안내](https://wiki.postgresql.org/wiki/A_Guide_to_CVE-2018-1058:_Protect_Your_Search_Path)). 사이드카·janitor·운영 SQL의 내장 함수 호출을 `pg_catalog`로 못 박고, 가로채기 함수(덫)를 심어 두고 사이드카·janitor가 그 덫을 한 번도 부르지 않는지 보는 시험을 붙였다([PR #365](https://github.com/3K-PokeClip/PokeClip-mono/pull/365)). 그 PR에서는 호출 쪽을 막고, 앱 표를 서버별 스키마로 옮기는 근본 정리는 따로 하기로 내가 정했다([ADR-0007](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/docs/decisions/2026-10-24-app-schemas.md)).
 
 ## 연결 결과는 db_connected 로그 한 줄로 판정한다
 
@@ -204,7 +204,7 @@ Java 앱 서버 네 대(auth, clip, chat-collector, chat-detector — Spring Boo
 
 ## 정리
 
-처음 질문으로 돌아가면, DB 비밀번호를 없애는 일은 IAM 정책 한 줄이 아니었다. 새 연결마다 토큰을 만들고, 그 토큰을 검증된 서버에만 건네고, 로그인한 뒤의 권한을 따로 좁히고, 실제로 그렇게 붙었는지를 로그 한 줄로 판정하는 것까지가 한 묶음이었다. 이 묶음은 언어가 바뀌어도 같았고, 달라진 것은 구멍이 생기는 자리였다.
+DB 비밀번호를 없애는 일은 IAM 정책 한 줄이 아니었다. 새 연결마다 토큰을 만들고, 그 토큰을 검증된 서버에만 건네고, 로그인한 뒤의 권한을 따로 좁히고, 실제로 그렇게 붙었는지를 로그 한 줄로 판정하는 것까지가 한 묶음이었다. 이 묶음은 언어가 바뀌어도 같았고, 달라진 것은 구멍이 생기는 자리였다.
 
 ## 출처
 
