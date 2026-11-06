@@ -21,14 +21,14 @@ part="$art_dir/$name.part.png"
 log="$art_dir/$name.log"
 lock="$art_dir/.$name.lock"
 
-if [ ! -f "$prompt" ]; then
-  echo "FAIL $name: 프롬프트 파일이 없다 $prompt (글 폴더 _workspace/blog/$slug/art/prompts/ 를 먼저 만든다)" >&2
-  exit 2
-fi
-
 if [ -e "$out" ]; then
   echo "SKIP $name: 이미 있음 — 다시 만들려면 새 이름(<name>-v2)을 쓴다"
   exit 0
+fi
+
+if [ ! -f "$prompt" ]; then
+  echo "FAIL $name: 프롬프트 파일이 없다 $prompt (글 폴더 _workspace/blog/$slug/art/prompts/ 를 먼저 만든다)" >&2
+  exit 2
 fi
 
 # 같은 이름을 동시에 돌리면 둘 다 위 검사를 지나 같은 파일을 쓴다 — mkdir 은 원자적이라 잠금으로 쓴다.
