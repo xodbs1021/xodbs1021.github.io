@@ -82,7 +82,7 @@
 `[읽는 이: completion-auditor · change-explainer]`
 
 - **운영 서버 실행:** 없음 — Vercel 프로젝트 `taeyun-blog` 이 이 저장소 `main` 을 빌드해 정적 파일 + 함수 `api/views.mjs` 로 서빙한다.
-- **서빙 대상(무엇을 서빙하나):** `npm run build` 산출 `dist/`(`vercel.json` 의 `buildCommand` · `outputDirectory`). 옛 주소 `xodbs1021.github.io` 는 GitHub Pages 가 글 페이지를 새 주소로 안내하고, 기존 정적 파일(`static/` 전체)과 RSS · 사이트맵은 그대로 보존해 서빙한다 — 워크플로 `deploy.yml` 이 `.legacy-site` 를 Actions 아티팩트로 올려 `actions/deploy-pages` 로 배포한다(브랜치 배포가 아님). 글 원본이 아니다.
+- **서빙 대상(무엇을 서빙하나):** `npm run build` 산출 `dist/`(`vercel.json` 의 `buildCommand` · `outputDirectory`). 옛 주소 `xodbs1021.github.io` 는 GitHub Pages 가 글 페이지를 새 주소로 안내하고, 정적 파일은 `static/` 을 복사해 서빙하되 `robots.txt` 는 새로 만들어 덮어쓰고, 빌드된 RSS(`index.xml`) · 사이트맵도 복사해 서빙한다(`scripts/legacy-redirects.mjs`) — 워크플로 `deploy.yml` 이 `.legacy-site` 를 Actions 아티팩트로 올려 `actions/deploy-pages` 로 배포한다(브랜치 배포가 아님). 글 원본이 아니다.
 - **소스→운영 반영 절차:** `main` 병합 → Vercel 자동 운영 배포. 에이전트의 `vercel redeploy --target production` 은 권한 분류기가 막는다(2026-11-04).
 - **"반영됨" 확인법:** 병합 커밋의 Vercel 커밋 상태(대상 URL)가 성공인지 + `https://taeyun.blog/<글 경로>/` 와 새 그림 · 영상 경로를 실제로 받아 200 인지. 병합했는데 Vercel 상태가 아예 안 생긴 적이 있다(2026-11-04 PR #18 — 새 그림 404, 다음 병합에서 해소, 원인 미확인).
 
