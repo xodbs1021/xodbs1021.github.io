@@ -21,6 +21,11 @@ part="$art_dir/$name.part.png"
 log="$art_dir/$name.log"
 lock="$art_dir/.$name.lock"
 
+if [ ! -f "$prompt" ]; then
+  echo "FAIL $name: 프롬프트 파일이 없다 $prompt (글 폴더 _workspace/blog/$slug/art/prompts/ 를 먼저 만든다)" >&2
+  exit 2
+fi
+
 if [ -e "$out" ]; then
   echo "SKIP $name: 이미 있음 — 다시 만들려면 새 이름(<name>-v2)을 쓴다"
   exit 0
@@ -50,8 +55,9 @@ if [ "$rc" -ne 0 ]; then
   echo "FAIL $name: codex 종료 코드 $rc — 로그 $log" >&2
   exit 1
 fi
-# 비어 있지 않고 PNG 로 읽히는(가로 크기를 낼 수 있는) 파일만 받아들인다.
-if [ ! -s "$part" ] || ! sips -g pixelWidth "$part" 2>/dev/null | grep -Eq 'pixelWidth: [0-9]+'; then
+# 비어 있지 않고 실제 형식이 PNG 이며 크기를 읽을 수 있는 파일만 받아들인다(JPEG · WebP 가 .png 이름으로 오면 거부).
+if [ ! -s "$part" ] || ! sips -g format -g pixelWidth "$part" 2>/dev/null | grep -q 'format: png' \
+   || ! sips -g pixelWidth "$part" 2>/dev/null | grep -Eq 'pixelWidth: [0-9]+'; then
   echo "FAIL $name: 유효한 PNG 가 안 생김 — 로그 $log" >&2
   exit 1
 fi
