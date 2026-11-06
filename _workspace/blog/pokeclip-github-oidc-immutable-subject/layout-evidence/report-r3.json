@@ -1,0 +1,74 @@
+{
+  "base": "http://127.0.0.1:53721",
+  "date": "2026-11-06T20:02:21.875Z",
+  "pages": [
+    {
+      "url": "/posts/projects/pokeclip-github-oidc-immutable-subject/",
+      "width": 768,
+      "issues": [],
+      "bodyFont": "\"Pretendard Variable\", Pretendard, -apple-system, \"system-ui\", sans-serif",
+      "proseWidth": 720
+    },
+    {
+      "url": "/posts/projects/pokeclip-github-oidc-immutable-subject/",
+      "width": 1440,
+      "issues": [],
+      "bodyFont": "\"Pretendard Variable\", Pretendard, -apple-system, \"system-ui\", sans-serif",
+      "proseWidth": 760
+    },
+    {
+      "url": "/posts/projects/pokeclip-github-oidc-immutable-subject/",
+      "width": 320,
+      "issues": [],
+      "bodyFont": "\"Pretendard Variable\", Pretendard, -apple-system, \"system-ui\", sans-serif",
+      "proseWidth": 280
+    },
+    {
+      "url": "/posts/projects/pokeclip-github-oidc-immutable-subject/",
+      "width": 390,
+      "issues": [],
+      "bodyFont": "\"Pretendard Variable\", Pretendard, -apple-system, \"system-ui\", sans-serif",
+      "proseWidth": 350
+    }
+  ],
+  "visuals": [
+    {
+      "url": "/posts/projects/pokeclip-github-oidc-immutable-subject/",
+      "width": 366,
+      "theme": "light",
+      "index": 0,
+      "file": "visual-projects_pokeclip-github-oidc-immutable-subject-390-light-0.png",
+      "emptyStatic": false,
+      "contrastIssues": [],
+      "clipped": [],
+      "error": false,
+      "svgScale": 1
+    },
+    {
+      "url": "/posts/projects/pokeclip-github-oidc-immutable-subject/",
+      "width": 760,
+      "theme": "light",
+      "index": 0,
+      "file": "visual-projects_pokeclip-github-oidc-immutable-subject-1440-light-0.png",
+      "emptyStatic": false,
+      "contrastIssues": [],
+      "clipped": [],
+      "error": false,
+      "svgScale": 1
+    },
+    {
+      "url": "/posts/projects/pokeclip-github-oidc-immutable-subject/",
+      "width": 366,
+      "theme": "dark",
+      "index": 0,
+      "file": "visual-projects_pokeclip-github-oidc-immutable-subject-390-dark-0.png",
+      "emptyStatic": false,
+      "contrastIssues": [],
+      "clipped": [],
+      "error": false,
+      "svgScale": 1
+    }
+  ],
+  "states": [],
+  "failures": []
+}
