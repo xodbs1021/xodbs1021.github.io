@@ -12,7 +12,7 @@ PokéClip의 미디어 서버에는 PostgreSQL(RDS)에 붙는 Go 프로그램이
 
 대신 RDS IAM 인증을 썼다. 서버가 가진 AWS 역할로 짧게 사는 로그인 토큰을 서명해 비밀번호 자리에 넣는 방식이다. 그런데 IAM 정책 한 줄로 끝나지는 않았다. 토큰을 언제 만들지, 그 토큰을 누구에게 건넬지, 로그인한 뒤 무엇까지 할 수 있게 할지, 실제로 그렇게 붙었는지를 무엇으로 판정할지를 각각 정해야 했다. 네 가지를 정하는 동안 AWS가 말하는 토큰 수명(15분)과 실제 RDS가 받아 준 시간이 달랐고, 그 차이가 시험과 판단을 바꿨다.
 
-IAM 전환, TLS 검증 강도, CA 인증서를 싣는 방식, 실제 RDS로 검증할 범위는 내가 정했다. 미디어 쪽 구현·시험 실행·리뷰는 AI 에이전트(Claude Code와 Codex)가 했다. Java 앱 서버 쪽 구현은 그 서버들을 맡은 팀원이 했다. 미디어 IAM·TLS 코드는 공개 저장소 [`3K-PokeClip/PokeClip-mono#314`](https://github.com/3K-PokeClip/PokeClip-mono/pull/314)의 병합 커밋 `7f99ccd1`(2026년 10월 23일), 실험 수치는 10월 22일 실험 RDS에서 에이전트가 잰 값이다(AWS 자원을 만들고 지우는 쓰기는 내가 승인했다).
+IAM 전환, TLS 검증 강도, CA 인증서를 싣는 방식, 실제 RDS로 검증할 범위는 내가 정했다. 미디어 쪽 구현·시험 실행·리뷰는 AI 에이전트(Claude Code와 Codex)가 했다. Java 앱 서버 쪽 구현은 그 서버들을 맡은 팀원이 했다. 에이전트가 구현한 미디어 쪽 코드는 10월 23일 공개 저장소 [`3K-PokeClip/PokeClip-mono#314`](https://github.com/3K-PokeClip/PokeClip-mono/pull/314)로 병합됐고(커밋 `7f99ccd1`), 실험 RDS 측정(10월 22일)도 에이전트가 했다(AWS 자원을 만들고 지우는 쓰기는 내가 승인했다).
 
 ![짧게 사는 출입증을 든 작은 로봇이 유리 자료실로 걸어가고, 문 옆의 금고는 열린 채 비어 있는 그림](/images/pokeclip-shared-db-auth-iam-tls-hero-access.png)
 
@@ -67,7 +67,7 @@ func iamBeforeConnect(tf TokenFunc, s Settings, timeout time.Duration) func(cont
 
 오류 문구에는 토큰·DSN·AWS 오류 원문을 싣지 않고 오류의 타입 이름만 싣는다. 자격 증명 도구가 실패하면 출력 원문을 SDK 오류에 넣는 경우가 있어서다.
 
-실험 RDS에서 에이전트가 서버 쪽에서 janitor 연결을 두 번 강제로 끊자(기동 18분 뒤, 43분 뒤), 다음 주기에 새 연결이 다시 로그인했다([실측 요약](https://github.com/xodbs1021/xodbs1021.github.io/blob/main/_workspace/blog/pokeclip-shared-db-auth-iam-tls/measurements.md)). 43분 뒤라면 처음 토큰은 이미 받아 주지 않을 때라, 새 연결이 새 토큰으로 붙었다는 뜻이다.
+실험 RDS에서 에이전트가 DB 쪽에서 janitor의 세션(백엔드)을 두 번 강제로 끊자(기동 18분 뒤, 43분 뒤), 다음 주기에 새 연결이 다시 로그인했다([실측 요약](https://github.com/xodbs1021/xodbs1021.github.io/blob/main/_workspace/blog/pokeclip-shared-db-auth-iam-tls/measurements.md)). 43분 뒤라면 처음 토큰은 이미 받아 주지 않을 때라, 새 연결이 새 토큰으로 붙었다는 뜻이다.
 
 <figure>
 <video controls playsinline preload="none" poster="/images/pokeclip-shared-db-auth-iam-tls-connection-token-lifetime-poster.jpg" width="1920" height="1080" aria-label="토큰 서명 뒤 시간이 흐르는 띠 아래로 연결 세 줄이 있다. 0분에 토큰 1로 로그인한 연결 1은 15분 공식 만료 뒤에도 그대로 질의하고, 17분의 연결 2는 새 토큰으로 로그인하며, 21분에 캐시한 토큰 1을 다시 쓴 연결 3은 PAM 인증 실패로 거부되는 장면">
@@ -83,9 +83,9 @@ func iamBeforeConnect(tf TokenFunc, s Settings, timeout time.Duration) func(cont
 더 약한 값은 고르지 않았다.
 
 - `require`는 CA 경로가 있으면 인증서 체인만 검사하고(`verify-ca`와 같다), CA 경로가 빠지면 조용히 아무것도 검증하지 않는다. 어느 쪽이든 호스트 이름은 보지 않는다([PostgreSQL 문서 — SSL 모드](https://www.postgresql.org/docs/17/libpq-ssl.html)). 설정 실수 하나로 중간자에게 토큰을 줄 수 있는 값이다.
-- `verify-ca`는 인증서 체인만 본다. 그런데 RDS 통합 CA 번들은 모든 AWS 고객의 RDS 인증서를 서명하는 공용 CA다. 다른 계정의 RDS 인증서도 체인 검사는 통과한다. 우리 인스턴스로 묶어 주는 것은 호스트 이름 검사다.
+- `verify-ca`는 인증서 체인만 본다. 그런데 RDS 통합 CA 번들은 여러 AWS 계정의 RDS가 함께 쓰는 루트 CA 인증서들을 담고 있어서, 다른 계정의 RDS 인증서도 체인 검사는 통과한다. 우리 인스턴스로 묶어 주는 것은 호스트 이름 검사다.
 
-CA 번들([AWS 문서](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.SSL.html)의 전 상용 리전 통합본)은 빌드 때 내려받지 않고 저장소에 커밋했다. 고정 없이 빌드 때 내려받으면 빌드마다 내용이 바뀔 수 있고, `ADD --checksum`으로 고정해도 인증서 내용 자체의 변경 diff는 저장소에 남지 않는다. 커밋해 두면 번들이 바뀔 때 리뷰할 diff가 남는다(이 비교는 결정 당시가 아니라 [ADR-0006](https://github.com/3K-PokeClip/PokeClip-mono/blob/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/docs/decisions/2026-10-23-rds-iam-db-auth.md)을 쓰며 덧붙인 설명이다). 기대 해시는 Dockerfile의 `sha256sum -c` 한 줄에 두고, 이미지 안에서는 root 소유 0644 파일로 둔다. 경로는 `POSTGRES_SSLROOTCERT` 하나로 받는다.
+CA 번들([AWS 문서](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.SSL.html)의 전 상용 리전 통합본)은 빌드 때 내려받지 않고 저장소에 커밋했다. 고정 없이 빌드 때 내려받으면 빌드마다 내용이 바뀔 수 있고, `ADD --checksum`으로 고정해도 인증서 내용 자체의 변경 diff는 저장소에 남지 않는다. 커밋해 두면 번들이 바뀔 때 리뷰할 diff가 남는다. 기대 해시는 Dockerfile의 `sha256sum -c` 한 줄에 두고, 이미지 안에서는 root 소유 0644 파일로 둔다. 경로는 `POSTGRES_SSLROOTCERT` 하나로 받는다.
 
 조용히 약해지는 길은 기동 단계에서 막았다([`validate`](https://github.com/3K-PokeClip/PokeClip-mono/blob/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/media/internal/pgconf/pgconf.go#L137-L172)). IAM 모드에서 아래 중 하나라도 해당하면 프로그램이 뜨지 않는다.
 
@@ -188,10 +188,12 @@ db_connected pool=… auth=iam sslmode=verify-full tls=true user=media_indexer h
 Java 앱 서버 네 대(auth, clip, chat-collector, chat-detector — Spring Boot, HikariCP)에도 사이드카처럼 IAM 토큰을 쓰자고 내가 제안했고, 그 서버들을 맡은 팀원이 chat-detector 하나로 실험 RDS에서 스파이크를 한 뒤([#336](https://github.com/3K-PokeClip/PokeClip-mono/pull/336)), 네 서버가 같이 쓰는 모듈 `db-support`를 만들어 모두에 붙였다([#340](https://github.com/3K-PokeClip/PokeClip-mono/pull/340), [#343](https://github.com/3K-PokeClip/PokeClip-mono/pull/343)).
 
 - **토큰 시점 — 같다.** Hikari의 `HikariCredentialsProvider`에 AWS SDK `RdsUtilities`로 서명한 토큰을 넣어 새 연결마다 만든다([`RdsIamCredentialsProvider`](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/services/db-support/src/main/java/com/pokeclip/db/RdsIamCredentialsProvider.java)). 토큰 생성 상한도 10초다. 팀원의 스파이크(10월 23일, 별도 실험 RDS PostgreSQL 17.9 db.t4g.micro, 로컬 맥에서 로컬 IAM 자격으로)에서 연결 수명을 2분으로 줄이고 32분을 돌려, 토큰 187개를 발급하는 동안 실패 0을 확인했다.
-- **구현 방식 — AWS 공식 JDBC 래퍼는 쓰지 않았다.** 결정 당시(10월 23일) chat 두 서버는 응답 없는 연결을 `socketTimeout: 10`(초)으로 끊었다(지금은 auth·clip도 같은 10초다 — [auth](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/services/auth/src/main/resources/application.yml#L35) · [clip](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/services/clip/src/main/resources/application.yml#L28) 설정). 래퍼는 이 값을 밀리초로 받아 pgjdbc에 초로 넘기는데, 1초 미만은 경고 없이 0으로 잘리고 pgjdbc는 0을 "시한 없음"으로 본다([aws-advanced-jdbc-wrapper#2157](https://github.com/aws/aws-advanced-jdbc-wrapper/issues/2157)). 경고만 더하는 수정([#2198](https://github.com/aws/aws-advanced-jdbc-wrapper/pull/2198))은 한국 시간 10월 23일에 병합됐고 이슈는 11월 5일에 닫혔다. 변환 방식은 하위 호환을 위해 그대로다.
+- **구현 방식 — AWS 공식 JDBC 래퍼는 쓰지 않았다.** 결정 당시(10월 23일) chat 두 서버는 응답 없는 연결을 `socketTimeout: 10`(초)으로 끊었다(지금은 auth·clip도 같은 10초다 — [auth](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/services/auth/src/main/resources/application.yml#L35) · [clip](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/services/clip/src/main/resources/application.yml#L28) 설정). 결정 당시 래퍼는 이 값을 밀리초로 받아 pgjdbc에 초로 넘겼고, 1초 미만은 경고 없이 0으로 잘렸다. pgjdbc는 0을 "시한 없음"으로 본다([aws-advanced-jdbc-wrapper#2157](https://github.com/aws/aws-advanced-jdbc-wrapper/issues/2157)). 경고만 더하는 수정([#2198](https://github.com/aws/aws-advanced-jdbc-wrapper/pull/2198))은 한국 시간 10월 23일에 병합됐고 이슈는 11월 5일에 닫혔다. 변환 방식은 하위 호환을 위해 그대로다.
 - **토큰을 건넬 상대 — Java라서 구멍이 하나 더 있었다.** Java도 `verify-full`을 강제하고 Go와 같은 CA 번들을 쓴다(두 번들의 바이트가 같은지 시험이 확인한다). 그런데 JDBC는 URL 쿼리와 드라이버 속성으로 접속을 바꿀 수 있다. `sslfactory=org.postgresql.ssl.NonValidatingFactory`는 `verify-full`을 둔 채 인증서 검증을 건너뛰고, `password=`는 IAM 토큰 대신 URL의 비밀번호를 드라이버에 넘기게 하고, `PGHOST=`는 서명한 호스트와 실제 접속 대상을 가른다. 막을 키를 고르는 방식은 리뷰에서 우회로가 두 번 연달아 나와, IAM 모드에서는 URL 쿼리를 통째로 거부하고 드라이버 속성은 `socketTimeout` 하나만 받는 허용 목록으로 바꿨다([`DataSourceLoginConfiguration`](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/services/db-support/src/main/java/com/pokeclip/db/DataSourceLoginConfiguration.java)). Go 쪽은 DSN을 개별 환경 변수로 직접 조립하고, DSN에 넣은 값이 pgx가 읽는 `PG*` 환경 변수보다 우선해서([pgx v5.10.0 `ParseConfig`](https://github.com/jackc/pgx/blob/v5.10.0/pgconn/config.go#L356-L363)) IAM 경로에 이런 통로가 없다.
 - **로그인 뒤 권한 — 서버마다 사용자를 따로 두고, 남의 표 읽기는 표 주인이 준다.** `app_auth`, `app_clip`, `app_chat_collector`, `app_chat_detector`가 각자 자기 표를 만든다. 판별 서버가 수집 서버의 `chat_messages`를 읽는 권한은 수집 서버의 마이그레이션이 준다. "앞으로 만들 표 전부"에 기본 권한을 주면 수집 키 표까지 판별 서버에 열리기 때문이다. 서버마다 그 권한만 가진 역할로 PostgreSQL 17 컨테이너에서 띄워 보고, 한 줄씩 거두면 그 경로가 `42501`(권한 없음)로 실패하는지까지 확인했다.
 - **판정 — 같다.** `auth`·`sslmode`·`tls` 등 공통 칸의 `db_connected` 줄을 남기고, `tls`도 실제 연결 기준이다.
+
+네 결정은 언어가 바뀌어도 같았고, 달라진 것은 구멍이 생기는 자리였다.
 
 ## 남은 한계
 
@@ -201,10 +203,6 @@ Java 앱 서버 네 대(auth, clip, chat-collector, chat-detector — Spring Boo
 - 같은 네트워크 네임스페이스의 컨테이너는 인스턴스 메타데이터에서 같은 역할 자격을 얻을 수 있어, 두 DB 사용자의 토큰을 다 만들 수 있다.
 - 코드가 막을 수 없는 조건이 있다. 컨테이너에 정적 AWS 키 환경 변수가 있거나 `~/.aws`가 마운트되면 SDK가 인스턴스 역할보다 그것을 먼저 쓴다([AWS SDK for Go v2 문서](https://docs.aws.amazon.com/sdk-for-go/v2/developer-guide/configure-gosdk.html)). 배포 정의에서 이 둘이 없음을 지켜야 한다.
 - 운영을 비밀번호로 되돌리는 일은 `POSTGRES_AUTH`를 비우는 것만으로 되지 않는다. `rds_iam`을 가진 사용자는 IAM 인증이 우선이라, 별도 절차가 필요하다([AWS 문서](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.html), [README 「password 로 되돌리기」](https://github.com/3K-PokeClip/PokeClip-mono/blob/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/media/README.md?plain=1#L2511)).
-
-## 정리
-
-DB 비밀번호를 없애는 일은 IAM 정책 한 줄이 아니었다. 새 연결마다 토큰을 만들고, 그 토큰을 검증된 서버에만 건네고, 로그인한 뒤의 권한을 따로 좁히고, 실제로 그렇게 붙었는지를 로그 한 줄로 판정하는 것까지가 한 묶음이었다. 이 묶음은 언어가 바뀌어도 같았고, 달라진 것은 구멍이 생기는 자리였다.
 
 ## 출처
 
