@@ -1,6 +1,6 @@
 # 실측 요약 — 「미디어 서버에서 DB 비밀번호를 없앴다」
 
-글 `/posts/0-to-1/pokeclip-shared-db-auth-iam-tls/` 의 실측 수치 출처다. 비공개 실험 · 운영 기록에서 계정 ID · 엔드포인트 · IP 를 빼고 옮겼다. 실행은 AI 에이전트, AWS 자원을 만들고 지우는 쓰기는 글쓴이가 승인했다.
+글 `/posts/0-to-1/pokeclip-shared-db-auth-iam-tls/` 의 실측 수치 출처다. 비공개 실험 · 운영 기록에서 계정 ID · 엔드포인트 · IP 를 빼고 옮겼다. 실행 주체는 절마다 다르다 — 1절은 AI 에이전트가 실행했고 AWS 자원을 만들고 지우는 쓰기는 글쓴이가 승인했다. 2절은 인프라 적용(apply)을 글쓴이가 직접 했고 기동 판정은 에이전트 세션이 돌렸다. 3절은 팀원의 스파이크를 공개 PR 에서 옮겼다.
 
 ## 1. 실험 RDS (2026-10-22)
 
@@ -30,7 +30,7 @@
 ### 토큰 수용 창
 
 - 계획한 대조: 토큰을 캐시하는 변이 바이너리는 16분 30초 대기 뒤 새 연결에서 실패해야 했다 → 원본 · 변이본 **둘 다 성공**(판별 실패).
-- 배제한 가설: 변이가 바이너리에 안 들어감(두 바이너리 sha256 이 다름) · 로컬 시계 어긋남(로컬 `date -u` 와 AWS 응답 `Date` 헤더가 같은 초).
+- 배제한 가설: 변이가 바이너리에 안 들어감(캐시 변이 diff 를 적용해 빌드 성공, 두 바이너리 sha256 도 다름) · 로컬 시계 어긋남(로컬 `date -u` 와 AWS 응답 `Date` 헤더가 같은 초).
 - 서명 시각을 과거로 옮긴 토큰으로 직접 측정(시점마다 1회):
 
 | 서명 뒤 경과 | 16분 | 18분 | 19분 30초 | 20분 30초 | 22분 | 30분 |
@@ -42,7 +42,7 @@
 
 ## 2. 운영 첫 기동 점검 (2026-11-03)
 
-운영 미디어 서버 첫 기동 때 런북 `infra/terraform/runbooks/media-swap.md` 의 기동 판정(`MEDIA START`)이 통과했다. 판정 항목 가운데 DB 연결은 `SIDECAR_DB`(사이드카 indexer 풀의 `db_connected` 줄 — IAM · `verify-full` · 실제 TLS) 1 이상, `JANITOR_DB`(janitor 의 `db_connected` 줄) 1 이상이다. 5분 관찰(`MEDIA WATCH`)도 같은 프로세스로 통과했다.
+운영 미디어 서버 첫 기동 때 런북 `infra/terraform/runbooks/media-swap.md` 의 기동 판정(`MEDIA START`)이 통과했다. 판정 항목 가운데 DB 연결은 `SIDECAR_DB`(사이드카 indexer 풀의 `db_connected` 줄 — IAM · `verify-full` · 실제 TLS) 1 이상, `JANITOR_DB`(janitor 풀의 `db_connected` 줄 — IAM · `verify-full` · 실제 TLS) 1 이상이다. 5분 관찰(`MEDIA WATCH`)도 같은 프로세스로 통과했다.
 
 ## 3. Java 앱 서버 스파이크 (팀원, 2026-10-23)
 
