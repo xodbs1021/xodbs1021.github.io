@@ -15,7 +15,7 @@ description: "블로그 메모·학습 기록을 초안으로 작성하거나 �
 1. 요청에서 주제, 자료, 초안/발행 범위, 기존 글 여부를 파악한다. 주제와 분류는 가능한 범위에서 판단하고 꼭 필요한 근거만 질문한다.
 2. 일반 글은 `.claude/agents/post-drafter.md`, 심층 아티클은 `../article-writer/SKILL.md`를 읽는다. 기존 글 수정은 해당 원본과 관련 근거부터 읽는다.
 3. `_workspace/blog/<slug>/`에 draft.md, evidence.md를 작성한다. 공개 글 수정도 우선 사본에서 진행한다. 기존 작업이 있으면 해당 작업을 이어간다.
-4. 시각화가 이해를 돕는 경우 `../visual-planner/SKILL.md`를 사용한다. 이미지 획득이 필요하면 `.claude/agents/image-manager.md`를 읽는다. 이미지가 없어도 이해되는 부분은 계속 진행하고 필수 자료의 누락만 명시한다.
+4. 시각화가 이해를 돕는 경우 `../visual-planner/SKILL.md`를 사용한다. 생성 이미지(비유 일러스트·모션그래픽 소재)는 `../gpt-image/SKILL.md`(Codex 내장 GPT 이미지)로, 모션그래픽·움직이는 그림은 `../motion-explainer/SKILL.md`로 만든다. 실제 사진(스톡)이 필요하면 `.claude/agents/image-manager.md`를 읽는다. 이미지가 없어도 이해되는 부분은 계속 진행하고 필수 자료의 누락만 명시한다.
 5. `.claude/agents/blog-quality-reviewer.md`로 검토해 review.md에 근거와 남은 문제를 기록한다. 아티클 문체 검토는 필요한 경우에만 추가한다.
 6. 초안 요청은 파일과 미확인 항목을 보고하고 끝낸다. 발행 지시가 있으면 `.claude/agents/publisher.md`로 필요한 검증과 배포까지 마친다.
 

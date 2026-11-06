@@ -1,0 +1,48 @@
+[
+  {
+    "id": "RewindFallout",
+    "post": "rewind-missing-segment",
+    "kind": "video",
+    "posterFrame": 269,
+    "alt": "되감기 창이 시간에 따라 오른쪽으로 밀리고, 일시정지한 재생점이 창 밖으로 떨어져 다음 조각 요청이 404 를 받는 장면"
+  },
+  {
+    "id": "EdgeLagsPlaylist",
+    "post": "rewind-missing-segment",
+    "kind": "still",
+    "alt": "재생 목록의 첫 조각이 5분마다 계단처럼 오르고, 엣지 하한이 같은 계단을 최대 약 2분 늦게 따라와 방금 받은 목록의 첫 조각은 막히지 않음을 보여 주는 그래프"
+  },
+  {
+    "id": "RefetchFlow",
+    "post": "rewind-missing-segment",
+    "kind": "video",
+    "posterFrame": 269,
+    "alt": "창 밖에서 404 를 받은 재생점이 받기를 멈추고, 같은 주소로 새 플레이어가 CDN 에서 최신 재생 목록을 다시 받은 뒤, 목록 첫 조각에서 세 조각 안쪽인 시작 하한까지 밀려 이어 재생하고 「가장 오래된 지점으로 옮겼어요」 알림을 띄우는 장면"
+  },
+  {
+    "id": "StartPositionCompare",
+    "post": "rewind-missing-segment",
+    "kind": "still",
+    "alt": "위 줄은 제어면이 알려 준 한 조각 늦은 하한에 여유 세 조각을 더해 추정한 시작 자리가 실제 시작 하한과 어긋나는 모습, 아래 줄은 다시 받은 목록의 첫 조각에 세 조각을 더해 실제 시작 하한에 바로 서는 모습을 견준 그림"
+  },
+  {
+    "id": "BranchTreeVsLine",
+    "post": "rewind-missing-segment",
+    "kind": "still",
+    "alt": "왼쪽은 404 뒤 제어면에 묻고 답에 따라 다섯 갈래로 나뉘며 그중 셋에 리뷰에서 나온 버그 다섯 개가 찍힌 나무, 오른쪽은 404, 받기 멈춤, 같은 주소로 목록 다시 받기, 목록 기준 이어 재생의 한 줄 흐름과 옆으로 빠지는 회색 출구 셋을 견준 그림"
+  },
+  {
+    "id": "TokenToVerifiedDb",
+    "post": "pokeclip-shared-db-auth-iam-tls",
+    "kind": "video",
+    "posterFrame": 350,
+    "alt": "사이드카가 연결마다 새 IAM 토큰을 만들고, 인증서와 호스트 이름이 맞는 RDS 로 가는 길은 verify-full 을 통과해 로그인하지만, 인증서가 맞지 않는 다른 서버로 가는 길은 토큰을 보내기 전에 끊기는 장면"
+  },
+  {
+    "id": "ConnectionTokenLifetime",
+    "post": "pokeclip-shared-db-auth-iam-tls",
+    "kind": "video",
+    "posterFrame": 350,
+    "alt": "토큰 서명 뒤 시간이 흐르는 띠 아래로 연결 세 줄이 있다. 0분에 토큰 1로 로그인한 연결 1은 15분 공식 만료 뒤에도 그대로 질의하고, 17분의 연결 2는 새 토큰으로 로그인하며, 21분에 캐시한 토큰 1을 다시 쓴 연결 3은 PAM 인증 실패로 거부되는 장면"
+  }
+]

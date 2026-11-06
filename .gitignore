@@ -1,4 +1,5 @@
-public/
+# 옛 Hugo 빌드 출력(Astro 는 static/ 을 쓴다). 루트에만 건다 — motion/public/art/ 는 커밋한다.
+/public/
 .claude/settings.local.json
 .DS_Store
 .vercel
@@ -21,3 +22,11 @@ data/image-manifest.json
 
 # Browser layout audit artifacts
 test-results/
+
+# motion-explainer (Remotion) — 렌더 중간물과 설치 때 복사되는 글꼴. 모션 소재 motion/public/art/ 는 커밋한다.
+motion/out/
+motion/public/fonts/
+
+# gpt-image — 생성 원본 · 로그(프롬프트 prompts/*.txt 는 커밋한다)
+_workspace/blog/*/art/*.png
+_workspace/blog/*/art/*.log
