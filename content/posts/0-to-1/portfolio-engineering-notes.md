@@ -25,7 +25,7 @@
 
 ## 10월 28일 추가한 플랫폼 개발 기록
 
-- [DB 연결의 IAM·TLS 규칙을 공통 모듈로 모은 이유](/posts/0-to-1/pokeclip-shared-db-auth-iam-tls/): 두 서비스·세 연결 풀의 인증 정책과 실제 RDS 재접속 검증.
+- [미디어 서버에서 DB 비밀번호를 없앤 방법](/posts/0-to-1/pokeclip-shared-db-auth-iam-tls/): 연결마다 만드는 IAM 토큰, verify-full, 로그인 뒤 권한, 공식 15분과 다른 실측 약 20분(1회). (11월 7일 새로 씀)
 - [작업 세션과 worktree의 검토 상태를 분리한 이유](/posts/0-to-1/harness-session-isolation-worktree-root/): 상태 누출 방지, 시작 위치 고정, 회귀·변이 검사의 범위.
 - [시작되지 않은 watcher의 종료를 기다리던 교착](/posts/open-source-analysis/mediamtx-certloader-no-watcher-shutdown/): MediaMTX #6427의 원인, 최소 수정과 재현 조건.
 

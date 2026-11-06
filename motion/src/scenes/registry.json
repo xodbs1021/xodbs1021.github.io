@@ -32,10 +32,17 @@
     "alt": "왼쪽은 404 뒤 제어면에 묻고 답에 따라 다섯 갈래로 나뉘며 그중 셋에 리뷰에서 나온 버그 다섯 개가 찍힌 나무, 오른쪽은 404, 받기 멈춤, 같은 주소로 목록 다시 받기, 목록 기준 이어 재생의 한 줄 흐름과 옆으로 빠지는 회색 출구 셋을 견준 그림"
   },
   {
-    "id": "IamConnectionLifetime",
+    "id": "TokenToVerifiedDb",
     "post": "pokeclip-shared-db-auth-iam-tls",
     "kind": "video",
-    "posterFrame": 359,
-    "alt": "로그인 토큰이 만료된 뒤에도 기존 DB 연결 A는 쿼리를 계속하고, 새 연결 B는 만료 토큰 재사용이 거부된 뒤 새 토큰으로 로그인하는 설명용 시간 흐름"
+    "posterFrame": 350,
+    "alt": "사이드카가 연결마다 새 IAM 토큰을 만들고, 인증서와 호스트 이름이 맞는 RDS 로 가는 길은 verify-full 을 통과해 로그인하지만, 인증서가 맞지 않는 다른 서버로 가는 길은 토큰을 보내기 전에 끊기는 장면"
+  },
+  {
+    "id": "ConnectionTokenLifetime",
+    "post": "pokeclip-shared-db-auth-iam-tls",
+    "kind": "video",
+    "posterFrame": 350,
+    "alt": "토큰 서명 뒤 시간이 흐르는 띠 아래로 연결 세 줄이 있다. 0분에 토큰 1로 로그인한 연결 1은 15분 공식 만료 뒤에도 그대로 질의하고, 17분의 연결 2는 새 토큰으로 로그인하며, 21분에 캐시한 토큰 1을 다시 쓴 연결 3은 PAM 인증 실패로 거부되는 장면"
   }
 ]

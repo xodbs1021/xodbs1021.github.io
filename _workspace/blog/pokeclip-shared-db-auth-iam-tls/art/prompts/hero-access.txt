@@ -1,0 +1,5 @@
+A calm wide scene: a small rounded white robot-like courier walks toward a glass-walled records room holding a glowing teal access pass with a small hourglass on it; next to the door an empty wall safe stands open with no key inside, showing that no permanent key is stored anywhere; inside the room one drawer of a cabinet is open.
+
+Style: clean isometric 3D tech illustration, soft studio lighting, matte materials with subtle glossy accents, calm editorial look. Palette strictly: deep ink #172c40, teal #087f8b, pale teal #e8f7f5, light grey #f3f6f9, slate #637489, white; use red #b42318 only for an error or blocked state. Absolutely NO text, letters, numbers, logos or brand marks anywhere.
+
+Output: a wide 16:9 scene with a soft light-grey background, generous empty margins, nothing important near the edges.
