@@ -74,3 +74,15 @@ ECharts 없음: 비교·추세·분포할 수치가 없다(48·882는 단일 사
 - `data/legacy-heading-ids.json`에 제목 앵커 10개 등록, 조회수 허용 slug 목록(`data/post-slugs.json`, #12 선례) 확인.
 - 전체 `npm run build && npm test && npm run test:layout` 후 배포, `LAYOUT_URL=https://taeyun.blog LAYOUT_PATH=pokeclip-github-oidc-immutable-subject npm run test:layout`로 공개본 확인.
 - 공개 URL 예정: `https://taeyun.blog/posts/projects/pokeclip-github-oidc-immutable-subject/`
+
+## 2026-11-07 수정 발행(r4) — 출처 절 · 모션그래픽 2편
+
+사용자 지적: 「출처도 없고 모션그래픽도 없다」. 원인 = 로컬 main(22710fc)이 원격보다 뒤처져, 그림 스킬(PR #16 motion-explainer, PR #23 gpt-image · 모션그래픽)과 갱신된 blog-writer/visual-planner가 빠진 옛 하네스로 작성했다(볼트 규칙 Section 0.5 「배포된 브랜치를 읽어라」 위반). 이번 판은 origin/main 워크트리에서 최신 하네스로 다시 진행.
+
+- 출처: 글 끝 `## 출처` — 공식 문서 4개(2026-11-07 확인, 무엇의 근거인지 한 줄씩) · PR 279/280/281 · 비공개 기록 명시.
+- 모션그래픽(visual-planner 「구성 요소 사이를 무언가 오가는 개념」 → motion-explainer): 소재 4장 gpt-image(images.md), 콘티 storyboard.md.
+  - `SubMismatch`(12초): sub 불일치로 막힘 → 조건 수정 뒤 통과. Mermaid 시퀀스 도표를 대체(중복 제거).
+  - `RefVsEnvironment`(12초): develop ref 조건에서는 Claude Code 잡도 조건상 통과 → environment 조건에서 배포 잡만 통과.
+- 장면 확인: 각 장면 160·350프레임 직접 확인, 이름표 겹침 1건(「environment 없음 — 막힘」 ↔ 「STS · 신뢰 정책」) 수정.
+- 독립 사실 검토(blog-quality-reviewer 역할, 공식 URL 4개 WebFetch): 수정 필요 2건 반영 — 캡션 「글자 그대로 비교」 일반화 → 「이 글의 조건에는 와일드카드가 없어」, 영상 2 aria-label이 Claude Code 잡이 실제 자격을 받은 것처럼 읽힘 → 「신뢰 조건상 통과할 수 있지만」. 권장 3건 반영 — 캡션에 「실제로 자격을 받은 기록은 없다」, 장면 라벨 「이 잡도 통과」 → 「조건상 통과」(재렌더), 그림 출처 문장 위치 이동.
+- 화면: 레이아웃 검사기는 영상을 캡처하지 않음(visuals 0) → 별도 스크립트로 390 light/dark · 1440 light에서 영상 figure 캡처, 포스터·mp4 200, preload none, 가로 넘침 0. 휴대폰 폭에서 영상 안 글자는 작다(스킬 규약상 한계) — 캡션이 같은 내용을 다시 말한다.
