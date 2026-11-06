@@ -168,7 +168,7 @@ IAM 토큰은 "누가 로그인하는가"를 정한다. 로그인한 뒤 무엇�
 
 처음 정한 `media_indexer` 권한은 표 단위 SELECT·INSERT·UPDATE였다(`stream_cutoffs`는 SELECT·INSERT만). DELETE와 DDL은 없었고, 표를 만드는 일은 별도 역할이 맡는다(운영 `ENSURE_SCHEMA=false`). 목록만 적어 두지 않고, 같은 권한만 가진 역할을 PostgreSQL 17 컨테이너에 만들어 사이드카의 저장 경로가 그 권한으로 끝까지 도는지 시험으로 확인했다(실험 RDS에서는 기동·유휴 경로까지만 봤다).
 
-권한 목록은 한 번 정하면 끝나는 것이 아니었다. 사흘 뒤(10월 26일) 만료된 조각을 정리하는 일을 사이드카가 맡게 되면서 `stream_segments` 등 만료 대상 표에 DELETE를(컷오프 표에는 UPDATE·DELETE도) 줬다([ADR-0006 개정 노트](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/docs/decisions/2026-10-26-media-indexer-m6-delete-grants.md)). DELETE를 주면 지운 조각의 순번(seq)을 다시 쓸 위험이 생긴다. 그래서 삭제된 조각의 최대 순번에 1을 더한 값을 스트림별 "다음 순번의 하한"으로 보존하는 표와, 그 하한을 올리고 새 순번이 하한 아래면 거부하는 트리거를 뒀다. 하한을 올리는 함수는 만든 사람의 권한으로 실행되는 함수(SECURITY DEFINER)였는데, 리뷰에서 **아무 계정이나 이 함수를 자기 표의 트리거로 붙일 수 있다**(PUBLIC에 실행 권한이 열려 있었다)는 것이 실측으로 재현됐다. 권한 없는 계정이 임시 표에 트리거를 걸어 남의 스트림 하한을 오염시킬 수 있었다. 그 함수의 PUBLIC 실행 권한을 회수하고, 함수 안에서도 대상 표가 맞는지 확인하게 했다.
+권한 목록은 한 번 정하면 끝나는 것이 아니었다. 사흘 뒤(10월 26일) 만료된 조각을 정리하는 일을 사이드카가 맡게 되면서 `stream_segments` 등 만료 대상 표에 DELETE를(컷오프 표에는 UPDATE·DELETE도) 줬다([ADR-0006 개정 노트](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/docs/decisions/2026-10-26-media-indexer-m6-delete-grants.md)). DELETE를 주면 지운 조각의 순번(seq)을 다시 쓸 위험이 생긴다. 그래서 삭제된 조각의 최대 순번에 1을 더한 값을 스트림별 "다음 순번의 하한"으로 보존하는 표와, 그 하한을 올리고 새 순번이 하한 아래면 거부하는 트리거를 뒀다. 하한을 올리는 함수는 만든 사람의 권한으로 실행되는 함수(SECURITY DEFINER)였는데, 커밋별 검수에서 **아무 계정이나 이 함수를 자기 표의 트리거로 붙일 수 있다**(PUBLIC에 실행 권한이 열려 있었다)는 문제가 짚였다([PR #440](https://github.com/3K-PokeClip/PokeClip-mono/pull/440)). 권한 없는 계정이 임시 표에 트리거를 걸어 남의 스트림 하한을 오염시킬 수 있었다. 그 함수의 PUBLIC 실행 권한을 회수하고, 함수 안에서도 대상 표가 맞는지 확인하게 했다.
 
 공유 DB에서는 이름 찾기도 권한 문제였다. 운영 런타임을 준비하며 리뷰하다가, 앱 서버 계정이 `public` 스키마에 함수를 만들 수 있으면 사이드카의 잠금 호출을 가로채 **`media_indexer` 신분으로 실행시킬 수 있다**는 것을 실측으로 확인했다. 내장 `pg_advisory_xact_lock`은 bigint를 받는데 사이드카는 integer 값을 넘긴다. `public`에 integer를 받는 같은 이름의 함수가 있으면, 형 변환이 필요 없는 그 함수가 더 잘 맞는 후보로 골라진다. `pg_catalog`가 먼저 검색되는데도 가로채지는 이유다([함수 선택 규칙](https://www.postgresql.org/docs/17/typeconv-func.html), 같은 유형의 [CVE-2018-1058](https://www.postgresql.org/support/security/CVE-2018-1058/)). 사이드카·janitor·운영 SQL의 내장 함수 호출을 `pg_catalog`로 못 박고, 가로채기 함수를 심어 두고 실패하는지 보는 시험을 붙였다([PR #365](https://github.com/3K-PokeClip/PokeClip-mono/pull/365)). 앱 표를 서버별 스키마로 옮기는 근본 정리는 별도 결정으로 진행했다([ADR-0007](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/docs/decisions/2026-10-24-app-schemas.md)).
 
@@ -181,7 +181,7 @@ IAM 토큰은 "누가 로그인하는가"를 정한다. 로그인한 뒤 무엇�
 db_connected pool=… auth=iam sslmode=verify-full tls=true user=media_indexer host=… port=5432 db=…
 ```
 
-`tls`는 설정값이 아니라 **실제 연결이 TLS인지**를 본 값이다. 이 줄은 비밀번호 모드(로컬)에서도 같은 형식으로 남는데, 그쪽 기본값 `prefer`는 서버가 TLS를 못 하면 조용히 평문으로 내려간다. 그래서 설정이 아니라 실제 연결 상태를 적었다. 비밀번호·토큰·DSN은 이 줄에 싣지 않는다. janitor에는 이 줄을 남기려고 기동 시 Ping을 새로 넣었다. 사이드카는 인덱서 풀 한 줄로 판정하고, 발행자 풀은 이 줄을 내지 않는다([README](https://github.com/3K-PokeClip/PokeClip-mono/blob/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/media/README.md#L305)). 배포 점검([런북](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/infra/terraform/runbooks/media-swap.md))은 이 줄을 기준으로 판정하고, 11월 3일 운영 미디어 서버 첫 기동 점검에서 사이드카(인덱서 풀)와 janitor의 `db_connected` 줄(`auth=iam`·`verify-full`·`tls=true`)을 확인하고 통과했다([실측 요약](https://github.com/xodbs1021/xodbs1021.github.io/blob/main/_workspace/blog/pokeclip-shared-db-auth-iam-tls/measurements.md)).
+`tls`는 설정값이 아니라 **실제 연결이 TLS인지**를 본 값이다. 이 줄은 비밀번호 모드(로컬)에서도 같은 형식으로 남는데, 그쪽 기본값 `prefer`는 서버가 TLS를 못 하면 조용히 평문으로 내려간다. 그래서 설정이 아니라 실제 연결 상태를 적었다. 비밀번호·토큰·DSN은 이 줄에 싣지 않는다. janitor에는 이 줄을 남기려고 기동 시 Ping을 새로 넣었다. 사이드카는 인덱서 풀 한 줄로 판정하고, 발행자 풀은 이 줄을 내지 않는다([README](https://github.com/3K-PokeClip/PokeClip-mono/blob/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/media/README.md?plain=1#L305)). 배포 점검([런북](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/infra/terraform/runbooks/media-swap.md))은 이 줄을 기준으로 판정하고, 11월 3일 운영 미디어 서버 첫 기동 점검에서 사이드카(인덱서 풀)와 janitor의 `db_connected` 줄(`auth=iam`·`verify-full`·`tls=true`)을 확인하고 통과했다([실측 요약](https://github.com/xodbs1021/xodbs1021.github.io/blob/main/_workspace/blog/pokeclip-shared-db-auth-iam-tls/measurements.md)).
 
 ## Java 앱 서버로 넓힌 팀원의 구현
 
@@ -200,7 +200,7 @@ Java 앱 서버 네 대(auth, clip, chat-collector, chat-detector — Spring Boo
 - 실험 RDS에서 첫 IAM 로그인은 약 5.6초가 걸렸고([실측 요약](https://github.com/xodbs1021/xodbs1021.github.io/blob/main/_workspace/blog/pokeclip-shared-db-auth-iam-tls/measurements.md)), 그 뒤 로그인은 0.5초 안팎이었다. 원인은 재지 않았다.
 - 미디어 서버의 역할 하나가 두 DB 사용자의 토큰을 다 만들 수 있다. 같은 네트워크 네임스페이스의 컨테이너도 마찬가지다. 사이드카와 janitor의 분리는 DB 권한이 맡는다.
 - 코드가 막을 수 없는 조건이 있다. 컨테이너에 정적 AWS 키 환경 변수가 있거나 `~/.aws`가 마운트되면 SDK가 인스턴스 역할보다 그것을 먼저 쓴다. 배포 정의에서 이 둘이 없음을 지켜야 한다.
-- 운영을 비밀번호로 되돌리는 일은 `POSTGRES_AUTH`를 비우는 것만으로 되지 않는다. `rds_iam`을 가진 사용자는 IAM 인증이 우선이라, 별도 절차가 필요하다([AWS 문서](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.html), [README 「password 로 되돌리기」](https://github.com/3K-PokeClip/PokeClip-mono/blob/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/media/README.md#L2511)).
+- 운영을 비밀번호로 되돌리는 일은 `POSTGRES_AUTH`를 비우는 것만으로 되지 않는다. `rds_iam`을 가진 사용자는 IAM 인증이 우선이라, 별도 절차가 필요하다([AWS 문서](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.html), [README 「password 로 되돌리기」](https://github.com/3K-PokeClip/PokeClip-mono/blob/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/media/README.md?plain=1#L2511)).
 - Java 앱 서버의 운영 IAM 기동 결과는 이 글에서 다루지 않았다.
 
 ## 정리
@@ -226,6 +226,7 @@ Java 앱 서버 네 대(auth, clip, chat-collector, chat-detector — Spring Boo
 - [`media/internal/pgconf`](https://github.com/3K-PokeClip/PokeClip-mono/tree/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/media/internal/pgconf) — `pgconf.go` · `iam.go` · `connected.go`
 - [PR #336](https://github.com/3K-PokeClip/PokeClip-mono/pull/336) · [PR #340](https://github.com/3K-PokeClip/PokeClip-mono/pull/340) · [PR #343](https://github.com/3K-PokeClip/PokeClip-mono/pull/343) — Java 앱 서버 스파이크와 `db-support`(팀원)
 - [ADR-0006 개정 노트(10월 26일)](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/docs/decisions/2026-10-26-media-indexer-m6-delete-grants.md) — 만료 몫 DELETE · seq 하한 트리거 · 정의자 함수 실행 권한 회수
+- [PR #440](https://github.com/3K-PokeClip/PokeClip-mono/pull/440) — M6 권한 · seq 하한, 정의자 함수 실행 권한 회수(검수 HIGH)
 - [PR #365](https://github.com/3K-PokeClip/PokeClip-mono/pull/365) — 내장 함수 호출 `pg_catalog` 한정과 가로채기 음성 대조 시험
 - [ADR-0007](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/docs/decisions/2026-10-24-app-schemas.md) — 앱 표를 서버별 스키마로
 - [`media/README.md`](https://github.com/3K-PokeClip/PokeClip-mono/blob/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/media/README.md) — `db_connected` 줄 · DB 접속 운영 전제 · password 로 되돌리기
