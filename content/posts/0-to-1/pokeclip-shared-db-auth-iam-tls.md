@@ -23,7 +23,7 @@ IAM 전환, TLS 검증 강도, CA 인증서를 싣는 방식, 실제 RDS로 검�
 | | DB 비밀번호 | RDS IAM 토큰 |
 |---|---|---|
 | 서버에 두는 것 | 오래 쓰는 비밀번호 | 없음. 실행 역할(인스턴스 역할)의 임시 자격만 |
-| 새었을 때 쓸 수 있는 기간 | 바꿀 때까지 | 서명 뒤 짧게 — 공식 15분(실측은 뒤에서) |
+| 새었을 때 쓸 수 있는 기간 | 바꿀 때까지 | 서명 뒤 짧게 — 공식 15분(실험 RDS 1회 실측은 약 20분) |
 | 교체 | 비밀번호를 바꾸고 모든 서버에 다시 배포 | 할 일 없음. 연결할 때마다 새로 서명한다 |
 | 누가 로그인할 수 있나 | 비밀번호를 아는 누구나 | `rds-db:connect` 권한을 받은 IAM 주체(역할·사용자)가 서명한 유효 토큰을 내민 쪽. 새어 나간 토큰은 수명 동안 재사용될 수 있다 |
 
@@ -73,7 +73,7 @@ func iamBeforeConnect(tf TokenFunc, s Settings, timeout time.Duration) func(cont
 <video controls playsinline preload="none" poster="/images/pokeclip-shared-db-auth-iam-tls-connection-token-lifetime-poster.jpg" width="1920" height="1080" aria-label="토큰 서명 뒤 시간이 흐르는 띠 아래로 연결 세 줄이 있다. 0분에 토큰 1로 로그인한 연결 1은 15분 공식 만료 뒤에도 그대로 질의하고, 17분의 연결 2는 새 토큰으로 로그인하며, 21분에 캐시한 토큰 1을 다시 쓴 연결 3은 PAM 인증 실패로 거부되는 장면">
 <source src="/videos/pokeclip-shared-db-auth-iam-tls-connection-token-lifetime.mp4" type="video/mp4">
 </video>
-<figcaption>토큰은 로그인 때만 검사된다 — 맺어 둔 연결은 만료와 무관하고, 새 연결에는 유효한 토큰이 필요해 연결마다 새로 만들며, 캐시한 토큰은 약 20분 뒤 거부된다(20분은 뒤에 나오는 실험 RDS 1대·1회 실측). 설명용 움직이는 그림이며 소재는 AI 생성, 실제 화면이 아니다.</figcaption>
+<figcaption>토큰은 로그인 때만 검사된다 — 맺어 둔 연결은 만료와 무관하고, 새 연결에는 유효한 토큰이 필요해 연결마다 새로 만들며, 캐시한 토큰은 약 20분 뒤 거부된다(20분은 실험 RDS 1대·1회 실측). 설명용 움직이는 그림이며 소재는 AI 생성, 실제 화면이 아니다.</figcaption>
 </figure>
 
 ## 토큰은 verify-full로 확인한 서버에만 건넨다
