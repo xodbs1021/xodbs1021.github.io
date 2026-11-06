@@ -38,6 +38,12 @@ if ! mkdir "$lock" 2>/dev/null; then
 fi
 trap 'rm -f "$part"; rmdir "$lock" 2>/dev/null || true' EXIT
 
+# 잠금을 잡는 사이 다른 실행이 먼저 끝냈을 수 있다 — 잠금 뒤에 한 번 더 본다.
+if [ -e "$out" ]; then
+  echo "SKIP $name: 이미 있음 — 다시 만들려면 새 이름(<name>-v2)을 쓴다"
+  exit 0
+fi
+
 # 읽기 실패 · 빈 프롬프트로 생성하지 않는다(명령 치환 안의 실패는 set -e 가 잡지 못한다).
 if ! spec="$(cat -- "$prompt")" || [ -z "${spec//[[:space:]]/}" ]; then
   echo "FAIL $name: 프롬프트를 읽지 못했거나 비었다 $prompt" >&2

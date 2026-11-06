@@ -50,7 +50,7 @@ for f in _workspace/blog/<slug>/art/prompts/*.txt; do basename "$f" .txt; done \
   | xargs -P 4 -I{} bash .claude/skills/gpt-image/scripts/gen.sh <slug> {}   # 여러 장(4개 병렬)
 ```
 
-스크립트는 저장소 루트에서 `codex exec` 로 내장 `image_gen` 을 한 번 부르고, 결과를 임시 이름 `<name>.part.png` 로 받아 비어 있지 않은 PNG 인지 확인한 뒤에만 `_workspace/blog/<slug>/art/<name>.png` 로 옮긴다(생성 원본은 `~/.codex/generated_images/<세션>/` 에 남는다). 출력 첫 단어로 결과를 안다: `OK`(새로 만듦) · `SKIP`(이미 있어 건너뜀 — 덮어쓰지 않는다, 다시 만들려면 `<name>-v2`) · `FAIL`(이름 형식 위반 · 프롬프트 없음 · 빈 프롬프트 · codex 실패 · PNG 가 아니거나 비어 있음 · 같은 이름이 실행 중). 이름은 kebab-case 만 받는다. 한 장에 약 40초(2026-10-31 실측, 5개 병렬 10장 약 2분). 로그는 같은 폴더의 `<name>.log`.
+스크립트는 저장소 루트에서 실행하고, `codex exec` 는 글의 `art/` 폴더를 작업 폴더로 삼아 내장 `image_gen` 을 한 번 부른다. 결과를 임시 이름 `<name>.part.png` 로 받아 비어 있지 않은 PNG 인지 확인한 뒤에만 `_workspace/blog/<slug>/art/<name>.png` 로 옮긴다(생성 원본은 `~/.codex/generated_images/<세션>/` 에 남는다). 출력 첫 단어로 결과를 안다: `OK`(새로 만듦) · `SKIP`(이미 있어 건너뜀 — 덮어쓰지 않는다, 다시 만들려면 `<name>-v2`) · `FAIL`(이름 형식 위반 · 프롬프트 없음 · 빈 프롬프트 · codex 실패 · PNG 가 아니거나 비어 있음 · 같은 이름이 실행 중). 이름은 kebab-case 만 받는다. 한 장에 약 40초(2026-10-31 실측, 5개 병렬 10장 약 2분). 다른 실행이 없는데 「다른 실행이 같은 이름을 만들고 있다」 로 FAIL 하면, 강제 종료로 남은 잠금 폴더 `_workspace/blog/<slug>/art/.<name>.lock` 을 지운다. 로그는 같은 폴더의 `<name>.log`.
 
 ## 검사
 
@@ -68,7 +68,7 @@ for f in _workspace/blog/<slug>/art/prompts/*.txt; do basename "$f" .txt; done \
   *<그림이 빗대는 것 한 문장>. AI 생성 비유 그림이며 실제 구성도가 아닙니다.*
   ```
 
-- **모션그래픽 소재:** 긴 변 1024px 로 줄여 `motion/public/art/<slug>/<name>.png` 에 둔다(`sips -Z 1024 …`). 이 폴더는 커밋된다(글꼴 폴더 `motion/public/fonts/` 만 git 제외). 이후는 [motion-explainer](../motion-explainer/SKILL.md) 「모션그래픽」 절.
+- **모션그래픽 소재:** 긴 변 1024px 로 줄여 `motion/public/art/<slug>/<name>.png` 에 둔다(`mkdir -p motion/public/art/<slug>` 뒤 `sips -Z 1024 …` — `sips` 는 폴더를 만들지 않는다). 이 폴더는 커밋된다(글꼴 폴더 `motion/public/fonts/` 만 git 제외). 이후는 [motion-explainer](../motion-explainer/SKILL.md) 「모션그래픽」 절.
 - `_workspace/blog/<slug>/art/` 의 원본 PNG · 로그는 git 제외다. 프롬프트(`prompts/*.txt`)는 커밋해 다시 만들 수 있게 둔다.
 
 ## 기록
