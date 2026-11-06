@@ -103,5 +103,5 @@ description: 블로그 글 작성 직전에 호출. image-need-judge로 이미�
 4. (스킬) image-need-judge 호출 → 필요 N개 판단
 5. (스킬) N > 0이면 image-prompt-generator 호출 → 영어 프롬프트
 6. (메인 클로드) 사용자에게 보고
-7. (사용자) 이미지 N개 다운로드해 전달 (또는 0개면 바로 다음 단계)
+7. (사용자 승인 뒤 메인 클로드) 프롬프트를 `_workspace/blog/<slug>/art/prompts/`에 넣고 `../gpt-image/SKILL.md`로 생성 · 검사 · 배치 (0개면 바로 다음 단계). 프롬프트 형식(STYLE 블록 · Output 줄)은 gpt-image 를 따른다.
 8. (메인 클로드) 글 작성
