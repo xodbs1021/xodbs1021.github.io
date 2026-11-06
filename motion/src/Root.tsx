@@ -1,6 +1,8 @@
 import { CONNECTION_TOKEN_LIFETIME_FRAMES, ConnectionTokenLifetime } from "./scenes/pokeclip-shared-db-auth-iam-tls/ConnectionTokenLifetime";
 import { TOKEN_TO_VERIFIED_DB_FRAMES, TokenToVerifiedDb } from "./scenes/pokeclip-shared-db-auth-iam-tls/TokenToVerifiedDb";
 import { Composition, Still } from "remotion";
+import { REF_VS_ENVIRONMENT_FRAMES, RefVsEnvironment } from "./scenes/pokeclip-github-oidc-immutable-subject/RefVsEnvironment";
+import { SUB_MISMATCH_FRAMES, SubMismatch } from "./scenes/pokeclip-github-oidc-immutable-subject/SubMismatch";
 import { BranchTreeVsLine } from "./scenes/rewind-missing-segment/BranchTreeVsLine";
 import { EdgeLagsPlaylist } from "./scenes/rewind-missing-segment/EdgeLagsPlaylist";
 import { REFETCH_FLOW_FRAMES, RefetchFlow } from "./scenes/rewind-missing-segment/RefetchFlow";
@@ -31,6 +33,8 @@ export const RemotionRoot: React.FC = () => (
       height={VIDEO.height}
     />
     <Still id="StartPositionCompare" component={StartPositionCompare} width={VIDEO.width} height={VIDEO.height} />
+    <Composition id="SubMismatch" component={SubMismatch} durationInFrames={SUB_MISMATCH_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition id="RefVsEnvironment" component={RefVsEnvironment} durationInFrames={REF_VS_ENVIRONMENT_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
     <Still id="BranchTreeVsLine" component={BranchTreeVsLine} width={VIDEO.width} height={VIDEO.height} />
   </>
 );

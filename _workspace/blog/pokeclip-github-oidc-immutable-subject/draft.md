@@ -12,7 +12,7 @@ PokeClip의 dev 배포 워크플로는 두 달 동안 액세스 키로 AWS에 �
 
 이 추정은 틀렸다. 원인은 우리 쪽 신뢰 정책에 있었다. 이 저장소의 토큰은 처음부터 `sub`에 숫자 ID가 붙은 형식으로 오고 있었는데, 신뢰 정책은 옛 이름 형식만 받고 있었다. 이 글은 그 원인을 찾은 과정, 액세스 키를 OIDC 역할로 바꾼 과정, 그리고 전환 후 리뷰에서 나온 "신뢰 범위가 너무 넓다"는 지적을 environment 단위로 좁힌 과정을 정리한다.
 
-먼저 역할을 밝힌다. 운영 측 문의와 원인 확인 지시는 내가 했다. AI가 제안한 신뢰 조건과 전환 순서를 검토해 승인했고, 머지도 승인했다. IAM을 바꾸는 스크립트는 대부분 내가 직접 실행했다. 조사, 워크플로 수정, 스크립트 작성, GitHub 설정은 AI 에이전트(Claude Code)가 했다. 리뷰는 Claude 리뷰어·Codex·보안 리뷰 에이전트가 함께 봤다. 키 삭제 스크립트는 내가 실행할 차례였는데 AI가 내 말을 실행 승인으로 읽고 먼저 실행했다. 이 일은 뒤에서 다시 적는다.
+먼저 역할을 밝힌다. 운영 측 문의와 원인 확인 지시는 내가 했다. AI가 제안한 신뢰 조건과 전환 순서를 검토해 승인했고, 머지도 승인했다. IAM을 바꾸는 스크립트는 대부분 내가 직접 실행했다. 조사, 워크플로 수정, 스크립트 작성, GitHub 설정은 AI 에이전트(Claude Code)가 했다. 리뷰는 Claude 리뷰어·Codex·보안 리뷰 에이전트가 함께 봤다. 키 삭제 스크립트는 내가 실행할 차례였는데 AI가 내 말을 실행 승인으로 읽고 먼저 실행했다. 이 일은 뒤에서 다시 적는다. 글의 움직이는 그림은 Claude Code가 Remotion으로 만들었고, 그 안의 소재 그림은 OpenAI 이미지 생성(Codex 내장)으로 만들었다.
 
 ## OIDC 로그인에서 sub가 하는 일
 
@@ -22,21 +22,12 @@ GitHub Actions의 OIDC 로그인은 오래 쓰는 비밀 대신 실행마다 새
 
 `sub`의 꼴은 잡의 맥락에 따라 달라진다. 브랜치에서 도는 잡이면 `repo:<소유자>/<저장소>:ref:refs/heads/<브랜치>`가 되고, 잡이 environment를 참조하면 ref 대신 `...:environment:<이름>`이 들어간다. [GitHub Docs](https://docs.github.com/en/actions/reference/security/oidc) 이 차이가 뒤에서 두 번 문제가 된다.
 
-```mermaid
-sequenceDiagram
-    participant J as GitHub Actions 잡
-    participant G as GitHub OIDC 공급자
-    participant S as AWS STS
-    J->>G: id-token 요청
-    G-->>J: 서명된 JWT (aud, sub ...)
-    J->>S: AssumeRoleWithWebIdentity
-    Note over S: 역할 신뢰 정책의<br/>aud·sub 조건과 비교
-    alt sub가 조건과 일치
-        S-->>J: 임시 자격 (역할의 최대 세션 안)
-    else 일치하지 않음
-        S-->>J: AccessDenied
-    end
-```
+<figure>
+<video controls playsinline preload="none" poster="/images/pokeclip-github-oidc-immutable-subject-sub-mismatch-poster.jpg" width="1920" height="1080" aria-label="배포 잡이 숫자 ID가 붙은 sub를 담은 토큰을 STS에 내지만 신뢰 조건이 이름 형식이라 검문 앞에서 AccessDenied로 막히고, 신뢰 조건을 숫자 ID 형식으로 고치자 같은 토큰이 검문을 지나 임시 자격을 받는 장면">
+<source src="/videos/pokeclip-github-oidc-immutable-subject-sub-mismatch.mp4" type="video/mp4">
+</video>
+<figcaption>STS는 토큰의 sub를 신뢰 조건과 비교한다. 이 글의 조건에는 와일드카드가 없어 형식이 다르면 일치하지 않아 막히고, 조건을 토큰 형식에 맞추면 임시 자격을 받는다. 설명용 움직이는 그림이며 실제 화면이 아닙니다. 소재는 AI 생성, 소리는 없습니다.</figcaption>
+</figure>
 
 8월의 주석은 비교에 필요한 값이 모두 일치한다고 적었다. 하지만 STS가 실제로 받은 `sub`와 비교한 기록은 없었다.
 
@@ -117,6 +108,13 @@ IAM 쓰기는 AI 쪽에서 실행하지 못했다. Claude Code의 자동 모드 
 - `id-token: write`를 워크플로 맨 위에서 배포 잡으로 내렸다. 같은 파일에 잡이 추가돼도 그 잡이 역할을 자동으로 받지 않게 하려는 것이다.
 - 역할 정책에서 쓰지 않던 `ssm:ListCommandInvocations`를 뺐다. 앞에서 말한 리전 단위 결과 목록 조회 권한이다.
 
+<figure>
+<video controls playsinline preload="none" poster="/images/pokeclip-github-oidc-immutable-subject-ref-vs-environment-poster.jpg" width="1920" height="1080" aria-label="신뢰 조건이 develop ref일 때는 배포 잡뿐 아니라 Claude Code 잡도 같은 sub라 신뢰 조건상 검문을 통과할 수 있지만, 조건을 environment dev-deploy로 좁히자 배포 잡만 통과하고 Claude Code 잡은 검문 앞에서 막히는 장면">
+<source src="/videos/pokeclip-github-oidc-immutable-subject-ref-vs-environment.mp4" type="video/mp4">
+</video>
+<figcaption>develop ref 단위 신뢰는 같은 브랜치에서 토큰을 받는 다른 잡도 통과시킨다. environment 단위로 좁히면 그 environment를 쓰는 배포 잡만 통과한다. 당시 Claude Code 잡은 조건상 통과할 수 있었을 뿐, 실제로 자격을 받은 기록은 없다. 설명용 움직이는 그림이며 실제 화면이 아닙니다. 소재는 AI 생성, 소리는 없습니다.</figcaption>
+</figure>
+
 ```yaml
 permissions:
   contents: read
@@ -175,3 +173,19 @@ prod는 v1을 내면서 develop을 main에 병합하고 main 기준으로 배포
 - `sub`는 두 곳에서 바뀐다. 저장소 설정(immutable 형식)과 워크플로 설정(environment 참조 여부)이다. 둘 중 하나를 바꿀 때는 신뢰 조건도 같은 걸음에서 바꿔야 한다.
 - ref 단위 신뢰는 "이 워크플로"가 아니라 "그 브랜치에서 토큰을 받는 모든 잡"을 믿는다.
 - 문서로 확인할 수 없는 형식은 옛 값과 새 값을 잠깐 함께 받으면서 실제 값을 관측한 뒤 좁힌다. 그 사이 열리는 창은 따로 닫는다.
+
+## 출처
+
+공식 문서(2026-11-07 확인):
+
+- GitHub Changelog, 「Immutable subject claims for GitHub Actions OIDC tokens」(2026-04-23 발표, 2026-06-10 구분자 정정) — immutable 형식, 자동 적용 대상과 날짜. https://github.blog/changelog/2026-04-23-immutable-subject-claims-for-github-actions-oidc-tokens/
+- GitHub Docs, 「OpenID Connect reference」 — `sub` 클레임 형식, 잡이 environment를 참조하면 ref 대신 environment가 들어가는 규칙. https://docs.github.com/en/actions/reference/security/oidc
+- AWS IAM 사용 설명서, 「Create a role for OpenID Connect federation」 — GitHub OIDC 신뢰 정책의 `sub` 조건 필수 검사, environment 보호 규칙 권고. https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html#idp_oidc_Create_GitHub
+- `aws-actions/configure-aws-credentials` v4 README — `role-to-assume`, `role-duration-seconds`(기본 3600초), OIDC에 필요한 `id-token: write`. https://github.com/aws-actions/configure-aws-credentials/blob/v4/README.md
+
+작업 기록:
+
+- [PR 279](https://github.com/3K-PokeClip/PokeClip-mono/pull/279) — dev 배포를 액세스 키에서 OIDC 역할로 전환.
+- [PR 280](https://github.com/3K-PokeClip/PokeClip-mono/pull/280) — 배포 잡을 environment `dev-deploy`로 묶고 `id-token` 권한을 잡 단위로 내림.
+- [PR 281](https://github.com/3K-PokeClip/PokeClip-mono/pull/281) — 2단계 뒤 머리 주석 정리.
+- 원인 조사(IAM 공급자·신뢰 정책·저장소 OIDC 설정·CloudTrail 조회), IAM 변경 스크립트, 리뷰 기록, 배포 실행 결과는 비공개 작업 기록이다. 계정 번호와 숫자 ID는 글에서 가렸다.
