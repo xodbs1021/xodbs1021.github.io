@@ -47,3 +47,4 @@
 | 2026-06-22 | lesson-planner / curriculum-quality-guard 갈아엎음 | agents/lesson-planner.md, agents/curriculum-quality-guard.md | harness 스킬로 재생성 — 시리즈 범위 검증 책임 명확화. curriculum-quality-guard 모드 2에 F 항목(시리즈 범위 명시) 10점 신규 |
 | 2026-06-23 | token-cost-analyzer 에이전트 추가 | agents/token-cost-analyzer.md | 강의별 sub-agent 토큰 소모 측정·분석. 평균 대비 1.5x 초과 시 원인+개선안. harness 스킬로 생성 |
 | 2026-11-04 | motion-explainer 스킬 + Remotion 공식 스킬 사본 추가 | skills/motion-explainer, skills/remotion-best-practices, skills/visual-planner, motion/ | 시간·흐름 개념을 짧은 움직이는 그림(mp4+포스터)·시간축 정지 그림으로. visual-planner 표에 「시간이 흐르며 바뀌는 상태」 줄 (PR 16) |
+| 2026-11-07 | gpt-image 스킬 + motion-explainer 모션그래픽(생성 소재 + 흐름선) | skills/gpt-image, skills/motion-explainer, skills/visual-planner, skills/blog-writer, skills/image-prompt-curator, motion/src/components/{Art,FlowPath}.tsx | 생성 이미지는 Codex 내장 GPT 이미지(imagegen)로 만들고, 구성 요소 사이 흐름은 생성 소재를 Remotion 으로 움직이는 모션그래픽으로. 도구 조사 레퍼런스 동봉 (PR 23) |
