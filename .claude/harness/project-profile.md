@@ -56,7 +56,7 @@
 `[읽는 이: planner · plan-reviewer · developer · reviewer · architecture-guide]`
 
 - 공개된 글의 소제목 id 는 바꾸지 않는다. 새 글을 공개하거나 소제목을 바꾸면 `data/legacy-heading-ids.json` 에 그 글의 id 목록을 넣는다 — 안 넣으면 `tests/blog-quality.test.mjs` 가 실패하고, 바꾸면 밖에서 걸린 `#앵커` 링크가 깨진다.
-- 글 URL(카테고리 폴더 · slug)은 바꾸지 않는다 — 옛 주소 리다이렉트(`scripts/legacy-redirects.mjs` · `vercel.json` redirects)와 검색 색인이 그 경로를 가리킨다. 옮기거나 지우면 리다이렉트를 함께 넣는다.
+- 글 URL(카테고리 폴더 · slug)은 바꾸지 않는다 — 검색 색인과 밖의 링크가 그 경로를 가리킨다. 옮기거나 지우면 두 곳에 함께 넣는다: `taeyun.blog` 쪽 이동은 `vercel.json` redirects(지금은 카테고리 5건뿐), 옛 주소 `xodbs1021.github.io` 쪽은 `scripts/legacy-redirects.mjs` 가 `data/legacy-paths.json` 과 글 목록으로 안내 페이지를 만든다.
 - 그림 · 영상은 `static/images` · `static/videos` **바로 아래** `<글 slug>-<장면>` 이름으로 둔다 — `optimize-images.mjs` 가 하위 폴더를 읽지 않아 크기 정보 · WebP/AVIF 파생본이 빠진다.
 - 정지 그림은 마크다운 이미지 문법으로 넣는다 — `<img>` · `<figure>` 를 직접 쓰면 렌더러가 크기 정보 · 파생본을 붙이지 않는다. 영상은 mp4 + 포스터 · `preload="none"` · 사용자 재생, GIF 금지(자동 재생 · 최적화 제외).
 - 새 글은 `draft: true` 로 시작하고, 처음 공개할 때 `date` 를 공개 시각으로 바꾼다 — 공개 필터가 `!draft && date <= now` 라 미래 날짜 글은 안 보이고, 초안 시각을 남기면 목록 순서가 틀린다(2026-11-04 실제로 겪음). 이미 공개된 글의 `date` 는 덮어쓰지 않는다.
@@ -82,7 +82,7 @@
 `[읽는 이: completion-auditor · change-explainer]`
 
 - **운영 서버 실행:** 없음 — Vercel 프로젝트 `taeyun-blog` 이 이 저장소 `main` 을 빌드해 정적 파일 + 함수 `api/views.mjs` 로 서빙한다.
-- **서빙 대상(무엇을 서빙하나):** `npm run build` 산출 `dist/`(`vercel.json` 의 `buildCommand` · `outputDirectory`). 옛 주소 `xodbs1021.github.io` 는 GitHub Pages 가 리다이렉트만 서빙한다 — 워크플로 `deploy.yml` 이 `.legacy-site` 를 Actions 아티팩트로 올려 `actions/deploy-pages` 로 배포한다(브랜치 배포가 아님). 글 원본이 아니다.
+- **서빙 대상(무엇을 서빙하나):** `npm run build` 산출 `dist/`(`vercel.json` 의 `buildCommand` · `outputDirectory`). 옛 주소 `xodbs1021.github.io` 는 GitHub Pages 가 글 페이지를 새 주소로 안내하고, 기존 정적 파일(`static/` 전체)과 RSS · 사이트맵은 그대로 보존해 서빙한다 — 워크플로 `deploy.yml` 이 `.legacy-site` 를 Actions 아티팩트로 올려 `actions/deploy-pages` 로 배포한다(브랜치 배포가 아님). 글 원본이 아니다.
 - **소스→운영 반영 절차:** `main` 병합 → Vercel 자동 운영 배포. 에이전트의 `vercel redeploy --target production` 은 권한 분류기가 막는다(2026-11-04).
 - **"반영됨" 확인법:** 병합 커밋의 Vercel 커밋 상태(대상 URL)가 성공인지 + `https://taeyun.blog/<글 경로>/` 와 새 그림 · 영상 경로를 실제로 받아 200 인지. 병합했는데 Vercel 상태가 아예 안 생긴 적이 있다(2026-11-04 PR #18 — 새 그림 404, 다음 병합에서 해소, 원인 미확인).
 
@@ -103,7 +103,7 @@
 ## 8. 도메인 예시 (examples)
 `[읽는 이: clarifier · 오케스트레이터 테스트 시나리오]`
 
-- 「RDS IAM 붙인 거 아티클로 써줘」 → 누구의 작업 범위인가(내 media 코드 vs 팀원 Java 서버)? 기존 공개 글을 고치나 버리고 새로 쓰나(URL · 소제목 id · 리다이렉트)? 공개까지인가 초안까지인가? 내부 숫자 · 계정 이름을 공개해도 되나? — 범위 · 발행 수준 · 공개 범위가 숨어 있음.
+- 「○○ 기능 붙인 거 아티클로 써줘」 → 누구의 작업 범위인가(내 구현 vs 팀원 구현)? 기존 공개 글을 고치나 버리고 새로 쓰나(URL · 소제목 id · 리다이렉트)? 공개까지인가 초안까지인가? 내부 숫자 · 계정 이름을 공개해도 되나? — 범위 · 발행 수준 · 공개 범위가 숨어 있음.
 - 「그림 넣어줘」 → 정지 그림 · 움직이는 그림 · 차트 · 생성 일러스트 중 무엇이 그 문단에 맞나? 생성 이미지는 외부 서비스로 프롬프트를 보낸다 — 괜찮은가?
 
 ---
@@ -132,7 +132,7 @@
 - **셋째 줄부터** 회수 블록: `- 걸리는 선행 결정: <제목 — 이번 작업에 어떻게 걸리는지
   한 줄>` (0건이면 `- 걸리는 선행 결정 없음`).
 
-**기계가 검증하는 것은 머리 두 줄의 형식뿐이다** — `_workspace/[0-9][0-9]_design*.md`·`[0-9][0-9]_plan*.md`
+**(로컬 하네스 설치본에서만 적용 — 훅은 저장소에 없다) 기계가 검증하는 것은 머리 두 줄의 형식뿐이다** — `_workspace/[0-9][0-9]_design*.md`·`[0-9][0-9]_plan*.md`
 가 저장된 턴은 Stop 훅(`stop:retrieval`)이 두 표명 형식 없이는 끝나지 않게 막고, 형식을
 지키면 스스로 풀린다. **진짜 읽었는지·조사했는지·표명 내용이 사실인지는 기계가 못 본다**
 — 그건 plan-reviewer 와 codex 리뷰의 검증 항목(산문 계약)이다. clarifier·ADR 작성 전
