@@ -30,3 +30,6 @@ motion/public/fonts/
 # gpt-image — 생성 원본 · 로그(프롬프트 prompts/*.txt 는 커밋한다)
 _workspace/blog/*/art/*.png
 _workspace/blog/*/art/*.log
+
+# 리뷰 원 스트림(codex 콘솔 출력)은 볼트 원문을 그대로 담으므로 공개 저장소에 올리지 않는다 — 볼트 raw 에 보관한다.
+_workspace/blog/*/rounds/*.stream.txt
