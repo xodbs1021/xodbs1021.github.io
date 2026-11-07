@@ -2,7 +2,7 @@
 
 | 파일 | 프롬프트 | 공급자 · 모델 | codex | 생성일 | 상태 |
 |---|---|---|---|---|---|
-| static/images/pokeclip-shared-db-auth-iam-tls-hero-access.png (1600px) | art/prompts/hero-access.txt | OpenAI · Codex CLI 내장 image_gen(ChatGPT 로그인) · 모델 미확인 | 0.165.0 | 2026-11-07 | 채택 |
+| static/images/pokeclip-shared-db-auth-iam-tls-hero-access.png (1600px) | art/prompts/hero-access.txt | OpenAI · Codex CLI 내장 image_gen(ChatGPT 로그인) · 모델 미확인 | 0.165.0 | 2026-11-07 | 버림 — 비유가 불분명해 사용자가 삭제 지시(11-07), 파일 삭제 |
 | motion/public/art/pokeclip-shared-db-auth-iam-tls/obj-server.png (1024px) | art/prompts/obj-server.txt | 같음 | 0.165.0 | 2026-11-07 | 채택 · check-alpha OK(투명 54%) |
 | motion/public/art/pokeclip-shared-db-auth-iam-tls/obj-token.png (1024px) | art/prompts/obj-token.txt | 같음 | 0.165.0 | 2026-11-07 | 채택 · check-alpha OK(66%) |
 | motion/public/art/pokeclip-shared-db-auth-iam-tls/obj-db.png (1024px) | art/prompts/obj-db.txt | 같음 | 0.165.0 | 2026-11-07 | 채택 · check-alpha OK(48%) |

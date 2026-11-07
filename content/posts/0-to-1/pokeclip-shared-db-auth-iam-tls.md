@@ -14,10 +14,6 @@ PokéClip의 미디어 서버에는 PostgreSQL(RDS)에 붙는 Go 프로그램이
 
 IAM 전환, TLS 검증 강도, CA 인증서를 싣는 방식, 실제 RDS로 검증할 범위는 내가 정했다. 미디어 쪽 구현·시험 실행·리뷰는 AI 에이전트(Claude Code와 Codex)가 했다. Java 앱 서버 쪽 구현은 그 서버들을 맡은 팀원이 했다. 에이전트가 구현한 미디어 쪽 코드는 10월 23일 공개 저장소 [`3K-PokeClip/PokeClip-mono#314`](https://github.com/3K-PokeClip/PokeClip-mono/pull/314)로 병합됐고(커밋 `7f99ccd1`), 실험 RDS 측정(10월 22일)도 에이전트가 했다(AWS 자원을 만들고 지우는 쓰기는 내가 승인했다).
 
-![짧게 사는 출입증을 든 작은 로봇이 유리 자료실로 걸어가고, 문 옆의 금고는 열린 채 비어 있는 그림](/images/pokeclip-shared-db-auth-iam-tls-hero-access.png)
-
-*금고(저장된 비밀번호) 대신 짧게 사는 출입증(IAM 토큰)으로 들어간다는 비유. AI 생성 그림이며 실제 구성도가 아니다.*
-
 ## 비밀번호를 없애면 무엇이 달라지나
 
 | | DB 비밀번호 | RDS IAM 토큰 |
