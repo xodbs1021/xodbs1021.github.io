@@ -30,3 +30,6 @@ motion/public/fonts/
 # gpt-image — 생성 원본 · 로그(프롬프트 prompts/*.txt 는 커밋한다)
 _workspace/blog/*/art/*.png
 _workspace/blog/*/art/*.log
+
+# Python 바이트코드
+__pycache__/
