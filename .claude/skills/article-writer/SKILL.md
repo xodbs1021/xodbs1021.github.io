@@ -13,7 +13,7 @@ description: "Medium 기술 아티클 스타일로 Hugo 블로그 포스트를 �
 | 에이전트 | 핵심 역할 | 언제 필요 | 파일 |
 |---------|---------|---------|------|
 | article-style-checker | Medium 스타일 7개 기준 검토 | 초안 완성 후 | `.claude/agents/article-style-checker.md` |
-| image-manager | Unsplash 검색 + Gemini 생성 | 이미지 요청/필요 시 | `.claude/agents/image-manager.md` |
+| image-manager | Unsplash 스톡 검색(생성 그림은 gpt-image) | 이미지 요청/필요 시 | `.claude/agents/image-manager.md` |
 | publisher | git add/commit/push | 발행 시 | `.claude/agents/publisher.md` |
 
 ---
