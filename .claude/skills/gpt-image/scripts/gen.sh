@@ -44,6 +44,9 @@ if [ -e "$out" ]; then
   exit 0
 fi
 
+# 강제 종료로 남은 지난 임시 파일을 이번 결과로 오인하지 않게 먼저 지운다.
+rm -f "$part"
+
 # 읽기 실패 · 빈 프롬프트로 생성하지 않는다(명령 치환 안의 실패는 set -e 가 잡지 못한다).
 if ! spec="$(cat -- "$prompt")" || [ -z "${spec//[[:space:]]/}" ]; then
   echo "FAIL $name: 프롬프트를 읽지 못했거나 비었다 $prompt" >&2

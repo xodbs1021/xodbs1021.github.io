@@ -22,7 +22,7 @@ description: "블로그 글에 쓸 글자 없는 그림(도입부 비유 일러�
 ## 실행 전 확인
 
 - **프롬프트는 OpenAI 로 나간다.** 계정 ID · 사설 주소 · 공개 전 제품 이름 · 내부 숫자를 프롬프트에 넣지 않는다. 생성은 사용자가 요청했거나 그림 계획을 승인했을 때만 한다(공통 기준 — 외부 공급자는 명시적으로 선택).
-- `codex features list | grep image_generation` 이 `stable true` 인지 보고, `codex --version` 을 작업 메모에 적는다.
+- macOS 전제다 — `gen.sh` · 배치 명령이 `sips` 를 쓴다. `codex features list | grep image_generation` 이 `stable true` 인지 보고, `codex --version` 을 작업 메모에 적는다.
 - 내장 도구가 실패하거나 없으면 멈추고 사용자에게 알린다. CLI 대체 경로나 다른 공급자로 넘어가지 않는다.
 
 ## 프롬프트
@@ -55,12 +55,12 @@ for f in _workspace/blog/<slug>/art/prompts/*.txt; do basename "$f" .txt; done \
 ## 검사
 
 1. 그림을 열어 본다(Read 도구로 이미지 열기). 볼 것: 글자 · 숫자 · 로고가 끼었는지, 팔레트 밖 색, 대상이 프롬프트와 같은지, 잘린 가장자리.
-2. 투명 소재는 실제로 투명한지 확인한다: `node .claude/skills/gpt-image/scripts/check-alpha.mjs <파일>...` 이 `OK`(네 모서리 알파 8 이하 · 투명 20–98%). `sips -g hasAlpha` 의 `yes` 는 알파 채널이 있다는 뜻일 뿐이라 모두 불투명한 RGBA 도 통과한다 — 그것으로 판정하지 않는다. 내장 경로에서 투명 배경이 실제로 나온 실측이 있지만(2026-10-31, 8/8장) 시기 · 모델에 따라 바뀔 수 있으니 매번 본다. `FAIL` 이면 프롬프트의 Output 줄을 확인하고 새 이름(`<name>-v2`)으로 한 번 다시 생성한다. 완전히 투명한 그림도 `FAIL` 이지만, 그림이 맞는지는 1번의 눈 확인이 판정한다.
+2. 투명 소재는 실제로 투명한지 확인한다(저장소 루트에서 `npm ci` 를 마친 뒤 — 블로그 의존성 `sharp` 를 쓴다): `node .claude/skills/gpt-image/scripts/check-alpha.mjs <파일>...` 이 `OK`(네 모서리 알파 8 이하 · 투명 20–98%). `sips -g hasAlpha` 의 `yes` 는 알파 채널이 있다는 뜻일 뿐이라 모두 불투명한 RGBA 도 통과한다 — 그것으로 판정하지 않는다. 내장 경로에서 투명 배경이 실제로 나온 실측이 있지만(2026-10-31, 8/8장) 시기 · 모델에 따라 바뀔 수 있으니 매번 본다. `FAIL` 이면 프롬프트의 Output 줄을 확인하고 새 이름(`<name>-v2`)으로 한 번 다시 생성한다. 완전히 투명한 그림도 `FAIL` 이지만, 그림이 맞는지는 1번의 눈 확인이 판정한다.
 3. 고칠 때는 한 번에 한 가지만 바꿔 다시 생성하고 다시 본다.
 
 ## 배치
 
-- **도입부 일러스트:** 긴 변 1600px 로 줄여 `static/images/<slug>-<name>.png` 에 둔다(`sips -Z 1600 <원본> --out static/images/<slug>-<name>.png`). 하위 폴더 금지(이미지 최적화가 바로 아래만 읽는다). 마크다운 이미지 문법으로 넣고 바로 아래 한 문장으로 생성 그림임을 밝힌다:
+- **도입부 일러스트:** 긴 변이 1600px 를 넘으면 1600px 로 줄여 `static/images/<slug>-<name>.png` 에 둔다(`sips -Z 1600 <원본> --out static/images/<slug>-<name>.png` — `sips -Z` 는 작은 원본을 키우므로 넘을 때만 쓰고, 아니면 그대로 복사한다). 하위 폴더 금지(이미지 최적화가 바로 아래만 읽는다). 마크다운 이미지 문법으로 넣고 바로 아래 한 문장으로 생성 그림임을 밝힌다:
 
   ```markdown
   ![<무엇을 빗댄 그림인지 한 문장>](/images/<slug>-<name>.png)
@@ -68,7 +68,7 @@ for f in _workspace/blog/<slug>/art/prompts/*.txt; do basename "$f" .txt; done \
   *<그림이 빗대는 것 한 문장>. AI 생성 비유 그림이며 실제 구성도가 아닙니다.*
   ```
 
-- **모션그래픽 소재:** 긴 변 1024px 로 줄여 `motion/public/art/<slug>/<name>.png` 에 둔다(`mkdir -p motion/public/art/<slug>` 뒤 `sips -Z 1024 …` — `sips` 는 폴더를 만들지 않는다). 이 폴더는 커밋된다(글꼴 폴더 `motion/public/fonts/` 만 git 제외). 이후는 [motion-explainer](../motion-explainer/SKILL.md) 「모션그래픽」 절.
+- **모션그래픽 소재:** 긴 변이 1024px 를 넘으면 1024px 로 줄여 `motion/public/art/<slug>/<name>.png` 에 둔다(`mkdir -p motion/public/art/<slug>` 뒤 `sips -Z 1024 …` — `sips` 는 폴더를 만들지 않고 작은 원본은 키우므로 넘을 때만 쓴다). 이 폴더는 커밋된다(글꼴 폴더 `motion/public/fonts/` 만 git 제외). 이후는 [motion-explainer](../motion-explainer/SKILL.md) 「모션그래픽」 절.
 - `_workspace/blog/<slug>/art/` 의 원본 PNG · 로그는 git 제외다. 프롬프트(`prompts/*.txt`)는 커밋해 다시 만들 수 있게 둔다.
 
 ## 기록

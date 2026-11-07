@@ -65,10 +65,11 @@ export const FlowPath: React.FC<FlowPathProps> = ({
     return null;
   }
   // 0 이하 · 비유한 값은 1프레임으로 — interpolate 는 입력 구간이 엄격히 증가해야 한다.
-  const drawn = progress(frame, start, Number.isFinite(drawFrames) ? Math.max(1, drawFrames) : 1);
+  const draw = Number.isFinite(drawFrames) ? Math.max(1, drawFrames) : 1;
+  const drawn = progress(frame, start, draw);
   const { strokeDasharray, strokeDashoffset } = evolvePath(drawn, d);
-  const cycle = Math.max(1, cycleFrames);
-  const flowStart = packetsFrom ?? start + drawFrames;
+  const cycle = Number.isFinite(cycleFrames) ? Math.max(1, cycleFrames) : 1;
+  const flowStart = packetsFrom ?? start + draw;
   const flowing = frame >= flowStart && frame < packetsUntil;
   const end = pointAt(d, length);
   const beforeEnd = pointAt(d, Math.max(0, length - TANGENT_STEP));
