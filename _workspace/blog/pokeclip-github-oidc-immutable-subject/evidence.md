@@ -22,7 +22,7 @@
 | 2 | 계정은 Innovation Sandbox 리스 계정(상위 조직 멤버), kty가 운영 측에 GitHub OIDC 허용 요청 | IDX 결정 48, 상단 설명 | 기록 |
 | 3 | 운영 측 답: SCP 차단 아님, 원인은 신뢰 정책 또는 공급자 | IDX 결정 78, R90 341 | 기록 |
 | 4 | 공급자 정상(URL·aud·지문 1개), 신뢰 정책 sub StringLike 옛 이름 형식 2개(대소문자 두 꼴), 저장소 설정 `use_immutable_subject: true`, CloudTrail AssumeRoleWithWebIdentity 48건 모두 AccessDenied·실제 sub는 immutable 꼴 | R90 341 | 실측(읽기) |
-| 5 | 이 저장소가 immutable이 된 이유는 미확인(대소문자 두 꼴 → 이름 변경 가능성) | R90 341 "미확인" | 미검증 |
+| 5 | 저장소 생성 2026-07-25(공개) → Changelog의 「2026-07-15 이후 생성 저장소 자동 적용」 대상. 직접 켠 기록 없음(341은 생성일 미확인). | `gh api repos/3K-PokeClip/PokeClip-mono` created_at 2026-11-07 조회, Changelog | 공개 데이터 + 추론(가장 그럴듯함) |
 | 6 | 신뢰 조건을 StringEquals aud + immutable develop sub로, 옛 값 제거 | R90 343 | 실행 기록 |
 | 7 | 1차 실행 스크립트 결함으로 수정 전 멈춤(역할 무변경 확인) → 2차 성공 | R92 progress 64·66 | 기록 |
 | 8 | PR 279: id-token: write, role-to-assume(비밀 AWS_DEPLOY_ROLE_ARN), role-duration-seconds 3600, 주석 정정 | R92 391, 394 | 코드 |
@@ -40,7 +40,7 @@
 | 20 | 키 삭제 전: OIDC 배포 3번 초록, CloudTrail 90일 882건 날짜 24개 모두 배포와 겹침(확정 아님) | R93 phase3-review-env, 453 | 실측(읽기) |
 | 21 | 키 삭제 10-18, 남은 키 0, 사용자 유지, 비밀 2개 삭제, 남은 AWS 비밀은 역할 ARN 하나 | R93 453, IDX 102 | 기록 |
 | 22 | 남은 것: develop 보호 규칙 없음, environment 승인자 0 → 실질 통제는 배포 브랜치 정책 | R93 445, IDX 9절 회부-6 | 기록 |
-| 23 | prod 계획: v1에서 main 기준 CI/CD, OIDC를 main + prod environment(승인자)로 좁힘 — **계획, 미구현** | `decisions/결정-CICD-v1-main병합기준-2026-10-23.md`, IDX 151 | 계획 |
+| 23 | 10-23 결정: v1 때 develop→main, main 기준 prod CI/CD. 11-03 PR 466 main 머지 `bad85cc7` · 태그 `v1.0.0` 완료, 그날 기록상 prod CI/CD(B12) 안 켬 · 재결정 미기록. prod OIDC(main + 승인자 있는 prod environment · immutable sub)는 **계획, 미구현** | `decisions/결정-CICD-v1-main병합기준-2026-10-23.md`, IDX 151, `specs/HTTPS-엣지-2026-10-06/출시v1.0.0-O7e-O7f-O8준비-2026-11-03.md` 5절 80행, `gh pr view 466`, 태그 v1.0.0 | 기록 + 계획 |
 
 ## 공식 문서 (2026-11-07 확인)
 
