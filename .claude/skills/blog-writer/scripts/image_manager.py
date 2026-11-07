@@ -4,7 +4,7 @@
 
 흐름:
   1. Unsplash 스톡 검색 → 있으면 바로 사용 (UNSPLASH_ACCESS_KEY 필요)
-  2. 없으면 → Stable Horde로 AI 이미지 생성 (완전 무료, API 키 불필요)
+  2. 없으면 실패로 끝난다. Stable Horde AI 생성은 --generate 로 명시했을 때만 한다(외부 공급자 명시 선택).
 
 Usage:
   python3 image_manager.py --topic "HLS segmentation" --filename "hls-segments"
@@ -190,7 +190,11 @@ def main():
         if result:
             image_data, ext = result
 
-    # Step 2: Stable Horde AI 생성
+    # Step 2: Stable Horde AI 생성 — --generate 로 명시했을 때만. 스톡이 없다고 생성 공급자로 몰래 넘어가지 않는다
+    # (공통 기준: 외부 공급자는 명시적으로 선택). 블로그 생성 그림의 기본 경로는 gpt-image 스킬이다.
+    if image_data is None and not args.generate:
+        print("\n❌ Unsplash 에서 찾지 못했다. 생성 그림이 필요하면 gpt-image 스킬을 쓰거나, Stable Horde 를 쓰기로 했으면 --generate 로 다시 실행한다.")
+        sys.exit(1)
     if image_data is None:
         print("🎨 Stable Horde로 이미지 생성 중...")
         result = generate_with_stable_horde(args.topic)
