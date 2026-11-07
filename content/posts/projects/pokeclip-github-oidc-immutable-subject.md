@@ -162,7 +162,7 @@ OIDC로 배포가 세 번 초록이 된 뒤 액세스 키를 정리했다. 지�
 
 이 신뢰의 실질적인 통제는 environment `dev-deploy`의 배포 브랜치 정책이다. 그 밖의 장치는 약하다. develop은 보호 브랜치라 강제 push와 삭제는 막혀 있지만, PR 필수 규칙과 필수 체크는 없다. 이것은 원래 있던 상태다. 이번에 새로 만든 `dev-deploy` environment에는 승인자를 두지 않았다. 그래서 develop에 직접 push할 수 있는 사람은 사실상 dev 배포 역할을 쓸 수 있다. 두 가지 모두 이번 작업에서는 바꾸지 않았고, prod를 설계할 때 판단할 항목으로 남겼다. AWS는 OIDC 정책에 environment를 쓴다면 environment에 보호 규칙을 두라고 강하게 권하고, 그 방법으로 배포 브랜치 제한을 든다. [AWS IAM 문서](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html#idp_oidc_Create_GitHub) 우리는 그 제한만 두었고, environment 승인자나 develop의 PR 필수 규칙처럼 그보다 강한 장치는 아직 없다.
 
-prod는 v1을 내면서 develop을 main에 병합하고 main 기준으로 배포하기로 했다. 그때 OIDC 신뢰 조건을 main 브랜치와 승인자가 있는 prod environment로 좁힐 계획이다. prod 역할의 `sub`도 처음부터 immutable 형식이어야 한다. 아직 계획이고 구현하지 않았다.
+10월 23일에는 v1을 낼 때 develop을 main에 병합하고, prod 배포는 main 기준 CI/CD로 돌리기로 정했다. 11월 3일 main 병합과 `v1.0.0` 태그는 끝났지만, 그날 기록 기준으로 prod CI/CD는 켜지 않았고 언제 켤지도 정하지 않았다. prod용 OIDC 역할을 만들 때는 신뢰 조건을 main 브랜치와 승인자가 있는 prod environment로 좁히고, `sub`도 처음부터 immutable 형식으로 쓸 계획이다. 이 부분은 아직 구현하지 않았다.
 
 ## 정리
 

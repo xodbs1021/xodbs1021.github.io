@@ -40,7 +40,7 @@
 | 20 | 키 삭제 전: OIDC 배포 3번 초록, CloudTrail 90일 882건 날짜 24개 모두 배포와 겹침(확정 아님) | R93 phase3-review-env, 453 | 실측(읽기) |
 | 21 | 키 삭제 10-18, 남은 키 0, 사용자 유지, 비밀 2개 삭제, 남은 AWS 비밀은 역할 ARN 하나 | R93 453, IDX 102 | 기록 |
 | 22 | 남은 것: develop 보호 규칙 없음, environment 승인자 0 → 실질 통제는 배포 브랜치 정책 | R93 445, IDX 9절 회부-6 | 기록 |
-| 23 | prod 계획: v1에서 main 기준 CI/CD, OIDC를 main + prod environment(승인자)로 좁힘 — **계획, 미구현** | `decisions/결정-CICD-v1-main병합기준-2026-10-23.md`, IDX 151 | 계획 |
+| 23 | 10-23 결정: v1 때 develop→main, main 기준 prod CI/CD. 11-03 PR 466 main 머지 `bad85cc7` · 태그 `v1.0.0` 완료, 그날 기록상 prod CI/CD(B12) 안 켬 · 재결정 미기록. prod OIDC(main + 승인자 있는 prod environment · immutable sub)는 **계획, 미구현** | `decisions/결정-CICD-v1-main병합기준-2026-10-23.md`, IDX 151, `specs/HTTPS-엣지-2026-10-06/출시v1.0.0-O7e-O7f-O8준비-2026-11-03.md` 5절 80행, `gh pr view 466`, 태그 v1.0.0 | 기록 + 계획 |
 
 ## 공식 문서 (2026-11-07 확인)
 
