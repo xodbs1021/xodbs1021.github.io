@@ -57,7 +57,7 @@ GitHub는 2026년 4월, OIDC 토큰의 `sub`에 소유자 ID와 저장소 ID를 
 | 이름 | `repo:3K-PokeClip/PokeClip-mono:ref:refs/heads/develop` |
 | immutable | `repo:3K-PokeClip@<OWNER_ID>/PokeClip-mono@<REPO_ID>:ref:refs/heads/develop` |
 
-우리 저장소에 이 설정이 왜 켜져 있었는지는 확인하지 못했다. 신뢰 정책에 대소문자가 다른 저장소 이름 두 개가 있었으니 이름을 바꾼 이력이 있을 수 있다. 다만 추정일 뿐이다. 확실한 것은 8월의 첫 시도부터 토큰이 이 형식으로 오고 있었고, 신뢰 정책이 그 형식을 몰랐다는 점이다.
+우리 저장소는 2026년 7월 25일에 만들어졌다. 7월 15일 이후 새로 만든 저장소에 이 형식이 자동으로 적용된다는 규칙에 해당한다. 누가 직접 켠 기록은 찾지 못했으니, 처음부터 자동 적용 대상이었다고 보는 것이 가장 그럴듯하다. 확실한 것은 8월의 첫 시도부터 토큰이 이 형식으로 오고 있었고, 신뢰 정책이 그 형식을 몰랐다는 점이다.
 
 ## 신뢰 조건부터 고쳤다
 
@@ -85,7 +85,7 @@ IAM 쓰기는 AI 쪽에서 실행하지 못했다. Claude Code의 자동 모드 
 - `role-duration-seconds: 3600`을 명시했다. 역할의 최대 세션이 1시간이고 잡 제한도 60분이다. 잡 시간을 늘리면 뒤쪽 AWS 호출이 세션 만료로 실패한다는 주석을 함께 달았다.
 - "SCP로 보인다"던 머리 주석을 실제 원인으로 고쳤다.
 
-역할 정책은 키 사용자와 같은 문서였다. dev EC2 한 대에 SSM 명령을 보내고 결과를 읽는 권한이다. 다만 결과 목록 조회 권한은 대상을 좁힐 수 없어 리전 단위였다. 이 권한은 뒤에서 뺀다.
+역할 정책은 키 사용자와 같은 문서였다. 명령 실행(`ssm:SendCommand`)은 dev EC2 한 대로 제한했지만, 결과 읽기 권한은 대상이 `Resource: "*"`였다. 그중 쓰지 않던 결과 목록 조회(`ssm:ListCommandInvocations`)는 뒤에서 뺀다. 남은 `ssm:GetCommandInvocation`도 대상이 `*`라서, 명령 ID와 인스턴스 ID를 알면 다른 명령의 결과를 읽을 수 있다. 이 범위는 지금도 그대로다.
 
 이 PR은 처음에 보안 검수 없이 PR 점검까지 갔다. 자격 증명과 IAM 신뢰를 바꾸는 변경인데 보안 검수 기록이 없다는 점을 PR 리뷰어가 HIGH로 지적했다. 그래서 보안 리뷰 에이전트와 Codex로 보안 검수를 따로 돌렸고, 둘 다 CRITICAL·HIGH 없이 통과했다.
 
@@ -101,12 +101,12 @@ IAM 쓰기는 AI 쪽에서 실행하지 못했다. Claude Code의 자동 모드 
 |---|---|---|
 | **배포 잡을 GitHub environment로 묶고 sub를 environment 형식으로 (택함)** | "그 environment를 쓰는 잡". environment의 배포 브랜치 정책도 함께 적용 | 다른 워크플로가 같은 environment를 쓰지 않게 둬야 함 |
 | 저장소 sub 템플릿에 워크플로 정보를 넣어 고정 | 특정 워크플로 | 저장소의 다른 OIDC 워크플로 sub도 모두 바뀜 |
-| 다른 워크플로에서 `id-token` 권한 제거 | 지금 있는 구멍 하나 | 조건 자체는 넓은 채로 남음 |
+| 다른 워크플로에서 `id-token` 권한 제거 (뺌) | 지금 있는 구멍 하나 | 우리 Claude Code 워크플로는 자기 인증에 OIDC가 필요해 이 권한을 빼면 멈춤. 신뢰 조건도 넓은 채로 남아 검토 중 후보에서 뺌 |
 
 나는 AI가 추천한 environment 방식을 택했다. AI가 `dev-deploy` environment를 만들고 배포 브랜치를 develop 하나로 제한했다. 같은 작업에서 두 가지를 더 정리했다.
 
 - `id-token: write`를 워크플로 맨 위에서 배포 잡으로 내렸다. 같은 파일에 잡이 추가돼도 그 잡이 역할을 자동으로 받지 않게 하려는 것이다.
-- 역할 정책에서 쓰지 않던 `ssm:ListCommandInvocations`를 뺐다. 앞에서 말한 리전 단위 결과 목록 조회 권한이다.
+- 역할 정책에서 쓰지 않던 `ssm:ListCommandInvocations`를 뺐다. 앞에서 말한, 대상이 `*`인 결과 목록 조회 권한이다.
 
 <figure>
 <video controls playsinline preload="none" poster="/images/pokeclip-github-oidc-immutable-subject-ref-vs-environment-poster.jpg" width="1920" height="1080" aria-label="신뢰 조건이 develop ref일 때는 배포 잡뿐 아니라 Claude Code 잡도 같은 sub라 신뢰 조건상 검문을 통과할 수 있지만, 조건을 environment dev-deploy로 좁히자 배포 잡만 통과하고 Claude Code 잡은 검문 앞에서 막히는 장면">
@@ -160,17 +160,17 @@ OIDC로 배포가 세 번 초록이 된 뒤 액세스 키를 정리했다. 지�
 
 ## 아직 남은 것
 
-이 신뢰의 실질적인 통제는 environment `dev-deploy`의 배포 브랜치 정책이다. 그런데 develop에는 PR 필수나 필수 체크 같은 보호 규칙이 없다. environment에도 승인자를 두지 않았다. develop에 직접 push할 수 있는 사람은 사실상 dev 배포 역할을 쓸 수 있다는 뜻이다. 둘 다 원래 있던 상태라 이번 작업에서는 바꾸지 않았고, prod를 설계할 때 판단할 항목으로 남겼다. AWS도 OIDC 정책에 environment를 쓴다면 보호 규칙을 두라고 강하게 권한다. [AWS IAM 문서](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html#idp_oidc_Create_GitHub)
+이 신뢰의 실질적인 통제는 environment `dev-deploy`의 배포 브랜치 정책이다. 그 밖의 장치는 약하다. develop은 보호 브랜치라 강제 push와 삭제는 막혀 있지만, PR 필수 규칙과 필수 체크는 없다. 이것은 원래 있던 상태다. 이번에 새로 만든 `dev-deploy` environment에는 승인자를 두지 않았다. 그래서 develop에 직접 push할 수 있는 사람은 사실상 dev 배포 역할을 쓸 수 있다. 두 가지 모두 이번 작업에서는 바꾸지 않았고, prod를 설계할 때 판단할 항목으로 남겼다. AWS는 OIDC 정책에 environment를 쓴다면 environment에 보호 규칙을 두라고 강하게 권하고, 그 방법으로 배포 브랜치 제한을 든다. [AWS IAM 문서](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html#idp_oidc_Create_GitHub) 우리는 그 제한만 두었고, environment 승인자나 develop의 PR 필수 규칙처럼 그보다 강한 장치는 아직 없다.
 
-prod는 v1을 내면서 develop을 main에 병합하고 main 기준으로 배포하기로 했다. 그때 OIDC 신뢰 조건을 main 브랜치와 승인자가 있는 prod environment로 좁힐 계획이다. prod 역할의 `sub`도 처음부터 immutable 형식이어야 한다. 아직 계획이고 구현하지 않았다.
+10월 23일에는 v1을 낼 때 develop을 main에 병합하고, prod 배포는 main 기준 CI/CD로 돌리기로 정했다. 11월 3일 main 병합과 `v1.0.0` 태그는 끝났지만, 그날 기록 기준으로 prod CI/CD는 켜지 않았고 언제 켤지도 정하지 않았다. prod용 OIDC 역할을 만들 때는 신뢰 조건을 main 브랜치와 승인자가 있는 prod environment로 좁히고, `sub`도 처음부터 immutable 형식으로 쓸 계획이다. 이 부분은 아직 구현하지 않았다.
 
 ## 정리
 
-처음 질문은 "왜 OIDC가 거부됐나"였다. 답은 조직 정책이 아니라 우리 신뢰 정책의 문자열 하나였다. 8월 주석이 말한 "일치"는 예상한 값끼리의 대조였고, STS가 실제로 받은 `sub`와는 비교되지 않았다. 그 값은 처음부터 CloudTrail에 있었다.
+처음 질문은 "왜 OIDC가 거부됐나"였다. 답은 조직 정책이 아니라 우리 신뢰 정책의 문자열 하나였다. 8월 주석이 말한 "일치"가 STS가 실제로 받은 `sub`와 대조한 결과라는 기록은 없다. 실제 값은 처음부터 CloudTrail에 있었다.
 
 전환하면서 배운 것은 세 가지다.
 
-- `sub`는 두 곳에서 바뀐다. 저장소 설정(immutable 형식)과 워크플로 설정(environment 참조 여부)이다. 둘 중 하나를 바꿀 때는 신뢰 조건도 같은 걸음에서 바꿔야 한다.
+- `sub`는 두 층에서 바뀐다. 저장소·조직의 OIDC 설정(immutable 형식, sub 템플릿)과 워크플로 설정(environment 참조 여부)이다. 둘 중 하나를 바꿀 때는 신뢰 조건도 같은 걸음에서 바꿔야 한다.
 - ref 단위 신뢰는 "이 워크플로"가 아니라 "그 브랜치에서 토큰을 받는 모든 잡"을 믿는다.
 - 문서로 확인할 수 없는 형식은 옛 값과 새 값을 잠깐 함께 받으면서 실제 값을 관측한 뒤 좁힌다. 그 사이 열리는 창은 따로 닫는다.
 
