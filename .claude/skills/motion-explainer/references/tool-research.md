@@ -18,7 +18,7 @@
 | HyperFrames | heygen-com/hyperframes · 76,245 · Apache-2.0 | v0.8.223(1.0 전) | 블록 약 450개 레지스트리를 실제로 쓰면 좋음 | **불합격** — 첫 사이트의 12초 영상을 사용자가 불합격 판정(10-31) |
 | Motion Canvas | motion-canvas/motion-canvas · 19,610 · MIT | 3.17.2(마지막 릴리스 2024-12) | 기본 부품은 훌륭 | 개발 정체 |
 | Revideo | midrender/revideo · 4,161 · MIT | 0.11.0 | Motion Canvas 갈래 | 작고 느려짐 |
-| Manim CE | ManimCommunity/manim · 42,045 · MIT | v0.22.1 | 단계형 도식은 강하지만 수학 영상처럼 보임 | 기각 — 미설치 · LaTeX 의존 · 한글 부담(11-03) |
+| Manim CE | ManimCommunity/manim · 42,045 · MIT | v0.22.1 | 단계형 도식은 강하지만 수학 영상처럼 보임 | 기각 — 미설치 · 수식을 쓰면 LaTeX 설치 부담 · 한글 부담(11-03) |
 | OpenMontage | calesthio/OpenMontage · 73,689 · AGPL-3.0 | — | 렌더러가 아니라 오케스트레이션 | 기각 — AGPL |
 
 블로그 그림 경로 조사(2026-11-03)에서 더 걸러진 것:
@@ -43,7 +43,7 @@
 
 - OpenAI `imagegen` 스킬이 Codex `skills/.system` 에 기본 탑재 — 「Default built-in tool mode (preferred): built-in `image_gen` … Does not require `OPENAI_API_KEY`」. CLI 대체 경로 `scripts/image_gen.py` 만 키가 필요하다.
 - 출력은 `~/.codex/generated_images/<세션>/exec-*.png` — 경로 인자가 없어 프롬프트로 「현재 폴더에 복사」 를 시킨다.
-- 투명 배경: 외부 보고(jdmnk/codex-imagegen-cli)는 「ChatGPT 경로에선 불가」 였지만, 실제로 8장 모두 알파가 있었다(남색 배경 합성으로 확인). 매번 `sips -g hasAlpha` 로 본다.
+- 투명 배경: 외부 보고(jdmnk/codex-imagegen-cli)는 「ChatGPT 경로에선 불가」 였지만, 실제로 8장 모두 알파가 있었다(당시 `sips -g hasAlpha` 와 남색 배경 합성으로 확인). 지금은 매번 `check-alpha.mjs`(네 모서리 투명 · 투명 비율)와 눈 확인으로 본다 — `hasAlpha` 는 모두 불투명한 RGBA 도 통과시켜 판정에 쓰지 않는다([gpt-image](../../gpt-image/SKILL.md) 「검사」).
 - 속도: 장당 약 40초, 5개 병렬로 10장 약 2분.
 - 실제 응답 모델명은 확인하지 못했다.
 - 시리즈 일관성: 모든 프롬프트에 같은 STYLE 블록(팔레트 hex · 조명 · 재질 · NO text). 프롬프트 순서는 장면 → 대상 → 세부 → 제약 → 용도 — https://developers.openai.com/cookbook/examples/multimodal/image-gen-models-prompting-guide

@@ -85,10 +85,6 @@ description: 블로그 글 작성 직전에 호출. image-need-judge로 이미�
 1. per-title-encoding-flow.png — 콘텐츠별 다른 사다리 (시각적 본질)
 2. shot-based-encoding.png — 영상 시간축 비트레이트 변화 (텍스트 표현 불가)
 
-패턴화 자기 점검:
-- 이전 5개 글의 갯수: 0, 0, 1, 0, 0
-- 이번 글: 2개 — 패턴 깨고 정직 판단함 ✅
-
 [영어 프롬프트]
 (image-prompt-generator 결과 첨부)
 ```
