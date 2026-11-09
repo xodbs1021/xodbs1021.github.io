@@ -119,13 +119,22 @@ try {
     const page=await browser.newPage();
     await page.route('**/api/views/**',r=>r.fulfill({status:200,contentType:'application/json',body:'{"views":0}'}));
     // Layout shifts are recorded from the first paint; a shift whose source sits in a figure fails.
-    await page.addInitScript(()=>{window.__shifts=[];new PerformanceObserver(list=>{for(const entry of list.getEntries())for(const source of entry.sources||[])window.__shifts.push({value:entry.value,figure:!!source.node?.closest?.('figure')})}).observe({type:'layout-shift',buffered:true})});
+    await page.addInitScript(()=>{window.__shifts=[];new PerformanceObserver(list=>{for(const entry of list.getEntries())for(const source of entry.sources||[]){const n=source.node,r=x=>[x.x,x.y,x.width,x.height].map(Math.round).join(',');window.__shifts.push({value:entry.value,at:Math.round(entry.startTime),figure:!!n?.closest?.('figure'),node:n?`${n.nodeName.toLowerCase()}${n.id?'#'+n.id:''}${typeof n.className==='string'&&n.className?'.'+n.className.split(' ')[0]:''} in ${n.closest?.('figure')?.id||'-'}`:'?',from:r(source.previousRect),to:r(source.currentRect)})}}).observe({type:'layout-shift',buffered:true})});
+    // Optional: reproduce slower CI runners locally (LAYOUT_CPU_THROTTLE=4). Thresholds are unchanged.
+    if(process.env.LAYOUT_CPU_THROTTLE)await (await page.context().newCDPSession(page)).send('Emulation.setCPUThrottlingRate',{rate:Number(process.env.LAYOUT_CPU_THROTTLE)});
     const requests=[];
     page.on('request',request=>requests.push(request.url()));
     for(const post of visualPosts){
       requests.length=0;
       await open(page,post.url,width,theme);
       const figures=page.locator('.chart-figure,.diagram');
+      // Layout shifts are judged on a reader's pass (load, then scroll past every figure) before any
+      // capture: element screenshots of figures taller than the viewport briefly resize it, which
+      // Chromium records as shifts that no visitor ever sees (CI run 42692708559).
+      // Dwell at each figure like a reader, so late size changes happen while it is on screen.
+      for(let i=0;i<await figures.count();i++){await figures.nth(i).scrollIntoViewIfNeeded();await page.waitForTimeout(200);}
+      const shifts=await page.evaluate(()=>window.__shifts.filter(s=>s.figure));
+      if(shifts.length)fail(`${post.url}@${width}/${theme}`,`layout shift from figures: ${shifts.map(s=>`${s.value.toFixed(4)} @${s.at}ms ${s.node} [${s.from}]→[${s.to}]`).join('; ')}`);
       for(let i=0;i<await figures.count();i++){
         const figure=figures.nth(i),scope=`${post.url}@${width}/${theme} figure ${i}`;
         try{
@@ -207,8 +216,6 @@ try {
           if(report.visuals.length%50===0)console.log(`Captured ${report.visuals.length} figures`);
         }catch(error){fail(scope,String(error));}
       }
-      const shifts=await page.evaluate(()=>window.__shifts.filter(s=>s.figure));
-      if(shifts.length)fail(`${post.url}@${width}/${theme}`,`layout shift from figures: ${shifts.map(s=>s.value.toFixed(4)).join(', ')}`);
       // Static figures need no chart or diagram runtime: report regressions in what the page downloads.
       if(!post.html.includes('is-interactive')){
         const heavy=requests.filter(u=>/\/_astro\/[^/]*(elk|echarts|mermaid|chart-live|flowDiagram|sequenceDiagram)[^/]*\.js/i.test(u));
