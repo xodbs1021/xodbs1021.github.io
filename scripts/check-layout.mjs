@@ -25,7 +25,7 @@ if (!process.env.LAYOUT_URL) {
 }
 const base = process.env.LAYOUT_URL || `http://127.0.0.1:${server.address().port}`;
 const browser = await chromium.launch();
-const report = {base, date:new Date().toISOString(), pages:[], visuals:[], states:[], failures:[]};
+const report = {base, date:new Date().toISOString(), pages:[], visuals:[], states:[], failures:[], warnings:[]};
 const fail = (scope, message) => {report.failures.push({scope,message});console.error(`FAIL ${scope}: ${message}`)};
 const slugName = url => url.replaceAll(/[^a-zA-Z0-9-]/g,'_');
 const widths = [320,390,768,1440];
@@ -47,7 +47,7 @@ const metrics = () => {
   const visible = el => !!el.getClientRects().length && getComputedStyle(el).visibility!=='hidden';
   if(document.documentElement.scrollWidth>innerWidth+1) issues.push(`document overflow ${document.documentElement.scrollWidth}/${innerWidth}`);
   for(const el of document.querySelectorAll('.prose p,.prose li,.article-description,.explanation-lab p,.explanation-lab label,.explanation-lab button')) {
-    if(!visible(el)||el.closest('.mermaid')) continue;
+    if(!visible(el)) continue;
     const s=getComputedStyle(el),r=rect(el);
     if(r.width<1) continue;
     // Explicit inner scrollers (code/table) are permitted, cropped prose is not.
@@ -112,62 +112,107 @@ try {
     await page.close();
   }));
   console.log(`Layout: ${report.pages.length} route/width checks, ${report.failures.length} issues`);
-  // Every chart/diagram is rendered, captured and checked at both text extremes.
-  // Images are not just loaded above the fold: visit each figure to trigger lazy rendering.
-  const visualPosts=posts.filter(p=>selected.includes(p.url)&&/data-chart|class="mermaid"|<svg/.test(p.html));
+  // Every chart/diagram is checked as readers see it: the variant actually shown at this width,
+  // its real rendered text size, how much of it fits before scrolling, contrast and accessible names.
+  const visualPosts=posts.filter(p=>selected.includes(p.url)&&/class="(chart-figure|diagram)[ "]/.test(p.html));
   for(const {width,theme} of (['pages','labs'].includes(process.env.LAYOUT_PHASE)?[]:[{width:390,theme:'light'},{width:1440,theme:'light'},{width:390,theme:'dark'}])){
     const page=await browser.newPage();
     await page.route('**/api/views/**',r=>r.fulfill({status:200,contentType:'application/json',body:'{"views":0}'}));
+    // Layout shifts are recorded from the first paint; a shift whose source sits in a figure fails.
+    await page.addInitScript(()=>{window.__shifts=[];new PerformanceObserver(list=>{for(const entry of list.getEntries())for(const source of entry.sources||[])window.__shifts.push({value:entry.value,figure:!!source.node?.closest?.('figure')})}).observe({type:'layout-shift',buffered:true})});
+    const requests=[];
+    page.on('request',request=>requests.push(request.url()));
     for(const post of visualPosts){
+      requests.length=0;
       await open(page,post.url,width,theme);
       const figures=page.locator('.chart-figure,.diagram');
       for(let i=0;i<await figures.count();i++){
         const figure=figures.nth(i),scope=`${post.url}@${width}/${theme} figure ${i}`;
         try{
           await figure.scrollIntoViewIfNeeded();
-          await figure.locator('canvas,svg').first().waitFor({timeout:15000});
-          await page.waitForTimeout(200); // Canvas animations have their own scheduler.
+          await figure.locator('svg:visible').first().waitFor({timeout:15000});
           const file=`visual-${slugName(post.slug)}-${width}-${theme}-${i}.png`;
           await figure.screenshot({path:path.join(out,file),animations:'disabled'});
-          const sizes=await figure.evaluate(el=>{
-            const svg=el.querySelector('.mermaid svg,.diagram-viewport svg');
-            const chart=el.querySelector('.echart svg');
-            const luminance=color=>{
-              const values=color.match(/[\d.]+/g)?.map(Number);
-              if(!values||values.length<3||values[3]===0)return null;
-              const rgb=values.slice(0,3).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4});
-              return rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722;
+          const sizes=await figure.evaluate((el,theme)=>{
+            const svg=[...el.querySelectorAll('svg')].find(s=>s.getClientRects().length);
+            const parse=color=>{
+              if(!color||color==='none'||color==='transparent')return null;
+              let v=color.match(/^color\(srgb ([\d.]+) ([\d.]+) ([\d.]+)(?: \/ ([\d.]+))?\)/);
+              if(v)return {rgb:[v[1],v[2],v[3]].map(Number),alpha:v[4]===undefined?1:Number(v[4])};
+              v=color.match(/[\d.]+/g)?.map(Number);
+              if(!v||v.length<3)return null;
+              return {rgb:v.slice(0,3).map(x=>x/255),alpha:v[3]??1};
             };
-            const contrastIssues=[...el.querySelectorAll('.mermaid .node')].flatMap(node=>{
-              const shape=node.querySelector('rect,polygon,circle,path'),label=node.querySelector('.nodeLabel');
-              if(!shape||!label)return [];
-              const a=luminance(getComputedStyle(shape).fill),b=luminance(getComputedStyle(label).color);
-              if(a===null||b===null)return [];
-              const contrast=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
-              return contrast<4.5?[`${label.textContent.slice(0,40)} (${contrast.toFixed(2)}:1)`]:[];
-            });
-            const clipped=chart?[...chart.querySelectorAll('text')].filter(t=>{const r=t.getBoundingClientRect(),b=chart.getBoundingClientRect();return r.width&&r.height&&(r.left<b.left-2||r.right>b.right+2||r.top<b.top-2||r.bottom>b.bottom+2)}).map(t=>t.textContent):[];
-            return {emptyStatic:el.classList.contains('static-diagram')&&!el.querySelector('svg text'),contrastIssues,chartWidth:chart?.getBoundingClientRect().width,clipped,error:el.textContent.includes('차트를 불러오지 못했습니다')||!!el.querySelector('.error-icon'),width:el.clientWidth,svgScale:svg?.viewBox.baseVal.width?svg.getBoundingClientRect().width/svg.viewBox.baseVal.width:null};
-          });
-          if(sizes.error) fail(scope,'visual renderer error');
+            const lum=({rgb})=>rgb.map(c=>c<=.04045?c/12.92:((c+.055)/1.055)**2.4).reduce((n,c,i)=>n+c*[.2126,.7152,.0722][i],0);
+            const ratio=(a,b)=>{const x=lum(a),y=lum(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
+            const bg=parse(getComputedStyle(el).backgroundColor);
+            if(!svg)return {error:true};
+            const box=svg.getBoundingClientRect(),view=svg.viewBox.baseVal;
+            const scale=view?.width?box.width/view.width:1;
+            const viewport=svg.closest('.diagram-viewport')||el;
+            const visibleRatio=Math.min(1,viewport.getBoundingClientRect().width/box.width);
+            const texts=[...svg.querySelectorAll('text')].filter(t=>t.getClientRects().length&&t.textContent.trim());
+            const textSizes=texts.map(t=>({text:t.textContent.trim().slice(0,30),px:parseFloat(getComputedStyle(t).fontSize)*scale}));
+            const small=textSizes.filter(t=>t.px<11.5).map(t=>`${t.text} (${t.px.toFixed(1)}px)`);
+            // Text sits either on a node shape (diagrams) or on the figure surface.
+            const lowText=[],lowMarks=[],hardSurfaces=[];
+            for(const t of texts){
+              // Mermaid paints actor text on its <tspan>; the <text> element itself carries the box fill.
+              const fill=parse(getComputedStyle(t.querySelector('tspan')||t).fill);if(!fill||fill.alpha<.9)continue;
+              // Sequence step numbers sit on the badge circle of their marker, not on the figure.
+              const node=t.classList.contains('sequenceNumber')?svg.querySelector('[id$="-sequencenumber"] circle'):t.closest('.node,.actor,g.label')?.parentElement?.querySelector?.(':scope > rect,:scope > polygon,:scope > path,:scope > circle');
+              const under=node&&parse(getComputedStyle(node).fill)?.alpha>=.9?parse(getComputedStyle(node).fill):bg;
+              if(under&&ratio(fill,under)<4.5)lowText.push(`${t.textContent.trim().slice(0,30)} (${ratio(fill,under).toFixed(2)}:1)`);
+            }
+            if(el.classList.contains('chart-figure'))for(const shape of svg.querySelectorAll('path,rect,circle')){
+              const r=shape.getBoundingClientRect(),s=getComputedStyle(shape);
+              const fill=parse(s.fill),stroke=parse(s.stroke),strokeWidth=parseFloat(s.strokeWidth)*scale;
+              const mark=fill&&fill.alpha*parseFloat(s.fillOpacity||'1')>=.9&&r.width*r.height>=16?fill:stroke&&strokeWidth>=1.5&&stroke.alpha>=.9?stroke:null;
+              if(mark&&bg&&ratio(mark,bg)<3&&ratio(mark,bg)>1.01)lowMarks.push(`${shape.tagName} ${ratio(mark,bg).toFixed(2)}:1`);
+            }
+            if(theme==='dark')for(const shape of svg.querySelectorAll('path,rect,polygon,circle')){
+              const fill=parse(getComputedStyle(shape).fill),r=shape.getBoundingClientRect();
+              if(fill&&fill.alpha>=.9&&r.width*r.height>100&&(fill.rgb.every(c=>c>.98)||fill.rgb.every(c=>c<.02)))hardSurfaces.push(shape.tagName);
+            }
+            const caption=el.querySelector('figcaption');
+            const captionContrast=caption&&bg?ratio(parse(getComputedStyle(caption).color),bg):null;
+            const title=svg.querySelector('title')?.textContent.trim();
+            const authoredLegacy=el.dataset.authored==='legacy';
+            return {authoredLegacy,variant:svg.closest('[class*="-variant"]')?.className||'svg',scale,visibleRatio,scrollAllowed:el.dataset.scroll==='allowed',minText:Math.min(...textSizes.map(t=>t.px)),small,lowText:[...new Set(lowText)].slice(0,8),lowMarks:[...new Set(lowMarks)].slice(0,8),hardSurfaces:hardSurfaces.length,captionContrast,title:!!title,desc:!!svg.querySelector('desc'),chart:el.classList.contains('chart-figure'),emptyStatic:el.classList.contains('static-diagram')&&!svg.querySelector('text'),error:!!el.querySelector('.diagram-missing')||el.classList.contains('diagram-missing')};
+          },theme);
+          if(sizes.error) fail(scope,'figure has no rendered SVG (missing pre-render?)');
           if(sizes.emptyStatic)fail(scope,'static SVG has no SVG text (HTML parser breakout)');
-          if(sizes.contrastIssues.length)fail(scope,'diagram text contrast below 4.5:1: '+sizes.contrastIssues.join(', '));
-          if(sizes.chartWidth&&sizes.chartWidth<700)fail(scope,'chart readable width lost (CSS import/cascade)');
-          if(sizes.clipped.length)fail(scope,'chart text outside canvas: '+sizes.clipped.join(', '));
-          if(sizes.svgScale!==null&&sizes.svgScale<.85)fail(scope,`diagram text shrunk to ${sizes.svgScale.toFixed(2)}x`);
-          const detail=figure.locator('.echart,.mermaid svg,.diagram-viewport svg').first();
-          const detailFile=file.replace('.png','-detail.png');
-          // Supplemental expanded image: real viewport capture above remains unchanged.
-          const scrollFrame=figure.locator('.chart-viewport,.mermaid,.diagram-viewport').first();
-          await scrollFrame.evaluate(el=>el.style.overflow='visible');
-          await detail.screenshot({path:path.join(out,detailFile),animations:'disabled'});
-          await scrollFrame.evaluate(el=>el.style.removeProperty('overflow'));
-          await scrollFrame.evaluate(el=>el.scrollLeft=el.scrollWidth);
-          await figure.screenshot({path:path.join(out,file.replace('.png','-end.png')),animations:'disabled'});
-          await scrollFrame.evaluate(el=>el.scrollLeft=0);
+          // Earlier hand-drawn SVG (fixed sizes/colors in the post) is reported, not failed; PR 3 rewrites it.
+          const authored=(message)=>sizes.authoredLegacy?report.warnings.push({scope,message:`earlier hand-drawn SVG: ${message}`}):fail(scope,message);
+          if(sizes.small?.length)authored('figure text renders below 12px: '+sizes.small.slice(0,6).join(', '));
+          if(sizes.lowText?.length)authored('figure text contrast below 4.5:1: '+sizes.lowText.join(', '));
+          if(sizes.lowMarks?.length)fail(scope,'data marks below 3:1 against the figure: '+sizes.lowMarks.join(', '));
+          if(sizes.hardSurfaces)fail(scope,`${sizes.hardSurfaces} hard-coded white/black surfaces in dark mode`);
+          if(sizes.captionContrast!==null&&sizes.captionContrast<4.5)fail(scope,`caption contrast ${sizes.captionContrast.toFixed(2)}:1`);
+          if(!sizes.title)fail(scope,'SVG has no <title>');
+          if(sizes.chart&&!sizes.desc)fail(scope,'chart SVG has no <desc>');
+          // At first view at least 80% of the drawing is visible; only earlier, undescribed figures may scroll.
+          if(width<=390&&sizes.visibleRatio<.8){
+            if(sizes.scrollAllowed)report.warnings.push({scope,message:`scrolls: ${(sizes.visibleRatio*100).toFixed(0)}% visible (earlier post, allowed)`});
+            else fail(scope,`only ${(sizes.visibleRatio*100).toFixed(0)}% of the figure is visible before scrolling`);
+          }
+          if(sizes.visibleRatio<1){
+            // Supplemental capture of the scrolled end; the real viewport capture above stays unchanged.
+            const scrollFrame=figure.locator('.diagram-viewport').first();
+            await scrollFrame.evaluate(el=>el.scrollLeft=el.scrollWidth);
+            await figure.screenshot({path:path.join(out,file.replace('.png','-end.png')),animations:'disabled'});
+            await scrollFrame.evaluate(el=>el.scrollLeft=0);
+          }
           report.visuals.push({url:post.url,width,theme,index:i,file,...sizes});
           if(report.visuals.length%50===0)console.log(`Captured ${report.visuals.length} figures`);
         }catch(error){fail(scope,String(error));}
+      }
+      const shifts=await page.evaluate(()=>window.__shifts.filter(s=>s.figure));
+      if(shifts.length)fail(`${post.url}@${width}/${theme}`,`layout shift from figures: ${shifts.map(s=>s.value.toFixed(4)).join(', ')}`);
+      // Static figures need no chart or diagram runtime: report regressions in what the page downloads.
+      if(!post.html.includes('is-interactive')){
+        const heavy=requests.filter(u=>/\/_astro\/[^/]*(elk|echarts|mermaid|chart-live|flowDiagram|sequenceDiagram)[^/]*\.js/i.test(u));
+        if(heavy.length)report.warnings.push({scope:`${post.url}@${width}/${theme}`,message:`static figures but loaded ${heavy.map(u=>u.split('/').pop()).join(', ')}`});
       }
     }
     await page.close();
@@ -307,5 +352,5 @@ try {
   await browser.close();
   if(server) await new Promise(resolve=>server.close(resolve));
 }
-console.log(JSON.stringify({routes:selected.length,pageChecks:report.pages.length,visuals:report.visuals.length,states:report.states.length,failures:report.failures.length,report:path.join(out,'report.json')}));
+console.log(JSON.stringify({routes:selected.length,pageChecks:report.pages.length,visuals:report.visuals.length,states:report.states.length,failures:report.failures.length,warnings:report.warnings.length,report:path.join(out,'report.json')}));
 if(report.failures.length){console.error(JSON.stringify(report.failures.slice(0,30),null,2));process.exitCode=1;}
