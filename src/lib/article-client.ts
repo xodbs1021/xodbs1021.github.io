@@ -34,6 +34,12 @@ if(slug && location.hostname==='taeyun.blog'){
 }
 const sectionObserver=new IntersectionObserver(entries=>{for(const entry of entries)if(entry.isIntersecting){document.querySelectorAll('.toc a').forEach(a=>a.classList.toggle('active',a.getAttribute('href')===`#${entry.target.id}`))}},{rootMargin:'-10% 0px -65% 0px'});document.querySelectorAll('.prose h2[id]').forEach(h=>sectionObserver.observe(h));
 
+// Diagrams that still overflow (earlier, wide drawings) say so under the caption.
+for(const viewport of document.querySelectorAll<HTMLElement>('.diagram-viewport')){
+  const figure=viewport.closest<HTMLElement>('figure');
+  const update=()=>{if(figure)figure.dataset.wide=String(viewport.scrollWidth>viewport.clientWidth+1)};
+  update();new ResizeObserver(update).observe(viewport);
+}
 // Screenshot/interaction readiness includes asynchronous diagram layout.
 // archify diagrams: live only on wide screens (the canvas is ~1560px wide); never fetched on mobile.
 const diagramFrames=[...document.querySelectorAll<HTMLIFrameElement>('iframe[data-diagram-src]')];

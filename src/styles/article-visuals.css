@@ -6,6 +6,8 @@
 .diagram-viewport:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .diagram-variant svg, .chart-variant svg { display: block; margin: 0 auto; }
 .diagram-narrow { display: none; }
+.visual-scroll-hint { display: none; margin-top: 6px; }
+[data-wide=true] > figcaption .visual-scroll-hint { display: block; }
 @container (max-width: 499px){.switch-500 .diagram-wide{display:none}.switch-500 .diagram-narrow{display:block}}
 @container (max-width: 599px){.switch-600 .diagram-wide{display:none}.switch-600 .diagram-narrow{display:block}}
 @container (max-width: 699px){.switch-700 .diagram-wide{display:none}.switch-700 .diagram-narrow{display:block}}

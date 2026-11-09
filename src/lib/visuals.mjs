@@ -4,6 +4,9 @@ import {loadManifest, readDiagramSvg, diagramKey, FONT_SIZE} from './diagrams.mj
 import {renderChart} from './chart-render.mjs';
 
 // Figures are emitted as placeholders while Markdown renders, then numbered in reading order.
+// Shown only when the drawing actually overflows (article-client sets data-wide).
+const SCROLL_HINT = '<span class="visual-scroll-hint">좌우로 스크롤하여 전체를 볼 수 있습니다.</span>';
+const withHint = figcaption => figcaption.replace('</figcaption>', `${SCROLL_HINT}</figcaption>`);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const manifest = loadManifest();
 export const visualReport = {warnings: [], missingDiagrams: []};
@@ -60,7 +63,7 @@ function mermaidFigure(item, figures, slug) {
   // Earlier posts may still scroll; new, fully described figures must fit (layout check fails otherwise).
   const scrollAttr = scrolls && !fig.complete ? ' data-scroll="allowed"' : '';
   const body = variants.map(v => `<div class="diagram-variant diagram-${v.variant}">${v.svg}</div>`).join('');
-  return `<figure class="diagram mermaid-figure${switchClass}" id="${esc(fig.id)}"${scrollAttr}><div class="diagram-viewport" tabindex="0" role="group" aria-label="${esc(fig.label)}">${body}</div>${fig.figcaption}</figure>`;
+  return `<figure class="diagram mermaid-figure${switchClass}" id="${esc(fig.id)}"${scrollAttr}><div class="diagram-viewport" tabindex="0" role="group" aria-label="${esc(fig.label)}">${body}</div>${withHint(fig.figcaption)}</figure>`;
 }
 
 function chartFigure(item, figures, slug) {
@@ -91,7 +94,7 @@ function staticSvgFigure(item, figures) {
   // Hand-drawn SVG is content: its sizes and colors are fixed in the post, so earlier ones are only reported.
   const legacy = fig.complete ? '' : `${width > PHONE_COLUMN ? ' data-scroll="allowed"' : ''} data-authored="legacy"`;
   const svg = /<title\b/.test(item.svg) ? item.svg : item.svg.replace(/(<svg\b[^>]*>)/, `$1<title>${esc(fig.title)}</title>`);
-  return `<figure class="diagram static-diagram" id="${esc(fig.id)}"${legacy}><div class="diagram-viewport" tabindex="0" role="group" aria-label="${esc(fig.label)}" style="--diagram-width:${width}px">${svg}</div>${fig.figcaption}</figure>`;
+  return `<figure class="diagram static-diagram" id="${esc(fig.id)}"${legacy}><div class="diagram-viewport" tabindex="0" role="group" aria-label="${esc(fig.label)}" style="--diagram-width:${width}px">${svg}</div>${withHint(fig.figcaption)}</figure>`;
 }
 
 function imageFigure(item, figures) {
