@@ -1,0 +1,48 @@
+{
+  "$comment": "블로그 색의 원천. scripts/build-tokens.mjs 가 src/styles/tokens.css 를 만들고, 도식·차트 렌더러와 motion/src/theme.ts 가 이 값을 읽는다. 대비 기준은 tests/visuals.test.mjs 가 고정한다(글자 4.5:1, 그래픽 3:1, 배경 bg·surface 둘 다).",
+  "themes": {
+    "light": {
+      "bg": "#ffffff",
+      "surface": "#f3f6f9",
+      "ink": "#172c40",
+      "muted": "#5d6e80",
+      "line": "#e5ebf0",
+      "grid": "#e5ebf0",
+      "accent": "#087f8b",
+      "accentSoft": "#e8f7f5",
+      "dataMuted": "#7a8a9b",
+      "danger": "#b42318",
+      "dangerSoft": "#fdecea",
+      "coverPanel": "#203e57",
+      "cat1": "#0072b2",
+      "cat2": "#b06a00",
+      "cat3": "#008b6a",
+      "cat4": "#d55e00",
+      "cat5": "#b0457f"
+    },
+    "dark": {
+      "bg": "#111c27",
+      "surface": "#192837",
+      "ink": "#e2edf4",
+      "muted": "#a0b1c0",
+      "line": "#2b3c4b",
+      "grid": "#2b3c4b",
+      "accent": "#70d4d0",
+      "accentSoft": "#173c43",
+      "dataMuted": "#6b7f93",
+      "danger": "#f97066",
+      "dangerSoft": "#3a2126",
+      "coverPanel": "#203e57",
+      "cat1": "#56b4e9",
+      "cat2": "#e69f00",
+      "cat3": "#009e73",
+      "cat4": "#d55e00",
+      "cat5": "#cc79a7"
+    }
+  },
+  "roles": {
+    "text": ["ink", "muted"],
+    "graphic": ["accent", "dataMuted", "danger", "cat1", "cat2", "cat3", "cat4", "cat5"],
+    "decorative": ["line", "grid", "accentSoft", "dangerSoft", "coverPanel"]
+  }
+}
