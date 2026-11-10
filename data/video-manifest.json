@@ -65,17 +65,31 @@
     "faststart": true,
     "poster": "/images/pokeclip-github-oidc-immutable-subject-sub-mismatch-poster.jpg"
   },
-  "pokeclip-pdt-chapters": {
-    "sha256": "135b1c4f4cc914b3b8ba3eb6a67ffa2a1f0e595b2ba36b8b640143a45d1e8183",
-    "bytes": 2425522,
+  "pokeclip-media-timeline-over-wall-clock-chapter-rule": {
+    "scene": "ChapterRule",
+    "alt": "영상 조각 다섯 개가 한 띠로 이어지는 동안, 앞 세 조각은 표시 시각을 이어 적어 장 1이 되고, 2분 틈 뒤의 조각에서 표시 시각이 건너뛰며 장 2가 열리고, 0.3초 일찍 온 다섯째 조각은 표시 시각을 앞 조각 끝보다 조금 당겨 적고 장 3을 여는 장면. 끝에는 세 단계 요약이 남는다",
+    "sha256": "1a5ef09e94679dbedec3c23512416c312048c56deb3195365215d1d244214928",
+    "bytes": 179026,
     "codec": "h264",
     "pixFmt": "yuv420p",
     "width": 1920,
     "height": 1080,
-    "duration": 50.6,
+    "duration": 11,
     "audio": 0,
     "faststart": true,
-    "poster": "/images/pokeclip-pdt-chapters-poster.jpg"
+    "poster": "/images/pokeclip-media-timeline-over-wall-clock-chapter-rule-poster.jpg",
+    "mobile": {
+      "sha256": "e2879845a8c8c8a52322da1f24788c4fbd99c4376f0e4d6954510a16aea8fd79",
+      "bytes": 217249,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-media-timeline-over-wall-clock-chapter-rule-mobile-poster.jpg"
+    }
   },
   "pokeclip-shared-db-auth-iam-tls-connection-token-lifetime": {
     "scene": "ConnectionTokenLifetime",

@@ -2,6 +2,7 @@ import { CONNECTION_TOKEN_LIFETIME_FRAMES, ConnectionTokenLifetime } from "./sce
 import { TOKEN_TO_VERIFIED_DB_FRAMES, TokenToVerifiedDb } from "./scenes/pokeclip-shared-db-auth-iam-tls/TokenToVerifiedDb";
 import { Composition, Still } from "remotion";
 import { CUTOVER_QUEUE_PAUSE_FRAMES, CutoverQueuePause } from "./scenes/aws-gcp-bidirectional-cutover-experiment/CutoverQueuePause";
+import { CHAPTER_RULE_FRAMES, ChapterRule } from "./scenes/pokeclip-media-timeline-over-wall-clock/ChapterRule";
 import { REF_VS_ENVIRONMENT_FRAMES, RefVsEnvironment } from "./scenes/pokeclip-github-oidc-immutable-subject/RefVsEnvironment";
 import { SUB_MISMATCH_FRAMES, SubMismatch } from "./scenes/pokeclip-github-oidc-immutable-subject/SubMismatch";
 import { BranchTreeVsLine } from "./scenes/rewind-missing-segment/BranchTreeVsLine";
@@ -53,6 +54,16 @@ export const RemotionRoot: React.FC = () => (
       component={CutoverQueuePause}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={CUTOVER_QUEUE_PAUSE_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="ChapterRule" component={ChapterRule} durationInFrames={CHAPTER_RULE_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="ChapterRuleMobile"
+      component={ChapterRule}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={CHAPTER_RULE_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}
