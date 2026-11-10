@@ -59,5 +59,13 @@
     "kind": "video",
     "posterFrame": 350,
     "alt": "신뢰 조건이 develop ref일 때는 배포 잡뿐 아니라 Claude Code 잡도 같은 sub라 신뢰 조건상 검문을 통과할 수 있지만, 조건을 environment dev-deploy로 좁히자 배포 잡만 통과하고 Claude Code 잡은 검문 앞에서 막히는 장면"
+  },
+  {
+    "id": "CutoverQueuePause",
+    "post": "aws-gcp-bidirectional-cutover-experiment",
+    "kind": "video",
+    "posterFrame": 290,
+    "alt": "트래픽 봇의 요청이 접수 큐를 거쳐 AWS 앱으로 흐르다가, 전환 중에는 앱으로 전달이 멈추고 요청이 접수 큐에 쌓이며, 전환이 끝나자 쌓인 요청부터 GCP 앱과 Cloud SQL 쪽으로 넘어가는 장면",
+    "mobile": true
   }
 ]

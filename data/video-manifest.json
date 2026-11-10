@@ -1,4 +1,30 @@
 {
+  "aws-gcp-bidirectional-cutover-experiment-cutover-queue-pause": {
+    "scene": "CutoverQueuePause",
+    "alt": "트래픽 봇의 요청이 접수 큐를 거쳐 AWS 앱으로 흐르다가, 전환 중에는 앱으로 전달이 멈추고 요청이 접수 큐에 쌓이며, 전환이 끝나자 쌓인 요청부터 GCP 앱과 Cloud SQL 쪽으로 넘어가는 장면",
+    "sha256": "ceabf9cbe425c2ffd3e1eb1d45e13fdecd80fbebdb7cf41394e3d164e1b233ed",
+    "bytes": 175567,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 10,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/aws-gcp-bidirectional-cutover-experiment-cutover-queue-pause-poster.jpg",
+    "mobile": {
+      "sha256": "39d3e1030556b33581f401ddc36021fbe50c0b9c109fb10b7456beadb09b5521",
+      "bytes": 193096,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 10,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/aws-gcp-bidirectional-cutover-experiment-cutover-queue-pause-mobile-poster.jpg"
+    }
+  },
   "multicloud-migration-film": {
     "sha256": "8ba874c5e8db0192a7218b5c362ce122ee466249875fbe5dc92bb0fe2b75d6ae",
     "bytes": 3228939,
