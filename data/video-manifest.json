@@ -91,18 +91,6 @@
       "poster": "/images/pokeclip-media-timeline-over-wall-clock-chapter-rule-mobile-poster.jpg"
     }
   },
-  "pokeclip-pdt-chapters": {
-    "sha256": "135b1c4f4cc914b3b8ba3eb6a67ffa2a1f0e595b2ba36b8b640143a45d1e8183",
-    "bytes": 2425522,
-    "codec": "h264",
-    "pixFmt": "yuv420p",
-    "width": 1920,
-    "height": 1080,
-    "duration": 50.6,
-    "audio": 0,
-    "faststart": true,
-    "poster": "/images/pokeclip-pdt-chapters-poster.jpg"
-  },
   "pokeclip-shared-db-auth-iam-tls-connection-token-lifetime": {
     "scene": "ConnectionTokenLifetime",
     "alt": "토큰 서명 뒤 시간이 흐르는 띠 아래로 연결 세 줄이 있다. 0분에 토큰 1로 로그인한 연결 1은 15분 공식 만료 뒤에도 그대로 질의하고, 17분의 연결 2는 새 토큰으로 로그인하며, 21분에 캐시한 토큰 1을 다시 쓴 연결 3은 PAM 인증 실패로 거부되는 장면",

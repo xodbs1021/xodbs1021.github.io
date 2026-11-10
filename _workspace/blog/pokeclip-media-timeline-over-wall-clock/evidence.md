@@ -38,7 +38,7 @@
 ## 그림
 
 - 그림 1 경로(Mermaid, 개념도) · 그림 2 보정식 전후(Mermaid, 개념도, 출처 PR #470) · 그림 3 장 규칙 반복 영상 `ChapterRule`(개념도, 값 설명용) · 그림 4 자연 겹침 그래프(실측, 비공개).
-- 11-02 판의 생성 일러스트(`/images/pokeclip-pdt-hero.jpg`)와 51초 영상(`/videos/pokeclip-pdt-chapters.mp4`)은 본문에서 뺐다(장식, 휴대폰 판독 불가, 포스터 148KB, 폐기된 「편집」 장면).
+- 11-02 판의 생성 일러스트(`/images/pokeclip-pdt-hero.jpg`)와 51초 영상(`/videos/pokeclip-pdt-chapters.mp4`)은 본문에서 뺐다(장식, 휴대폰 판독 불가, 포스터 148KB, 폐기된 「편집」 장면). — 2026-11-10 사용자 결정으로 저장소에서 삭제(어떤 글도 쓰지 않음, git 기록에는 남음).
 
 ## 넣지 않는 것
 

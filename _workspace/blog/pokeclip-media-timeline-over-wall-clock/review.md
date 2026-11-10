@@ -38,3 +38,5 @@
 ## 남은 일
 
 - 본문에서 뺀 `static/images/pokeclip-pdt-hero.jpg`, `static/videos/pokeclip-pdt-chapters.mp4`, `static/images/pokeclip-pdt-chapters-poster.jpg`는 다른 곳에서 쓰지 않음. 삭제 여부는 사용자 결정.
+
+- 옛 미디어 3개(51초 영상·포스터·생성 일러스트): 2026-11-10 사용자 결정으로 이번 PR에서 저장소에서 삭제, `data/video-manifest.json`에서도 제거(check-videos 재생성).
