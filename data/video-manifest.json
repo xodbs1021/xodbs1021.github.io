@@ -39,9 +39,9 @@
   },
   "pokeclip-github-oidc-immutable-subject-ref-vs-environment": {
     "scene": "RefVsEnvironment",
-    "alt": "신뢰 조건이 develop ref일 때는 배포 잡뿐 아니라 Claude Code 잡도 같은 sub라 신뢰 조건상 검문을 통과할 수 있지만, 조건을 environment dev-deploy로 좁히자 배포 잡만 통과하고 Claude Code 잡은 검문 앞에서 막히는 장면",
-    "sha256": "cc887d4b90b40b080fcefbb069053a8578110986ffeda78efd5dc3826c087e6c",
-    "bytes": 684617,
+    "alt": "세 단계가 차례로 바뀐다. PR 279 뒤에는 신뢰 조건이 develop ref라 배포 잡과 Claude Code 잡이 모두 조건상 검문을 지날 수 있고, 1단계에서는 조건이 ref와 environment 두 값이 되며 Claude Code 잡을 꺼 두고, 2단계에서는 조건이 environment dev-deploy 하나가 되어 배포 잡만 임시 자격을 받고 다시 켠 Claude Code 잡은 검문 앞에서 막히는 장면",
+    "sha256": "b84fc552b024dac02a4fb46420bb78abbc84087ed323d15bab4dd1c0a9811c58",
+    "bytes": 240557,
     "codec": "h264",
     "pixFmt": "yuv420p",
     "width": 1920,
@@ -49,21 +49,19 @@
     "duration": 12,
     "audio": 0,
     "faststart": true,
-    "poster": "/images/pokeclip-github-oidc-immutable-subject-ref-vs-environment-poster.jpg"
-  },
-  "pokeclip-github-oidc-immutable-subject-sub-mismatch": {
-    "scene": "SubMismatch",
-    "alt": "배포 잡이 숫자 ID가 붙은 sub를 담은 토큰을 STS에 내지만 신뢰 조건이 이름 형식이라 검문 앞에서 AccessDenied로 막히고, 신뢰 조건을 숫자 ID 형식으로 고치자 같은 토큰이 검문을 지나 임시 자격을 받는 장면",
-    "sha256": "2a12dfee9824917e4aa5bec2a2282d3f68c94c9f2ee4261d20a72898722d025e",
-    "bytes": 620432,
-    "codec": "h264",
-    "pixFmt": "yuv420p",
-    "width": 1920,
-    "height": 1080,
-    "duration": 12,
-    "audio": 0,
-    "faststart": true,
-    "poster": "/images/pokeclip-github-oidc-immutable-subject-sub-mismatch-poster.jpg"
+    "poster": "/images/pokeclip-github-oidc-immutable-subject-ref-vs-environment-poster.jpg",
+    "mobile": {
+      "sha256": "ea59044cb466a0aff224a4315dd073dc2b9ff7947c75cf87857956e1e335032c",
+      "bytes": 254469,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 12,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-github-oidc-immutable-subject-ref-vs-environment-mobile-poster.jpg"
+    }
   },
   "pokeclip-media-timeline-over-wall-clock-chapter-rule": {
     "scene": "ChapterRule",

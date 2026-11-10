@@ -1,5 +1,0 @@
-A temporary access key: a stylized teal key attached to a small round timer ring, suggesting credentials that expire after a short time.
-
-Style: clean isometric 3D tech illustration, soft studio lighting, matte materials with subtle glossy accents, calm editorial look. Palette strictly: deep ink #172c40, teal #087f8b, pale teal #e8f7f5, light grey #f3f6f9, slate #637489, white; use red #b42318 only for an error or blocked state. Absolutely NO text, letters, numbers, logos or brand marks anywhere.
-
-Output: a single isolated object, centered, square 1:1 image with a genuinely TRANSPARENT background (preserve alpha), no ground shadow plane, no backdrop.
