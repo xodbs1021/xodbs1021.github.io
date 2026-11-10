@@ -3,7 +3,7 @@ import path from 'node:path';
 import http from 'node:http';
 import {chromium} from 'playwright';
 import {posts} from '../src/lib/posts.mjs';
-import {labForSlug,labsForSlug} from '../src/lib/explanation-models.mjs';
+import {labForSlug,labsForSlug,cutoverStages} from '../src/lib/explanation-models.mjs';
 
 // Inspect the built site, including its actual cascade and client-side renderers.
 // LAYOUT_URL is also used after deployment; never increment public view counters.
@@ -262,11 +262,12 @@ try {
         await lab.locator('[data-choice="3"]').focus();await page.keyboard.press('ArrowRight');
         if(await lab.locator('[data-choice="0"]').getAttribute('aria-pressed')!=='true')fail(scope,'arrow key did not wrap to the first category');
       }else if(mode==='cutover'){
-        await lab.locator('[data-choice="2"]').click();
+        const fenced=cutoverStages.findIndex(stage=>stage.writer===null);
+        await lab.locator(`[data-choice="${fenced}"]`).click();
         if(!await lab.locator('[data-result]').textContent().then(t=>t.includes('없음')))fail(scope,'switch stage still reports a writer');
         await capture('switch');
         await lab.locator('[data-action=reset]').click();
-        for(let i=0;i<3;i++){await lab.locator('[data-action=next]').focus();await page.keyboard.press('Enter');}
+        for(let i=0;i<cutoverStages.length-1;i++){await lab.locator('[data-action=next]').focus();await page.keyboard.press('Enter');}
         if(!await lab.locator('[data-result]').textContent().then(t=>t.includes('대상 DB 하나')))fail(scope,'next button did not reach the final stage');
         if(!await lab.locator('[data-action=next]').isDisabled())fail(scope,'next stays enabled on the final stage');
         await capture('done');

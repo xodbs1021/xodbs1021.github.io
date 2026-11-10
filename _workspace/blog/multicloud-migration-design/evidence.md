@@ -1,41 +1,38 @@
-# 근거 메모 — projects/multicloud-migration-design (2026-11-01 작성)
+# evidence — multicloud-migration-design (2026-11-10 다시 쓰기)
 
-공개하지 않는 작업 메모. 주장 / 원본 / 확인 날짜 / 수행 주체 / 근거 유형.
+유형: 의사결정 (post-types.md). 시리즈 1편(설계와 바뀐 결정). 2편(AWS↔GCP 양방향 전환 실험)은 별도 글. 11-01 판의 근거 메모는 git 기록(origin/main 30247ee 이전)에 있다.
 
-| 주장 | 원본 | 확인 | 수행 주체 | 유형 |
-|---|---|---|---|---|
-| 4단계 흐름(수집→모델→적응→전환), Export만으로 런타임 의존성을 다 알 수 없다는 전제 | 볼트 Projects/multicloud-migration/architecture.md "설계 계약 (2026-10-31, 사용자 합의)" | 2026-11-01 | 김태윤이 AI(Codex)와 논의해 확정 — 원자료 raw/multicloud-migration/2026-10-31-site/02_cx_user-instructions_r1.txt "Codex conversation" | 가정·모형(설계) |
-| 단일 쓰기 DB, 두 앱 동시 운영 허용, C 단계 순서 | 같은 문서 "DB와 무중단 목표"; ADR-001 | 2026-11-01 | 김태윤 확정 | 가정·모형(설계) |
-| 대기 허용·실패·유실·중복 0건은 목표, 미측정 | 같은 문서 "목표", "실제 … 0건 달성은 미구현/미검증" | 2026-11-01 | — | 미검증(목표) |
-| 호환성 4분류 문구와 예시 | migration.taeyun.blog app.js categories (v1·v2 공개본 app.js 바이트 동일) | 2026-11-01 | Codex 작성(v1), 김태윤 지시 | 가정·모형 |
-| DB 전환 단계별 앱·DB 상태 문구 | 같은 app.js stages. 모형 단계 이름은 본문 표(A–D)에 맞춰 바꿈 | 2026-11-01 | Codex 작성(v1) | 가정·모형 |
-| 롤백 세 구간, 세 번째 칸 미정 (대상 승격 전 취소는 사이트 index.html "새 DB가 쓰기를 받기 전: … 전환을 취소해 원본 운영을 재개") | 볼트 architecture.md "대상이 새 쓰기를 받은 이후에는 검증된 역동기화/복구 없이 원본 주소로 되돌리지 않는다", index.md "다음 구현 전 결정할 것: … 역복제 지원 범위" | 2026-11-01 | 미정 항목은 볼트 기록. 후보 3개는 2026-10-31~11-01 Claude Code 대화에서 제안(김태윤 질문), 미결정 | 설계 검토·제안 |
-| DMS 글은 B→A 직접 역복제를 "not advisable"(복제 흐름을 시험할 수 없음)로 보고 fall forward(A→B→A′)를 권함 | https://aws.amazon.com/blogs/database/rolling-back-from-a-migration-with-aws-dms/ | 2026-11-01 WebFetch 재확인(후반부 잘림) | 문헌 | 문헌값 |
-| 구성 수집 공식 문서 3종, RDS 이전 2종 | 글 하단 URL 6개 (사이트 references와 동일) | 2026-10-31 | 문헌 | 문헌값 |
-| 구성도·상태도는 Claude Code가 archify로, 영상은 Claude Code가 Remotion으로, 일러스트는 Codex CLI image_gen(ChatGPT 로그인)으로 제작 | 볼트 Projects/multicloud-migration/decisions/ADR-002.md, specs/2026-10-31-site-v2-archify-remotion.md | 2026-11-01 | AI 제작, 김태윤 지시 | 사실(제작 방식) |
+## 역할
 
-## 미디어
+- 사용자(김태윤): 클라우드↔클라우드(AWS↔GCP) 이전 담당. 설계 원칙(단일 쓰기 DB, 2026-10-31 AI와 논의해 결정), 본선 범위·전환 방식 선택(2026-11-07), crosscloud PR 구현 지시·리뷰·머지, 11-08 실험 준비·실행·원복.
+- 팀원(이름 비공개 — 사용자 결정 2026-11-10): 전환 상태 머신 `migration.cloud`(Hackathon PR #61), 접수 큐 durable-ingress(sample-app `src/durable-ingress`), 실험에 쓴 gitops 경로.
+- AI: crosscloud 구현·리뷰(Codex, Claude Code). 설계 논의(Codex).
+- 실험 경로에 사용자 crosscloud 어댑터(#84)·리허설(#118)은 들어가지 않았다(볼트 specs/2026-11-08-crosscloud-pr118…: "#118 고정물 리허설은 실행하지 않는다", 실험은 팀원 gitops `apps/cloud-migration-aws`, 원장 29: 접수 큐 초기 대상 aws).
 
-| 파일 | 출처 | 생성 여부 |
+## 주장 → 근거
+
+| 주장 | 근거 | 종류 |
 |---|---|---|
-| static/images/multicloud-migration-hero.jpg | Codex CLI 내장 image_gen(ChatGPT 로그인) 2026-10-31 생성, 프롬프트 볼트 raw/multicloud-migration/2026-10-31-site-v2/06_cc_image-prompts_r1.txt | AI 생성 일러스트 — 본문에 명시 |
-| static/images/multicloud-migration-architecture.jpg | archify 3.2.0 구성도 화면 캡처(migration.taeyun.blog/architecture.html) | 실제 산출물 캡처 |
-| static/images/multicloud-migration-cutover-states.jpg | archify lifecycle 화면 캡처(cutover-states.html) | 실제 산출물 캡처 |
-| static/videos/multicloud-migration-film.mp4 | Remotion 4.0.539 렌더(57.8초, 1080p) → 블로그용 재인코딩 crf 26, 3.2MB, 무음 | 설명 영상 — 캡션에 명시 |
-| static/images/multicloud-migration-film-poster.jpg | 위 영상 150프레임 | — |
+| 상태 순서 PRECHECK→COPYING→READY→FENCING→DRAINING→STOPPING→SWITCHING→COMPLETED | https://github.com/SoftBankHackathon2026/Hackathon/blob/main/migration/CLOUD_MIGRATION.md (2026-11-10 확인, 28–48행) | 공개 코드 문서 |
+| FENCING: 원본 테이블을 한 트랜잭션에서 잠그고 ALWAYS 트리거 설치 | 같은 문서 38–39행 | 공개 |
+| DRAINING·STOPPING에서 기본키별 모든 열 전체 비교, 누락·추가·변경 0까지 | 같은 문서 40–43행 | 공개 |
+| SWITCHING 이후 오류 → NEEDS_RECOVERY, 자동 재시도·롤백 금지 | 같은 문서 106–108행 | 공개 |
+| 즉석 귀환/롤백 미제공, 역방향 = 새 job_id + 새 빈 대상 + 반대 설정 | 같은 문서 27–28행 | 공개 |
+| CDC = Debezium source + 테이블별 JDBC sink, 기본키 upsert | 같은 문서 34–36행 | 공개 |
+| 접수 큐: Redis Stream XADD 후 202 accepted | https://github.com/SoftBankHackathon2026/sample-app/blob/main/src/durable-ingress/service.js (29, 229행) | 공개 |
+| 원본 파악·대상 판정(읽기 전용, 사람 결정이 남으면 종료 코드 3) | https://github.com/SoftBankHackathon2026/Hackathon/pull/78 + 볼트 architecture.md 「전환 방식·감사 기록」 | 공개 PR |
+| AI 코드 적응 시연 제외("비밀번호 앱만"), 결합 탐지는 유지 | 볼트 ADR-005 3번 | 내부 결정 |
+| DNS 가중치 전환 → 접수 큐 전달 대상 전환으로 대체 | 볼트 ADR-005 1번 | 내부 결정 |
+| 11-08 결과: AWS→GCP 1,083=1,083, 복사 80초, 승인→전환 23초 / GCP→AWS 2,734=2,734, 82초, 21초 / 봇 쓰기 2,582건 실패 0·결과 불명 0 | 팀 내부 보고서(Notion, 비공개) + 볼트 specs/2026-11-08-team-demo… | **비공개 실측** — 사용자 결정 "비공개 실측으로 공개" |
+| 실험 Git 변경과 원복 | gitops PR #85 #87 #89 #92 (공개) | 공개 |
+| fall forward 권고, 직접 역복제는 시험 불가로 비권장 | https://aws.amazon.com/blogs/database/rolling-back-from-a-migration-with-aws-dms/ | 문헌 |
+| crosscloud PR 목록 | Hackathon #71 #77 #78 #80 #82 #84 #86 #118 (모두 merged, 2026-11-10 gh api 확인) | 공개 |
 
-## 상호작용 모형
+## 넣지 않는 것
 
-compatibility / cutover — src/lib/explanation-models.mjs. 실제 판정·전환을 하지 않는 설명용 모형. 모형 안 한계 문구에 명시.
+계정 ID, 클러스터·DB 인스턴스 이름, 내부 IP, Slack·Notion 주소, 팀원 이름.
 
-## 리뷰 반영 (2026-11-01)
+## 미확인
 
-- 측정 항목 "CDC 적용 위치"의 출처: 공개 drawio 2쪽 "추가 측정: 대기 시간·p95/p99 지연·CDC 적용 위치·진행 중 트랜잭션·전환 소요 시간" (raw/multicloud-migration/2026-10-31-site-v2/published/assets/multicloud-migration.drawio).
-- "조용히 실패", "URL 형식과 만료 규칙이 달라집니다" 같은 단정은 원자료에 없어 "놓칠 수 있습니다", "달라질 수 있습니다"로 낮춤.
-
-## 인터랙티브 구성도 임베드 (2026-11-02)
-
-- `static/diagrams/multicloud-migration-architecture/index.html`, `static/diagrams/multicloud-migration-cutover/index.html` = migration.taeyun.blog 의 `architecture.html`, `cutover-states.html` 과 같은 바이트(archify 3.2.0 산출물). 원본 JSON: 볼트 `raw/multicloud-migration/2026-10-31-site-v2/04_cc_archify-platform-candidate_r1.json`, `05_cc_archify-cutover-candidate_r3.json`.
-- 구성도를 고칠 때: JSON 수정 → `archify finalize` 4관문 통과 → 두 사이트(migration-site/dist, 이 블로그 static/diagrams)에 같은 파일을 복사 → `npm run build && npm test && npm run test:layout`.
-- 넓은 화면(900px 이상)+JS: `?embed=1&theme=<블로그 테마>`로 iframe을 스크립트가 채움. 좁은 화면·JS 끔: 최적화 이미지와 「전체 화면으로 열기」만 표시하고 iframe은 받지 않음.
-- 보안 헤더: `/diagrams/`만 같은 출처 프레임 허용(X-Frame-Options SAMEORIGIN, frame-ancestors 'self'). 나머지 경로는 DENY · frame-ancestors 'none' 유지. 전역 frame-src 에 'self' 추가.
+- 봇 "최대 지연 8.2초/4.1초"의 정확한 정의(요청 생성→처리 완료인지) — 보고서 원문 확인 전까지 1편에 쓰지 않음.
+- PostgreSQL 버전(실험 인프라) — 2편에서 확인.

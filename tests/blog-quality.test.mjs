@@ -100,9 +100,11 @@ test('a post can carry several explanation models, each a known mode',()=>{
 test('cutover model never lets two databases accept writes',()=>{
  const stages=cutoverStages.map((_,i)=>cutoverStage(i));
  for(const stage of stages)assert.ok(stage.writable.length<=1,stage.key);
- assert.deepEqual(stages.map(s=>s.writable[0]??null),['원본 DB','원본 DB',null,'대상 DB']);
- assert.match(stages[2].summary,/없음/);
- assert.throws(()=>cutoverStage(4));assert.throws(()=>cutoverStage(-1));
+ assert.deepEqual(stages.map(s=>s.key),['precheck','copying','ready','fencing','draining','stopping','switching','completed']);
+ assert.deepEqual(stages.map(s=>s.writable[0]??null),['원본 DB','원본 DB','원본 DB',null,null,null,'대상 DB','대상 DB']);
+ for(const i of [3,4,5])assert.match(stages[i].summary,/없음/);
+ assert.match(stages[6].gate,/NEEDS_RECOVERY/);
+ assert.throws(()=>cutoverStage(8));assert.throws(()=>cutoverStage(-1));
 });
 test('compatibility model covers the four classifications with an explicit next step',()=>{
  assert.equal(compatibilityCategories.length,4);
@@ -123,18 +125,20 @@ test('built posts render one section per declared model',()=>{
 });
 
 test('archify embeds stay unloaded in markup and only their own path may be framed',()=>{
- const slug='projects/multicloud-migration-design';
- const $=load(fs.readFileSync(`dist/posts/${slug}/index.html`,'utf8'));
- const figures=$('.diagram-embed');
- assert.equal(figures.length,2);
- figures.each((_,el)=>{
-  const frame=$(el).find('iframe'),src=frame.attr('data-diagram-src');
-  assert.equal(frame.attr('src'),undefined,'frame must be loaded by script on wide screens only');
-  assert.ok(frame.attr('title'));assert.equal(frame.attr('loading'),'lazy');
-  assert.ok(fs.existsSync(`dist${src}index.html`),src);
-  assert.equal($(el).find('.diagram-open').attr('href'),src);
-  assert.ok($(el).find('p img').attr('alt'));
- });
+ // Any post may embed an archify page; every embed must follow the same loading contract.
+ for(const p of posts){
+  const $=load(fs.readFileSync(`dist/posts/${p.slug}/index.html`,'utf8'));
+  $('.diagram-embed').each((_,el)=>{
+   const frame=$(el).find('iframe'),src=frame.attr('data-diagram-src');
+   assert.equal(frame.attr('src'),undefined,'frame must be loaded by script on wide screens only');
+   assert.ok(frame.attr('title'));assert.equal(frame.attr('loading'),'lazy');
+   assert.ok(fs.existsSync(`dist${src}index.html`),src);
+   assert.equal($(el).find('.diagram-open').attr('href'),src);
+   assert.ok($(el).find('p img').attr('alt'));
+  });
+ }
+ // Standalone archify pages stay published so links made before embeds were removed keep working.
+ for(const page of ['multicloud-migration-architecture','multicloud-migration-cutover'])assert.ok(fs.existsSync(`dist/diagrams/${page}/index.html`),page);
  const rules=JSON.parse(fs.readFileSync('vercel.json','utf8')).headers;
  const value=(rule,key)=>rule.headers.find(h=>h.key===key)?.value||'';
  const site=rules.find(r=>r.source==='/((?!diagrams/).*)'),diagrams=rules.find(r=>r.source==='/diagrams/(.*)');
