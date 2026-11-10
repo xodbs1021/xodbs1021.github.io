@@ -620,6 +620,15 @@
       "bytes": 18066
     }
   },
+  "e932f83607ca3ede": {
+    "source": "content/posts/projects/multicloud-migration-design.md",
+    "wide": {
+      "file": "e932f83607ca3ede-wide.svg",
+      "width": 430,
+      "height": 646,
+      "bytes": 25212
+    }
+  },
   "ed88d5fe785fe73f": {
     "source": "content/posts/tech-blurting/opus-deep-dive.md",
     "wide": {

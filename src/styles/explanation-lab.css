@@ -329,9 +329,6 @@
   .lab-choices {
     grid-template-columns:repeat(2,minmax(0,1fr))
   }
-  .lab-steps {
-    grid-template-columns:1fr
-  }
   .cutover-board {
     grid-template-columns:1fr
   }

@@ -5,7 +5,7 @@ const {slug}=Astro.props;
 const modes=labsForSlug(slug);
 const firstCategory=compatibilityCategories[0];
 const firstStage=cutoverStage(0);
-const titles={recovery:'이벤트가 없어도 인덱스를 채울 수 있을까?',authorization:'허용된 요청은 어디까지 도달할까?',latency:'대기 시간은 어디에 쌓일까?',compatibility:'대체 리소스가 있으면 같은 동작일까?',cutover:'앱이 두 곳에서 돌 때 쓰기는 어디로 갈까?'};
+const titles={recovery:'이벤트가 없어도 인덱스를 채울 수 있을까?',authorization:'허용된 요청은 어디까지 도달할까?',latency:'대기 시간은 어디에 쌓일까?',compatibility:'대체 리소스가 있으면 같은 동작일까?',cutover:'전환 단계마다 쓰기는 어느 DB가 받을까?'};
 ---
 {modes.map((mode,i)=>{const titleId=i===0?'lab-title':`lab-title-${mode}`;return <section class="explanation-lab" data-lab={mode} aria-labelledby={titleId} data-pagefind-ignore>
   <header><span class="category-label">직접 바꿔보기 · 설명용 모형</span><h2 id={titleId}>{titles[mode]}</h2><p>아래 결과는 선택한 입력으로 계산합니다. 실제 서버에 요청하거나 본문의 실험을 재실행하지 않습니다.</p></header>
@@ -42,7 +42,7 @@ const titles={recovery:'이벤트가 없어도 인덱스를 채울 수 있을까
     <p class="lab-limit">분류 예시는 판정 방식을 설명하기 위한 것입니다. 실제 판정은 엔진·버전·사용 기능·권한을 수집한 뒤 공식 문서를 근거로 하며, 이 모형은 어떤 리소스도 판정하지 않습니다.</p>
   </>}
   {mode==='cutover'&&<>
-    <p>앱은 두 클라우드에서 동시에 돌 수 있지만, DB 쓰기는 한 곳에서만 받습니다. 단계를 고르거나 「다음 단계」를 눌러 연결과 쓰기 주체가 어떻게 바뀌는지 보세요.</p>
+    <p>전환 도구는 단계마다 어느 DB가 쓰기를 받는지 바꿉니다. 단계를 고르거나 「다음 단계」를 누르면 앱 연결과 쓰기 주체가 어떻게 바뀌는지 볼 수 있습니다.</p>
     <div class="lab-choices lab-steps" role="group" aria-label="전환 단계">{cutoverStages.map((stage,j)=><button type="button" disabled data-choice={j} aria-pressed={j===0?'true':'false'}>{stage.label}</button>)}</div>
     <div class="lab-panel"><h3 data-panel="title">{firstStage.title}</h3><p data-panel="copy">{firstStage.copy}</p></div>
     <div class="cutover-board" data-writer={firstStage.writer}>
@@ -52,7 +52,7 @@ const titles={recovery:'이벤트가 없어도 인덱스를 채울 수 있을까
     </div>
     <div class="lab-actions"><button type="button" data-action="next" disabled>다음 단계</button><button type="button" data-action="reset" disabled>초기화</button></div>
     <p class="lab-result" role="status" aria-live="polite" data-result>{`${firstStage.stage} · ${firstStage.summary}`}</p>
-    <p class="lab-limit">설명용 모형입니다. 실제 CDC·전환·롤백은 아직 구현·측정하지 않았고, 요청 실패·쓰기 유실·중복 처리 0건은 합의한 목표일 뿐 결과가 아닙니다.</p>
+    <p class="lab-limit">설명용 모형입니다. 단계 이름과 조건은 팀원이 만든 전환 도구의 공개 문서를 따릅니다. 2026년 11월 8일 실험 결과는 본문에 비공개 실측으로 적었습니다.</p>
   </>}
   <noscript><p>JavaScript가 꺼져 있어 기본 예시를 표시합니다. 위 설명과 본문만으로도 조건과 한계를 읽을 수 있습니다.</p></noscript>
 </section>})}
