@@ -115,6 +115,32 @@
       "poster": "/images/pokeclip-recording-defect-in-origin-decode-recovery-mobile-poster.jpg"
     }
   },
+  "pokeclip-round-vod-round-document": {
+    "scene": "RoundDocument",
+    "alt": "한 회차(약 2시간)를 나타낸 띠에서 7.66초 조각 자리에 빨간 선이 서며 목록이 seq 4–1626과 seq 1627–1733 둘로 갈린다. 고치기 전 줄에는 다시보기 문서가 목록마다 하나씩 둘 생기고, 회차 API가 준 다시보기는 마지막 문서 B의 7.5분뿐이다. 고친 뒤 줄에서는 회차 문서 하나가 회차 전체 폭으로 자라고, 갈린 자리에 DISCONTINUITY 한 줄이 서며, 회차 API가 준 다시보기가 회차 전체 약 2시간을 덮는다",
+    "sha256": "3d2b20db4d0ea8bfec0c21c5d71cc955b49629e16c0381dab5185944b7eb0d6a",
+    "bytes": 254931,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-round-vod-round-document-poster.jpg",
+    "mobile": {
+      "sha256": "a59fdc21e1d4b7e9bd4ac37d985e608199b05c20d36141e94cbbe17fa432e981",
+      "bytes": 222285,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-round-vod-round-document-mobile-poster.jpg"
+    }
+  },
   "pokeclip-shared-db-auth-iam-tls-connection-token-lifetime": {
     "scene": "ConnectionTokenLifetime",
     "alt": "토큰 서명 뒤 시간이 흐르는 띠 아래로 연결 세 줄이 있다. 0분에 토큰 1로 로그인한 연결 1은 15분 공식 만료 뒤에도 그대로 질의하고, 17분의 연결 2는 새 토큰으로 로그인하며, 21분에 캐시한 토큰 1을 다시 쓴 연결 3은 PAM 인증 실패로 거부되는 장면",
