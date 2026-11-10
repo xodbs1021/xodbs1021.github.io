@@ -161,6 +161,15 @@
       "bytes": 19874
     }
   },
+  "48675b3ff0fcfc15": {
+    "source": "content/posts/0-to-1/pokeclip-black-screen-three-causes.md",
+    "wide": {
+      "file": "48675b3ff0fcfc15-wide.svg",
+      "width": 392,
+      "height": 631,
+      "bytes": 19895
+    }
+  },
   "4a61b431f94d8e2b": {
     "source": "content/posts/tech-blurting/ffmpeg-deep-dive.md",
     "wide": {

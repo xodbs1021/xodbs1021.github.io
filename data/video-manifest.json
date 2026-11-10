@@ -37,6 +37,32 @@
     "faststart": true,
     "poster": "/images/multicloud-migration-film-poster.jpg"
   },
+  "pokeclip-black-screen-three-causes-stage-unblock": {
+    "scene": "StageUnblock",
+    "alt": "OBS에서 화면까지 ① 변환, ② 목록·조각, ③ hls.js 초기화 세 단계가 놓인 길에서 진행선이 한 단계씩 나아간다. 진행선이 닿은 단계는 빨갛게 막히며 muxer 오류 반복, GAP 7개와 401, 생성자 예외 이름표가 뜨고, 고친 뒤에는 청록으로 바뀌며 당시 통과로 본 증거인 오류 0건, 창 30에서 GAP 0개, 생성자 통과가 남는다. 셋째 단계를 넘자 검은 화면 상자가 재생으로 바뀌고 재생과 되감기 이름표가 뜬다",
+    "sha256": "d41cd80012ce428f71fe4934c0b2e69a00f5f86d109e380aa92f164bf3dc3107",
+    "bytes": 216092,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11.5,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-black-screen-three-causes-stage-unblock-poster.jpg",
+    "mobile": {
+      "sha256": "fa2fd27af7f8d068a757d4621a5273734e42c97267635d0076dc33728d539597",
+      "bytes": 218173,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11.5,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-black-screen-three-causes-stage-unblock-mobile-poster.jpg"
+    }
+  },
   "pokeclip-github-oidc-immutable-subject-ref-vs-environment": {
     "scene": "RefVsEnvironment",
     "alt": "세 단계가 차례로 바뀐다. PR 279 뒤에는 신뢰 조건이 develop ref라 배포 잡과 Claude Code 잡이 모두 조건상 검문을 지날 수 있고, 1단계에서는 조건이 ref와 environment 두 값이 되며 Claude Code 잡을 꺼 두고, 2단계에서는 조건이 environment dev-deploy 하나가 되어 배포 잡만 임시 자격을 받고 다시 켠 Claude Code 잡은 검문 앞에서 막히는 장면",
