@@ -38,6 +38,15 @@
       "bytes": 19522
     }
   },
+  "12ec1e92c021bdff": {
+    "source": "content/posts/projects/aws-gcp-bidirectional-cutover-experiment.md",
+    "wide": {
+      "file": "12ec1e92c021bdff-wide.svg",
+      "width": 374,
+      "height": 757,
+      "bytes": 22663
+    }
+  },
   "18c1ace855c29607": {
     "source": "content/posts/tech-blurting/nvenc-gpu-transcoding.md",
     "wide": {
