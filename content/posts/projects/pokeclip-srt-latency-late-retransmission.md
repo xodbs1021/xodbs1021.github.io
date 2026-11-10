@@ -9,7 +9,7 @@ draft: false
 
 녹화 서버(MediaMTX)의 녹화기는 프레임이 빠져도 `too many reordered frames`라고 말합니다. [1편](/posts/projects/pokeclip-recording-defect-in-origin/)에서는 녹화 원본의 결함 조각이 이 오류와 녹화기 교체 근처에 몰려 있다는 데까지 확인했습니다. 11월 8일 운영 경로로 보낸 첫 시험 방송에서는 녹화기 오류 14건이 모두 송출 2–7분째, 받는 쪽 RTT(Round-Trip Time, 왕복 시간)가 최대 10.1초까지 뛴 구간에서 났습니다. AWS 실험대에서 143번 재 보니 지연만 튀는 것은 재정렬 오류를 내지 않았습니다. 급등 중 잃은 패킷의 재전송이 SRT latency 안에 오지 못하면 받는 쪽 SRT 구현(gosrt)이 그 자리를 건너뛰었고, 빠진 프레임이 녹화기 오류가 됐습니다. 실험대에서 latency를 3,000ms로 올리면 1.5초 급등의 재정렬 오류와 녹화기 교체가 0이 됐고, 그래서 OBS 플러그인의 latency 기본값을 1,000ms에서 3,000ms로 올렸습니다. 복호 오류가 있는 조각은 남았고, 평시 라이브 지연은 2초 늘어납니다.
 
-저는 PokeClip 팀에서 원인을 운영 경로 시험 방송으로 확정하자고 정했고, latency를 3초로 올리기로 정했습니다. 운영 미디어 서버의 SRT 통계 수집과 로그·카운터 읽기는 AI의 원격 실행이 자동 모드 분류기에 막혀 제가 읽기 전용으로 직접 실행했습니다. 실험 설계·실행·분석, 시험 방송의 OBS 송출 조작, PR 본문 작성은 AI(Claude Code와 하위 에이전트)가 했고, 리뷰는 Claude Code와 Codex가 했습니다. 플러그인 변경([PR #493](https://github.com/3K-PokeClip/PokeClip-mono/pull/493))은 develop에 머지됐고 운영 반영 전입니다.
+저는 PokeClip 팀에서 원인을 운영 경로 시험 방송으로 확정하자고 정했고, latency를 3초로 올리기로 정했습니다. 운영 미디어 서버의 SRT 통계 수집과 로그·카운터 읽기는 AI의 원격 실행이 자동 모드 분류기에 막혀 제가 읽기 전용으로 직접 실행했습니다. 실험 설계·실행·분석, 시험 방송의 OBS 송출 조작, 플러그인 코드 변경과 PR 본문 작성은 AI(Claude Code와 하위 에이전트)가 했습니다. 코드는 Claude Code와 Codex가 리뷰했고 제가 검수했습니다. 플러그인 변경([PR #493](https://github.com/3K-PokeClip/PokeClip-mono/pull/493))은 develop에 머지됐고 운영 반영 전입니다.
 
 ## 녹화기는 프레임이 빠져도 순서가 뒤바뀌었다고 말합니다
 
