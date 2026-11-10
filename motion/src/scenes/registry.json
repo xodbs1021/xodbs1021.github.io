@@ -67,5 +67,13 @@
     "posterFrame": 290,
     "alt": "트래픽 봇의 요청이 접수 큐를 거쳐 AWS 앱으로 흐르다가, 전환 중에는 앱으로 전달이 멈추고 요청이 접수 큐에 쌓이며, 전환이 끝나자 쌓인 요청부터 GCP 앱과 Cloud SQL 쪽으로 넘어가는 장면",
     "mobile": true
+  },
+  {
+    "id": "ChapterRule",
+    "post": "pokeclip-media-timeline-over-wall-clock",
+    "kind": "video",
+    "posterFrame": 320,
+    "alt": "영상 조각 다섯 개가 한 띠로 이어지는 동안, 앞 세 조각은 표시 시각을 이어 적어 장 1이 되고, 2분 틈 뒤의 조각에서 표시 시각이 건너뛰며 장 2가 열리고, 0.3초 일찍 온 다섯째 조각은 표시 시각이 앞 조각 끝보다 조금 뒤로 당겨 적히는 장면",
+    "mobile": true
   }
 ]

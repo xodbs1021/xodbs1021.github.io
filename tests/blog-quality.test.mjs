@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {load} from 'cheerio';
 import sharp from 'sharp';
-import {posts} from '../src/lib/posts.mjs';
+import {posts,slugify} from '../src/lib/posts.mjs';
 import {readingPaths,readingContext} from '../src/lib/reading-paths.mjs';
 import {reconcile,playbackCases,playbackDecision,latencyBudget,labForSlug,labsForSlug,compatibilityCategories,compatibilityCategory,cutoverStages,cutoverStage} from '../src/lib/explanation-models.mjs';
 
@@ -40,6 +40,20 @@ test('curated reading sequences have valid, unique destinations and correct neig
 test('original heading anchors remain unchanged after corrections',()=>{
  const baseline=JSON.parse(fs.readFileSync('data/legacy-heading-ids.json'));
  for(const p of posts) assert.deepEqual(p.headings.map(h=>h.id),baseline[p.slug],p.slug);
+});
+// Legacy ids are assigned by position, so inserting a heading without updating the baseline shifts every later id.
+test('legacy heading ids are not shifted onto other headings or duplicated',()=>{
+ for(const p of posts){
+  const own=p.headings.map(h=>slugify(h.text));
+  const ids=p.headings.map(h=>h.id);
+  assert.equal(new Set(ids).size,ids.length,`${p.slug}: duplicate heading id`);
+  for(const [i,id] of ids.entries()){
+   // Repeated heading text is de-duplicated by the anchor plugin (-1, -2 …); that is the heading's own id.
+   if(id===own[i]||id.replace(/-\d+$/,'')===own[i])continue;
+   const other=own.findIndex((s,j)=>j!==i&&s===id);
+   assert.equal(other,-1,`${p.slug}: heading ${i+1} carries the id of heading ${other+1} ("${id}")`);
+  }
+ }
 });
 test('responsive derivatives have the declared dimensions, formats, and original fallback',async()=>{
  const manifest=JSON.parse(fs.readFileSync('data/image-manifest.json'));
