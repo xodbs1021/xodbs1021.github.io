@@ -25,8 +25,9 @@
 
 - **손으로 쓴 SVG** — 정지 그림 · 짧은 반복에 맞지만, 블로그 렌더러가 본문 SVG 에 캡션 「구조와 흐름」 을 고정으로 붙인다. 2순위.
 - **Mermaid** — 갈래 · 흐름만. 움직임 없음. 3순위.
-- **GIF** — 이미지 최적화에서 빠지고 자동 재생이라 편집 정책(사용자 재생)과 어긋남. 금지.
-- **Lottie** — 블로그에 런타임이 없음.
+- **GIF** — 용량. 기존 클립 2개를 GIF(960px · 15fps)로 바꾸니 mp4 의 3.5배(214KB → 753KB) · 9.6배(620KB → 5.95MB)였다(2026-11-10 실측). 자동 재생은 형식이 아니라 재생 방식의 문제라 금지 근거가 아니다. https://web.dev/articles/replace-gifs-with-videos 도 같은 결론. 금지.
+- **Lottie · Rive** — 에디터(After Effects · Rive 에디터)로 만드는 형식이라 에이전트가 텍스트로 자동 생성하기 어렵다. 런타임도 추가로 필요하다(lottie-web gzip 약 77KB, Rive wasm 279–749KB, 2026-11-10 jsDelivr 확인). 기업 기술 블로그 레퍼런스 28개 중 기술 설명 본문에 쓴 곳은 없었다.
+- **Motion Canvas 주의** — 공식 도메인은 `motion-canvas.io` 다. `motioncanvas.io` 는 공식 사이트가 아니다(2026-11-10 확인, `/blog` 가 무관한 스팸).
 - **fal.ai 등 유료 생성 영상** — API 키 · 비용, 생성 영상 속 글자 · 도식을 믿을 수 없음.
 - **archify** — 정지 · 상호작용 구성도에는 맞음(블로그 `/diagrams/` 에 이미 씀). 시간에 따라 밀리는 움직임에는 안 맞음.
 
@@ -51,7 +52,7 @@
 
 ## 5. 라이선스
 
-- Remotion: 개인 · 직원 3명 이하 영리 조직 · 비영리 · 평가는 무료. 그 밖은 회사 라이선스(Creators 1인 월 $25, Automators 렌더당 $0.01 · 월 최소 $100). 인원은 회사 전체 기준. https://www.remotion.dev/docs/license/faq (10-31 확인). 이 블로그는 개인 사용.
+- Remotion: 개인 · 직원 3명 이하 영리 조직 · 비영리 · 평가는 무료. 그 밖은 회사 라이선스(Creators 1인 월 $25, Automators 렌더당 $0.01 · 월 최소 $100). 인원은 회사 전체 기준이고, 고객사 소유 프로젝트 · 외주 인력과 일하면 합산한다. https://www.remotion.dev/docs/license/faq (11-10 재확인). 이 블로그는 개인 사용. 위 표의 판 정보는 10-31 기준이며 11-10 기준 최신은 Remotion v4.0.542, Motion Canvas 3.17.2(변화 없음), Manim v0.22.1 이다(`gh api` 확인).
 - Pretendard: SIL OFL 1.1.
 
 ## 6. 원문 (볼트)
