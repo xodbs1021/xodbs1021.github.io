@@ -1,9 +1,12 @@
 ---
 title: "치지직 하이라이트 자동 추출 파이프라인 설계기 - PokeClip"
 date: 2026-06-13T00:52:51+09:00
+lastmod: "2026-11-11T06:13:36+09:00"
 categories: ["0-to-1"]
 draft: false
 ---
+
+> 2026년 6월 설계 초기(v3) 기록입니다. 그 뒤 하이라이트 탐지 구조는 [v3에서 v4로 바뀌었고](/posts/0-to-1/pokeclip-v3-to-v4-cascade/), 채팅 수집은 [Spring으로 옮겼습니다](/posts/0-to-1/pokeclip-language-ownership-boundaries/). 지금의 미디어 구조는 [미디어 시각을 정본으로 삼은 글](/posts/projects/pokeclip-media-timeline-over-wall-clock/)에서 다룹니다.
 
 라이브 방송에서 하이라이트 클립을 자동으로 뽑아내는 시스템을 만들었다. 치지직 스트림을 실시간으로 받아서 재밌는 순간을 감지하고, 클립으로 저장하는 파이프라인이다.
 

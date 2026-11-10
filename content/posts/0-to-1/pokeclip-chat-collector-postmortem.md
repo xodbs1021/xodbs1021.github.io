@@ -1,9 +1,12 @@
 ---
 title: "치지직·SOOP 실시간 채팅 수집기를 만들며 겪은 문제들"
 date: 2026-07-05T01:00:56+09:00
+lastmod: "2026-11-11T06:13:36+09:00"
 categories: ["0-to-1"]
 draft: false
 ---
+
+> 2026년 7월 초 Node·Fastify로 만든 채팅 수집기 시절의 기록이고, 본문은 AI(Claude Code)가 1인칭으로 쓴 회고입니다. 본문의 「사용자」가 저입니다. 채팅 수집은 그 뒤 [Spring으로 옮겼습니다](/posts/0-to-1/pokeclip-language-ownership-boundaries/).
 
 방송 채팅 데이터로 하이라이트를 찾아내는 도구를 만들면서 부딪힌 문제들과 해결 과정, 그리고 한 번의 틀린 가설에 대한 기록이다.
 
