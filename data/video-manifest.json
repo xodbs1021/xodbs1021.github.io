@@ -63,6 +63,32 @@
       "poster": "/images/pokeclip-black-screen-three-causes-stage-unblock-mobile-poster.jpg"
     }
   },
+  "pokeclip-database-authoritative-manifest-publishing-late-writer-fenced": {
+    "scene": "LateWriterFenced",
+    "alt": "writer A가 DB 장부에서 세대 10을 예약하고 PUT을 보낸 채 멈춘 사이 fence가 writer B로 넘어가고, B가 세대 11을 예약해 S3에 11번까지 담은 목록을 올린다. 늦게 도착한 A의 PUT은 S3 앞에서 412로, A가 장부를 맞추려는 쓰기는 fence 불일치로 막히고 S3에는 11번까지 담은 목록이 남는 장면",
+    "sha256": "f5e2d00c68cbb049ae7238c77047dfa55539204be8e4ddaf6c72c6930f23e31c",
+    "bytes": 194573,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11.5,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-database-authoritative-manifest-publishing-late-writer-fenced-poster.jpg",
+    "mobile": {
+      "sha256": "4a9bab72a7b371deb654deaec30dbbfd809f5468b7d9bcbbda84d74a0bd3e627",
+      "bytes": 180384,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11.5,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-database-authoritative-manifest-publishing-late-writer-fenced-mobile-poster.jpg"
+    }
+  },
   "pokeclip-github-oidc-immutable-subject-ref-vs-environment": {
     "scene": "RefVsEnvironment",
     "alt": "세 단계가 차례로 바뀐다. PR 279 뒤에는 신뢰 조건이 develop ref라 배포 잡과 Claude Code 잡이 모두 조건상 검문을 지날 수 있고, 1단계에서는 조건이 ref와 environment 두 값이 되며 Claude Code 잡을 꺼 두고, 2단계에서는 조건이 environment dev-deploy 하나가 되어 배포 잡만 임시 자격을 받고 다시 켠 Claude Code 잡은 검문 앞에서 막히는 장면",
@@ -87,6 +113,32 @@
       "audio": 0,
       "faststart": true,
       "poster": "/images/pokeclip-github-oidc-immutable-subject-ref-vs-environment-mobile-poster.jpg"
+    }
+  },
+  "pokeclip-manifest-window-boundaries-publish-boundary": {
+    "scene": "PublishBoundary",
+    "alt": "조각 9–13 가운데 9와 10은 완료, 11·12·13은 대기다. 12가 먼저 완료돼도 청록 공개 경계는 10 뒤에서 멈춰 있고, 11이 완료되는 순간 경계가 12 뒤까지 한 번에 늘어나며 13은 대기로 남는 장면",
+    "sha256": "1cee56510991a34b14d70b9f38d4bc42789115d25d2a353ffb1fe5d9736f3a86",
+    "bytes": 131176,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-manifest-window-boundaries-publish-boundary-poster.jpg",
+    "mobile": {
+      "sha256": "85c3946f543629006a310a9a0273eb1dc48118c2bfa261978dd0c9cc25c0035a",
+      "bytes": 134754,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-manifest-window-boundaries-publish-boundary-mobile-poster.jpg"
     }
   },
   "pokeclip-media-timeline-over-wall-clock-chapter-rule": {
@@ -165,6 +217,32 @@
       "audio": 0,
       "faststart": true,
       "poster": "/images/pokeclip-round-vod-round-document-mobile-poster.jpg"
+    }
+  },
+  "pokeclip-session-url-and-endlist-session-url-inherit": {
+    "scene": "SessionUrlInherit",
+    "alt": "세션 A 목록에 ENDLIST가 붙은 뒤, 끊긴 시간이 300초 창 안의 120초까지 흐르고 세션 B의 새 목록 주소가 열린다. A의 조각 0–14가 B 목록 머리로 내려와 접두부가 되고, 경계에 끊김 표시와 새 MAP이 선 뒤 B의 새 조각 15–17이 붙는다. A 목록은 ENDLIST를 단 채 그대로 남는 장면",
+    "sha256": "2e423abba978777f3c5a4b7fa4fd44822a11d4f1920c26caf3c8dbf75c2fcfa9",
+    "bytes": 204449,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11.5,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-session-url-and-endlist-session-url-inherit-poster.jpg",
+    "mobile": {
+      "sha256": "2553d1dfb58cd6b37d6c1245a78400269195588d6e93d481f3e166d082c7acf3",
+      "bytes": 231212,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11.5,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-session-url-and-endlist-session-url-inherit-mobile-poster.jpg"
     }
   },
   "pokeclip-shared-db-auth-iam-tls-connection-token-lifetime": {
@@ -271,6 +349,32 @@
       "audio": 0,
       "faststart": true,
       "poster": "/images/rewind-missing-segment-rewind-fallout-mobile-poster.jpg"
+    }
+  },
+  "stream-id-contract-compatible-migration-deploy-order": {
+    "scene": "DeployOrder",
+    "alt": "두 줄의 배포 순서. 위 줄은 소비자가 먼저 ingestStreamId로 조각을 찾게 배포되고 생산자가 새 streamId를 내 조각 조회가 정상으로 끝난다. 아래 줄은 생산자가 먼저 새 streamId를 내고 옛 소비자가 경로 칸에 세션 id를 넣어 조회해 0행으로 끝나는 장면",
+    "sha256": "5c01ca4932cf74175c2c4cfa98df334a44581abf0c8f93afcf6affa393fbbe80",
+    "bytes": 198259,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/stream-id-contract-compatible-migration-deploy-order-poster.jpg",
+    "mobile": {
+      "sha256": "0d272cb0a6662d18b52eda8dc02dc5642e06c61f68c027bfaa99c86ba7097797",
+      "bytes": 242301,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/stream-id-contract-compatible-migration-deploy-order-mobile-poster.jpg"
     }
   }
 }
