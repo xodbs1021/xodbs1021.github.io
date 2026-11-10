@@ -362,6 +362,15 @@
       "bytes": 20556
     }
   },
+  "74aea08aff8bf4b0": {
+    "source": "content/posts/projects/pokeclip-github-oidc-immutable-subject.md",
+    "wide": {
+      "file": "74aea08aff8bf4b0-wide.svg",
+      "width": 392,
+      "height": 490,
+      "bytes": 18429
+    }
+  },
   "7d101bec75286308": {
     "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
     "wide": {

@@ -4,7 +4,6 @@ import { Composition } from "remotion";
 import { CUTOVER_QUEUE_PAUSE_FRAMES, CutoverQueuePause } from "./scenes/aws-gcp-bidirectional-cutover-experiment/CutoverQueuePause";
 import { CHAPTER_RULE_FRAMES, ChapterRule } from "./scenes/pokeclip-media-timeline-over-wall-clock/ChapterRule";
 import { REF_VS_ENVIRONMENT_FRAMES, RefVsEnvironment } from "./scenes/pokeclip-github-oidc-immutable-subject/RefVsEnvironment";
-import { SUB_MISMATCH_FRAMES, SubMismatch } from "./scenes/pokeclip-github-oidc-immutable-subject/SubMismatch";
 import { REFETCH_FLOW_FRAMES, RefetchFlow } from "./scenes/rewind-missing-segment/RefetchFlow";
 import { REWIND_FALLOUT_FRAMES, RewindFallout } from "./scenes/rewind-missing-segment/RewindFallout";
 import { MOBILE_VIDEO, VIDEO } from "./theme";
@@ -49,8 +48,16 @@ export const RemotionRoot: React.FC = () => (
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}
     />
-    <Composition id="SubMismatch" component={SubMismatch} durationInFrames={SUB_MISMATCH_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
     <Composition id="RefVsEnvironment" component={RefVsEnvironment} durationInFrames={REF_VS_ENVIRONMENT_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="RefVsEnvironmentMobile"
+      component={RefVsEnvironment}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={REF_VS_ENVIRONMENT_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
     <Composition id="CutoverQueuePause" component={CutoverQueuePause} durationInFrames={CUTOVER_QUEUE_PAUSE_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
     <Composition
       id="CutoverQueuePauseMobile"
