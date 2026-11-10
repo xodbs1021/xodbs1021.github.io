@@ -1,11 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { createHash } from 'node:crypto';
 import matter from 'gray-matter';
 import MarkdownIt from 'markdown-it';
 import attrs from 'markdown-it-attrs';
 import anchor from 'markdown-it-anchor';
 import hljs from 'highlight.js';
+import {createVisuals,interactiveCharts} from './visuals.mjs';
 
 const root = process.cwd();
 const oldHeadings = JSON.parse(fs.readFileSync(path.join(root, 'data/legacy-heading-ids.json'), 'utf8'));
@@ -35,7 +35,21 @@ const md = new MarkdownIt({html:true, linkify:true, typographer:false, highlight
 const imageManifestPath = path.join(root,'data/image-manifest.json');
 const imageManifest = fs.existsSync(imageManifestPath) ? JSON.parse(fs.readFileSync(imageManifestPath,'utf8')) : {};
 const renderImage = md.renderer.rules.image;
-md.renderer.rules.image = (tokens,idx,options,env,self) => {
+// An image alone in its paragraph with figure attributes ({kind="…" caption="…"}) becomes a numbered figure.
+const FIGURE_ATTRS = ['kind','caption','source','id'];
+md.core.ruler.push('figure_images',state=>{
+  const tokens=state.tokens;
+  for(let i=1;i<tokens.length-1;i++){
+    const inline=tokens[i],children=inline.children?.filter(t=>!(t.type==='text'&&!t.content.trim())&&t.type!=='softbreak');
+    if(tokens[i-1].type!=='paragraph_open'||inline.type!=='inline'||children?.length!==1||children[0].type!=='image')continue;
+    const image=children[0];
+    if(!FIGURE_ATTRS.some(a=>image.attrGet(a)!==null&&a!=='id'))continue;
+    image.meta={...image.meta,figure:Object.fromEntries(FIGURE_ATTRS.map(a=>[a,image.attrGet(a)]).filter(([,v])=>v!==null))};
+    image.attrs=image.attrs.filter(([name])=>!FIGURE_ATTRS.includes(name));
+    tokens[i-1].hidden=true;tokens[i+1].hidden=true;
+  }
+});
+const renderPicture = (tokens,idx,options,env,self) => {
   const token=tokens[idx], src=token.attrGet('src');
   const image=imageManifest[src];
   token.attrSet('loading','lazy'); token.attrSet('decoding','async');
@@ -47,24 +61,24 @@ md.renderer.rules.image = (tokens,idx,options,env,self) => {
   const sources=['avif','webp'].filter(f=>image.variants[f]).map(f=>`<source type="image/${f}" srcset="${image.variants[f].map(v=>`${v.src} ${v.width}w`).join(', ')}" sizes="${sizes}">`).join('');
   return sources ? `<picture>${sources}${fallback}</picture>` : fallback;
 };
+md.renderer.rules.image = (tokens,idx,options,env,self) => {
+  const html=renderPicture(tokens,idx,options,env,self), figure=tokens[idx].meta?.figure;
+  return figure&&env.visuals ? env.visuals.placeholder({type:'image',html,attrs:figure}) : html;
+};
 const fence = md.renderer.rules.fence;
 md.renderer.rules.fence=(tokens,idx,options,env,self)=> {
-  if(tokens[idx].info.trim()==='mermaid') return `<figure class="diagram"><pre class="mermaid" tabindex="0" role="region" aria-label="다이어그램, 넓은 경우 좌우로 스크롤">${escape(tokens[idx].content)}</pre><figcaption>구조와 흐름<span class="visual-scroll-hint">좌우로 스크롤하여 전체를 볼 수 있습니다.</span></figcaption></figure>`;
+  const token=tokens[idx];
+  if(token.info.trim()==='mermaid') return env.visuals.placeholder({type:'diagram',source:token.content,attrs:Object.fromEntries(token.attrs||[])})+'\n';
   return fence(tokens,idx,options,env,self);
 };
-export const charts = new Map();
-export const posts = files(path.join(root,'content/posts')).filter(p=>p.endsWith('.md')&&!path.basename(p).startsWith('_')).map(file=>{
-  const {data,content}=parse(fs.readFileSync(file,'utf8'));
-  const slug=path.relative(path.join(root,'content/posts'),file).replace(/\.md$/,'').split(path.sep).join('/');
+// Only charts marked interactive="true" are fetched by the client; the rest are static SVG.
+export const charts = interactiveCharts;
+// Markdown → HTML with numbered figures. Exported so tests can render fixtures the same way.
+export function renderBody(content, slug) {
   const rawBlocks=[];
+  const visuals=createVisuals(slug);
   const body=content.replaceAll('https://xodbs1021.github.io','https://taeyun.blog')
-    .replace(/\{\{<\s*chart\s*([^>]*?)>\}\}([\s\S]*?)\{\{<\s*\/chart\s*>\}\}/g,(_,args,source)=>{
-      const id=createHash('sha256').update(source).digest('hex').slice(0,16);
-      charts.set(id,source.trim());
-      const caption=args.match(/caption="([^"]*)"/)?.[1]||'설명 자료';
-      const height=args.match(/height="(\d+)px"/)?.[1]||360;
-      return `\n<figure class="chart-figure"><div class="chart-viewport" tabindex="0" role="region" aria-label="차트, 넓은 경우 좌우로 스크롤"><div class="echart" data-chart="${id}" style="height:${Number(height)}px" role="img" aria-label="${escape(caption)}"></div></div><figcaption>${escape(caption)}<span class="visual-scroll-hint">좌우로 스크롤하여 전체를 볼 수 있습니다.</span></figcaption></figure>\n`;
-    }).replace(/\{\{<\s*rawhtml\s*>\}\}([\s\S]*?)\{\{<\s*\/rawhtml\s*>\}\}/g,(_,html)=>{
+    .replace(/\{\{<\s*chart\s*([^>]*?)>\}\}([\s\S]*?)\{\{<\s*\/chart\s*>\}\}/g,(_,args,source)=>`\n\n${visuals.placeholder({type:'chart',args,source})}\n\n`).replace(/\{\{<\s*rawhtml\s*>\}\}([\s\S]*?)\{\{<\s*\/rawhtml\s*>\}\}/g,(_,html)=>{
       rawBlocks.push(html);
       return `\n\n<!--BLOG_RAW_HTML_${rawBlocks.length-1}-->\n\n`;
     });
@@ -75,15 +89,17 @@ export const posts = files(path.join(root,'content/posts')).filter(p=>p.endsWith
     tokens[i].attrSet('id',id);
     headings.push({depth:Number(tokens[i].tag.slice(1)),id,text:tokens[i+1].children?.filter(t=>t.type==='text'||t.type==='code_inline').map(t=>t.content).join('')||tokens[i+1].content});
   }
-  const html=md.renderer.render(tokens,md.options,{})
-    .replace(/<!--BLOG_RAW_HTML_(\d+)-->/g,(_,index)=>rawBlocks[Number(index)])
-    .replace(/<svg\b[\s\S]*?<\/svg>/g, svg=>{
-    const width=Number(svg.match(/viewBox="[\d.]+ [\d.]+ ([\d.]+) [\d.]+"/)?.[1])||720;
-    return `<figure class="diagram static-diagram"><div class="diagram-viewport" tabindex="0" role="region" aria-label="다이어그램, 넓은 경우 좌우로 스크롤" style="--diagram-width:${width}px">${svg}</div><figcaption>구조와 흐름<span class="visual-scroll-hint">좌우로 스크롤하여 전체를 볼 수 있습니다.</span></figcaption></figure>`;
-  });
+  const html=visuals.finish(visuals.wrapStaticSvg(md.renderer.render(tokens,md.options,{visuals})
+    .replace(/<!--BLOG_RAW_HTML_(\d+)-->/g,(_,index)=>rawBlocks[Number(index)])));
+  return {html,headings,figures:visuals.figures.figures};
+}
+export const posts = files(path.join(root,'content/posts')).filter(p=>p.endsWith('.md')&&!path.basename(p).startsWith('_')).map(file=>{
+  const {data,content}=parse(fs.readFileSync(file,'utf8'));
+  const slug=path.relative(path.join(root,'content/posts'),file).replace(/\.md$/,'').split(path.sep).join('/');
+  const {html,headings,figures}=renderBody(content,slug);
   const plain=content.replace(/\{\{<[\s\S]*?>\}\}/g,'').replace(/<[^>]*>/g,'').replace(/[#*`\[\]]/g,'').replace(/\s+/g,' ').trim();
   const lead=(content.trim().split(/\n\s*\n/).find(p=>!p.startsWith('>')&&!p.startsWith('#')&&p!=='---')||'').replace(/[#*`]/g,'').replace(/\s+/g,' ').trim();
-  return {...data,slug,url:`/posts/${slug}/`,html,headings,raw:content,file:path.relative(root,file),category:classify(slug,data.categories?.[0]||slug.split('/')[0]),tags:data.tags||[],date:new Date(data.date),description:data.description||(lead.length>180?lead.slice(0,177)+'…':lead),minutes:Math.max(1,Math.ceil(plain.length/650))};
+  return {...data,slug,figures,url:`/posts/${slug}/`,html,headings,raw:content,file:path.relative(root,file),category:classify(slug,data.categories?.[0]||slug.split('/')[0]),tags:data.tags||[],date:new Date(data.date),description:data.description||(lead.length>180?lead.slice(0,177)+'…':lead),minutes:Math.max(1,Math.ceil(plain.length/650))};
 }).filter(p=>!p.draft && p.date <= new Date()).sort((a,b)=>b.date-a.date);
 export const formatDate = date => new Intl.DateTimeFormat('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit',timeZone:'Asia/Seoul'}).format(new Date(date));
 export const tags = [...new Set(posts.flatMap(p=>p.tags))];

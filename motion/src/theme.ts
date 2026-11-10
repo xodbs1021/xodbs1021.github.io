@@ -1,7 +1,8 @@
 import { loadFont } from "@remotion/fonts";
 import { staticFile } from "remotion";
+import tokens from "../../src/styles/visual-tokens.json";
 
-// 블로그(src/styles/global.css)와 같은 서체·팔레트를 쓴다.
+// 블로그와 같은 서체·팔레트를 쓴다.
 // 글꼴 파일은 npm install 때 scripts/copy-fonts.mjs 가 public/fonts 로 복사한다.
 const FAMILY = "Pretendard Variable";
 
@@ -14,16 +15,18 @@ loadFont({
 export const FONT = `'${FAMILY}', 'Apple SD Gothic Neo', sans-serif`;
 export const MONO = "'SF Mono', Menlo, monospace";
 
+// 색은 블로그와 같은 원천(src/styles/visual-tokens.json)의 밝은 테마 값을 쓴다.
+const LIGHT = tokens.themes.light;
 export const COLOR = {
-  ink: "#172c40",
-  muted: "#637489",
-  line: "#e5ebf0",
-  surface: "#f3f6f9",
-  accent: "#087f8b",
-  accentSoft: "#e8f7f5",
-  danger: "#b42318",
-  dangerSoft: "#fdecea",
-  white: "#ffffff",
+  ink: LIGHT.ink,
+  muted: LIGHT.muted,
+  line: LIGHT.line,
+  surface: LIGHT.surface,
+  accent: LIGHT.accent,
+  accentSoft: LIGHT.accentSoft,
+  danger: LIGHT.danger,
+  dangerSoft: LIGHT.dangerSoft,
+  white: LIGHT.bg,
 } as const;
 
 // 데스크톱 본문(760px)에서 약 0.4배, 390px 폭 휴대폰에서 약 0.17배로 줄어든다.

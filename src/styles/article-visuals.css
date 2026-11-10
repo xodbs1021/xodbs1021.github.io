@@ -1,27 +1,54 @@
-/* Never shrink diagram text to fit a phone or crop chart labels at its edge. */
-.prose .chart-figure, .prose .diagram { overflow: visible; }
-.chart-viewport, .diagram-viewport, .prose .mermaid {
-  max-width: 100%;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-}
-.chart-viewport > .echart { min-width: 720px; }
-.prose .mermaid {
-  font-family: inherit;
-  margin: 0;
-  border-radius: 0;
-}
-.mermaid svg { max-width: none; display: block; margin: auto; }
-.prose .mermaid p { margin: 0; word-break: normal; }
+/* Figures are pre-rendered SVG (diagrams: scripts/render-diagrams.mjs, charts: src/lib/chart-render.mjs).
+   Colors come from tokens.css, so the same SVG follows the theme toggle. Text never renders below 12px:
+   a figure switches to its narrow variant first, and only scrolls when no variant fits. */
+.prose .chart-figure, .prose .diagram { container-type: inline-size; }
+.diagram-viewport { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+.diagram-viewport:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.diagram-variant svg, .chart-variant svg { display: block; margin: 0 auto; }
+.diagram-narrow { display: none; }
 .visual-scroll-hint { display: none; margin-top: 6px; }
 [data-wide=true] > figcaption .visual-scroll-hint { display: block; }
-.chart-viewport:focus-visible, .mermaid:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-}
+@container (max-width: 499px){.switch-500 .diagram-wide{display:none}.switch-500 .diagram-narrow{display:block}}
+@container (max-width: 599px){.switch-600 .diagram-wide{display:none}.switch-600 .diagram-narrow{display:block}}
+@container (max-width: 699px){.switch-700 .diagram-wide{display:none}.switch-700 .diagram-narrow{display:block}}
+@container (max-width: 799px){.switch-800 .diagram-wide{display:none}.switch-800 .diagram-narrow{display:block}}
+@container (max-width: 899px){.switch-900 .diagram-wide{display:none}.switch-900 .diagram-narrow{display:block}}
+@container (max-width: 999px){.switch-1000 .diagram-wide{display:none}.switch-1000 .diagram-narrow{display:block}}
+@container (max-width: 1099px){.switch-1100 .diagram-wide{display:none}.switch-1100 .diagram-narrow{display:block}}
+@container (max-width: 1199px){.switch-1200 .diagram-wide{display:none}.switch-1200 .diagram-narrow{display:block}}
+@container (max-width: 1299px){.switch-1300 .diagram-wide{display:none}.switch-1300 .diagram-narrow{display:block}}
+@container (max-width: 1399px){.switch-1400 .diagram-wide{display:none}.switch-1400 .diagram-narrow{display:block}}
+@container (max-width: 1499px){.switch-1500 .diagram-wide{display:none}.switch-1500 .diagram-narrow{display:block}}
+@container (max-width: 1599px){.switch-1600 .diagram-wide{display:none}.switch-1600 .diagram-narrow{display:block}}
+@container (max-width: 1699px){.switch-1700 .diagram-wide{display:none}.switch-1700 .diagram-narrow{display:block}}
+@container (max-width: 1799px){.switch-1800 .diagram-wide{display:none}.switch-1800 .diagram-narrow{display:block}}
+@container (max-width: 1899px){.switch-1900 .diagram-wide{display:none}.switch-1900 .diagram-narrow{display:block}}
+@container (max-width: 1999px){.switch-2000 .diagram-wide{display:none}.switch-2000 .diagram-narrow{display:block}}
 
-.diagram-viewport svg { width: var(--diagram-width); max-width: none; display: block; }
-.diagram-viewport:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+/* Charts: 720px drawing above 600px of column, 360px drawing (horizontal bars, wrapped labels) below. */
+.chart-variant svg { width: 100%; height: auto; max-width: 100%; }
+.chart-narrow { display: none; max-width: 480px; margin: 0 auto; }
+@container (max-width: 599px) { .chart-wide { display: none; } .chart-narrow { display: block; } }
+.chart-axes { margin: 8px 0 0; font-size: 12px; line-height: 1.6; color: var(--muted); text-align: center; }
+.chart-figure.is-live .chart-variant { display: none; }
+.chart-figure .echart { width: 100%; }
+
+/* Data tables behind every chart: the accessible equivalent, collapsed by default. */
+.figure-data { margin-top: 12px; font-size: 13px; }
+.figure-data summary { cursor: pointer; color: var(--muted); text-align: center; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+.figure-data table { margin: 8px 0 0; font-size: 13px; background: var(--bg); }
+.figure-data th, .figure-data td { padding: 6px 10px; min-width: 0; }
+
+/* Captions: "그림 N." label, sentence, kind badge, source. */
+.prose figcaption .fig-label { font-weight: 700; color: var(--ink); }
+.prose figcaption .fig-kind { display: inline-block; margin-left: 6px; padding: 0 6px; border: 1px solid var(--line); border-radius: 6px; white-space: nowrap; }
+.prose figcaption .fig-source { margin-left: 6px; }
+.prose figcaption a { color: var(--accent); }
+.prose .image-figure img { margin-bottom: 0; }
+.diagram-missing { color: var(--danger); text-align: center; }
+
+/* Raw inline SVG kept as authored (from {{< rawhtml >}}). */
+.static-diagram .diagram-viewport svg { width: var(--diagram-width); max-width: none; }
 
 /* Interactive diagrams (archify) — desktop with JS: live iframe; mobile or no JS: image + open link. */
 .prose .diagram-embed{margin:32px 0}

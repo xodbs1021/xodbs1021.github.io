@@ -24,13 +24,15 @@
 `[읽는 이: developer · planner · reviewer · plan-reviewer]`
 
 - **언어:** JavaScript(ESM, `.mjs`) · Astro 컴포넌트 · TypeScript(`motion/` 과 `src/lib/article-client.ts`)
-- **프레임워크/런타임:** Astro 7 · markdown-it(+anchor · attrs) · ECharts 6 · Mermaid 12 · MiniSearch · sharp · Node 24.x. 조회수 API 는 Vercel 함수 `api/views.mjs` + Upstash Redis. 영상 장면은 `motion/`(Remotion 4.0.539 · React 19, 배포 제외).
+- **프레임워크/런타임:** Astro 7 · markdown-it(+anchor · attrs) · ECharts 6(빌드 때 서버 SVG 렌더) · Mermaid 12(개발 의존성, `npm run render:diagrams` 로 미리 렌더) · MiniSearch · sharp · Node 24.x. 조회수 API 는 Vercel 함수 `api/views.mjs` + Upstash Redis. 영상 장면은 `motion/`(Remotion 4.0.539 · React 19, 배포 제외).
 - **패키지 매니저:** npm(`package-lock.json`, CI · Vercel 모두 `npm ci`)
 - **핵심 디렉토리 맵:**
   - `content/posts/<카테고리 폴더>/<slug>.md` — 글 원문(frontmatter: title · date · categories · tags · draft · description). 카테고리 폴더 이름은 옛 Hugo 이름이고 표시 카테고리는 `src/lib/taxonomy.mjs` 가 정한다.
   - `src/lib/posts.mjs` — 글 읽기 · 소제목 id · 공개 필터(`!draft && date <= now`). `src/pages/` — 라우트. `src/components/` · `src/layouts/` — 화면.
   - `static/images/` · `static/videos/` — 그림 · 영상(바로 아래 평평한 이름). `static/diagrams/` — archify 임베드.
   - `data/legacy-heading-ids.json` — 공개된 글의 소제목 id 기준선.
+  - `src/styles/visual-tokens.json` — 색의 원천. `scripts/build-tokens.mjs` 가 `src/styles/tokens.css` 를 만들고, 도식 · 차트 렌더러와 `motion/src/theme.ts` 가 같은 값을 읽는다.
+  - `data/diagrams/mermaid/` + `data/diagram-manifest.json` — 미리 렌더한 Mermaid SVG(색은 CSS 변수). `data/legacy-figure-gaps.json` — 캡션 메타데이터(`kind` · `caption`)가 아직 없는 옛 그림 수 기준선.
   - `scripts/` — `optimize-images.mjs`(WebP/AVIF 파생) · `prepare.mjs` · `check-layout.mjs`(Playwright 화면 검수) · `legacy-redirects.mjs`(옛 주소 리다이렉트).
   - `tests/*.test.mjs` — node:test 단위 시험.
   - `motion/` — Remotion 장면(`src/scenes/<slug>/`, `registry.json` ↔ `Root.tsx`).
@@ -57,6 +59,9 @@
 
 - 공개된 글의 소제목 id 는 바꾸지 않는다. 새 글을 공개하거나 소제목을 바꾸면 `data/legacy-heading-ids.json` 에 그 글의 id 목록을 넣는다 — 안 넣으면 `tests/blog-quality.test.mjs` 가 실패하고, 바꾸면 밖에서 걸린 `#앵커` 링크가 깨진다.
 - 글 URL(카테고리 폴더 · slug)은 바꾸지 않는다 — 검색 색인과 밖의 링크가 그 경로를 가리킨다. 옮기거나 지우면 두 곳에 함께 넣는다: `taeyun.blog` 쪽 이동은 `vercel.json` redirects(지금은 카테고리 5건뿐), 옛 주소 `xodbs1021.github.io` 쪽은 `scripts/legacy-redirects.mjs` 가 `data/legacy-paths.json` 과 글 목록으로 안내 페이지를 만든다.
+- Mermaid 블록을 추가 · 수정하면 `npm run render:diagrams` 를 돌리고 `data/diagrams/mermaid/` · `data/diagram-manifest.json` 을 함께 커밋한다 — 빌드(`scripts/prepare.mjs`)는 브라우저를 띄우지 않으므로(Vercel 빌드 이미지에서 Chromium 이 안 뜬다) 렌더 결과가 없으면 실패한다.
+- 새로 공개하는 글의 그림(도식 · 차트 · 그림 속성을 단 이미지)은 `kind` 와 `caption` 을 갖춘다 — 없으면 `tests/visuals.test.mjs` 가 실패한다. 옛 그림을 고치면 `data/legacy-figure-gaps.json` 의 수를 같이 줄인다(기준선은 늘리지 않는다).
+- 색은 `src/styles/visual-tokens.json` 에서만 바꾼다 — `global.css` · 차트 JSON · motion 에 새 hex 를 쓰면 다크 화면에서 깨지고 대비 시험이 그 값을 보지 못한다.
 - 그림 · 영상은 `static/images` · `static/videos` **바로 아래** `<글 slug>-<장면>` 이름으로 둔다 — `optimize-images.mjs` 가 하위 폴더를 읽지 않아 크기 정보 · WebP/AVIF 파생본이 빠진다.
 - 정지 그림은 마크다운 이미지 문법으로 넣는다 — `<img>` · `<figure>` 를 직접 쓰면 렌더러가 크기 정보 · 파생본을 붙이지 않는다. 영상은 mp4 + 포스터 · `preload="none"` · 사용자 재생, GIF 금지(자동 재생 · 최적화 제외).
 - 새 글은 `draft: true` 로 시작하고, 처음 공개할 때 `date` 를 공개 시각으로 바꾼다 — 공개 필터가 `!draft && date <= now` 라 미래 날짜 글은 안 보이고, 초안 시각을 남기면 목록 순서가 틀린다(2026-11-04 실제로 겪음). 이미 공개된 글의 `date` 는 덮어쓰지 않는다.
@@ -73,7 +78,9 @@
 - 글 소제목 ↔ `data/legacy-heading-ids.json` ↔ `tests/blog-quality.test.mjs` — 공유 계약: slug 별 id 배열.
 - 본문 그림 경로 ↔ `scripts/optimize-images.mjs` ↔ 렌더러의 `<picture>` 생성 — 공유 계약: `static/images/<이름>` 평평한 경로 · 마크다운 이미지 문법.
 - `motion/src/scenes/registry.json` ↔ `motion/src/Root.tsx` ↔ `static/videos|images/<slug>-<장면>` ↔ 글의 `<video>` 마크업 — 공유 계약: 장면 id(PascalCase → kebab 파일 이름) · posterFrame · alt.
-- 차트 JSON(본문) ↔ `src/lib/chart-layout.mjs` ↔ `src/pages/charts/` — 공유 계약: ECharts option 형태.
+- 차트 JSON(본문) ↔ `src/lib/chart-render.mjs`(빌드 SSR) · `src/lib/chart-layout.mjs`(폭별 배치) ↔ `src/pages/charts/`(`interactive="true"` 차트만) — 공유 계약: ECharts option 형태(순수 JSON).
+- Mermaid 원문 ↔ `src/lib/diagrams.mjs`(키 = 원문 + 렌더 정책 + mermaid 판) ↔ `scripts/render-diagrams.mjs` ↔ `data/diagram-manifest.json` — 공유 계약: 키와 SVG 파일 이름.
+- 그림 속성(Mermaid 펜스 `{#id kind caption source}` · chart `kind` `source` `interactive` · 이미지 `{kind caption source}`) ↔ `src/lib/figures.mjs`(번호 · 캡션) ↔ `tests/visuals.test.mjs` — 공유 계약: `kind` 허용 값 6개.
 - 조회수: 화면 스크립트(`src/lib/article-client.ts`) ↔ `api/views.mjs` ↔ Upstash Redis — 공유 계약: 요청 경로 · 응답 JSON.
 
 ---
