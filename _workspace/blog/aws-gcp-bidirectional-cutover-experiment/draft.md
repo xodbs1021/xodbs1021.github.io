@@ -3,7 +3,7 @@ title: "AWS↔GCP DB 전환은 23초, 준비는 4시간이 넘었습니다"
 date: "2026-11-10T14:55:47+09:00"
 author: "김태윤"
 categories: ["projects"]
-draft: true
+draft: false
 description: "팀 데모 인프라의 PostgreSQL을 AWS에서 GCP로, 다시 AWS로 옮긴 실험. 전환은 20여 초였지만 한 번도 켜진 적 없는 전환 장치를 켜는 데 막힌 아홉 가지, 9초 만의 실패를 9분 뒤에 안 감시 실수, 역방향의 권한 우회와 원복까지."
 tags: ["멀티 클라우드", "마이그레이션", "CDC", "PostgreSQL", "EKS", "GKE", "SoftBank Hackathon"]
 ---
