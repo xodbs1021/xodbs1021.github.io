@@ -5,10 +5,14 @@
 // 출력 — 이미지 최적화(scripts/optimize-images.mjs)가 static/images 바로 아래만 읽으므로 하위 폴더를 쓰지 않는다.
 //   영상  static/videos/<글>-<장면>.mp4 (H.264) + static/images/<글>-<장면>-poster.jpg
 //   정지  static/images/<글>-<장면>.png
+//   휴대폰판(registry 의 "mobile": true) static/videos/<글>-<장면>-mobile.mp4 + static/images/<글>-<장면>-mobile-poster.jpg
+//     — Root.tsx 에 <장면 id>Mobile 이름으로 1080×1350 Composition 을 함께 등록한다.
+// 렌더가 끝나면 scripts/check-videos.mjs 로 영상 목록(data/video-manifest.json)을 다시 쓰고 규격을 검사한다.
 // <장면> 은 id 를 kebab-case 로 바꾼 것이다(RewindFallout → rewind-fallout).
 // 결과는 out/tmp 에 먼저 만들고, 전부 성공했을 때만 최종 위치로 옮긴다.
 import { bundle } from "@remotion/bundler";
 import { getCompositions, renderMedia, renderStill } from "@remotion/renderer";
+import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmdirSync, rmSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -19,6 +23,8 @@ const TMP = path.join(MOTION, "out", "tmp");
 const FONT = path.join(MOTION, "public", "fonts", "PretendardVariable.woff2");
 const ID = /^[A-Z][A-Za-z0-9]*$/;
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+const MOBILE = { width: 1080, height: 1350 };
+const mobileId = (id) => `${id}Mobile`;
 
 const fail = (message) => {
   throw new Error(message);
@@ -36,6 +42,7 @@ const loadRegistry = () => {
     if (scene.kind !== "video" && scene.kind !== "still") fail(`${where}: kind 는 video 또는 still`);
     if (typeof scene.alt !== "string" || scene.alt.trim() === "") fail(`${where}: alt 가 비었다`);
     if (scene.kind === "video" && !Number.isInteger(scene.posterFrame)) fail(`${where}: video 는 정수 posterFrame 이 필요하다`);
+    if (scene.mobile !== undefined && (scene.mobile !== true || scene.kind !== "video")) fail(`${where}: mobile 은 video 장면에만 true 로 쓴다`);
   }
   const ids = registry.map((scene) => scene.id);
   if (new Set(ids).size !== ids.length) fail("registry.json 에 겹치는 id 가 있다");
@@ -58,7 +65,7 @@ const pick = (args, registry) => {
 const check = (registry, compositions) => {
   if (!existsSync(FONT)) fail(`글꼴이 없다: ${FONT} — motion 폴더에서 npm install 을 다시 한다`);
   const registered = new Set(compositions.map((c) => c.id));
-  const listed = new Set(registry.map((scene) => scene.id));
+  const listed = new Set(registry.flatMap((scene) => (scene.mobile ? [scene.id, mobileId(scene.id)] : [scene.id])));
   const onlyRoot = [...registered].filter((id) => !listed.has(id));
   const onlyRegistry = [...listed].filter((id) => !registered.has(id));
   if (onlyRoot.length > 0 || onlyRegistry.length > 0) {
@@ -66,6 +73,11 @@ const check = (registry, compositions) => {
   }
   for (const scene of registry) {
     const { durationInFrames } = compositions.find((c) => c.id === scene.id);
+    if (scene.mobile) {
+      const mobile = compositions.find((c) => c.id === mobileId(scene.id));
+      if (mobile.width !== MOBILE.width || mobile.height !== MOBILE.height) fail(`${mobileId(scene.id)}: ${mobile.width}×${mobile.height} — 휴대폰판은 ${MOBILE.width}×${MOBILE.height}`);
+      if (mobile.durationInFrames !== durationInFrames) fail(`${mobileId(scene.id)}: 길이가 ${scene.id} 와 다르다`);
+    }
     const isStill = durationInFrames === 1;
     if ((scene.kind === "still") !== isStill) {
       fail(`${scene.id}: registry kind(${scene.kind}) 와 Root 등록(${isStill ? "Still" : "Composition"})이 다르다`);
@@ -78,16 +90,23 @@ const check = (registry, compositions) => {
 
 const outputsOf = (scene) => {
   const name = `${scene.post}-${kebab(scene.id)}`;
-  if (scene.kind === "still") return [{ kind: "still", final: path.join(REPO, "static", "images", `${name}.png`) }];
+  if (scene.kind === "still") return [{ kind: "still", id: scene.id, final: path.join(REPO, "static", "images", `${name}.png`) }];
+  const outputs = [
+    { kind: "video", id: scene.id, final: path.join(REPO, "static", "videos", `${name}.mp4`) },
+    { kind: "poster", id: scene.id, final: path.join(REPO, "static", "images", `${name}-poster.jpg`) },
+  ];
+  if (!scene.mobile) return outputs;
   return [
-    { kind: "video", final: path.join(REPO, "static", "videos", `${name}.mp4`) },
-    { kind: "poster", final: path.join(REPO, "static", "images", `${name}-poster.jpg`) },
+    ...outputs,
+    { kind: "video", id: mobileId(scene.id), final: path.join(REPO, "static", "videos", `${name}-mobile.mp4`) },
+    { kind: "poster", id: mobileId(scene.id), final: path.join(REPO, "static", "images", `${name}-mobile-poster.jpg`) },
   ];
 };
 
 const renderOne = async ({ kind, tmp, scene, composition, serveUrl }) => {
   if (kind === "video") {
-    await renderMedia({ composition, serveUrl, codec: "h264", crf: 23, outputLocation: tmp });
+    // yuv420p · faststart · 무음은 scripts/check-videos.mjs 가 다시 검사한다.
+    await renderMedia({ composition, serveUrl, codec: "h264", crf: 23, pixelFormat: "yuv420p", muted: true, outputLocation: tmp });
   } else if (kind === "poster") {
     await renderStill({ composition, serveUrl, output: tmp, frame: scene.posterFrame, imageFormat: "jpeg", jpegQuality: 88 });
   } else {
@@ -122,10 +141,10 @@ const renderAll = async (scenes, compositions, serveUrl) => {
   try {
     const done = [];
     for (const scene of scenes) {
-      const composition = compositions.find((c) => c.id === scene.id);
-      for (const { kind, final } of outputsOf(scene)) {
+      for (const { kind, id, final } of outputsOf(scene)) {
+        const composition = compositions.find((c) => c.id === id);
         const tmp = path.join(TMP, path.basename(final));
-        console.log(`렌더: ${scene.id} → ${path.basename(final)}`);
+        console.log(`렌더: ${id} → ${path.basename(final)}`);
         await renderOne({ kind, tmp, scene, composition, serveUrl });
         done.push({ tmp, final });
       }
@@ -156,6 +175,9 @@ const main = async () => {
       return;
     }
     await renderAll(scenes, compositions, serveUrl);
+    if (scenes.some((scene) => scene.kind === "video")) {
+      execFileSync(process.execPath, [path.join(REPO, "scripts", "check-videos.mjs")], { cwd: REPO, stdio: "inherit" });
+    }
   } finally {
     rmSync(serveUrl, { recursive: true, force: true });
   }

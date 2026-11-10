@@ -41,3 +41,62 @@ export const BAND_LABEL_Y = ROW_Y - 128;
 export const BAND_TAG_Y = ROW_Y - 140;
 /** 재생점 위 상태 이름표(「일시정지」 등)의 y. */
 export const PLAYHEAD_TAG_Y = ROW_Y - 200;
+
+// 장면 1(RewindFallout) 의 휴대폰판(1080×1350) 좌표. 조각 수 · 창 크기 · 시간 흐름은 그대로 두고 간격만 좁힌다.
+// RefetchFlow 는 아직 휴대폰판이 없어 위 데스크톱 상수만 쓴다.
+const M_LEFT = 75;
+const M_PITCH = 72;
+const M_CELL = { width: 66, height: 104 } as const;
+const M_ROW_Y = 700;
+const mCellX = (i: number) => M_LEFT + i * M_PITCH;
+
+export type RowGeometry = {
+  readonly left: number;
+  readonly cell: { readonly width: number; readonly height: number };
+  readonly rowY: number;
+  readonly cellX: (i: number) => number;
+  readonly bandX: (windowStart: number) => number;
+  readonly bandWidth: number;
+  readonly bandTop: number;
+  readonly bandHeight: number;
+  readonly playheadTop: number;
+  readonly playheadHeight: number;
+  readonly pausedX: number;
+  readonly bandLabelY: number;
+  readonly bandTagY: number;
+  readonly playheadTagY: number;
+};
+
+export const DESKTOP_ROW: RowGeometry = {
+  left: LEFT,
+  cell: CELL,
+  rowY: ROW_Y,
+  cellX,
+  bandX,
+  bandWidth: BAND_WIDTH,
+  bandTop: BAND_TOP,
+  bandHeight: BAND_HEIGHT,
+  playheadTop: PLAYHEAD_TOP,
+  playheadHeight: PLAYHEAD_HEIGHT,
+  pausedX: PAUSED_X,
+  bandLabelY: BAND_LABEL_Y,
+  bandTagY: BAND_TAG_Y,
+  playheadTagY: PLAYHEAD_TAG_Y,
+};
+
+export const MOBILE_ROW: RowGeometry = {
+  left: M_LEFT,
+  cell: M_CELL,
+  rowY: M_ROW_Y,
+  cellX: mCellX,
+  bandX: (windowStart: number) => mCellX(windowStart) - 8,
+  bandWidth: WINDOW_CELLS * M_PITCH - (M_PITCH - M_CELL.width) + 16,
+  bandTop: M_ROW_Y - 26,
+  bandHeight: M_CELL.height + 52,
+  playheadTop: M_ROW_Y - 56,
+  playheadHeight: M_CELL.height + 80,
+  pausedX: mCellX(PAUSED_CELL) + M_CELL.width * 0.22,
+  bandLabelY: M_ROW_Y - 128,
+  bandTagY: M_ROW_Y - 150,
+  playheadTagY: M_ROW_Y - 256,
+};
