@@ -117,6 +117,32 @@
     "faststart": true,
     "poster": "/images/pokeclip-shared-db-auth-iam-tls-token-to-verified-db-poster.jpg"
   },
+  "pokeclip-srt-latency-late-retransmission-late-retransmit": {
+    "scene": "LateRetransmit",
+    "alt": "보낸 뒤 0초부터 4초까지의 시간축 세 줄을 재생점이 함께 지난다. latency 1초 창에서 급등 중 잃은 패킷은 창 끝에서 건너뛰어지고 2.8초에 온 재전송은 늦어서 버려진다. latency 3초 창에서는 같은 재전송이 창 안에 와 그 자리를 메운다. 잃지 않고 1.5초 늦게 온 패킷은 1초 창을 지났어도 버리지 않고 내보낸다",
+    "sha256": "20822d3938d148e122aed52bd4a54ecbb7a22ed83c7fddefdb473eafae41c6e2",
+    "bytes": 202889,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-srt-latency-late-retransmission-late-retransmit-poster.jpg",
+    "mobile": {
+      "sha256": "e9aa2d64aaa2e5bae70419486d169cf0cca66c3ef0f2eafc03cec84a2ece5287",
+      "bytes": 205176,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-srt-latency-late-retransmission-late-retransmit-mobile-poster.jpg"
+    }
+  },
   "rewind-missing-segment-refetch-flow": {
     "scene": "RefetchFlow",
     "alt": "창 밖에서 404 를 받은 재생점이 받기를 멈추고, 같은 주소로 새 플레이어가 CDN 에서 최신 재생 목록을 다시 받은 뒤, 목록 첫 조각에서 세 조각 안쪽인 시작 하한까지 밀려 이어 재생하고 「가장 오래된 지점으로 옮겼어요」 알림을 띄우는 장면",
