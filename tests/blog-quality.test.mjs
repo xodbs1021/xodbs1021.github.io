@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {load} from 'cheerio';
 import sharp from 'sharp';
-import {posts,slugify} from '../src/lib/posts.mjs';
+import {posts,slugify,renderBody} from '../src/lib/posts.mjs';
 import {readingPaths,readingContext} from '../src/lib/reading-paths.mjs';
 import {reconcile,playbackCases,playbackDecision,latencyBudget,labForSlug,labsForSlug,compatibilityCategories,compatibilityCategory,cutoverStages,cutoverStage} from '../src/lib/explanation-models.mjs';
 
@@ -101,7 +101,8 @@ test('corrected numerical claims and explicit model boundaries survive publishin
 });
 
 test('raw SVG stays in the SVG namespace across blank lines',()=>{
- const post=posts.find(p=>p.slug==='0-to-1/github-pages-blog-automation');
+ // Fixture is an unpublished post that still holds the only raw SVG block with blank lines.
+ const post=renderBody(fs.readFileSync('content/posts/0-to-1/github-pages-blog-automation.md','utf8').split(/^---$/m).slice(2).join('---'),'0-to-1/github-pages-blog-automation');
  const $=load(post.html);
  assert.ok($('.static-diagram svg text').length>10);
  assert.equal($('.diagram-viewport > p').length,0);

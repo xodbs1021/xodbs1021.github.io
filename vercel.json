@@ -135,6 +135,21 @@
       "source": "/categories/coding-test/",
       "destination": "/posts/",
       "permanent": true
+    },
+    {
+      "source": "/posts/0-to-1/github-pages-blog-automation/",
+      "destination": "/categories/notes/",
+      "permanent": false
+    },
+    {
+      "source": "/posts/0-to-1/blog-improvement-report/",
+      "destination": "/categories/notes/",
+      "permanent": false
+    },
+    {
+      "source": "/posts/0-to-1/soma-k1-6month-goals/",
+      "destination": "/categories/notes/",
+      "permanent": false
     }
   ]
 }
