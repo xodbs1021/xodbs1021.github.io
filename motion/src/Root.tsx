@@ -6,6 +6,7 @@ import { CHAPTER_RULE_FRAMES, ChapterRule } from "./scenes/pokeclip-media-timeli
 import { REF_VS_ENVIRONMENT_FRAMES, RefVsEnvironment } from "./scenes/pokeclip-github-oidc-immutable-subject/RefVsEnvironment";
 import { REFETCH_FLOW_FRAMES, RefetchFlow } from "./scenes/rewind-missing-segment/RefetchFlow";
 import { REWIND_FALLOUT_FRAMES, RewindFallout } from "./scenes/rewind-missing-segment/RewindFallout";
+import { DECODE_RECOVERY_FRAMES, DecodeRecovery } from "./scenes/pokeclip-recording-defect-in-origin/DecodeRecovery";
 import { LATE_RETRANSMIT_FRAMES, LateRetransmit } from "./scenes/pokeclip-srt-latency-late-retransmission/LateRetransmit";
 import { MOBILE_VIDEO, VIDEO } from "./theme";
 
@@ -75,6 +76,16 @@ export const RemotionRoot: React.FC = () => (
       component={ChapterRule}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={CHAPTER_RULE_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="DecodeRecovery" component={DecodeRecovery} durationInFrames={DECODE_RECOVERY_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="DecodeRecoveryMobile"
+      component={DecodeRecovery}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={DECODE_RECOVERY_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}
