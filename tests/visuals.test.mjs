@@ -122,3 +122,11 @@ test('narrow chart layout turns category bars horizontal without changing data',
   assert.deepEqual(axisNames, [['가로축', '지연 (ms)'], ['세로축', '단계']]);
   assert.ok(minHeight >= 2 * 36);
 });
+
+test('accTitle/accDescr follow the diagram declaration (mermaid fails to detect the type otherwise)', async () => {
+  const {mermaidSourceProblem} = await import('../src/lib/diagrams.mjs');
+  assert.match(mermaidSourceProblem('accTitle: 흐름\naccDescr: 설명\nflowchart TB\n  A --> B'), /comes before the diagram type/);
+  assert.equal(mermaidSourceProblem('flowchart TB\n  accTitle: 흐름\n  accDescr: 설명\n  A --> B'), null);
+  assert.equal(mermaidSourceProblem('---\ntitle: t\n---\nsequenceDiagram\n  accTitle: 순서'), null);
+  for (const d of collectDiagrams()) assert.equal(mermaidSourceProblem(d.source), null, d.file);
+});

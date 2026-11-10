@@ -2,19 +2,38 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import http from 'node:http';
 import {chromium} from 'playwright';
-import {posts} from '../src/lib/posts.mjs';
+import {load} from 'cheerio';
+import {posts,renderBody} from '../src/lib/posts.mjs';
+import {loadVideoManifest,videoMode} from '../src/lib/videos.mjs';
 import {labForSlug,labsForSlug,cutoverStages} from '../src/lib/explanation-models.mjs';
 
 // Inspect the built site, including its actual cascade and client-side renderers.
 // LAYOUT_URL is also used after deployment; never increment public view counters.
 const out = path.resolve(process.env.LAYOUT_REPORT || 'test-results/layout');
 await fs.mkdir(out, {recursive: true});
-const types = {'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.avif':'image/avif','.woff2':'font/woff2'};
+const types = {'.mp4':'video/mp4','.jpg':'image/jpeg','.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.avif':'image/avif','.woff2':'font/woff2'};
+// Video figures ({{< motion >}}) are also checked on a fixture page made from a real article
+// template, so the shipped script and stylesheet are exercised before any post uses the shortcode.
+const FIXTURE = '/__fixtures/motion/';
+async function motionFixture(){
+  const videos=loadVideoManifest(),names=Object.keys(videos);
+  const loop=names.find(n=>videos[n].mobile&&videos[n].scene)||names.find(n=>videos[n].scene&&videoMode(videos[n].duration)==='loop');
+  const explain=names.find(n=>videoMode(videos[n].duration)==='explain');
+  if(!loop||!explain)return null;
+  const filler=Array.from({length:6},()=>'반복 영상은 화면에 절반 이상 들어왔을 때만 재생하고, 벗어나면 멈춥니다. 이 문단은 영상이 첫 화면 아래에서 시작하도록 둔 채움 문장입니다.').join('\n\n');
+  const markdown=[filler,'',`{{< motion scene="${videos[loop].scene}" id="fig-loop" kind="개념도" caption="반복 영상 시험" >}}`,'',filler,'',`{{< motion name="${explain}" id="fig-explain" alt="설명 영상 시험" kind="개념도" caption="설명 영상 시험" >}}`,'',filler].join('\n');
+  const template=posts.find(p=>!labForSlug[p.slug]);
+  const $=load(await fs.readFile(path.join('dist',template.url,'index.html'),'utf8'));
+  $('.article-content').html(renderBody(markdown,'fixture/motion').html);
+  return $.html();
+}
 let server;
 if (!process.env.LAYOUT_URL) {
+  const fixture = await motionFixture();
   server = http.createServer(async (req,res) => {
     try {
       const name = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+      if (name === FIXTURE && fixture) { res.writeHead(200, {'Content-Type':'text/html'}).end(fixture); return; }
       const file = path.resolve('dist', '.' + name + (name.endsWith('/') ? 'index.html' : ''));
       if (!file.startsWith(path.resolve('dist') + path.sep)) throw new Error('outside dist');
       const body = await fs.readFile(file);
@@ -97,7 +116,7 @@ async function screenshot(page,selector,name){
   return file;
 }
 try {
-  const queue=(['visuals','labs'].includes(process.env.LAYOUT_PHASE)?[]:selected).flatMap(url=>widths.map(width=>({url,width})));
+  const queue=(['visuals','labs','videos'].includes(process.env.LAYOUT_PHASE)?[]:selected).flatMap(url=>widths.map(width=>({url,width})));
   await Promise.all(Array.from({length:4},async()=>{
     const page=await browser.newPage();
     await page.route('**/api/views/**',r=>r.fulfill({status:200,contentType:'application/json',body:'{"views":0}'}));
@@ -115,7 +134,7 @@ try {
   // Every chart/diagram is checked as readers see it: the variant actually shown at this width,
   // its real rendered text size, how much of it fits before scrolling, contrast and accessible names.
   const visualPosts=posts.filter(p=>selected.includes(p.url)&&/class="(chart-figure|diagram)[ "]/.test(p.html));
-  for(const {width,theme} of (['pages','labs'].includes(process.env.LAYOUT_PHASE)?[]:[{width:390,theme:'light'},{width:1440,theme:'light'},{width:390,theme:'dark'}])){
+  for(const {width,theme} of (['pages','labs','videos'].includes(process.env.LAYOUT_PHASE)?[]:[{width:390,theme:'light'},{width:1440,theme:'light'},{width:390,theme:'dark'}])){
     const page=await browser.newPage();
     await page.route('**/api/views/**',r=>r.fulfill({status:200,contentType:'application/json',body:'{"views":0}'}));
     // Layout shifts are recorded from the first paint; a shift whose source sits in a figure fails.
@@ -224,8 +243,98 @@ try {
     }
     await page.close();
   }
+  // Videos: loops wait for the reader under reduced motion, play only on screen otherwise, pause from
+  // the keyboard, pick the 4:5 copy on phones, never shift layout, and keep a caption with a kind.
+  const videoPages=['pages','labs','visuals'].includes(process.env.LAYOUT_PHASE)?[]:[
+    ...(server&&!process.env.LAYOUT_PATH?[FIXTURE]:[]),
+    ...posts.filter(p=>selected.includes(p.url)&&p.html.includes('class="motion-figure"')).map(p=>p.url),
+  ];
+  for(const url of videoPages)for(const {width,theme,motion} of [{width:390,theme:'light',motion:'reduce'},{width:390,theme:'dark',motion:'no-preference'},{width:1440,theme:'light',motion:'no-preference'},{width:1440,theme:'dark',motion:'reduce'}]){
+    const page=await browser.newPage();
+    await page.route('**/api/views/**',r=>r.fulfill({status:200,contentType:'application/json',body:'{"views":0}'}));
+    await page.addInitScript(()=>{window.__shifts=[];new PerformanceObserver(list=>{for(const entry of list.getEntries())for(const source of entry.sources||[])if(source.node?.closest?.('figure'))window.__shifts.push(entry.value)}).observe({type:'layout-shift',buffered:true})});
+    await open(page,url,width,theme);
+    await page.emulateMedia({colorScheme:theme,reducedMotion:motion});
+    // The client reads the preference at load; reload so it starts under this setting.
+    await page.reload({waitUntil:'load'});
+    await page.waitForFunction(()=>document.documentElement.dataset.articleReady==='true');
+    const figures=page.locator('.motion-figure');
+    for(let i=0;i<await figures.count();i++){
+      const figure=figures.nth(i),video=figure.locator('video'),scope=`${url}@${width}/${theme}/${motion} video ${i}`;
+      try{
+        const info=await figure.evaluate(el=>({play:el.dataset.play,mobile:el.hasAttribute('data-mobile'),label:el.querySelector('figcaption .fig-label')?.textContent,kind:!!el.querySelector('figcaption .fig-kind'),name:el.querySelector('video').getAttribute('aria-label')}));
+        if(!info.label?.startsWith('그림 '))fail(scope,'caption has no "그림 N." label');
+        if(!info.kind)report.warnings.push({scope,message:'caption has no kind'});
+        if(!info.name)fail(scope,'video has no accessible name');
+        const isPlaying=()=>video.evaluate(v=>!v.paused&&v.currentTime>0);
+        if(info.play==='loop'){
+          if(await video.evaluate(v=>v.controls))fail(scope,'loop clip still shows native controls with JavaScript on');
+          const button=figure.locator('.motion-toggle');
+          if(!await button.isVisible())fail(scope,'pause/play button hidden');
+          else if((await button.boundingBox()).height<44)fail(scope,'pause/play button below 44px');
+          await figure.scrollIntoViewIfNeeded();
+          if(motion==='reduce'){
+            await page.waitForTimeout(800);
+            if(!await video.evaluate(v=>v.paused))fail(scope,'autoplays under prefers-reduced-motion');
+            // What these readers see first: the poster and the play button.
+            await figure.screenshot({path:path.join(out,`video-${slugName(url)}-${width}-${theme}-reduce-${i}-poster.png`),animations:'disabled'});
+            await button.focus();await page.keyboard.press('Enter');
+            if(!await page.waitForFunction(el=>!el.paused&&el.currentTime>0,await video.elementHandle(),{timeout:8000}).then(()=>true,()=>false))fail(scope,'Enter on the button did not start playback');
+          }else if(!await page.waitForFunction(el=>!el.paused&&el.currentTime>0,await video.elementHandle(),{timeout:8000}).then(()=>true,()=>false))fail(scope,'loop did not start on screen');
+          if(await isPlaying()){
+            if(await button.textContent()!=='일시정지')fail(scope,'button does not offer pause while playing');
+            await button.focus();await page.keyboard.press('Space');
+            if(!await video.evaluate(v=>v.paused))fail(scope,'Space on the button did not pause');
+            if(motion==='no-preference'){
+              // A pause by the reader holds even when the clip scrolls away and back.
+              await page.evaluate(()=>scrollTo(0,0));await figure.scrollIntoViewIfNeeded();await page.waitForTimeout(600);
+              if(await isPlaying())fail(scope,'resumed after the reader paused it');
+              await button.click();
+              await page.waitForFunction(el=>!el.paused,await video.elementHandle(),{timeout:8000}).catch(()=>{});
+              await page.evaluate(()=>scrollTo(0,0));
+              if(!await page.waitForFunction(el=>el.paused,await video.elementHandle(),{timeout:4000}).then(()=>true,()=>false))fail(scope,'kept playing off screen');
+              await figure.scrollIntoViewIfNeeded();
+            }
+          }
+          const src=await video.evaluate(v=>v.currentSrc);
+          if(info.mobile&&width<=600&&!src.includes('-mobile.mp4'))fail(scope,`phone did not pick the 4:5 copy (${src})`);
+          if(width>600&&src.includes('-mobile.mp4'))fail(scope,'desktop picked the phone copy');
+        }else{
+          if(!await video.evaluate(v=>v.controls))fail(scope,'explainer has no controls');
+          if(await figure.locator('.motion-toggle').count())fail(scope,'explainer has a loop button');
+          await figure.scrollIntoViewIfNeeded();await page.waitForTimeout(400);
+          if(await isPlaying())fail(scope,'explainer autoplayed');
+        }
+        // The poster or the playing frame fills a fixed-ratio frame.
+        const box=await figure.locator('.motion-frame').evaluate(async el=>{
+          const r=el.getBoundingClientRect(),img=el.querySelector('.motion-poster img'),video=el.querySelector('video');
+          // Loops show a <picture> under the video; explainers use the poster attribute.
+          const poster=img?img.complete&&img.naturalWidth>0:await new Promise(done=>{const probe=new Image();probe.onload=()=>done(probe.naturalWidth>0);probe.onerror=()=>done(false);probe.src=video.poster});
+          return {w:r.width,h:r.height,poster};
+        });
+        if(!box.poster)fail(scope,'poster image did not load');
+        const ratio=box.w/box.h,expected=info.mobile&&width<=600?1080/1350:16/9;
+        if(Math.abs(ratio-expected)>.02)fail(scope,`frame ratio ${ratio.toFixed(3)} (expected ${expected.toFixed(3)})`);
+        const file=`video-${slugName(url)}-${width}-${theme}-${motion}-${i}.png`;
+        await figure.screenshot({path:path.join(out,file),animations:'disabled'});
+        report.states.push({slug:url,mode:'video',width,theme,state:`${motion}-${i}`,file});
+      }catch(error){fail(scope,String(error));}
+    }
+    const shifts=await page.evaluate(()=>window.__shifts);
+    if(shifts.length)fail(`${url}@${width}/${theme}/${motion}`,`layout shift from video figures: ${shifts.map(v=>v.toFixed(4)).join(', ')}`);
+    await page.close();
+  }
+  if(videoPages.length){
+    // Without JavaScript a loop keeps native controls so readers can still play it.
+    const noJs=await browser.newPage({javaScriptEnabled:false,viewport:{width:390,height:1000}});
+    await noJs.goto(base+videoPages[0]);
+    const first=noJs.locator('.motion-figure[data-play=loop] video').first();
+    if(await first.count()&&!await first.evaluate(v=>v.controls))fail('video/no-js','loop clip has no controls without JavaScript');
+    if(await noJs.locator('.motion-figure .motion-poster img').first().count()&&!await noJs.locator('.motion-figure .motion-poster img').first().isVisible())fail('video/no-js','poster hidden without JavaScript');
+    await noJs.close();
+  }
   // Mutate actual inputs, not the result text. Inspect long states as well as defaults.
-  const labRuns=Object.keys(['pages','visuals'].includes(process.env.LAYOUT_PHASE)?{}:labForSlug).flatMap(slug=>labsForSlug(slug).map(mode=>({slug,mode,multi:labsForSlug(slug).length>1})));
+  const labRuns=Object.keys(['pages','visuals','videos'].includes(process.env.LAYOUT_PHASE)?{}:labForSlug).flatMap(slug=>labsForSlug(slug).map(mode=>({slug,mode,multi:labsForSlug(slug).length>1})));
   for(const {slug,mode,multi} of labRuns){
     if(!selected.includes(`/posts/${slug}/`))continue;
     const labSelector=`[data-lab="${mode}"]`,labName=`lab-${slugName(slug)}${multi?'-'+mode:''}`;
@@ -287,7 +396,7 @@ try {
       await page.close();
     }
   }
-  if(!['pages','visuals'].includes(process.env.LAYOUT_PHASE))for(const {slug,mode,multi} of labRuns){
+  if(!['pages','visuals','videos'].includes(process.env.LAYOUT_PHASE))for(const {slug,mode,multi} of labRuns){
     if(!selected.includes(`/posts/${slug}/`))continue;
     const labSelector=`[data-lab="${mode}"]`,labName=`lab-${slugName(slug)}${multi?'-'+mode:''}`;
     const page=await browser.newPage({javaScriptEnabled:false,viewport:{width:320,height:1000}});
@@ -306,7 +415,7 @@ try {
   }
   // archify embeds: wide screens get the live frame (loaded, themed); narrow screens and no-JS
   // keep the optimized image and an open link, and must never fetch the ~0.9MB frame.
-  const embedPosts=['pages','visuals','labs'].includes(process.env.LAYOUT_PHASE)?[]:posts.filter(p=>selected.includes(p.url)&&p.html.includes('data-diagram-src'));
+  const embedPosts=['pages','visuals','labs','videos'].includes(process.env.LAYOUT_PHASE)?[]:posts.filter(p=>selected.includes(p.url)&&p.html.includes('data-diagram-src'));
   for(const post of embedPosts){
     for(const {width,theme} of [{width:1440,theme:'light'},{width:1440,theme:'dark'},{width:1024,theme:'light'},{width:390,theme:'light'},{width:390,theme:'dark'}]){
       const page=await browser.newPage();

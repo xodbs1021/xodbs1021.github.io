@@ -20,11 +20,13 @@ type CellProps = {
   readonly label?: string;
   readonly opacity?: number;
   readonly scale?: number;
+  /** 조각 번호 글자 크기. 휴대폰판(1080×1350)은 48px 이상. */
+  readonly size?: number;
 };
 
 /** 영상 조각 하나. */
 export const SegmentCell: React.FC<CellProps> = ({
-  x, y, width, height, state, label, opacity = 1, scale = 1,
+  x, y, width, height, state, label, opacity = 1, scale = 1, size = TEXT.small,
 }) => (
   <div
     style={{
@@ -38,7 +40,7 @@ export const SegmentCell: React.FC<CellProps> = ({
       display: "grid",
       placeItems: "center",
       fontFamily: FONT,
-      fontSize: TEXT.small,
+      fontSize: size,
       fontWeight: 650,
       opacity,
       transform: `scale(${scale})`,

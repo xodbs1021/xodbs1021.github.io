@@ -32,7 +32,7 @@
   - `static/images/` · `static/videos/` — 그림 · 영상(바로 아래 평평한 이름). `static/diagrams/` — archify 임베드.
   - `data/legacy-heading-ids.json` — 공개된 글의 소제목 id 기준선.
   - `src/styles/visual-tokens.json` — 색의 원천. `scripts/build-tokens.mjs` 가 `src/styles/tokens.css` 를 만들고, 도식 · 차트 렌더러와 `motion/src/theme.ts` 가 같은 값을 읽는다.
-  - `data/diagrams/mermaid/` + `data/diagram-manifest.json` — 미리 렌더한 Mermaid SVG(색은 CSS 변수). `data/legacy-figure-gaps.json` — 캡션 메타데이터(`kind` · `caption`)가 아직 없는 옛 그림 수 기준선.
+  - `data/diagrams/mermaid/` + `data/diagram-manifest.json` — 미리 렌더한 Mermaid SVG(색은 CSS 변수). `data/legacy-figure-gaps.json` — 캡션 메타데이터(`kind` · `caption`)가 아직 없는 옛 그림 수 기준선. `data/video-manifest.json` — `static/videos` 영상의 해시 · 길이 · 규격 · 휴대폰판 · registry alt(`scripts/check-videos.mjs` 가 ffprobe 로 쓴다).
   - `scripts/` — `optimize-images.mjs`(WebP/AVIF 파생) · `prepare.mjs` · `check-layout.mjs`(Playwright 화면 검수) · `legacy-redirects.mjs`(옛 주소 리다이렉트).
   - `tests/*.test.mjs` — node:test 단위 시험.
   - `motion/` — Remotion 장면(`src/scenes/<slug>/`, `registry.json` ↔ `Root.tsx`).
@@ -59,6 +59,7 @@
 
 - 공개된 글의 소제목 id 는 바꾸지 않는다. 새 글을 공개하거나 소제목을 바꾸면 `data/legacy-heading-ids.json` 에 그 글의 id 목록을 넣는다 — 안 넣으면 `tests/blog-quality.test.mjs` 가 실패하고, 바꾸면 밖에서 걸린 `#앵커` 링크가 깨진다.
 - 글 URL(카테고리 폴더 · slug)은 바꾸지 않는다 — 검색 색인과 밖의 링크가 그 경로를 가리킨다. 옮기거나 지우면 두 곳에 함께 넣는다: `taeyun.blog` 쪽 이동은 `vercel.json` redirects(지금은 카테고리 5건뿐), 옛 주소 `xodbs1021.github.io` 쪽은 `scripts/legacy-redirects.mjs` 가 `data/legacy-paths.json` 과 글 목록으로 안내 페이지를 만든다.
+- 영상을 추가 · 교체하면 `node scripts/check-videos.mjs` 로 `data/video-manifest.json` 을 다시 쓰고 함께 커밋한다(Remotion 렌더는 끝에 자동 실행) — 빌드는 이 파일만 읽고(Vercel 빌드에는 `motion/` 과 ffprobe 가 없다) `{{< motion >}}` 이 가리키는 영상이 목록에 없으면 실패하며, `tests/videos.test.mjs` 는 파일 해시가 목록과 다르면 실패한다.
 - Mermaid 블록을 추가 · 수정하면 `npm run render:diagrams` 를 돌리고 `data/diagrams/mermaid/` · `data/diagram-manifest.json` 을 함께 커밋한다 — 빌드(`scripts/prepare.mjs`)는 브라우저를 띄우지 않으므로(Vercel 빌드 이미지에서 Chromium 이 안 뜬다) 렌더 결과가 없으면 실패한다.
 - 새로 공개하는 글의 그림(도식 · 차트 · 그림 속성을 단 이미지)은 `kind` 와 `caption` 을 갖춘다 — 없으면 `tests/visuals.test.mjs` 가 실패한다. 옛 그림을 고치면 `data/legacy-figure-gaps.json` 의 수를 같이 줄인다(기준선은 늘리지 않는다).
 - 색은 `src/styles/visual-tokens.json` 에서만 바꾼다 — `global.css` · 차트 JSON · motion 에 새 hex 를 쓰면 다크 화면에서 깨지고 대비 시험이 그 값을 보지 못한다.
@@ -79,6 +80,7 @@
 - 본문 그림 경로 ↔ `scripts/optimize-images.mjs` ↔ 렌더러의 `<picture>` 생성 — 공유 계약: `static/images/<이름>` 평평한 경로 · 마크다운 이미지 문법.
 - `motion/src/scenes/registry.json` ↔ `motion/src/Root.tsx` ↔ `static/videos|images/<slug>-<장면>` ↔ 글의 `<video>` 마크업 — 공유 계약: 장면 id(PascalCase → kebab 파일 이름) · posterFrame · alt.
 - 차트 JSON(본문) ↔ `src/lib/chart-render.mjs`(빌드 SSR) · `src/lib/chart-layout.mjs`(폭별 배치) ↔ `src/pages/charts/`(`interactive="true"` 차트만) — 공유 계약: ECharts option 형태(순수 JSON).
+- `static/videos/*.mp4` ↔ `scripts/check-videos.mjs` ↔ `data/video-manifest.json` ↔ `src/lib/videos.mjs` · `visuals.mjs` — 공유 계약: 파일 이름(`<글>-<장면>` · `-mobile`), 해시(주소의 `?v=`), 길이(12초 이하 = 반복 재생).
 - Mermaid 원문 ↔ `src/lib/diagrams.mjs`(키 = 원문 + 렌더 정책 + mermaid 판) ↔ `scripts/render-diagrams.mjs` ↔ `data/diagram-manifest.json` — 공유 계약: 키와 SVG 파일 이름.
 - 그림 속성(Mermaid 펜스 `{#id kind caption source}` · chart `kind` `source` `interactive` · 이미지 `{kind caption source}`) ↔ `src/lib/figures.mjs`(번호 · 캡션) ↔ `tests/visuals.test.mjs` — 공유 계약: `kind` 허용 값 6개.
 - 조회수: 화면 스크립트(`src/lib/article-client.ts`) ↔ `api/views.mjs` ↔ Upstash Redis — 공유 계약: 요청 경로 · 응답 JSON.

@@ -1,4 +1,5 @@
 import 'highlight.js/styles/github-dark.css';
+import {setupMotion} from './motion-client';
 if(matchMedia('(max-width: 800px)').matches)document.querySelector('.toc details')?.removeAttribute('open');
 await document.fonts.ready;
 const fontFamily=getComputedStyle(document.body).fontFamily;
@@ -24,7 +25,8 @@ if(liveCharts.length){
 document.querySelectorAll('pre').forEach(pre=>{const button=document.createElement('button');button.className='copy-code';button.textContent='복사';button.setAttribute('aria-label','코드 복사');button.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(pre.querySelector('code')?.textContent||'');button.textContent='복사됨';setTimeout(()=>button.textContent='복사',1800)}catch{button.textContent='복사 실패'}});pre.append(button)});
 document.querySelector('.copy-url')?.addEventListener('click',async e=>{try{await navigator.clipboard.writeText(location.href);(e.target as HTMLElement).textContent='주소를 복사했어요'}catch{(e.target as HTMLElement).textContent='주소창에서 주소를 복사해 주세요'}});
 const dialog=document.querySelector<HTMLDialogElement>('#image-dialog');
-document.querySelectorAll<HTMLImageElement>('.prose img').forEach(img=>{img.loading='lazy';img.tabIndex=0;img.setAttribute('role','button');img.setAttribute('aria-label',`${img.alt||'이미지'} 확대`);const show=()=>{const large=dialog!.querySelector('img')!;large.src=img.dataset.original||img.src;large.alt=img.alt;dialog!.showModal()};img.addEventListener('click',show);img.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show()}})});
+// Video posters are part of the player, not zoomable images.
+document.querySelectorAll<HTMLImageElement>('.prose img:not(.motion-poster img)').forEach(img=>{img.loading='lazy';img.tabIndex=0;img.setAttribute('role','button');img.setAttribute('aria-label',`${img.alt||'이미지'} 확대`);const show=()=>{const large=dialog!.querySelector('img')!;large.src=img.dataset.original||img.src;large.alt=img.alt;dialog!.showModal()};img.addEventListener('click',show);img.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show()}})});
 dialog?.addEventListener('click',e=>{if(e.target===dialog||(e.target as HTMLElement).tagName==='BUTTON')dialog.close()});
 const slug=document.querySelector<HTMLElement>('[data-slug]')?.dataset.slug;
 if(slug && location.hostname==='taeyun.blog'){
@@ -59,4 +61,5 @@ if(diagramFrames.length){
   wide.addEventListener('change',syncDiagrams);
   window.addEventListener('themechange',syncDiagrams);
 }
+setupMotion();
 document.documentElement.dataset.articleReady='true';

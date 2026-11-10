@@ -78,6 +78,7 @@ export function renderBody(content, slug) {
   const rawBlocks=[];
   const visuals=createVisuals(slug);
   const body=content.replaceAll('https://xodbs1021.github.io','https://taeyun.blog')
+    .replace(/\{\{<\s*motion\s+([^>]*?)\/?>\}\}/g,(_,args)=>`\n\n${visuals.placeholder({type:'motion',args})}\n\n`)
     .replace(/\{\{<\s*chart\s*([^>]*?)>\}\}([\s\S]*?)\{\{<\s*\/chart\s*>\}\}/g,(_,args,source)=>`\n\n${visuals.placeholder({type:'chart',args,source})}\n\n`).replace(/\{\{<\s*rawhtml\s*>\}\}([\s\S]*?)\{\{<\s*\/rawhtml\s*>\}\}/g,(_,html)=>{
       rawBlocks.push(html);
       return `\n\n<!--BLOG_RAW_HTML_${rawBlocks.length-1}-->\n\n`;
