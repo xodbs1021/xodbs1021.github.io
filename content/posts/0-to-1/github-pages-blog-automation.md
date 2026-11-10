@@ -3,7 +3,7 @@ title: GitHub Pages 블로그 자동화 구축기
 date: 2026-05-20T10:00:00+09:00
 categories:
   - 0-to-1
-draft: false
+draft: true
 ---
 - - -
 
