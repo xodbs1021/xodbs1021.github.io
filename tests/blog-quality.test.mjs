@@ -57,11 +57,19 @@ test('responsive derivatives have the declared dimensions, formats, and original
  }
  for(const post of posts){
   const $=load(fs.readFileSync(`dist${post.url}index.html`,'utf8'));
-  $('.article-content img').each((_,el)=>{
+  $('.article-content img').not('.motion-poster img').each((_,el)=>{
    const img=$(el),entry=manifest[img.attr('src')];if(!entry)return;
    assert.equal(img.attr('data-original'),entry.original);assert.equal(Number(img.attr('width')),entry.width);
    assert.equal(img.attr('loading'),'lazy');
    if(!entry.preserveQuality)assert.equal(img.parent('picture').find('source').length,2);
+  });
+  // Video posters are their own <picture>: AVIF+WebP for the desktop poster, plus the same pair for the phone poster.
+  $('.motion-poster img').each((_,el)=>{
+   const img=$(el),entry=manifest[img.attr('src')];
+   assert.ok(entry,`poster ${img.attr('src')} missing from image manifest`);
+   assert.equal(Number(img.attr('width')),entry.width);assert.equal(img.attr('loading'),'lazy');
+   const mobile=img.closest('.motion-figure').is('[data-mobile]');
+   assert.equal(img.parent('picture').find('source').length,mobile?4:2);
   });
  }
 });
