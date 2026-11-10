@@ -84,5 +84,37 @@
     "posterFrame": 330,
     "alt": "OBS에서 화면까지 ① 변환, ② 목록·조각, ③ hls.js 초기화 세 단계가 놓인 길에서 진행선이 한 단계씩 나아간다. 진행선이 닿은 단계는 빨갛게 막히며 muxer 오류 반복, GAP 7개와 401, 생성자 예외 이름표가 뜨고, 고친 뒤에는 청록으로 바뀌며 당시 통과로 본 증거인 오류 0건, 창 30에서 GAP 0개, 생성자 통과가 남는다. 셋째 단계를 넘자 검은 화면 상자가 재생으로 바뀌고 재생과 되감기 이름표가 뜬다",
     "mobile": true
+  },
+  {
+    "id": "SessionUrlInherit",
+    "post": "pokeclip-session-url-and-endlist",
+    "kind": "video",
+    "posterFrame": 330,
+    "alt": "세션 A 목록에 ENDLIST가 붙은 뒤, 끊긴 시간이 300초 창 안의 120초까지 흐르고 세션 B의 새 목록 주소가 열린다. A의 조각 0–14가 B 목록 머리로 내려와 접두부가 되고, 경계에 끊김 표시와 새 MAP이 선 뒤 B의 새 조각 15–17이 붙는다. A 목록은 ENDLIST를 단 채 그대로 남는 장면",
+    "mobile": true
+  },
+  {
+    "id": "LateWriterFenced",
+    "post": "pokeclip-database-authoritative-manifest-publishing",
+    "kind": "video",
+    "posterFrame": 330,
+    "alt": "writer A가 DB 장부에서 세대 10을 예약하고 PUT을 보낸 채 멈춘 사이 fence가 writer B로 넘어가고, B가 세대 11을 예약해 S3에 11번까지 담은 목록을 올린다. 늦게 도착한 A의 PUT은 S3 앞에서 412로, A가 장부를 맞추려는 쓰기는 fence 불일치로 막히고 S3에는 11번까지 담은 목록이 남는 장면",
+    "mobile": true
+  },
+  {
+    "id": "PublishBoundary",
+    "post": "pokeclip-manifest-window-boundaries",
+    "kind": "video",
+    "posterFrame": 315,
+    "alt": "조각 9–13 가운데 9와 10은 완료, 11·12·13은 대기다. 12가 먼저 완료돼도 청록 공개 경계는 10 뒤에서 멈춰 있고, 11이 완료되는 순간 경계가 12 뒤까지 한 번에 늘어나며 13은 대기로 남는 장면",
+    "mobile": true
+  },
+  {
+    "id": "DeployOrder",
+    "post": "stream-id-contract-compatible-migration",
+    "kind": "video",
+    "posterFrame": 315,
+    "alt": "두 줄의 배포 순서. 위 줄은 소비자가 먼저 ingestStreamId로 조각을 찾게 배포되고 생산자가 새 streamId를 내 조각 조회가 정상으로 끝난다. 아래 줄은 생산자가 먼저 새 streamId를 내고 옛 소비자가 경로 칸에 세션 id를 넣어 조회해 0행으로 끝나는 장면",
+    "mobile": true
   }
 ]

@@ -10,6 +10,10 @@ import { DECODE_RECOVERY_FRAMES, DecodeRecovery } from "./scenes/pokeclip-record
 import { LATE_RETRANSMIT_FRAMES, LateRetransmit } from "./scenes/pokeclip-srt-latency-late-retransmission/LateRetransmit";
 import { ROUND_DOCUMENT_FRAMES, RoundDocument } from "./scenes/pokeclip-round-vod/RoundDocument";
 import { STAGE_UNBLOCK_FRAMES, StageUnblock } from "./scenes/pokeclip-black-screen-three-causes/StageUnblock";
+import { SESSION_URL_INHERIT_FRAMES, SessionUrlInherit } from "./scenes/pokeclip-session-url-and-endlist/SessionUrlInherit";
+import { LATE_WRITER_FENCED_FRAMES, LateWriterFenced } from "./scenes/pokeclip-database-authoritative-manifest-publishing/LateWriterFenced";
+import { PUBLISH_BOUNDARY_FRAMES, PublishBoundary } from "./scenes/pokeclip-manifest-window-boundaries/PublishBoundary";
+import { DEPLOY_ORDER_FRAMES, DeployOrder } from "./scenes/stream-id-contract-compatible-migration/DeployOrder";
 import { MOBILE_VIDEO, VIDEO } from "./theme";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
@@ -118,6 +122,46 @@ export const RemotionRoot: React.FC = () => (
       component={StageUnblock}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={STAGE_UNBLOCK_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="SessionUrlInherit" component={SessionUrlInherit} durationInFrames={SESSION_URL_INHERIT_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="SessionUrlInheritMobile"
+      component={SessionUrlInherit}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={SESSION_URL_INHERIT_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="LateWriterFenced" component={LateWriterFenced} durationInFrames={LATE_WRITER_FENCED_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="LateWriterFencedMobile"
+      component={LateWriterFenced}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={LATE_WRITER_FENCED_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="PublishBoundary" component={PublishBoundary} durationInFrames={PUBLISH_BOUNDARY_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="PublishBoundaryMobile"
+      component={PublishBoundary}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={PUBLISH_BOUNDARY_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="DeployOrder" component={DeployOrder} durationInFrames={DEPLOY_ORDER_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="DeployOrderMobile"
+      component={DeployOrder}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={DEPLOY_ORDER_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}
