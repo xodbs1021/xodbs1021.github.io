@@ -60,3 +60,19 @@
 .prose .diagram-embed>p img{margin:0 auto}
 .prose .diagram-embed figcaption{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px 12px}
 .prose .diagram-open{display:inline-flex;align-items:center;min-height:44px;padding:0 4px;font-weight:650;font-size:13px}
+
+/* Videos ({{< motion >}}): a fixed-ratio frame (no layout shift), an optimized poster picture under
+   the video until its first frame plays, and a pause button outside the frame for loop clips.
+   Scenes are drawn on a light canvas; in dark mode the frame reads as a deliberate card. */
+.prose .motion-figure { margin: 32px 0; }
+.motion-frame { position: relative; aspect-ratio: var(--ratio); border-radius: 12px; overflow: hidden; background: #fff; border: 1px solid var(--line); }
+@media (max-width: 600px) { .motion-figure[data-mobile] .motion-frame { aspect-ratio: var(--ratio-mobile); } }
+.motion-frame > .motion-poster, .prose .motion-frame > video { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; border-radius: 0; }
+.prose .motion-poster img { width: 100%; height: 100%; max-height: none; margin: 0; object-fit: contain; border-radius: 0; cursor: auto; }
+.prose .motion-frame > video { object-fit: contain; background: transparent; }
+.motion-frame.is-started > .motion-poster { visibility: hidden; }
+:root[data-theme=dark] .motion-frame { border-color: var(--muted); box-shadow: 0 0 0 4px var(--surface); }
+.motion-toggle { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-top: 10px; padding: 0 16px; border: 1px solid var(--line); border-radius: 22px; background: var(--bg); color: var(--ink); font-size: 14px; font-weight: 650; }
+.motion-toggle::before { content: ''; width: 0; height: 0; border-left: 10px solid currentColor; border-top: 6px solid transparent; border-bottom: 6px solid transparent; }
+.motion-toggle[data-state=playing]::before { width: 10px; height: 12px; border: 0; border-left: 3px solid currentColor; border-right: 3px solid currentColor; box-sizing: border-box; }
+.motion-toggle[hidden] { display: none; }

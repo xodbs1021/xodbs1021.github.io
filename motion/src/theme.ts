@@ -33,5 +33,11 @@ export const COLOR = {
 // 글자는 TEXT.small(36px) 이상 — 휴대폰에서는 작으므로 핵심은 캡션 문장이 다시 말한다(스킬 규약).
 export const VIDEO = { width: 1920, height: 1080, fps: 30 } as const;
 export const TEXT = { title: 52, label: 42, small: 36 } as const;
-// bottom: 영상은 브라우저 재생 컨트롤과 그 위 그림자가 아래 약 20% 를 덮는다(포스터 상태에서 늘 보임) — 핵심은 이 위에 둔다.
+// bottom: 설명 영상(12초 초과)은 브라우저 재생 컨트롤과 그 그림자가 아래 약 20% 를 덮는다 — 핵심은 이 위에 둔다.
+// 반복 영상(12초 이하)은 컨트롤 없이 재생하므로(블로그가 그림 밖에 버튼을 단다) 덮이지 않는다.
 export const SAFE = { x: 120, y: 96, bottom: 840 } as const;
+// 휴대폰판(4:5). 390px 폭에서 약 0.33배로 보이므로 글자는 48px 이상(화면에서 약 16px).
+// 반복 영상은 브라우저 컨트롤 없이 재생하므로 아래를 비우지 않는다.
+export const MOBILE_VIDEO = { width: 1080, height: 1350, fps: VIDEO.fps } as const;
+export const MOBILE_TEXT = { title: 56, label: 48, small: 48 } as const;
+export const MOBILE_SAFE = { x: 60, y: 96, bottom: 1250 } as const;

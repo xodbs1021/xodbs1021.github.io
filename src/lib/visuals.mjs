@@ -2,6 +2,8 @@ import {createHash} from 'node:crypto';
 import {createFigures, parseArgs} from './figures.mjs';
 import {loadManifest, readDiagramSvg, diagramKey, FONT_SIZE} from './diagrams.mjs';
 import {renderChart} from './chart-render.mjs';
+import fs from 'node:fs';
+import {loadVideoManifest, resolveVideo, videoUrl, MOBILE_QUERY} from './videos.mjs';
 
 // Figures are emitted as placeholders while Markdown renders, then numbered in reading order.
 // Shown only when the drawing actually overflows (article-client sets data-wide).
@@ -9,6 +11,9 @@ const SCROLL_HINT = '<span class="visual-scroll-hint">좌우로 스크롤하여 
 const withHint = figcaption => figcaption.replace('</figcaption>', `${SCROLL_HINT}</figcaption>`);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const manifest = loadManifest();
+const videoManifest = loadVideoManifest();
+const imageManifestFile = 'data/image-manifest.json';
+const imageManifest = fs.existsSync(imageManifestFile) ? JSON.parse(fs.readFileSync(imageManifestFile, 'utf8')) : {};
 export const visualReport = {warnings: [], missingDiagrams: []};
 export const interactiveCharts = new Map();
 
@@ -97,6 +102,54 @@ function staticSvgFigure(item, figures) {
   return `<figure class="diagram static-diagram" id="${esc(fig.id)}"${legacy}><div class="diagram-viewport" tabindex="0" role="group" aria-label="${esc(fig.label)}" style="--diagram-width:${width}px">${svg}</div>${withHint(fig.figcaption)}</figure>`;
 }
 
+// Poster as a responsive <picture> under the video: the <video poster> attribute can be neither
+// responsive nor optimized. The phone copy's poster comes first so its media query wins.
+function posterPicture(posters) {
+  const sizes = '(max-width: 800px) calc(100vw - 40px), 760px';
+  const sources = [];
+  let fallback;
+  for (const {src, media} of posters) {
+    const image = imageManifest[src];
+    if (!image) throw new Error(`video poster ${src} is not in data/image-manifest.json (run the build's image step)`);
+    for (const format of ['avif', 'webp']) {
+      const variants = image.variants[format];
+      if (variants?.length) sources.push(`<source${media ? ` media="${media}"` : ''} type="image/${format}" srcset="${variants.map(v => `${v.src} ${v.width}w`).join(', ')}" sizes="${sizes}">`);
+    }
+    if (!media) fallback = `<img src="${esc(src)}" alt="" width="${image.width}" height="${image.height}" loading="lazy" decoding="async">`;
+  }
+  return `<picture class="motion-poster">${sources.join('')}${fallback}</picture>`;
+}
+
+function posterVariant(src) {
+  const image = imageManifest[src];
+  if (!image) throw new Error(`video poster ${src} is not in data/image-manifest.json (run the build's image step)`);
+  return image.variants.webp?.find(v => v.width >= Math.min(960, image.width))?.src || src;
+}
+
+function motionFigure(item, figures, slug) {
+  const args = parseArgs(item.args);
+  const video = resolveVideo(args, videoManifest);
+  if (video.error) throw new Error(`${slug}: ${video.error}`);
+  const {name, entry, alt, mode} = video;
+  const fig = figures.add({type: 'video', id: args.id, kind: args.kind, caption: args.caption, source: args.source, fallbackCaption: alt});
+  const mobile = entry.mobile;
+  const posters = [...(mobile ? [{src: mobile.poster, media: MOBILE_QUERY}] : []), {src: entry.poster}];
+  const sources = [
+    ...(mobile ? [`<source media="${MOBILE_QUERY}" src="${videoUrl(name, mobile, '-mobile')}" type="video/mp4">`] : []),
+    `<source src="${videoUrl(name, entry)}" type="video/mp4">`,
+  ].join('');
+  // Loops keep native controls until the client script swaps them for the pause button,
+  // so readers without JavaScript can still play them.
+  const attrs = mode === 'loop' ? 'muted loop playsinline controls preload="none"' : 'controls playsinline preload="none"';
+  const ratio = `--ratio:${entry.width}/${entry.height}${mobile ? `;--ratio-mobile:${mobile.width}/${mobile.height}` : ''}`;
+  const toggle = mode === 'loop' ? `<button type="button" class="motion-toggle" hidden>재생</button>` : '';
+  // Explainers keep native controls, and Chrome paints a controlled video without a poster attribute
+  // black over anything beneath it, so they use the optimized 960px WebP as the poster attribute.
+  const under = mode === 'loop' ? posterPicture(posters) : '';
+  const poster = mode === 'loop' ? '' : ` poster="${esc(posterVariant(entry.poster))}"`;
+  return `<figure class="motion-figure" id="${esc(fig.id)}" data-play="${mode}"${mobile ? ' data-mobile' : ''}><div class="motion-frame" style="${ratio}">${under}<video ${attrs}${poster} width="${entry.width}" height="${entry.height}" aria-label="${esc(alt)}">${sources}</video></div>${toggle}${fig.figcaption}</figure>`;
+}
+
 function imageFigure(item, figures) {
   const fig = figures.add({type: 'image', id: item.attrs.id, kind: item.attrs.kind, caption: item.attrs.caption, source: item.attrs.source});
   return `<figure class="image-figure" id="${esc(fig.id)}">${item.html}${fig.figcaption}</figure>`;
@@ -113,7 +166,7 @@ export function createVisuals(slug) {
       return html.replace(/<svg\b[\s\S]*?<\/svg>/g, svg => this.placeholder({type: 'svg', svg}));
     },
     finish(html) {
-      const build = {diagram: mermaidFigure, chart: chartFigure, svg: staticSvgFigure, image: imageFigure};
+      const build = {diagram: mermaidFigure, chart: chartFigure, svg: staticSvgFigure, image: imageFigure, motion: motionFigure};
       const out = html.replace(/<!--BLOG_FIG_(\d+)-->/g, (_, i) => {
         const item = pending[Number(i)];
         return build[item.type](item, figures, slug);

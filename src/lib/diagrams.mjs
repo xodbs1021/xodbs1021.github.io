@@ -36,6 +36,19 @@ export function narrowSource(source) {
   return lines.join('\n');
 }
 
+// Mermaid detects the diagram type from the first statement, so accTitle/accDescr must come after
+// the declaration line ("flowchart TB", "sequenceDiagram" …). Placed before it, mermaid 12 fails with
+// "UnknownDiagramError: No diagram type detected" — reported here with the file and the fix.
+export function mermaidSourceProblem(source) {
+  const lines = source.split('\n');
+  let i = 0;
+  if (lines[0]?.trim() === '---') { i = lines.findIndex((l, n) => n > 0 && l.trim() === '---') + 1; if (i === 0) return 'front matter is not closed with ---'; }
+  const first = lines.slice(i).map(l => l.trim()).find(l => l && !l.startsWith('%%'));
+  if (!first) return 'empty diagram';
+  if (/^acc(Title|Descr)\b/.test(first)) return `"${first.split(':')[0]}" comes before the diagram type; put accTitle/accDescr on the lines after "flowchart TB", "sequenceDiagram" and so on`;
+  return null;
+}
+
 export function loadManifest() {
   const file = path.join(root, MANIFEST_PATH);
   return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : {};

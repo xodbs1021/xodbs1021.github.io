@@ -39,17 +39,17 @@ description: "블로그 글의 시간·흐름 개념(창이 밀린다, 한쪽이
 - 이어지는 장면(앞 장면의 끝에서 시작하는 장면)은 좌표 상수를 `motion/src/scenes/<글 slug>/layout.ts` 로 함께 쓴다. 공유 상수를 고친 뒤에는 앞 장면을 다시 렌더해 `git diff --stat static/` 이 0 인지(바이트가 같은지)로 회귀를 확인한다. 그 장면을 일부러 바꾼 경우는 바뀐 장면을 다시 눈으로 확인한다.
 - 장면: `motion/src/scenes/<글 slug>/<Id>.tsx`, 목록은 `motion/src/scenes/registry.json`, 등록은 `motion/src/Root.tsx`. 둘의 id 가 다르면 `render.mjs --check` 가 실패한다.
 - 파일 이름: `<name>` = `<글 slug>-<id 의 kebab-case>`(예: 글 `rewind-missing-segment` 의 `RewindFallout` → `rewind-missing-segment-rewind-fallout`). id 는 PascalCase 로, 약어도 `HlsDemo` 처럼 쓴다(`HLSDemo` 는 `hlsdemo` 가 된다).
-- 산출: 영상 `static/videos/<name>.mp4` + 포스터 `static/images/<name>-poster.jpg`, 정지 그림 `static/images/<name>.png`. 하위 폴더를 쓰지 않는다 — 이미지 최적화(`scripts/optimize-images.mjs`)가 `static/images` 바로 아래만 읽어서, 하위 폴더 그림은 크기 정보 · WebP/AVIF 파생본을 받지 못한다.
+- 산출: 영상 `static/videos/<name>.mp4` + 포스터 `static/images/<name>-poster.jpg`, 휴대폰판 `static/videos/<name>-mobile.mp4` + `static/images/<name>-mobile-poster.jpg`, 정지 그림 `static/images/<name>.png`. 영상 목록 `data/video-manifest.json`(크기 · 길이 · 해시 · registry 의 alt)은 렌더 뒤 자동으로 다시 쓰이며 함께 커밋한다 — 빌드는 이 파일만 읽는다(Vercel 빌드에는 `motion/` 과 ffprobe 가 없다). 하위 폴더를 쓰지 않는다 — 이미지 최적화(`scripts/optimize-images.mjs`)가 `static/images` 바로 아래만 읽어서, 하위 폴더 그림은 크기 정보 · WebP/AVIF 파생본을 받지 못한다.
 
 ## 절차
 
 1. **콘티.** 글의 작업 폴더(`_workspace/blog/<slug>/storyboard.md`)에 장면마다 「무엇이 · 어떤 순서로 · 몇 초에」 와 끝 프레임의 모습을 적는다. 끝 프레임은 포스터이므로 혼자서도 뜻이 통해야 한다.
 2. **설치(처음 한 번).** `cd motion && npm install`. postinstall 이 Pretendard(SIL OFL) 를 `public/fonts/` 로 복사한다. 첫 렌더 때 Remotion 이 렌더용 Chrome(약 570MB)을 「현재 폴더에서 가장 가까운 package.json 옆 `node_modules/.remotion`」 에 내려받는다 — `render.mjs` 는 먼저 `motion/` 으로 옮겨 가므로 `motion/node_modules/.remotion` 하나만 생긴다. `npx remotion …` CLI 를 직접 쓸 때는 반드시 `motion/` 안에서 실행한다.
-3. **장면 작성.** 공통 부품과 `theme.ts` 를 쓴다. 장면 파일 머리에 콘티 위치를 적는다. 새 장면은 `Root.tsx` 에 등록하고 `registry.json` 에 `id · post · kind(video|still) · posterFrame(영상만) · alt` 를 넣는다.
+3. **장면 작성.** 공통 부품과 `theme.ts` 를 쓴다. 장면 파일 머리에 콘티 위치를 적는다. 새 장면은 `Root.tsx` 에 등록하고 `registry.json` 에 `id · post · kind(video|still) · posterFrame(영상만) · alt` 를 넣는다. 휴대폰판을 만들 반복 영상은 registry 에 `"mobile": true` 를 더하고, `Root.tsx` 에 `<Id>Mobile` 이름으로 `MOBILE_VIDEO`(1080×1350) Composition 을 같은 길이로 등록한다 — 장면은 `layout="mobile"` prop 으로 좌표 · 글자 크기만 바꾼다(예: `RewindFallout` 과 `rewind-missing-segment/layout.ts` 의 `MOBILE_ROW`).
 4. **검사.** `cd motion && npm run lint` — eslint · tsc 와 `render.mjs --check`(registry 항목 · Root 와의 id 일치 · posterFrame 범위 · 글꼴 파일).
 5. **눈으로 확인.** 영상은 시작 · 중간 · 끝 프레임을 `npx remotion still src/index.ts <id> out/check/f<N>.jpg --frame=<N>` 으로 뽑아 이미지로 열어 본다. 정지 그림은 렌더 결과를 연다. 볼 것: 글자 · 선 · 이름표 겹침, 가려진 숫자, 화면 밖으로 나간 글자, 콘티와 다른 움직임. 제목 글자가 Pretendard 인지도 본다 — 글꼴이 안 실리면 맥 기본 글꼴(Apple SD Gothic Neo)로 대신 그려지므로, 이미 있는 그림(예: `static/images/rewind-missing-segment-edge-lags-playlist.png` 의 제목)과 글자 모양을 견준다. 끝으로 본문 폭에서 본다 — 그림을 760px · 390px 폭으로 줄여 열어(또는 초안을 로컬 빌드해 휴대폰 폭으로) 핵심 이름표가 읽히는지 확인한다. 고치고 다시 본다.
-6. **렌더.** `node motion/scripts/render.mjs <id>` 또는 `--post <slug>`(스크립트가 `motion/` 으로 옮겨 가서 실행하므로 어느 폴더에서 불러도 된다). 렌더 전에 `--check` 와 같은 검사를 하고, 결과는 `out/tmp` 에 만든 뒤 전부 성공해야 최종 위치로 옮기고, 옮기다 실패하면 이전 판으로 되돌린다. 번들 임시 폴더도 끝나면 지운다.
-7. **글에 넣기.** 아래 마크업. alt 는 `registry.json` 의 문장을 쓴다. 캡션에 그림의 핵심을 한 문장으로 다시 말하고 「설명용 그림 · 실제 화면(측정) 아님」 을 밝힌다.
+6. **렌더.** `node motion/scripts/render.mjs <id>` 또는 `--post <slug>`(스크립트가 `motion/` 으로 옮겨 가서 실행하므로 어느 폴더에서 불러도 된다). 렌더 전에 `--check` 와 같은 검사를 하고, 결과는 `out/tmp` 에 만든 뒤 전부 성공해야 최종 위치로 옮기고, 옮기다 실패하면 이전 판으로 되돌린다. 번들 임시 폴더도 끝나면 지운다. 영상을 렌더하면 끝에 `scripts/check-videos.mjs` 가 ffprobe 로 규격(H.264 · yuv420p · 오디오 없음 · moov 앞 · 용량)을 검사하고 `data/video-manifest.json` 을 다시 쓴다. 저장소 밖에서 만든 영상을 넣었을 때도 `node scripts/check-videos.mjs` 를 직접 실행한다.
+7. **글에 넣기.** 아래 표기. alt 는 `registry.json` 의 문장이 자동으로 들어간다. 캡션에 그림의 핵심을 한 문장으로 다시 말하고, 성격은 `kind="개념도"`(실제 화면 · 측정이 아님)로 적는다.
 8. **정리.** 확인용 프레임을 뽑았으면 `motion/out/` 를 지운다. 렌더 중간물을 남기지 않는다. 장면 코드 오류로 번들 단계에서 실패했으면 시스템 임시 폴더(`node -e "console.log(require('os').tmpdir())"`)에 `remotion-webpack-bundle-*` 가 남으니 그것도 지운다(`npx remotion still` 처럼 CLI 를 직접 쓴 경우도 같다).
 
 알려진 한계(`render.mjs`): 번들 단계 실패 시 임시 폴더 잔류, 최종 위치로 옮기다 실패하고 복구까지 실패하는 이중 장애에서는 이전 판을 잃을 수 있음, 빈 `out/` 삭제가 권한 오류를 내면 성공한 렌더가 실패로 끝남.
@@ -64,31 +64,30 @@ description: "블로그 글의 시간·흐름 개념(창이 밀린다, 한쪽이
 4. **장면 작성.** `Art` 로 소재를 순서대로 등장시키고(`enter` 를 엇갈리게, `phase` 를 달리해 같이 흔들리지 않게), `FlowPath` 로 선을 그린 뒤 패킷을 흘린다. 막힘은 `packetsUntil` 로 패킷을 멈추고 끝에 `danger` 색 `Tag` 를 띄운다. 대기 · 재시도는 `dashed`. 이름표 · 숫자는 `Tag` · `Label` 로 코드에서 얹는다.
 5. 나머지(검사 · 눈으로 확인 · 렌더 · 글에 넣기 · 정리)는 위 절차 4–8 과 같다. 눈으로 확인할 때 소재 가장자리의 흰 테두리(알파 경계)와 패킷이 소재 뒤로 숨는지도 본다.
 
-migration-site 영상은 58초 · 7장면이었지만 그 길이는 근거 영상의 사정이다. 블로그 모션그래픽은 아래 규약 그대로다 — 6–12초, 아래 20% 비움, `COLOR` 만, 영상 하나에 소재 3–4장 이하. 장면이 넷 이상 필요하면 영상을 나눈다(블로그 영상은 문단 옆에 놓이므로 한 영상 = 한 주장). 캡션에 「설명용 움직이는 그림 · 소재는 AI 생성」 을 밝힌다.
+migration-site 영상은 58초 · 7장면이었지만 그 길이는 근거 영상의 사정이다. 블로그 모션그래픽은 아래 규약 그대로다 — 반복 영상은 4–12초, `COLOR` 만, 영상 하나에 소재 3–4장 이하. 장면이 넷 이상 필요하면 영상을 나눈다(블로그 영상은 문단 옆에 놓이므로 한 영상 = 한 주장). 캡션 문장에 「소재는 AI 생성」 을 밝힌다.
 
 ## 규약
 
-- 영상은 아래 약 20%(y > `SAFE.bottom` = 840)를 비운다. 포스터 상태에서는 브라우저 재생 컨트롤과 그 위 그림자가 늘 그 자리를 덮는다. 정지 그림(png)은 덮이지 않는다.
-- 캔버스 1920×1080, 30fps. 움직이는 그림은 6–12초(2프레임 이상 — 1프레임짜리는 `render.mjs` 가 정지 그림으로 본다).
-- 글자는 `TEXT.small`(36px) 이상. 데스크톱 본문(760px)에서 약 14px 이지만 390px 폭 휴대폰에서는 약 6px 로 줄어 읽기 어렵다(영상은 눌러 키울 수 없다). 그래서 ① 그림 안 글자는 이름표 몇 개로 줄이고, ② 그림의 핵심은 캡션 · 본문 문장이 다시 말해 그림 글자를 못 읽어도 뜻이 통하게 한다. 휴대폰 전용 세로 그림은 만들지 않는다(한계).
+- 재생 두 갈래(길이로 정해진다). **반복 영상(12초 이하)**: 소리 없이 화면에 절반 이상 들어왔을 때만 반복 재생하고 벗어나면 멈춘다. 그림 아래 일시정지 · 재생 버튼이 붙고(키보드로 조작), 움직임 줄이기 설정이면 자동 재생하지 않고 포스터와 재생 버튼만 둔다. 브라우저 재생 컨트롤이 없으므로 아래를 비울 필요가 없다. **설명 영상(12초 초과, 60초 이하)**: 브라우저 컨트롤로 독자가 재생한다 — 아래 약 20%(y > `SAFE.bottom` = 840)를 비운다(컨트롤과 그 그림자가 덮는다). 정지 그림(png)은 덮이지 않는다.
+- 캔버스 1920×1080, 30fps. 반복 영상은 4–12초 · 주장 하나(2프레임 이상 — 1프레임짜리는 `render.mjs` 가 정지 그림으로 본다).
+- 글자는 `TEXT.small`(36px) 이상. 데스크톱 본문(760px)에서 약 14px 이지만 390px 폭 휴대폰에서는 약 6px 로 줄어 읽기 어렵다(영상은 눌러 키울 수 없다). 그래서 ① 그림 안 글자는 이름표 몇 개로 줄이고, ② 그림의 핵심은 캡션 · 본문 문장이 다시 말해 그림 글자를 못 읽어도 뜻이 통하게 한다. ③ 이름표가 핵심인 반복 영상은 휴대폰판(1080×1350, 글자 `MOBILE_TEXT` 48px 이상 — 390px 폭에서 약 16px)을 함께 만든다. 600px 이하 화면은 휴대폰판과 그 포스터를 받는다.
+- 다크 모드: 장면은 밝은 캔버스 하나다. 다크 화면에서는 렌더러가 테두리를 둔 카드로 보여 준다(다크 판 렌더는 아직 없다).
 - 색은 `COLOR` 만 쓴다. 정상 = ink, 창 · 안전 = accent, 오류 · 막힘 = danger, 지워짐 · 보조 = muted.
 - 한글 · 숫자 · 화살표 · 이름표는 코드로 그린다. 생성 이미지에 글자를 넣지 않는다.
 - 글자 없는 소재 그림이 필요하면 [gpt-image](../gpt-image/SKILL.md)로 만든다(Codex CLI 내장 `image_gen`, ChatGPT 로그인 — 프롬프트 · 검사 · 기록 절차가 거기 있다). 실제 화면 · 측정 결과처럼 보이게 만들지 않는다.
-- 영상은 H.264 mp4(crf 23), `preload="none"` · 포스터 · 사용자 재생. GIF 는 쓰지 않는다 — 같은 장면을 GIF(960px · 15fps)로 바꾸면 mp4 의 3.5–9.6배였다(2026-11-10, 기존 블로그 클립 2개 재인코딩 실측). 이미지 최적화에서도 빠진다.
+- 영상은 H.264 mp4(crf 23, yuv420p, 오디오 없음, moov 앞), `preload="none"`. 용량 상한: 반복 영상 1MB, 설명 영상 4MB, 독자가 받는 포스터(960px AVIF · WebP) 60KB — `npm test`(`tests/videos.test.mjs`)가 검사한다. 주소에 내용 해시(`?v=`)가 붙어 1년 캐시되고, 해시 없는 주소는 1시간마다 다시 확인한다(`vercel.json`). GIF 는 쓰지 않는다 — 같은 장면을 GIF(960px · 15fps)로 바꾸면 mp4 의 3.5–9.6배였다(2026-11-10, 기존 블로그 클립 2개 재인코딩 실측). 이미지 최적화에서도 빠진다.
 - 글에 나오는 숫자는 장면에도 같게 쓴다. 공개 여부가 정해지지 않은 내부 숫자는 장면에 넣지 않는다. 범위 값을 한 점으로 그리면 「최대」 처럼 어느 끝인지 라벨에 밝힌다.
 
 ## 마크업
 
-영상(기존 글 `projects/multicloud-migration-design` 과 같은 꼴):
+영상 — Remotion 장면은 `scene`(registry id), 저장소 밖에서 만든 영상은 `name`(`static/videos` 파일 이름) + `alt`:
 
-```html
-<figure>
-<video controls playsinline preload="none" poster="/images/<name>-poster.jpg" width="1920" height="1080" aria-label="<registry.json 의 alt>">
-<source src="/videos/<name>.mp4" type="video/mp4">
-</video>
-<figcaption><그림의 핵심 한 문장>. 설명용 움직이는 그림이며 실제 화면이 아닙니다. 소리는 없습니다.</figcaption>
-</figure>
+```markdown
+{{< motion scene="RewindFallout" kind="개념도" caption="일시정지한 사이 되감기 창이 밀려 다음 조각이 404 를 받는다." >}}
+{{< motion name="multicloud-migration-film" alt="<장면 설명>" kind="개념도" caption="<핵심 한 문장>. 소재는 AI 생성." >}}
 ```
+
+렌더러(`src/lib/visuals.mjs`)가 "그림 N." 캡션, 비율이 고정된 틀(레이아웃 이동 없음), 최적화한 포스터, 휴대폰판 `<source media>`, 반복 영상의 일시정지 버튼을 만든다. `id="fig-…"` 를 주면 본문에서 `[[fig-…]]` 로 가리킬 수 있다. 목록에 없는 `scene` · `name` 은 빌드 오류다(`node scripts/check-videos.mjs` 를 먼저 실행). 예전 글의 `<figure><video …>` 원시 HTML 도 그대로 렌더되지만 번호 · 재생 규칙을 받지 못하므로, 글을 고칠 때 이 표기로 바꾼다.
 
 정지 그림 — 마크다운 이미지 문법이어야 블로그 렌더러가 크기 정보와 WebP/AVIF 파생본을 붙인다(`<img>` · `<figure>` 를 직접 쓰면 빠진다). 마크다운 이미지는 figcaption 이 없으므로, 기존 글처럼 바로 아래 한 문장으로 설명용임을 밝힌다:
 
