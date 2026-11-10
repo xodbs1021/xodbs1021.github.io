@@ -121,7 +121,15 @@ export const RefetchFlow: React.FC<Props> = ({ layout = "desktop" }) => {
 
       <WindowBand x={bandX} y={bandTop} width={bandWidth} height={bandHeight} />
       <WindowBand x={bandX - 8 * pulse} y={bandTop - 8 * pulse} width={bandWidth + 16 * pulse} height={bandHeight + 16 * pulse} opacity={pulse} />
-      <Label x={bandX} y={bandLabelY} size={text.small} color={COLOR.accent} weight={720}>
+      {/* 휴대폰판은 글자가 커서 왼쪽 맞춤이면 이름표가 7 번 조각 위로 밀린다 — 첫 조각(6) 가운데에 맞춘다. */}
+      <Label
+        x={layout === "mobile" ? cellX(END_WINDOW_START) + cell.width / 2 : bandX}
+        y={bandLabelY}
+        size={text.small}
+        color={COLOR.accent}
+        weight={720}
+        anchor={layout === "mobile" ? "center" : "left"}
+      >
         목록 첫 조각
       </Label>
       <Label x={bandX + bandWidth} y={bandLabelY} size={text.small} color={COLOR.accent} weight={720} anchor="right">

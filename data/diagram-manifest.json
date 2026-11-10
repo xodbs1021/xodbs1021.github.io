@@ -485,15 +485,6 @@
       "bytes": 21701
     }
   },
-  "a6a693a3d7ec9286": {
-    "source": "content/posts/projects/rewind-missing-segment.md",
-    "wide": {
-      "file": "a6a693a3d7ec9286-wide.svg",
-      "width": 392,
-      "height": 552,
-      "bytes": 18746
-    }
-  },
   "a71cda3dc227b88e": {
     "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
     "wide": {

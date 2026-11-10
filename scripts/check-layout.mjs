@@ -182,6 +182,8 @@ try {
             const texts=[...svg.querySelectorAll('text')].filter(t=>t.getClientRects().length&&t.textContent.trim());
             const textSizes=texts.map(t=>({text:t.textContent.trim().slice(0,30),px:parseFloat(getComputedStyle(t).fontSize)*scale}));
             const small=textSizes.filter(t=>t.px<11.5).map(t=>`${t.text} (${t.px.toFixed(1)}px)`);
+            // Chart text past the viewBox is cut off by the SVG edge (e.g. a long y-axis name at 720px).
+            const outside=el.classList.contains('chart-figure')?texts.filter(t=>{const r=t.getBoundingClientRect();return r.left<box.left-1||r.right>box.right+1||r.top<box.top-1||r.bottom>box.bottom+1}).map(t=>t.textContent.trim().slice(0,30)):[];
             // Text sits either on a node shape (diagrams) or on the figure surface.
             const lowText=[],lowMarks=[],hardSurfaces=[];
             for(const t of texts){
@@ -206,12 +208,14 @@ try {
             const captionContrast=caption&&bg?ratio(parse(getComputedStyle(caption).color),bg):null;
             const title=svg.querySelector('title')?.textContent.trim();
             const authoredLegacy=el.dataset.authored==='legacy';
-            return {authoredLegacy,variant:svg.closest('[class*="-variant"]')?.className||'svg',scale,visibleRatio,scrollAllowed:el.dataset.scroll==='allowed',minText:Math.min(...textSizes.map(t=>t.px)),small,lowText:[...new Set(lowText)].slice(0,8),lowMarks:[...new Set(lowMarks)].slice(0,8),hardSurfaces:hardSurfaces.length,captionContrast,title:!!title,desc:!!svg.querySelector('desc'),chart:el.classList.contains('chart-figure'),emptyStatic:el.classList.contains('static-diagram')&&!svg.querySelector('text'),error:!!el.querySelector('.diagram-missing')||el.classList.contains('diagram-missing')};
+            return {authoredLegacy,variant:svg.closest('[class*="-variant"]')?.className||'svg',scale,visibleRatio,scrollAllowed:el.dataset.scroll==='allowed',minText:Math.min(...textSizes.map(t=>t.px)),small,outside,lowText:[...new Set(lowText)].slice(0,8),lowMarks:[...new Set(lowMarks)].slice(0,8),hardSurfaces:hardSurfaces.length,captionContrast,title:!!title,desc:!!svg.querySelector('desc'),chart:el.classList.contains('chart-figure'),emptyStatic:el.classList.contains('static-diagram')&&!svg.querySelector('text'),error:!!el.querySelector('.diagram-missing')||el.classList.contains('diagram-missing')};
           },theme);
           if(sizes.error) fail(scope,'figure has no rendered SVG (missing pre-render?)');
           if(sizes.emptyStatic)fail(scope,'static SVG has no SVG text (HTML parser breakout)');
           // Earlier hand-drawn SVG (fixed sizes/colors in the post) is reported, not failed; PR 3 rewrites it.
           const authored=(message)=>sizes.authoredLegacy?report.warnings.push({scope,message:`earlier hand-drawn SVG: ${message}`}):fail(scope,message);
+          // Posts not yet rewritten in PR 3 still clip edge tick labels: the full run reports them, a post check (LAYOUT_PATH) fails.
+          if(sizes.outside?.length){const message='chart text outside the SVG viewBox: '+sizes.outside.slice(0,6).join(', ');process.env.LAYOUT_PATH?fail(scope,message):report.warnings.push({scope,message})}
           if(sizes.small?.length)authored('figure text renders below 12px: '+sizes.small.slice(0,6).join(', '));
           if(sizes.lowText?.length)authored('figure text contrast below 4.5:1: '+sizes.lowText.join(', '));
           if(sizes.lowMarks?.length)fail(scope,'data marks below 3:1 against the figure: '+sizes.lowMarks.join(', '));

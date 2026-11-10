@@ -133,8 +133,8 @@
     "faststart": true,
     "poster": "/images/rewind-missing-segment-refetch-flow-poster.jpg",
     "mobile": {
-      "sha256": "50850cc7e05e59cd04f67434b95e89cb33034a7b14beffa8f68c6ef763c6b700",
-      "bytes": 232378,
+      "sha256": "ca23d006c045681357d470bed50b0d3e3b5b5daaf0a152ae13c6ec8403409792",
+      "bytes": 232615,
       "codec": "h264",
       "pixFmt": "yuv420p",
       "width": 1080,
