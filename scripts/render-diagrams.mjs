@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {chromium} from 'playwright';
-import {collectDiagrams, diagramKey, narrowSource, DIAGRAM_DIR, MANIFEST_PATH, MERMAID_SENTINELS, FONT_SIZE, RENDER_POLICY, mermaidVersion, loadManifest} from '../src/lib/diagrams.mjs';
+import {collectDiagrams, mermaidSourceProblem, diagramKey, narrowSource, DIAGRAM_DIR, MANIFEST_PATH, MERMAID_SENTINELS, FONT_SIZE, RENDER_POLICY, mermaidVersion, loadManifest} from '../src/lib/diagrams.mjs';
 import {cssVar} from '../src/lib/tokens.mjs';
 
 // Run locally or in CI after adding/changing a Mermaid block, then commit data/diagrams and the manifest.
@@ -12,6 +12,11 @@ const FONT = "'Pretendard Variable', Pretendard, sans-serif";
 const mermaidDist = path.resolve('node_modules/mermaid/dist');
 
 const diagrams = collectDiagrams();
+const invalid = diagrams.map(d => [d, mermaidSourceProblem(d.source)]).filter(([, problem]) => problem);
+if (invalid.length) {
+  console.error(invalid.map(([d, problem]) => `${d.file}: ${problem}`).join('\n'));
+  process.exit(1);
+}
 const unique = [...new Map(diagrams.map(d => [d.key, d])).values()];
 const previous = loadManifest();
 const manifest = {};
