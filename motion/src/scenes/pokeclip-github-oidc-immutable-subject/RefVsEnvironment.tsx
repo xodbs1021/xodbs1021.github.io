@@ -1,5 +1,5 @@
 // 콘티: _workspace/blog/pokeclip-github-oidc-immutable-subject/storyboard.md
-// 신뢰 조건을 develop ref → (ref + environment 두 값, Claude Code 잡 꺼 둠) → environment 한 값으로 옮긴 두 걸음.
+// 신뢰 조건이 받는 값을 브랜치 값 → (브랜치 값 + environment 값, Claude Code 잡 꺼 둠) → environment 값으로 옮긴 두 걸음.
 // 반복 클립(12초 이하), 생성 소재 없음. layout="mobile" 은 1080×1350 휴대폰판(RefVsEnvironmentMobile).
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { Node, type NodeTone } from "../../components/Flow";
@@ -24,6 +24,8 @@ type Layout = {
   readonly deploy: Box;
   readonly claude: Box;
   readonly claudeStatus: Point;
+  /** 1단계부터 배포 잡 자신의 sub 가 바뀌었음을 알리는 이름표. */
+  readonly deployChange: Point;
   readonly gate: Box;
   readonly key: Box;
   readonly blockMark: Point;
@@ -45,6 +47,7 @@ const DESKTOP: Layout = {
   deploy: { x: 120, y: 330, width: 360, height: 130 },
   claude: { x: 120, y: 640, width: 360, height: 130 },
   claudeStatus: { x: 300, y: 820 },
+  deployChange: { x: 300, y: 258 },
   gate: { x: 860, y: 470, width: 400, height: 150 },
   key: { x: 1500, y: 470, width: 300, height: 150 },
   blockMark: { x: 790, y: 640 },
@@ -63,17 +66,18 @@ const MOBILE: Layout = {
   steps: [{ x: 210, y: 40 }, { x: 540, y: 40 }, { x: 870, y: 40 }],
   conditionLabel: { x: 540, y: 150 },
   condition: { x: 540, y: 225 },
-  deploy: { x: 60, y: 330, width: 440, height: 130 },
-  claude: { x: 580, y: 330, width: 440, height: 130 },
-  claudeStatus: { x: 880, y: 540 },
+  deploy: { x: 60, y: 400, width: 440, height: 130 },
+  claude: { x: 580, y: 400, width: 440, height: 130 },
+  claudeStatus: { x: 880, y: 565 },
+  deployChange: { x: 280, y: 314 },
   gate: { x: 240, y: 710, width: 600, height: 150 },
   key: { x: 340, y: 990, width: 400, height: 130 },
-  blockMark: { x: 660, y: 640 },
+  blockMark: { x: 660, y: 645 },
   blockTag: { x: 540, y: 1200 },
   paths: {
-    deploy: "M 280 460 C 280 600, 420 620, 420 710",
-    claudePass: "M 660 460 L 660 710",
-    claudeBlock: "M 660 460 L 660 600",
+    deploy: "M 280 530 C 280 630, 420 640, 420 710",
+    claudePass: "M 660 530 L 660 710",
+    claudeBlock: "M 660 530 L 660 630",
     gateToKey: "M 540 860 L 540 990",
   },
 };
@@ -81,7 +85,7 @@ const MOBILE: Layout = {
 const LAYOUTS = { desktop: DESKTOP, mobile: MOBILE } as const;
 
 const STEP_NAMES = ["PR 279 뒤", "1단계", "2단계"] as const;
-const CONDITIONS = ["develop ref", "ref + environment", "environment dev-deploy"] as const;
+const CONDITIONS = ["브랜치 값", "브랜치 값 + environment 값", "environment 값"] as const;
 const CLAUDE_STATUS = ["켜짐", "꺼 둠", "다시 켬"] as const;
 const NOTES = ["같은 브랜치의 다른 잡도 조건상 통과", "두 값을 받는 동안 다른 잡은 꺼 둠", "environment 없는 잡은 막힘"] as const;
 
@@ -151,6 +155,10 @@ export const RefVsEnvironment: React.FC<Props> = ({ layout = "desktop" }) => {
       </Tag>
 
       <Node {...L.deploy} tone="accent" size={L.text.node}>배포 잡</Node>
+      {/* 1단계부터 배포 잡의 sub 도 브랜치 값 → environment 값으로 바뀐다(그래서 두 값이 잠시 필요했다). */}
+      <Tag x={L.deployChange.x} y={L.deployChange.y} anchor="center" tone="accent" size={L.text.tag} opacity={progress(frame, T.step1, 12)}>
+        브랜치 → environment
+      </Tag>
       <Node {...L.claude} tone={claudeTone} size={L.text.node}>Claude Code 잡</Node>
       {CLAUDE_STATUS.map((status, i) => (
         <Tag key={status} x={L.claudeStatus.x} y={L.claudeStatus.y} anchor="center" tone={i === 1 ? "muted" : "ink"} size={L.text.tag} opacity={span(i)}>

@@ -40,8 +40,8 @@
   "pokeclip-github-oidc-immutable-subject-ref-vs-environment": {
     "scene": "RefVsEnvironment",
     "alt": "세 단계가 차례로 바뀐다. PR 279 뒤에는 신뢰 조건이 develop ref라 배포 잡과 Claude Code 잡이 모두 조건상 검문을 지날 수 있고, 1단계에서는 조건이 ref와 environment 두 값이 되며 Claude Code 잡을 꺼 두고, 2단계에서는 조건이 environment dev-deploy 하나가 되어 배포 잡만 임시 자격을 받고 다시 켠 Claude Code 잡은 검문 앞에서 막히는 장면",
-    "sha256": "b84fc552b024dac02a4fb46420bb78abbc84087ed323d15bab4dd1c0a9811c58",
-    "bytes": 240557,
+    "sha256": "f907b713281fdc8dea12de661b22fec836c86c9538d06ce7abf50866f44b6d31",
+    "bytes": 250919,
     "codec": "h264",
     "pixFmt": "yuv420p",
     "width": 1920,
@@ -51,8 +51,8 @@
     "faststart": true,
     "poster": "/images/pokeclip-github-oidc-immutable-subject-ref-vs-environment-poster.jpg",
     "mobile": {
-      "sha256": "ea59044cb466a0aff224a4315dd073dc2b9ff7947c75cf87857956e1e335032c",
-      "bytes": 254469,
+      "sha256": "15f0db47fd28d251c20626448f0796fb6336f5db3659c3e574cef69dae4cfe8a",
+      "bytes": 261461,
       "codec": "h264",
       "pixFmt": "yuv420p",
       "width": 1080,
