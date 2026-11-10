@@ -67,9 +67,9 @@
   },
   "pokeclip-media-timeline-over-wall-clock-chapter-rule": {
     "scene": "ChapterRule",
-    "alt": "영상 조각 다섯 개가 한 띠로 이어지는 동안, 앞 세 조각은 표시 시각을 이어 적어 장 1이 되고, 2분 틈 뒤의 조각에서 표시 시각이 건너뛰며 장 2가 열리고, 0.3초 일찍 온 다섯째 조각은 표시 시각이 앞 조각 끝보다 조금 뒤로 당겨 적히는 장면",
-    "sha256": "c9bcf328c0ffbc2cfa6622059ca6f37c0881befc2253d32a28bd506ad60868c0",
-    "bytes": 134436,
+    "alt": "영상 조각 다섯 개가 한 띠로 이어지는 동안, 앞 세 조각은 표시 시각을 이어 적어 장 1이 되고, 2분 틈 뒤의 조각에서 표시 시각이 건너뛰며 장 2가 열리고, 0.3초 일찍 온 다섯째 조각은 표시 시각을 앞 조각 끝보다 조금 당겨 적고 장 3을 여는 장면. 끝에는 세 단계 요약이 남는다",
+    "sha256": "1a5ef09e94679dbedec3c23512416c312048c56deb3195365215d1d244214928",
+    "bytes": 179026,
     "codec": "h264",
     "pixFmt": "yuv420p",
     "width": 1920,
@@ -79,8 +79,8 @@
     "faststart": true,
     "poster": "/images/pokeclip-media-timeline-over-wall-clock-chapter-rule-poster.jpg",
     "mobile": {
-      "sha256": "68e86d6a8007e2dc8d12d1b5bb8208988e04289c1ffc5dcdae5121a1aa526b44",
-      "bytes": 155697,
+      "sha256": "e2879845a8c8c8a52322da1f24788c4fbd99c4376f0e4d6954510a16aea8fd79",
+      "bytes": 217249,
       "codec": "h264",
       "pixFmt": "yuv420p",
       "width": 1080,

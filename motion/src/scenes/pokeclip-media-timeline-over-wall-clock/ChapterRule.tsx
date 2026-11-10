@@ -1,7 +1,7 @@
 // 콘티: _workspace/blog/pokeclip-media-timeline-over-wall-clock/storyboard.md 「영상 1」
 // 섞기 규칙: 한 장 안은 미디어 길이를 누적해 잇고, 틈이 문턱을 넘으면 새 장을 열고,
-// 1초 미만으로 일찍 온 조각은 표시 시각을 최대 999ms 당겨 적는다(반복 클립, 생성 소재 없음).
-// 영상 띠는 끝까지 끊기지 않는다 — 달라지는 것은 위 줄의 표시 시각뿐이다.
+// 1초 미만으로 일찍 온 조각은 표시 시각을 최대 999ms 당겨 적고 그 값으로 새 장을 연다(반복 클립, 생성 소재 없음).
+// 영상 띠는 끝까지 끊기지 않는다 — 달라지는 것은 위 줄의 표시 시각과 아래 줄의 장뿐이다.
 // layout="mobile" 은 1080×1350 휴대폰판(ChapterRuleMobile) — 같은 움직임을 큰 글자로 그린다.
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { Label, Tag } from "../../components/Timeline";
@@ -17,6 +17,7 @@ const T = {
   gapTag: 125,
   overlapTag: 215,
   pullBack: 230,
+  summary: 275,
   end: CHAPTER_RULE_FRAMES,
 } as const;
 
@@ -25,6 +26,13 @@ const CLOCK = ["0:00", "0:04", "0:08", "2:12", "2:15.7"] as const;
 /** 다섯째 조각이 일찍 오지 않았다면 받았을 시각(앞 조각 끝). */
 const EXPECTED_FIFTH = "2:16";
 
+/** 장 띠: 몇 번째 조각부터 몇 개, 어느 조각과 함께 나타나는가, 끝까지 남는 요약 줄. */
+const CHAPTERS = [
+  { name: "장 1", from: 0, count: 3, appear: 0, note: "장 1 · 문턱 안 → 이어 적기", noteAt: T.joinTag + 10 },
+  { name: "장 2", from: 3, count: 1, appear: 3, note: "장 2 · 틈 → 새 장", noteAt: T.gapTag + 10 },
+  { name: "장 3", from: 4, count: 1, appear: 4, note: "장 3 · 겹침 → 당겨 적고 새 장", noteAt: T.pullBack + 10 },
+] as const;
+
 type Layout = {
   readonly text: { readonly tag: number; readonly clock: number; readonly band: number };
   readonly phaseTag: { readonly x: number; readonly y: number };
@@ -32,29 +40,30 @@ type Layout = {
   readonly strip: { readonly x: number; readonly y: number; readonly segWidth: number; readonly height: number };
   readonly bandY: number;
   readonly bandHeight: number;
-  readonly noteY: number;
+  /** 끝까지 남는 세 단계 요약 줄의 왼쪽·윗변·줄 간격. */
+  readonly notes: { readonly x: number; readonly y: number; readonly gap: number };
 };
 
 // 데스크톱: 왼쪽에서 오른쪽으로 조각 다섯. 좌표는 SAFE.x(120) 안쪽.
 const DESKTOP: Layout = {
   text: { tag: TEXT.small, clock: TEXT.label, band: TEXT.small },
   phaseTag: { x: 960, y: 96 },
-  clockY: 290,
-  strip: { x: 210, y: 420, segWidth: 300, height: 150 },
-  bandY: 620,
+  clockY: 270,
+  strip: { x: 210, y: 400, segWidth: 300, height: 150 },
+  bandY: 590,
   bandHeight: 70,
-  noteY: 780,
+  notes: { x: 210, y: 720, gap: 62 },
 };
 
 // 휴대폰판: 같은 띠를 좁게, 글자 48px 이상.
 const MOBILE: Layout = {
   text: { tag: MOBILE_TEXT.small, clock: MOBILE_TEXT.label, band: MOBILE_TEXT.small },
   phaseTag: { x: 540, y: 96 },
-  clockY: 400,
-  strip: { x: 50, y: 560, segWidth: 196, height: 170 },
-  bandY: 790,
+  clockY: 360,
+  strip: { x: 50, y: 520, segWidth: 196, height: 170 },
+  bandY: 740,
   bandHeight: 84,
-  noteY: 1010,
+  notes: { x: 50, y: 900, gap: 84 },
 };
 
 const LAYOUTS = { desktop: DESKTOP, mobile: MOBILE } as const;
@@ -66,20 +75,24 @@ export const ChapterRule: React.FC<Props> = ({ layout = "desktop" }) => {
   const L = LAYOUTS[layout];
   const segX = (i: number) => L.strip.x + i * L.strip.segWidth;
   const shown = (i: number) => progress(frame, T.seg[i], 12);
-  const chapterTwo = frame >= T.seg[3];
   const pulled = progress(frame, T.pullBack, 18);
+  // 지금 장 = 가장 늦게 나타난 장. 강조색은 그 하나만.
+  const current = CHAPTERS.reduce((at, c, i) => (frame >= T.seg[c.appear] ? i : at), 0);
 
   return (
     <AbsoluteFill style={{ background: COLOR.surface }}>
-      {/* 구간 이름표 — 한 번에 하나만 보인다. */}
+      {/* 구간 이름표 — 한 번에 하나만 보인다. 끝 프레임에는 요약. */}
       <Tag x={L.phaseTag.x} y={L.phaseTag.y} anchor="center" tone="ink" size={L.text.tag} opacity={visibleBetween(frame, T.joinTag, T.gapTag + 6, 12)}>
         차이가 문턱 안 → 이어 적기
       </Tag>
       <Tag x={L.phaseTag.x} y={L.phaseTag.y} anchor="center" tone="ink" size={L.text.tag} opacity={visibleBetween(frame, T.gapTag, T.overlapTag + 6, 12)}>
         틈이 문턱 밖 → 새 장
       </Tag>
-      <Tag x={L.phaseTag.x} y={L.phaseTag.y} anchor="center" tone="accent" size={L.text.tag} opacity={progress(frame, T.overlapTag, 12)}>
-        일찍 옴 → 최대 999ms 당기기
+      <Tag x={L.phaseTag.x} y={L.phaseTag.y} anchor="center" tone="accent" size={L.text.tag} opacity={visibleBetween(frame, T.overlapTag, T.summary + 6, 12)}>
+        일찍 옴 → 최대 999ms 당기고 새 장
+      </Tag>
+      <Tag x={L.phaseTag.x} y={L.phaseTag.y} anchor="center" tone="ink" size={L.text.tag} opacity={progress(frame, T.summary, 12)}>
+        영상은 이어지고, 표시 시각만 바뀝니다
       </Tag>
 
       {/* 위 줄: 조각 시작마다 적히는 표시 시각. */}
@@ -135,43 +148,37 @@ export const ChapterRule: React.FC<Props> = ({ layout = "desktop" }) => {
       ))}
 
       {/* 아래 줄: 장. 지금 장만 강조색. */}
-      <div
-        style={{
-          position: "absolute",
-          left: segX(0),
-          top: L.bandY,
-          width: L.strip.segWidth * 3 - 10,
-          height: L.bandHeight,
-          borderRadius: 12,
-          background: chapterTwo ? COLOR.line : COLOR.accentSoft,
-          border: `3px solid ${chapterTwo ? COLOR.muted : COLOR.accent}`,
-          opacity: shown(0),
-        }}
-      />
-      <Label x={segX(0) + 24} y={L.bandY + (L.bandHeight - L.text.band) / 2 - 4} size={L.text.band} weight={700} color={chapterTwo ? COLOR.muted : COLOR.accent} opacity={shown(0)}>
-        장 1
-      </Label>
-      <div
-        style={{
-          position: "absolute",
-          left: segX(3),
-          top: L.bandY,
-          width: L.strip.segWidth * (1 + shown(4)) - 10,
-          height: L.bandHeight,
-          borderRadius: 12,
-          background: COLOR.accentSoft,
-          border: `3px solid ${COLOR.accent}`,
-          opacity: shown(3),
-        }}
-      />
-      <Label x={segX(3) + 24} y={L.bandY + (L.bandHeight - L.text.band) / 2 - 4} size={L.text.band} weight={700} color={COLOR.accent} opacity={shown(3)}>
-        장 2
-      </Label>
+      {CHAPTERS.map((c, i) => {
+        const active = i === current;
+        return (
+          <div key={c.name}>
+            <div
+              style={{
+                position: "absolute",
+                left: segX(c.from),
+                top: L.bandY,
+                width: L.strip.segWidth * c.count - 10,
+                height: L.bandHeight,
+                borderRadius: 12,
+                boxSizing: "border-box",
+                background: active ? COLOR.accentSoft : COLOR.line,
+                border: `3px solid ${active ? COLOR.accent : COLOR.muted}`,
+                opacity: shown(c.appear),
+              }}
+            />
+            <Label x={segX(c.from) + 24} y={L.bandY + (L.bandHeight - L.text.band) / 2 - 4} size={L.text.band} weight={700} color={active ? COLOR.accent : COLOR.muted} opacity={shown(c.appear)}>
+              {c.name}
+            </Label>
+          </div>
+        );
+      })}
 
-      {/* 끝 프레임에도 남는 요약 — 실패가 아니므로 danger 색을 쓰지 않는다. */}
-      <Tag x={L.phaseTag.x} y={L.noteY} anchor="center" tone="muted" size={L.text.tag} opacity={progress(frame, T.pullBack + 30, 12)}>
-        영상은 이어지고, 표시 시각만 바뀝니다
-      </Tag>
+      {/* 세 단계 요약 — 끝 프레임(포스터)에도 남는다. 실패가 아니므로 danger 색을 쓰지 않는다. */}
+      {CHAPTERS.map((c, i) => (
+        <Label key={c.note} x={L.notes.x} y={L.notes.y + i * L.notes.gap} size={L.text.band} weight={600} color={COLOR.ink} opacity={progress(frame, c.noteAt, 12)}>
+          {c.note}
+        </Label>
+      ))}
     </AbsoluteFill>
   );
 };
