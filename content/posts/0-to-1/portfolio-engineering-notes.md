@@ -60,7 +60,7 @@
 
 완료 알림을 놓쳤다고 디스크에 남은 방송 파일까지 사라진 것은 아닙니다. 파일·DB·객체 저장소가 어긋났을 때 어디서 사실을 확인하고 다시 처리할지 정했습니다.
 
-- **CASE 14** · [200인데 검은 화면이었다: 세 원인이 겹친 HLS 재생 문제 추적](https://xodbs1021.github.io/posts/0-to-1/pokeclip-black-screen-three-causes/)
+- **CASE 14** · [HTTP 200인데 검은 화면, 세 단계를 지나서야 재생됐습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-black-screen-three-causes/)
 - **CASE 15** · [276개 파일을 회수해도 p95만으로는 부족했습니다: 알림 유실을 견디는 인덱서](https://xodbs1021.github.io/posts/0-to-1/pokeclip-indexer-recovery-without-events/)
 - **CASE 16** · [S3에는 올라갔는데 DB는 pending: 업로드 복구의 기준을 정하다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-upload-state-and-recovery/)
 

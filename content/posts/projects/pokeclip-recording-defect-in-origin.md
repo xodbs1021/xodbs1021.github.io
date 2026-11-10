@@ -1,7 +1,7 @@
 ---
 title: "Chrome에서만 멈춘 녹화 조각, 결함은 원본에 있었습니다"
 date: "2026-11-11T01:13:27+09:00"
-lastmod: "2026-11-11T02:34:52+09:00"
+lastmod: "2026-11-11T05:10:38+09:00"
 description: "회차 다시보기를 검증하다 운영 녹화 조각 하나에서 Chrome 재생이 멈췄습니다. 끊김 표시·헤드리스·우리 재포장 가설을 차례로 지우고 녹화 원본의 프레임 결손에 닿은 과정과, 오류 알림 없이 굳던 웹 플레이어를 다음 조각으로 넘겨 잇는 실험."
 categories: ["projects"]
 tags: ["HLS", "hls.js", "H.264", "MediaMTX", "Chrome", "디버깅"]
@@ -98,7 +98,7 @@ ERR [path <stream>] [recorder] too many reordered frames (13)
 
 우리가 쓰는 MediaMTX(v1.21.1 기반 판)는 mediacommon v2.9.5를 쓰고, 그 DTS 추출기는 프레임마다 POC가 일정한 폭으로 늘어난다고 보고 다음 POC를 예상합니다([dts_extractor.go](https://github.com/bluenviron/mediacommon/blob/v2.9.5/pkg/codecs/h264/dts_extractor.go)). 실제 POC가 예상에서 벗어나면 그만큼을 순서가 바뀐 프레임으로 세고, 그 수가 `maxReorderedFrames = 10`을 넘으면 이 오류를 냅니다. 프레임이 여러 장 빠져도 POC가 크게 뛰므로 같은 오류가 납니다. 상류에는 프레임 손실 때의 추출을 고치거나 추출 오류 뒤에도 이어 가려는 PR이 열려 있습니다([mediacommon #394](https://github.com/bluenviron/mediacommon/pull/394), [mediamtx #5714](https://github.com/bluenviron/mediamtx/pull/5714)). 녹화기는 인스턴스가 오류로 끝나면 2초를 쉬고 새 인스턴스를 띄웁니다([recorder.go](https://github.com/bluenviron/mediamtx/blob/v1.21.1/internal/recorder/recorder.go#L89-L104)). 교체마다 약 2초가 빈 것과 크기가 맞습니다.
 
-같은 문구는 [지난 글](/posts/0-to-1/pokeclip-black-screen-three-causes/)에도 나왔습니다. 그때는 B-frame 인코딩과 LL-HLS 분할에서 HLS muxer가 DTS를 구하지 못한 경로였습니다. 이번에는 녹화기(`[recorder]`)가 낸 오류이고, 프레임이 빠져 POC가 뛴 경로입니다. 같은 문구라도 어느 구성 요소가 냈는지, 그 앞에서 프레임이 빠졌는지를 따로 봐야 합니다.
+같은 문구는 [지난 글](/posts/0-to-1/pokeclip-black-screen-three-causes/)에서 HLS muxer도 낸 적이 있습니다. 그때는 B-frame 없는 baseline으로 바꾸자 오류가 사라졌지만, 그 설정은 DTS 추출기의 재정렬 검사 자체를 건너뛰게 해서 원인을 가려 주지 못했습니다. 이번에는 녹화기(`[recorder]`)가 낸 오류이고, 프레임이 빠져 POC가 뛴 경로입니다. 같은 문구라도 어느 구성 요소가 냈는지, 그 앞에서 프레임이 빠졌는지를 따로 봐야 합니다.
 
 1624처럼 교체를 일으키지 않은 결함은 빠진 프레임이 기준 10을 넘지 않았던 경우로 보입니다. 조각마다 빠진 프레임 수를 세지는 않아 추정입니다.
 
@@ -174,4 +174,4 @@ B2는 순서에 기댑니다. `recoverMediaError()` 바로 뒤 같은 처리기 
 - [bluenviron/mediamtx PR #5714](https://github.com/bluenviron/mediamtx/pull/5714) — DTS 추출 실패 뒤 끊지 않고 이어 가는 제안(열림)
 - [bluenviron/mediamtx v1.21.1 `internal/recorder/recorder.go`](https://github.com/bluenviron/mediamtx/blob/v1.21.1/internal/recorder/recorder.go#L89-L104) — 녹화기 인스턴스가 끝나면 2초 뒤 새로 시작(기본값은 53–54행)
 - [video-dev/hls.js v1.7.3 API 문서 `hls.recoverMediaError()`](https://github.com/video-dev/hls.js/blob/v1.7.3/docs/API.md#hlsrecovermediaerror) — 매체 요소 오류에서의 복구와 예제
-- [200인데 검은 화면이었다: 세 원인이 겹친 HLS 재생 문제 추적](/posts/0-to-1/pokeclip-black-screen-three-causes/) — 같은 오류 문구의 다른 경로(B-frame·LL-HLS 분할)
+- [HTTP 200인데 검은 화면, 세 단계를 지나서야 재생됐습니다](/posts/0-to-1/pokeclip-black-screen-three-causes/) — 같은 오류 문구가 HLS muxer에서 난 사례와 baseline 전환이 검사를 건너뛴다는 정정
