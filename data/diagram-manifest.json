@@ -479,6 +479,15 @@
       "bytes": 17640
     }
   },
+  "a336f961a86fde2d": {
+    "source": "content/posts/projects/pokeclip-recording-defect-in-origin.md",
+    "wide": {
+      "file": "a336f961a86fde2d-wide.svg",
+      "width": 184,
+      "height": 666,
+      "bytes": 20578
+    }
+  },
   "a374f5e1319ca955": {
     "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
     "wide": {
