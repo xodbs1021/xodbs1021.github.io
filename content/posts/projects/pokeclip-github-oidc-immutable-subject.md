@@ -1,5 +1,5 @@
 ---
-title: "GitHub OIDC 거부는 SCP가 아니라 sub 형식 때문이었습니다"
+title: "GitHub OIDC 거부, 원인은 SCP가 아니라 sub였습니다"
 date: "2026-11-07T04:48:02+09:00"
 lastmod: "2026-11-10T22:55:49+09:00"
 author: "김태윤"
