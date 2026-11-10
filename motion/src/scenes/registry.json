@@ -47,18 +47,12 @@
     "alt": "토큰 서명 뒤 시간이 흐르는 띠 아래로 연결 세 줄이 있다. 0분에 토큰 1로 로그인한 연결 1은 15분 공식 만료 뒤에도 그대로 질의하고, 17분의 연결 2는 새 토큰으로 로그인하며, 21분에 캐시한 토큰 1을 다시 쓴 연결 3은 PAM 인증 실패로 거부되는 장면"
   },
   {
-    "id": "SubMismatch",
-    "post": "pokeclip-github-oidc-immutable-subject",
-    "kind": "video",
-    "posterFrame": 350,
-    "alt": "배포 잡이 숫자 ID가 붙은 sub를 담은 토큰을 STS에 내지만 신뢰 조건이 이름 형식이라 검문 앞에서 AccessDenied로 막히고, 신뢰 조건을 숫자 ID 형식으로 고치자 같은 토큰이 검문을 지나 임시 자격을 받는 장면"
-  },
-  {
     "id": "RefVsEnvironment",
     "post": "pokeclip-github-oidc-immutable-subject",
     "kind": "video",
-    "posterFrame": 350,
-    "alt": "신뢰 조건이 develop ref일 때는 배포 잡뿐 아니라 Claude Code 잡도 같은 sub라 신뢰 조건상 검문을 통과할 수 있지만, 조건을 environment dev-deploy로 좁히자 배포 잡만 통과하고 Claude Code 잡은 검문 앞에서 막히는 장면"
+    "posterFrame": 340,
+    "alt": "세 단계가 차례로 바뀐다. PR 279 뒤에는 신뢰 조건이 develop ref라 배포 잡과 Claude Code 잡이 모두 조건상 검문을 지날 수 있고, 1단계에서는 조건이 ref와 environment 두 값이 되며 Claude Code 잡을 꺼 두고, 2단계에서는 조건이 environment dev-deploy 하나가 되어 배포 잡만 임시 자격을 받고 다시 켠 Claude Code 잡은 검문 앞에서 막히는 장면",
+    "mobile": true
   },
   {
     "id": "CutoverQueuePause",
