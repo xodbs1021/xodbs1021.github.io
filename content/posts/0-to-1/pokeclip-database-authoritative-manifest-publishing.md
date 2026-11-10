@@ -103,7 +103,7 @@ A가 쥔 fence는 lease 5초 안에 늘리지 않으면 다른 프로세스가 �
 
 ## 측정 조건
 
-- 실제 S3 실험: 2026년 10월 17일, 작성자 기계의 로컬 compose(미디어 서버·사이드카). ffmpeg testsrc2 720p30과 AAC 44.1kHz 1채널, SRT 90초 송출, 송출 중 사이드카 재시작 1회. 실험 접두 둘에만 쓰기를 승인했고 실험 뒤 객체 46개를 지웠습니다. 1회 동작 확인입니다.
+- 실제 S3 실험: 2026년 10월 17일, 작성자 기계의 로컬 compose(미디어 서버·사이드카). ffmpeg testsrc2 720p30과 AAC 44.1kHz 1채널, SRT 90초 송출, 송출 중 사이드카 재시작 1회. 실험 접두 둘에만 쓰기를 제가 승인했고 실험 뒤 객체 46개를 지웠습니다. 1회 동작 확인입니다.
 - 낡은 writer 시험: PostgreSQL을 붙여 `-race`로 28회(종결 리뷰 라운드 3). 변이 시험은 커밋 8의 정식 실행입니다.
 - 근거는 팀 내부 실험·리뷰 기록(비공개)이고 공개 요약은 PR #289 본문의 Test plan과 PokeClip-mono [`media/README.md` 「ⓒ 실측 기록」](https://github.com/3K-PokeClip/PokeClip-mono/blob/1818c54948395fb0ba80cb37e85770b4d526d853/media/README.md?plain=1#L2387-L2395)입니다.
 - DB 왕복 2,820회/시간/스트림은 설계 산식이고 측정값이 아닙니다.
