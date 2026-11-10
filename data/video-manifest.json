@@ -122,8 +122,8 @@
   "rewind-missing-segment-refetch-flow": {
     "scene": "RefetchFlow",
     "alt": "창 밖에서 404 를 받은 재생점이 받기를 멈추고, 같은 주소로 새 플레이어가 CDN 에서 최신 재생 목록을 다시 받은 뒤, 목록 첫 조각에서 세 조각 안쪽인 시작 하한까지 밀려 이어 재생하고 「가장 오래된 지점으로 옮겼어요」 알림을 띄우는 장면",
-    "sha256": "d6fd80aa3c6f5ff7bbee28395cb3074e12cf5091ddc4cdd12a0163caff8206c5",
-    "bytes": 269781,
+    "sha256": "f3c1fab753a72b9cda3791e3ff327de7200e2bccbf6894f17d5265c8ace50152",
+    "bytes": 268644,
     "codec": "h264",
     "pixFmt": "yuv420p",
     "width": 1920,
@@ -131,7 +131,19 @@
     "duration": 9,
     "audio": 0,
     "faststart": true,
-    "poster": "/images/rewind-missing-segment-refetch-flow-poster.jpg"
+    "poster": "/images/rewind-missing-segment-refetch-flow-poster.jpg",
+    "mobile": {
+      "sha256": "50850cc7e05e59cd04f67434b95e89cb33034a7b14beffa8f68c6ef763c6b700",
+      "bytes": 232378,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 9,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/rewind-missing-segment-refetch-flow-mobile-poster.jpg"
+    }
   },
   "rewind-missing-segment-rewind-fallout": {
     "scene": "RewindFallout",
