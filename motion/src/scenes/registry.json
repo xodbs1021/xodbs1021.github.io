@@ -116,5 +116,37 @@
     "posterFrame": 315,
     "alt": "두 줄의 배포 순서. 위 줄은 소비자가 먼저 ingestStreamId로 조각을 찾게 배포되고 생산자가 새 streamId를 내 조각 조회가 정상으로 끝난다. 아래 줄은 생산자가 먼저 새 streamId를 내고 옛 소비자가 경로 칸에 세션 id를 넣어 조회해 0행으로 끝나는 장면",
     "mobile": true
+  },
+  {
+    "id": "LiveHandoff",
+    "post": "pokeclip-live-dvr-separation-handoff",
+    "kind": "video",
+    "posterFrame": 330,
+    "alt": "되감기 목록 끝 E 앞의 청록 띠로 재생점 P가 들어가고, 라이브 목록의 시작 하한이 P 이하라는 이름표가 선 뒤 P가 라이브 목록으로 내려간다. 첫 번째에는 확인 시한 막대가 다 차기 전에 이어 재생돼 확정 이름표가 뜨고, 두 번째에는 라이브가 이어지지 않은 채 시한 막대가 다 차 빨갛게 바뀐 뒤 P가 넘기기 전 자리의 되감기 목록으로 돌아가며, 시청자가 멈춰 뒀으면 멈춘 채 둔다는 글이 뜨는 장면",
+    "mobile": true
+  },
+  {
+    "id": "LiveWindowPause",
+    "post": "pokeclip-live-window-without-fork",
+    "kind": "video",
+    "posterFrame": 330,
+    "alt": "7초, 14초, 28초 창 세 줄이 라이브 끝을 따라 15초 동안 오른쪽으로 밀린다. 멈춘 플레이어가 기다리던 조각은 점선 자리에 남고, 7초 창과 14초 창은 차례로 그 조각을 지나쳐 빨간 400 이름표가, 28초 창은 끝까지 그 조각을 품어 청록 200 이름표가 뜨는 장면",
+    "mobile": true
+  },
+  {
+    "id": "AudioGapSeam",
+    "post": "pokeclip-reconnect-audio-gap",
+    "kind": "video",
+    "posterFrame": 330,
+    "alt": "앞 조각의 소리 막대가 영상 막대보다 먼저 끝난다. 다음 조각을 영상 끝에 붙이면 소리 줄에 빨간 빈틈이 생기고, 소리 끝으로 당기면 빈틈은 사라지는 대신 영상 줄에 빨간 점선 겹침이 생긴다. 아래에서 끊김 표시가 있는 버퍼는 세 토막으로 갈리고, 같은 세션에서 표시를 뺀 버퍼는 한 줄로 이어지는 장면",
+    "mobile": true
+  },
+  {
+    "id": "OverlapQuery",
+    "post": "pokeclip-segment-overlap-contract",
+    "kind": "video",
+    "posterFrame": 315,
+    "alt": "0–4초 A, 4–8초 B, 8–12초 C 조각 두 줄 위에 요청 [3.9, 8) 청록 띠가 놓인다. 위 BETWEEN 줄은 시작점 4와 8만 보고 B와 C를 고르며 A는 빠짐, C는 더 고름 이름표가 붙는다. 아래 겹침 줄은 A와 B를 고르고 끝점만 닿는 C를 제외하는 장면",
+    "mobile": true
   }
 ]

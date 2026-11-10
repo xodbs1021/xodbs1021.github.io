@@ -115,6 +115,58 @@
       "poster": "/images/pokeclip-github-oidc-immutable-subject-ref-vs-environment-mobile-poster.jpg"
     }
   },
+  "pokeclip-live-dvr-separation-handoff-live-handoff": {
+    "scene": "LiveHandoff",
+    "alt": "되감기 목록 끝 E 앞의 청록 띠로 재생점 P가 들어가고, 라이브 목록의 시작 하한이 P 이하라는 이름표가 선 뒤 P가 라이브 목록으로 내려간다. 첫 번째에는 확인 시한 막대가 다 차기 전에 이어 재생돼 확정 이름표가 뜨고, 두 번째에는 라이브가 이어지지 않은 채 시한 막대가 다 차 빨갛게 바뀐 뒤 P가 넘기기 전 자리의 되감기 목록으로 돌아가며, 시청자가 멈춰 뒀으면 멈춘 채 둔다는 글이 뜨는 장면",
+    "sha256": "002027e6dbd68fab6069478abdb9280397604094bf66e60efa5a63bf2f9ae403",
+    "bytes": 230252,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11.5,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-live-dvr-separation-handoff-live-handoff-poster.jpg",
+    "mobile": {
+      "sha256": "9afbb1d185c51583e18279d65f7dc31dd6a5f5242f4f23d2447e642956be28b9",
+      "bytes": 229702,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11.5,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-live-dvr-separation-handoff-live-handoff-mobile-poster.jpg"
+    }
+  },
+  "pokeclip-live-window-without-fork-live-window-pause": {
+    "scene": "LiveWindowPause",
+    "alt": "7초, 14초, 28초 창 세 줄이 라이브 끝을 따라 15초 동안 오른쪽으로 밀린다. 멈춘 플레이어가 기다리던 조각은 점선 자리에 남고, 7초 창과 14초 창은 차례로 그 조각을 지나쳐 빨간 400 이름표가, 28초 창은 끝까지 그 조각을 품어 청록 200 이름표가 뜨는 장면",
+    "sha256": "7dca0469a20a756c983d4f4aaf4a788bac0a6f7e78808d70c77ae33c99199583",
+    "bytes": 181140,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11.5,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-live-window-without-fork-live-window-pause-poster.jpg",
+    "mobile": {
+      "sha256": "f7a918611ff06b2b10856a94e55b2ecf16bf9223e88a36fdd93043492352561e",
+      "bytes": 198317,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11.5,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-live-window-without-fork-live-window-pause-mobile-poster.jpg"
+    }
+  },
   "pokeclip-manifest-window-boundaries-publish-boundary": {
     "scene": "PublishBoundary",
     "alt": "조각 9–13 가운데 9와 10은 완료, 11·12·13은 대기다. 12가 먼저 완료돼도 청록 공개 경계는 10 뒤에서 멈춰 있고, 11이 완료되는 순간 경계가 12 뒤까지 한 번에 늘어나며 13은 대기로 남는 장면",
@@ -167,6 +219,32 @@
       "poster": "/images/pokeclip-media-timeline-over-wall-clock-chapter-rule-mobile-poster.jpg"
     }
   },
+  "pokeclip-reconnect-audio-gap-audio-gap-seam": {
+    "scene": "AudioGapSeam",
+    "alt": "앞 조각의 소리 막대가 영상 막대보다 먼저 끝난다. 다음 조각을 영상 끝에 붙이면 소리 줄에 빨간 빈틈이 생기고, 소리 끝으로 당기면 빈틈은 사라지는 대신 영상 줄에 빨간 점선 겹침이 생긴다. 아래에서 끊김 표시가 있는 버퍼는 세 토막으로 갈리고, 같은 세션에서 표시를 뺀 버퍼는 한 줄로 이어지는 장면",
+    "sha256": "9457ce0e8a7a6c6641256b7e005ef6d7acfcf4749792d1250271e924a4745410",
+    "bytes": 151330,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11.5,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-reconnect-audio-gap-audio-gap-seam-poster.jpg",
+    "mobile": {
+      "sha256": "8c1c502c7272e0069822a809a24ca96c62f8ca8bfac0c4f2a6a0146b5de0f5d2",
+      "bytes": 153255,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11.5,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-reconnect-audio-gap-audio-gap-seam-mobile-poster.jpg"
+    }
+  },
   "pokeclip-recording-defect-in-origin-decode-recovery": {
     "scene": "DecodeRecovery",
     "alt": "조각 1623부터 1626까지 놓인 세 줄에서 재생점이 차례로 결함 조각 1624에 닿는다. 그대로 둔 첫 줄은 오류 자리에서 굳고, recoverMediaError만 부르는 둘째 줄은 다시 붙일 때마다 같은 자리에서 또 오류가 나 세 번 뒤 끊김 덮개로 끝나며, 다시 붙인 뒤 다음 조각 시작으로 옮기는 셋째 줄은 1624의 나머지를 건너뛰어 1625부터 이어 재생하는 장면",
@@ -217,6 +295,32 @@
       "audio": 0,
       "faststart": true,
       "poster": "/images/pokeclip-round-vod-round-document-mobile-poster.jpg"
+    }
+  },
+  "pokeclip-segment-overlap-contract-overlap-query": {
+    "scene": "OverlapQuery",
+    "alt": "0–4초 A, 4–8초 B, 8–12초 C 조각 두 줄 위에 요청 [3.9, 8) 청록 띠가 놓인다. 위 BETWEEN 줄은 시작점 4와 8만 보고 B와 C를 고르며 A는 빠짐, C는 더 고름 이름표가 붙는다. 아래 겹침 줄은 A와 B를 고르고 끝점만 닿는 C를 제외하는 장면",
+    "sha256": "adb1d6bfefaf25a76f0db05254c1ee763cd306d4b1e3583221ba798765f071e9",
+    "bytes": 150982,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-segment-overlap-contract-overlap-query-poster.jpg",
+    "mobile": {
+      "sha256": "d611ddcbf148a62441e91c7b0a259f10b5c491024b115e07356925242f0a9eb4",
+      "bytes": 145414,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-segment-overlap-contract-overlap-query-mobile-poster.jpg"
     }
   },
   "pokeclip-session-url-and-endlist-session-url-inherit": {
