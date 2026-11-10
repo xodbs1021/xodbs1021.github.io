@@ -58,8 +58,30 @@ description: "블로그 글의 설명마다 맞는 시각 형식(영상·단계�
 
 - 색은 강조 하나 + 회색이 기본이다. 지금 독자가 봐야 할 경로·항목 하나만 강조색으로 칠하고, 실패·차단에만 위험색을 쓴다. 강조에는 색 외에 두 번째 단서(굵은 값 라벨, 주석, 점선)를 함께 둔다.
 - 글자는 휴대폰 화면에서 실제 12px 이상으로 읽혀야 한다. 넓은 가로 도식은 휴대폰에서 읽히는 형태(세로 배치, 단순화한 핵심 경로)를 함께 준비한다.
-- 그림 바로 앞에 무엇을 볼지 한 문장, 바로 뒤에 해석 한 문장을 둔다. 캡션은 "그림 N."과 그림 성격(실측, 문헌값, 설명용 가정, 개념도, 재구성, 스크린샷), 출처를 담는다. 지원 표기법은 현재 `src/lib/posts.mjs`에서 확인하고, 지원하지 않는 속성을 있다고 가정하지 않는다.
+- 그림 바로 앞에 무엇을 볼지 한 문장, 바로 뒤에 해석 한 문장을 둔다. 캡션은 렌더러가 붙이는 "그림 N."과 그림 성격(`kind`), 출처(`source`)를 담는다. 캡션 문장에 "설명용 가정 · 실측 근거 미확인:" 같은 접두어를 쓰지 않는다 — 성격은 `kind`로 적는다.
 - 접근성: 도식에는 제목과 짧은 설명(Mermaid `accTitle`/`accDescr`), 그래프에는 핵심 결론을 본문 텍스트로도 제공한다.
+
+## 5. 표기법
+
+렌더러(`src/lib/posts.mjs`, `src/lib/visuals.mjs`)가 지원하는 것만 쓴다. MDX는 지원하지 않는다. 그림은 글 안 순서대로 "그림 N."으로 번호가 붙는다.
+
+- **`kind`**(필수): `실측` · `문헌값` · `설명용 가정` · `개념도` · `재구성` · `스크린샷` 중 하나. 새 글에서 `kind`·`caption`이 빠지면 `npm test`(`tests/visuals.test.mjs`)가 실패한다.
+- **Mermaid**: 펜스 속성으로 id·성격·캡션·출처를 적는다. `accTitle`/`accDescr`는 **다이어그램 선언 줄 다음**에 둔다 — 선언(`flowchart TB` 등)보다 앞에 두면 mermaid 12가 종류를 찾지 못해 렌더가 실패한다(`npm run render:diagrams`가 파일과 함께 알려 준다).
+
+  ````markdown
+  ```mermaid {#fig-scheduler kind="개념도" caption="스케줄러는 큐 깊이로 기존 풀과 증설을 가른다." source="https://example.com/doc"}
+  flowchart TB
+    accTitle: GPU 스케줄링 흐름
+    accDescr: 새 스트림이 큐 깊이에 따라 기존 GPU 풀 또는 HPA 증설로 간다.
+    A[새 스트림] --> B{큐 깊이}
+  ```
+  ````
+
+  도식을 추가·수정하면 `npm run render:diagrams`를 실행하고 `data/diagrams/`와 `data/diagram-manifest.json`을 커밋한다(빌드는 렌더 결과만 읽고, 없으면 실패한다). 노드 글자는 15px이고 휴대폰 칸에서 12px까지 줄어들 수 있으므로 새 도식은 세로(TB) 기준 폭 약 440px 이하로 설계한다. 넓은 `LR` 도식은 휴대폰용 TB 판이 자동으로 생긴다. 시퀀스도는 TB 판이 없으니 참가자 수를 줄인다.
+- **그래프**: `{{< chart caption="…" kind="…" source="…" id="fig-…" height="360px" >}}` 안에 JSON ECharts option. 툴팁이 꼭 필요할 때만 `interactive="true"`(브라우저에서 ECharts를 불러온다). 세부 규칙은 [echarts-curator](../echarts-curator/SKILL.md).
+- **이미지**: 문단에 이미지 하나만 있을 때 `![대체 텍스트](/images/x.png){kind="스크린샷" caption="…" source="https://…"}`. 속성이 없는 이미지는 번호 없이 렌더된다.
+- **영상**: `{{< motion scene="<Remotion 장면 id>" kind="개념도" caption="…" >}}` 또는 저장소 밖에서 만든 영상은 `{{< motion name="<static/videos 파일 이름>" alt="…" kind="…" caption="…" >}}`. 12초 이하는 화면에 들어올 때만 소리 없이 반복 재생하고 일시정지 버튼이 붙는다(움직임 줄이기 설정이면 포스터와 재생 버튼). 12초를 넘으면 컨트롤로 독자가 재생한다. 세부 규칙은 [motion-explainer](../motion-explainer/SKILL.md).
+- **본문 참조**: `[[fig-scheduler]]` → "그림 3" 링크. 없는 id는 빌드 경고다.
 
 ## 결과
 
