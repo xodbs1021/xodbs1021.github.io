@@ -102,18 +102,18 @@ AWS의 DMS 롤백 글도 새 DB에서 원래 DB로 직접 거꾸로 복제하는
 
 ## 실제 클라우드에서 두 방향 모두 옮겼습니다
 
-11월 8일 팀 데모 인프라에서 같은 서비스를 AWS(EKS, RDS for PostgreSQL)에서 GCP(GKE, Cloud SQL for PostgreSQL)로 옮긴 뒤, 새 빈 RDS 데이터베이스를 대상으로 다시 되돌렸습니다. 옮긴 데이터는 표 1개이고, PostgreSQL 버전은 기록하지 않았습니다. 아래 값은 팀 내부 보고서 기준의 비공개 실측입니다.
+11월 8일 팀 데모 인프라에서 같은 서비스를 AWS(EKS, RDS for PostgreSQL)에서 GCP(GKE, Cloud SQL for PostgreSQL)로 옮긴 뒤, 새 빈 RDS 데이터베이스를 대상으로 다시 되돌렸습니다. 옮긴 데이터는 표 1개이고, 원본 RDS는 PostgreSQL 16.15, 대상 Cloud SQL은 PostgreSQL 16입니다. 아래 값은 팀 내부 보고서 기준의 비공개 실측입니다.
 
 | 방향 | 전체 비교(원본 = 대상 행 수) | 초기 복사 | 승인부터 전환 완료까지 |
 | --- | --- | --- | --- |
 | AWS → GCP | 1,083 = 1,083, 누락·추가·변경 0 | 80초 | 23초 |
 | GCP → AWS | 2,734 = 2,734, 누락·추가·변경 0 | 82초 | 21초 |
 
-실험 동안 트래픽 봇이 보낸 쓰기 2,582건 가운데 실패한 요청과 결과를 알 수 없는 요청은 모두 0건이었습니다. 실험에 쓴 Git 변경은 [gitops #85](https://github.com/SoftBankHackathon2026/gitops/pull/85), [#87](https://github.com/SoftBankHackathon2026/gitops/pull/87), [#89](https://github.com/SoftBankHackathon2026/gitops/pull/89)이고, 실험 뒤 [#92](https://github.com/SoftBankHackathon2026/gitops/pull/92)로 Git 상태를 실험 전과 같게 되돌렸습니다. 클러스터와 DB에 남은 실험 자원도 지웠습니다. 다만 실험 때 다시 설정한 전환용 DB 계정 비밀번호는 원래 값을 몰라, 소유자가 재설정해야 하는 상태로 남았습니다.
+두 번의 전환 동안 트래픽 봇이 시도한 쓰기 2,582건 가운데 실패한 요청과 결과를 알 수 없는 요청은 모두 0건이었습니다(집계 시점에 1건은 처리 중). 봇이 잰 응답 지연은 AWS → GCP 구간에서 p95 1,079ms, p99 1,311ms였고, 가장 긴 요청은 전환으로 전달이 멈춘 구간의 8,249ms였습니다. GCP → AWS 직후 구간의 가장 긴 요청은 4,139ms였습니다. 실험에 쓴 Git 변경은 [gitops #85](https://github.com/SoftBankHackathon2026/gitops/pull/85), [#87](https://github.com/SoftBankHackathon2026/gitops/pull/87), [#89](https://github.com/SoftBankHackathon2026/gitops/pull/89)이고, 실험 뒤 [#92](https://github.com/SoftBankHackathon2026/gitops/pull/92)로 Git 상태를 실험 전과 같게 되돌렸습니다. 클러스터와 DB에 남은 실험 자원도 지웠습니다. 다만 실험 때 다시 설정한 전환용 DB 계정 비밀번호는 원래 값을 몰라, 소유자가 재설정해야 하는 상태로 남았습니다.
 
 ## 실험은 한 번씩이었고, 제 코드는 실클라우드에서 돌지 않았습니다
 
-- **한 번씩만 돌렸습니다.** 두 방향 각 1회, 표 1개, 시험용 봇 트래픽입니다. 실제 사용자 트래픽이나 반복 측정이 아닙니다. 요청 지연은 정해진 방식으로 집계하지 않았습니다.
+- **한 번씩만 돌렸습니다.** 두 방향 각 1회, 표 1개, 시험용 봇 트래픽입니다. 실제 사용자 트래픽이나 반복 측정이 아닙니다. 지연 값도 봇 한 대가 잰 한 번의 값입니다.
 - **제 crosscloud 코드는 실험 경로 밖에 있습니다.** 실험은 팀 데모 인프라(EKS, GKE)에서 팀원의 전환 도구를 직접 돌렸습니다. 제 판정과 Terraform은 ECS·Cloud Run 시험 환경을 대상으로 만들었고, 로컬 시험까지만 확인했습니다.
 - **판정 범위가 좁습니다.** 단일 리전, 컨테이너 하나짜리 ECS 서비스, 대응표의 5쌍만 다룹니다. 대응표 밖 의존은 미분류로 남기므로, 실제 클라우드를 읽으면 대개 종료 코드 3으로 멈출 것으로 봅니다. 사람이 확인했다고 표시해 넘기는 입력 경로도 아직 없습니다([PR #78](https://github.com/SoftBankHackathon2026/Hackathon/pull/78)).
 - **역방향에는 손으로 한 우회가 있었습니다.** GCP → AWS 방향은 Cloud SQL에서 복제용 publication의 소유자를 바꿀 권한이 없어, publication을 미리 만들어 두고서야 돌았습니다.
