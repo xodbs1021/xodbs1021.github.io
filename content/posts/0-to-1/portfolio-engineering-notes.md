@@ -29,8 +29,8 @@
 - [워크트리를 나눠도 섞이던 하네스 검사 상태를 세션별로 나눴습니다](/posts/0-to-1/harness-session-isolation-worktree-root/): 세션별 상태 폴더, 첫 훅에서 고정한 작업 루트, 커밋 가드 회귀, 변이 32개 중 31개 검출. (11월 12일 새로 씀)
 - [시작되지 않은 watcher의 종료를 기다리던 교착](/posts/open-source-analysis/mediamtx-certloader-no-watcher-shutdown/): MediaMTX #6427의 원인, 최소 수정과 재현 조건.
 
-- [MediaMTX 앞 nginx의 요청 대상 검증](/posts/0-to-1/pokeclip-nginx-playback-request-boundary/): 경로·쿼리 일치와 정규화 우회 차단.
-- [Media 호스트의 컨테이너·설정 파일 재시작 경계](/posts/0-to-1/pokeclip-media-host-restart-lifecycle/): 비정상 종료 시 수명 불일치와 복구 검증.
+- [nginx는 경로의 방송과 쿼리의 방송이 같을 때만 넘깁니다](/posts/0-to-1/pokeclip-nginx-playback-request-boundary/): 경로·쿼리 일치와 정규화 우회 차단.
+- [systemd가 정리를 건너뛰자 옛 비밀 컨테이너가 남았습니다](/posts/0-to-1/pokeclip-media-host-restart-lifecycle/): 비정상 종료 시 수명 불일치와 복구 검증.
 - [Live와 DVR의 분리, 다시 이어 붙이는 조건](/posts/0-to-1/pokeclip-live-dvr-separation-handoff/): 완료한 발행·되감기 연동과 진행 중인 자동 전환 검증.
 
 ## 먼저 읽을 다섯 가지 판단
@@ -109,10 +109,10 @@
 테스트가 개발 DB에 잔여 행을 남기거나, 테스트가 사라졌는데도 CI가 초록색이 되는 경우를 확인했습니다. 일부러 오류를 넣거나 테스트를 제거해 검사가 실제로 실패하는지 대조했습니다.
 
 - **CASE 17** · [통합 테스트 잔여 행을 전용 DB와 소유 표식으로 막았습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-test-database-ownership-marker/)
-- **CASE 18** · [USER만 바꾸면 녹화가 깨진다: scratch와 새 볼륨의 권한 설계](https://xodbs1021.github.io/posts/0-to-1/pokeclip-scratch-volume-ownership/)
+- **CASE 18** · [비root 녹화를 위해 새 볼륨의 소유권을 이미지에 심었습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-scratch-volume-ownership/)
 - **CASE 34** · [미디어 CI를 경로 필터로 좁히자 필수 체크를 포기해야 했습니다](https://xodbs1021.github.io/posts/0-to-1/media-ci-path-filter-required-check-tradeoff/)
 - **CASE 35** · [테스트 파일을 빼도 통과하던 CI를 커버리지 게이트로 막았습니다](https://xodbs1021.github.io/posts/0-to-1/coverage-gate-that-fails-when-tests-disappear/)
-- **후속 기록** · [MediaMTX 업그레이드에서 이미지만 바꾸면 놓치는 것들](https://xodbs1021.github.io/posts/0-to-1/pokeclip-dependency-upgrade-contracts/)
+- **후속 기록** · [MediaMTX를 포크로 바꾸며 녹화 입력부터 다시 만들었습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-dependency-upgrade-contracts/)
 
 ## MediaMTX 기여와 리뷰에서 바뀐 판단 {#opensource}
 
@@ -143,7 +143,7 @@
 
 현재 구현에 쓰지 않는 경로 조정 설계도 있고, 임시 기준값으로 11월 3일 출시본에 들어갔지만 정확도는 아직 재지 않은 채팅 하이라이트 판별도 있습니다. 부분 목록으로 방송을 삭제하지 않는 원칙과, 자동 탐지가 빗나가도 손으로 표시한 장면을 같은 카드 표에 남기는 선택은 다음 설계에도 참고할 수 있어 남겼습니다.
 
-- **CASE 13** · [부분 목록으로 방송을 지우지 않기: 폐기한 경로 조정 설계에서 남은 판단](https://xodbs1021.github.io/posts/0-to-1/pokeclip-path-reconciler-design-history/)
+- **CASE 13** · [부분 목록으로 방송을 지우지 않으려던 경로 조정자를 버렸습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-path-reconciler-design-history/)
 - **CASE 32** · [채팅 급증 판별은 임시 기준이라 수동 표시 경로를 함께 뒀습니다](https://xodbs1021.github.io/posts/0-to-1/chat-highlight-research-and-fallback/)
 
 ## 상태와 자료를 읽는 기준 {#source}

@@ -412,5 +412,45 @@
     "posterFrame": 345,
     "alt": "EC2 호스트 하나에서 첫 재부팅 뒤에는 Docker가 앱·DB 컨테이너를 되살리고 systemd가 Docker 뒤에 Target API를 띄워 수동 명령 없이 데이터 2건과 함께 돌아오고, DELETE가 컨테이너와 네트워크를 지우고 상태 파일에 tombstone을 남긴 뒤(DB 볼륨은 남음) 두 번째 재부팅에서는 컨테이너가 다시 생기지 않고 Target API가 tombstone을 읽어 GET 404를 유지하는 장면",
     "mobile": true
+  },
+  {
+    "id": "CrashLeftoverContainer",
+    "post": "pokeclip-media-host-restart-lifecycle",
+    "kind": "video",
+    "posterFrame": 350,
+    "alt": "위 줄 고치기 전에는 systemd 유닛에 SIGKILL이 오자 MediaMTX 컨테이너가 헬스 200과 옛 비밀을 든 채 남고, 비밀 파일이 지워진 자리에 디렉터리가 생겨 다음 기동이 실패를 되풀이한다. 아래 줄 고친 뒤에는 같은 SIGKILL 뒤 ExecStopPost가 compose를 내리고 create_host_path: false와 --force-recreate로 새 비밀 파일과 새 컨테이너가 뜨는 장면",
+    "mobile": true
+  },
+  {
+    "id": "PlaybackQueryGuard",
+    "post": "pokeclip-nginx-playback-request-boundary",
+    "kind": "video",
+    "posterFrame": 345,
+    "alt": "재생 요청 다섯 개가 차례로 nginx로 들어와, /A/list?path=A만 청록 선으로 재생 서버 9996에 닿고 /A/list?path=B, path가 두 번인 요청, pa%74h 키 요청, /A/..%2fB/list는 nginx 앞에서 403을 받고 멈춘 뒤 상류 도달 0 이름표가 뜨는 장면",
+    "mobile": true
+  },
+  {
+    "id": "VolumeFirstCopy",
+    "post": "pokeclip-scratch-volume-ownership",
+    "kind": "video",
+    "posterFrame": 250,
+    "alt": "빈 볼륨이 처음 붙는 세 경우가 나란히 진행돼, 이미지에 경로가 없으면 복사할 것이 없어 볼륨이 root:root로 남고 UID 10002 녹화기의 쓰기가 실패하며, 이미지에 10002 소유 빈 디렉터리가 있으면 소유권이 복사돼 쓰기가 성공하고, 볼륨에 이전 데이터가 있으면 복사하지 않아 소유가 그대로 남는 장면",
+    "mobile": true
+  },
+  {
+    "id": "HlsSessionAfterCut",
+    "post": "pokeclip-dependency-upgrade-contracts",
+    "kind": "video",
+    "posterFrame": 320,
+    "alt": "송출을 끊은 0초 뒤로 요청 점이 이어지며, 10초까지는 200, 10초부터 40초까지는 세션이 살아 있어도 404, 40초 뒤로는 401 칸이 차례로 채워지고 404 구간에 404 창 30초 이름표가 뜨는 장면",
+    "mobile": true
+  },
+  {
+    "id": "AuthQueueSerial",
+    "post": "pokeclip-path-reconciler-design-history",
+    "kind": "video",
+    "posterFrame": 320,
+    "alt": "송출 연결 10개가 한꺼번에 도착하지만 인증 관문을 0.3초씩 하나씩만 지나 수락 칸에 쌓이고, 수락 시각 막대가 0.3초에서 3.057초까지 늘어나며, 같은 줄 끝에 새 HLS 세션과 목록 API 요청도 대기하는 장면",
+    "mobile": true
   }
 ]

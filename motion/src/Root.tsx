@@ -52,6 +52,11 @@ import { BROKEN_JAVA_GATE_FRAMES, BrokenJavaGate } from "./scenes/shakedown-java
 import { PRIMARY_KILL_FAILOVER_FRAMES, PrimaryKillFailover } from "./scenes/shakedown-database-tls-identity-and-failover/PrimaryKillFailover";
 import { RESTORE_TARGET_CHECK_FRAMES, RestoreTargetCheck } from "./scenes/shakedown-database-restore-proves-backup/RestoreTargetCheck";
 import { REBOOT_TWICE_TOMBSTONE_FRAMES, RebootTwiceTombstone } from "./scenes/shakedown-reboot-recovery-and-deletion/RebootTwiceTombstone";
+import { CRASH_LEFTOVER_CONTAINER_FRAMES, CrashLeftoverContainer } from "./scenes/pokeclip-media-host-restart-lifecycle/CrashLeftoverContainer";
+import { PLAYBACK_QUERY_GUARD_FRAMES, PlaybackQueryGuard } from "./scenes/pokeclip-nginx-playback-request-boundary/PlaybackQueryGuard";
+import { VOLUME_FIRST_COPY_FRAMES, VolumeFirstCopy } from "./scenes/pokeclip-scratch-volume-ownership/VolumeFirstCopy";
+import { HLS_SESSION_AFTER_CUT_FRAMES, HlsSessionAfterCut } from "./scenes/pokeclip-dependency-upgrade-contracts/HlsSessionAfterCut";
+import { AUTH_QUEUE_SERIAL_FRAMES, AuthQueueSerial } from "./scenes/pokeclip-path-reconciler-design-history/AuthQueueSerial";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
@@ -569,6 +574,56 @@ export const RemotionRoot: React.FC = () => (
       component={RebootTwiceTombstone}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={REBOOT_TWICE_TOMBSTONE_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="CrashLeftoverContainer" component={CrashLeftoverContainer} durationInFrames={CRASH_LEFTOVER_CONTAINER_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="CrashLeftoverContainerMobile"
+      component={CrashLeftoverContainer}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={CRASH_LEFTOVER_CONTAINER_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="PlaybackQueryGuard" component={PlaybackQueryGuard} durationInFrames={PLAYBACK_QUERY_GUARD_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="PlaybackQueryGuardMobile"
+      component={PlaybackQueryGuard}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={PLAYBACK_QUERY_GUARD_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="VolumeFirstCopy" component={VolumeFirstCopy} durationInFrames={VOLUME_FIRST_COPY_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="VolumeFirstCopyMobile"
+      component={VolumeFirstCopy}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={VOLUME_FIRST_COPY_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="HlsSessionAfterCut" component={HlsSessionAfterCut} durationInFrames={HLS_SESSION_AFTER_CUT_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="HlsSessionAfterCutMobile"
+      component={HlsSessionAfterCut}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={HLS_SESSION_AFTER_CUT_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="AuthQueueSerial" component={AuthQueueSerial} durationInFrames={AUTH_QUEUE_SERIAL_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="AuthQueueSerialMobile"
+      component={AuthQueueSerial}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={AUTH_QUEUE_SERIAL_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}
