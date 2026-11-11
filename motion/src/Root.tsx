@@ -49,6 +49,9 @@ import { SESSION_STATE_SPLIT_FRAMES, SessionStateSplit } from "./scenes/harness-
 import { GENERATION_AND_PLAN_GATES_FRAMES, GenerationAndPlanGates } from "./scenes/shakedown-bounded-ai-image-generation/GenerationAndPlanGates";
 import { START_STOP_TIME_BUDGETS_FRAMES, StartStopTimeBudgets } from "./scenes/shakedown-plan-deployment-and-recovery/StartStopTimeBudgets";
 import { BROKEN_JAVA_GATE_FRAMES, BrokenJavaGate } from "./scenes/shakedown-java-syntax-before-security-scan/BrokenJavaGate";
+import { PRIMARY_KILL_FAILOVER_FRAMES, PrimaryKillFailover } from "./scenes/shakedown-database-tls-identity-and-failover/PrimaryKillFailover";
+import { RESTORE_TARGET_CHECK_FRAMES, RestoreTargetCheck } from "./scenes/shakedown-database-restore-proves-backup/RestoreTargetCheck";
+import { REBOOT_TWICE_TOMBSTONE_FRAMES, RebootTwiceTombstone } from "./scenes/shakedown-reboot-recovery-and-deletion/RebootTwiceTombstone";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
@@ -536,6 +539,36 @@ export const RemotionRoot: React.FC = () => (
       component={BrokenJavaGate}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={BROKEN_JAVA_GATE_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="PrimaryKillFailover" component={PrimaryKillFailover} durationInFrames={PRIMARY_KILL_FAILOVER_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="PrimaryKillFailoverMobile"
+      component={PrimaryKillFailover}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={PRIMARY_KILL_FAILOVER_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="RestoreTargetCheck" component={RestoreTargetCheck} durationInFrames={RESTORE_TARGET_CHECK_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="RestoreTargetCheckMobile"
+      component={RestoreTargetCheck}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={RESTORE_TARGET_CHECK_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="RebootTwiceTombstone" component={RebootTwiceTombstone} durationInFrames={REBOOT_TWICE_TOMBSTONE_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="RebootTwiceTombstoneMobile"
+      component={RebootTwiceTombstone}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={REBOOT_TWICE_TOMBSTONE_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}

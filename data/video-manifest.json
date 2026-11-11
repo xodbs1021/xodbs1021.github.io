@@ -1183,6 +1183,58 @@
       "poster": "/images/shakedown-bounded-ai-image-generation-generation-and-plan-gates-mobile-poster.jpg"
     }
   },
+  "shakedown-database-restore-proves-backup-restore-target-check": {
+    "scene": "RestoreTargetCheck",
+    "alt": "스냅샷에서 복원한 RDS가 있어도 앱이 옛 URL Secret으로 원본 RDS를 읽는 동안 응답은 기존 행 ✓이지만 DB 호스트가 원본이라 「복원 대상을 읽지 않음」이 뜨고, Secret을 복원 주소의 새 버전으로 바꾸고 새 task definition으로 재배포하자 요청이 복원 RDS로 가서 기존 행 ✓ · 새 쓰기 ✓ · DB 호스트 복원이 되어 「복원한 대상에서 읽음」이 뜨는 장면",
+    "sha256": "d7ef6ddd1a41cd0d77b3e4c3252306e29c94a185238f07ea68034ac59174d689",
+    "bytes": 225466,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 12,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/shakedown-database-restore-proves-backup-restore-target-check-poster.jpg",
+    "mobile": {
+      "sha256": "c72d24aab8ea8623ac9a2e6a5851410594ef956369f6ff0a8931c85f25fb761d",
+      "bytes": 271862,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 12,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/shakedown-database-restore-proves-backup-restore-target-check-mobile-poster.jpg"
+    }
+  },
+  "shakedown-database-tls-identity-and-failover-primary-kill-failover": {
+    "scene": "PrimaryKillFailover",
+    "alt": "앱이 primary 인 멤버 1 에 쓰다가 멤버 1 이 SIGKILL 로 종료(재시작 끔)되고, 장애 요청 시점부터 흐르는 시간축에 1.89초와 7.15초의 HTTP 실패 표시가 찍힌 뒤 멤버 2 가 primary 로 선출되고 12.24초에 멤버 2 로의 쓰기가 성공하는 장면",
+    "sha256": "163bbb424c279d563546e8469309af7527dd4372acff0e0046fdbf8c5001ca25",
+    "bytes": 164013,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 12,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/shakedown-database-tls-identity-and-failover-primary-kill-failover-poster.jpg",
+    "mobile": {
+      "sha256": "b840278ff6ab82887b01dad5b76aeee04013843565e249ac60d3a99b0085ae37",
+      "bytes": 188614,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 12,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/shakedown-database-tls-identity-and-failover-primary-kill-failover-mobile-poster.jpg"
+    }
+  },
   "shakedown-java-syntax-before-security-scan-broken-java-gate": {
     "scene": "BrokenJavaGate",
     "alt": "같은 깨진 Java 입력 「class Broken { void broken( {」가 두 줄에서 지나간다. 위 「수정 전」 줄에서는 입력이 Semgrep 1.180.0 상자로 가고 상자가 위험색이 되며 위험색 「ALLOW」가 뜬다. 아래 「수정 후」 줄에서는 입력이 Tree-sitter 상자로 가서 상자가 강조색이 되고 강조색 「SCAN_FAILED」가 뜨며, 그 뒤의 Semgrep 상자는 점선 회색으로 남아 도달하지 않는 장면",
@@ -1233,6 +1285,32 @@
       "audio": 0,
       "faststart": true,
       "poster": "/images/shakedown-plan-deployment-and-recovery-start-stop-time-budgets-mobile-poster.jpg"
+    }
+  },
+  "shakedown-reboot-recovery-and-deletion-reboot-twice-tombstone": {
+    "scene": "RebootTwiceTombstone",
+    "alt": "EC2 호스트 하나에서 첫 재부팅 뒤에는 Docker가 앱·DB 컨테이너를 되살리고 systemd가 Docker 뒤에 Target API를 띄워 수동 명령 없이 데이터 2건과 함께 돌아오고, DELETE가 컨테이너와 네트워크를 지우고 상태 파일에 tombstone을 남긴 뒤(DB 볼륨은 남음) 두 번째 재부팅에서는 컨테이너가 다시 생기지 않고 Target API가 tombstone을 읽어 GET 404를 유지하는 장면",
+    "sha256": "4260b68b93e5fd35552736c33c72c2e057538cf29b32f2941d007c02697ae026",
+    "bytes": 361190,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 12,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/shakedown-reboot-recovery-and-deletion-reboot-twice-tombstone-poster.jpg",
+    "mobile": {
+      "sha256": "35db78137b5b81f17f785f10bcbee023f7df3c3bc8d4f9efb5ed5a48ece015bc",
+      "bytes": 410137,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 12,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/shakedown-reboot-recovery-and-deletion-reboot-twice-tombstone-mobile-poster.jpg"
     }
   },
   "stream-id-contract-compatible-migration-deploy-order": {

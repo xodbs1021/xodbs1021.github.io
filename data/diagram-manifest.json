@@ -377,6 +377,15 @@
       "bytes": 17261
     }
   },
+  "5f030eeb41835088": {
+    "source": "content/posts/0-to-1/shakedown-database-restore-proves-backup.md",
+    "wide": {
+      "file": "5f030eeb41835088-wide.svg",
+      "width": 335,
+      "height": 791,
+      "bytes": 22976
+    }
+  },
   "5f5cc398acab1997": {
     "source": "content/posts/tech-blurting/aac-and-friends.md",
     "wide": {
@@ -384,6 +393,15 @@
       "width": 1016,
       "height": 210,
       "bytes": 18334
+    }
+  },
+  "60d06f1a008623c2": {
+    "source": "content/posts/0-to-1/shakedown-reboot-recovery-and-deletion.md",
+    "wide": {
+      "file": "60d06f1a008623c2-wide.svg",
+      "width": 392,
+      "height": 587,
+      "bytes": 19894
     }
   },
   "6725c73f796d2016": {
@@ -831,6 +849,15 @@
       "width": 947,
       "height": 567,
       "bytes": 30849
+    }
+  },
+  "c7b7ae089120217c": {
+    "source": "content/posts/0-to-1/shakedown-database-tls-identity-and-failover.md",
+    "wide": {
+      "file": "c7b7ae089120217c-wide.svg",
+      "width": 392,
+      "height": 741,
+      "bytes": 24531
     }
   },
   "cf9d9cbff42e38c1": {

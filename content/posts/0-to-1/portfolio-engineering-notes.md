@@ -135,9 +135,9 @@
 - **후속 기록** · [AI에 맡기는 이미지 생성과 배포 판단의 범위부터 제한했습니다](https://xodbs1021.github.io/posts/0-to-1/shakedown-bounded-ai-image-generation/)
 - **후속 기록** · [선택한 배포 계획을 AWS에 적용하고 장애 뒤 복구를 쟀습니다](https://xodbs1021.github.io/posts/0-to-1/shakedown-plan-deployment-and-recovery/)
 - **후속 기록** · [잘못된 Java 구문이 검사를 통과해 구문 검사를 앞에 뒀습니다](https://xodbs1021.github.io/posts/0-to-1/shakedown-java-syntax-before-security-scan/)
-- **후속 기록** · [TLS로 연결됐는데도 더 확인한 것: MySQL 호스트 검증과 MongoDB 장애 전환](https://xodbs1021.github.io/posts/0-to-1/shakedown-database-tls-identity-and-failover/)
-- **후속 기록** · [백업이 있다는 말 대신 복원한 데이터로 확인했습니다](https://xodbs1021.github.io/posts/0-to-1/shakedown-database-restore-proves-backup/)
-- **후속 기록** · [재부팅 후에는 살아나고, 삭제 후에는 살아나지 않아야 했습니다](https://xodbs1021.github.io/posts/0-to-1/shakedown-reboot-recovery-and-deletion/)
+- **후속 기록** · [TLS 연결 성공과 잘못된 호스트 거부를 짝으로 시험했습니다](https://xodbs1021.github.io/posts/0-to-1/shakedown-database-tls-identity-and-failover/)
+- **후속 기록** · [백업이 있다는 말 대신 새 DB에 복원한 데이터로 확인했습니다](https://xodbs1021.github.io/posts/0-to-1/shakedown-database-restore-proves-backup/)
+- **후속 기록** · [재부팅 후에는 살아나고 삭제 후에는 살아나지 않아야 했습니다](https://xodbs1021.github.io/posts/0-to-1/shakedown-reboot-recovery-and-deletion/)
 
 ## 방향이 바뀌었어도 남길 판단 {#reference}
 
