@@ -72,7 +72,7 @@
 - **CASE 22** · [HLS 오류는 0건인데 녹화 142초 중 62초가 사라졌습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-zero-errors-missing-playback/)
 - **CASE 23** · [HLS 녹화 재생을 가른 것은 init이 아니라 tfdt였습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-cdn-timeline-normalization/)
 - **CASE 24** · [FFmpeg 재포장은 조각마다 init이 달라 Go로 바꿨습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-go-remux-same-io-benchmark/)
-- **CASE 25** · [재접속의 0.2초 빈틈: 타임스탬프와 불연속 태그를 함께 바꾸기](https://xodbs1021.github.io/posts/0-to-1/pokeclip-reconnect-audio-gap/)
+- **CASE 25** · [같은 세션 재접속에 HLS 끊김 표시를 달지 않은 이유](https://xodbs1021.github.io/posts/0-to-1/pokeclip-reconnect-audio-gap/)
 
 ## 조회 계약과 식별자 전환 {#contracts}
 
