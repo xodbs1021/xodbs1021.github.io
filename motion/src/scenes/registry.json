@@ -332,5 +332,37 @@
     "posterFrame": 340,
     "alt": "위 「채팅 시각 · 5초 창」 축에 5초 창마다 메시지 수 막대가 자라고, 점선 「최근 15분 중앙값」, 실선 「중앙값 × 3」, 그보다 낮은 점선 「10건」이 뜬다. 두 선을 모두 넘은 막대 셋이 강조색으로 바뀌고, 10건만 넘은 회색 막대 하나는 그대로 남는다. 강조된 막대 위에 괄호와 「20초 안 → 한 사건」이 붙는다. 첫 급증 창에서 아래 「영상 위치」 축으로 화살표와 「− 3.9초」가 이어지고, 옮긴 구간이 왼쪽 「앞 15초」, 오른쪽 「뒤 5초」로 늘어 카드 구간이 된다. 그 카드가 오른쪽 「카드 표」로 옮겨 「자동 · 채팅 급증」 카드가 되고, 아래에 「핫키 · 손으로 표시」 카드가 같은 카드 표에 들어오는 장면",
     "mobile": true
+  },
+  {
+    "id": "CoverageGateRuns",
+    "post": "coverage-gate-that-fails-when-tests-disappear",
+    "kind": "video",
+    "posterFrame": 320,
+    "alt": "「① 정상 실행」 「② 테스트 파일 하나 제외」 「③ 임시 커밋 제거 후 재실행」 세 칸이 차례로 켜진다. 칸마다 작은 네모 9개가 청록으로 채워지며 「9개 패키지 테스트 ok」가 뜨고, 점선 「80%」 기준선 위로 index 막대가 오른다. 첫째와 셋째 막대는 「index 81.8%」까지 올라 「게이트 통과」가 뜨고, 둘째 막대는 빨간색으로 「index 52.3%」에서 멈춰 기준선 아래에 머물며 「게이트 실패」가 뜨는 장면",
+    "mobile": true
+  },
+  {
+    "id": "ProtectionFirstOrder",
+    "post": "media-ci-path-filter-required-check-tradeoff",
+    "kind": "video",
+    "posterFrame": 320,
+    "alt": "위 줄 「워크플로부터 바꾸면」 옆에 빨간 「보호: media-gate 필수 그대로」가 뜨고, 「웹 PR · 미디어 워크플로 생략」과 「미디어 PR · check만 실행, media-gate 없음」 두 상자 옆에 빨간 「Pending」이 붙는다. 아래 줄 「보호를 먼저 풀면」 옆에 청록 「보호: media-gate 해제」가 뜨고, 「웹 PR · 미디어 워크플로 생략」 옆에 회색 「media-ci 체크 0개」, 「미디어 PR · check 실행」 옆에 청록 「check 1개 성공」이 붙는 장면",
+    "mobile": true
+  },
+  {
+    "id": "DecoyDbGuard",
+    "post": "pokeclip-test-database-ownership-marker",
+    "kind": "video",
+    "posterFrame": 320,
+    "alt": "왼쪽 「옛 판정 · 표 개수」에서 「① public 표 1개 → 테스트 DB로 봄」 「② 행 비우기」가 차례로 켜지자 「미끼 DB · stream_segments」 상자의 「행 하나」 칸이 빨간 「지워짐」으로 바뀌고 「미끼 DB의 행 삭제」가 뜬다. 오른쪽 「새 판정 · 소유 표식」에서 「① CREATE DATABASE → 이미 있음」 「② 소유 표식 확인 → 없음」이 켜지면 같은 모양의 미끼 DB 상자가 청록으로 바뀌고 「행 하나」 칸은 그대로 남은 채 「사용 · 정리 거부」가 뜨는 장면",
+    "mobile": true
+  },
+  {
+    "id": "SessionStateSplit",
+    "post": "harness-session-isolation-worktree-root",
+    "kind": "video",
+    "posterFrame": 320,
+    "alt": "위에 「세션 A · 워크트리 A」와 「세션 B · 워크트리 B」 상자가 있다. 두 세션에서 점이 하나씩 선을 따라 내려와 아래 「공유 상태 폴더 하나」에 나란히 앉고, 세션 A가 빨개지며 「B의 표식 때문에 종료 차단」이 뜬다. 이어 공유 폴더가 청록 「A의 상태」와 「B의 상태」 두 폴더로 갈라지고, 점이 각자 바로 아래 자기 폴더로 내려가며 「A의 표식만 읽음」과 맨 아래 회색 「전: 공유 폴더 하나 → A가 B의 표식 때문에 종료 차단」이 뜨는 장면",
+    "mobile": true
   }
 ]

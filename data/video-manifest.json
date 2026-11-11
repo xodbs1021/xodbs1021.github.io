@@ -77,6 +77,84 @@
       "poster": "/images/clip-edit-recipe-render-boundary-recipe-rerender-mobile-poster.jpg"
     }
   },
+  "coverage-gate-that-fails-when-tests-disappear-coverage-gate-runs": {
+    "scene": "CoverageGateRuns",
+    "alt": "「① 정상 실행」 「② 테스트 파일 하나 제외」 「③ 임시 커밋 제거 후 재실행」 세 칸이 차례로 켜진다. 칸마다 작은 네모 9개가 청록으로 채워지며 「9개 패키지 테스트 ok」가 뜨고, 점선 「80%」 기준선 위로 index 막대가 오른다. 첫째와 셋째 막대는 「index 81.8%」까지 올라 「게이트 통과」가 뜨고, 둘째 막대는 빨간색으로 「index 52.3%」에서 멈춰 기준선 아래에 머물며 「게이트 실패」가 뜨는 장면",
+    "sha256": "21ac2ab70b4c8e1a896c7013bbcd20df985bca243f6317dce019a553b87f910b",
+    "bytes": 250639,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/coverage-gate-that-fails-when-tests-disappear-coverage-gate-runs-poster.jpg",
+    "mobile": {
+      "sha256": "6fc79a36606d615ef3e4c8cf0514a92b5ffd576e7cb304540d421cdac7c1b695",
+      "bytes": 193562,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/coverage-gate-that-fails-when-tests-disappear-coverage-gate-runs-mobile-poster.jpg"
+    }
+  },
+  "harness-session-isolation-worktree-root-session-state-split": {
+    "scene": "SessionStateSplit",
+    "alt": "위에 「세션 A · 워크트리 A」와 「세션 B · 워크트리 B」 상자가 있다. 두 세션에서 점이 하나씩 선을 따라 내려와 아래 「공유 상태 폴더 하나」에 나란히 앉고, 세션 A가 빨개지며 「B의 표식 때문에 종료 차단」이 뜬다. 이어 공유 폴더가 청록 「A의 상태」와 「B의 상태」 두 폴더로 갈라지고, 점이 각자 바로 아래 자기 폴더로 내려가며 「A의 표식만 읽음」과 맨 아래 회색 「전: 공유 폴더 하나 → A가 B의 표식 때문에 종료 차단」이 뜨는 장면",
+    "sha256": "64f208f1a61bed67e5522ef56f39dc597af6f0cd9159258c202239f15acbacbb",
+    "bytes": 183172,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/harness-session-isolation-worktree-root-session-state-split-poster.jpg",
+    "mobile": {
+      "sha256": "514ed4a8984117e56350a539bd1aab67832f7c220b8665ad741470da1c767749",
+      "bytes": 194704,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/harness-session-isolation-worktree-root-session-state-split-mobile-poster.jpg"
+    }
+  },
+  "media-ci-path-filter-required-check-tradeoff-protection-first-order": {
+    "scene": "ProtectionFirstOrder",
+    "alt": "위 줄 「워크플로부터 바꾸면」 옆에 빨간 「보호: media-gate 필수 그대로」가 뜨고, 「웹 PR · 미디어 워크플로 생략」과 「미디어 PR · check만 실행, media-gate 없음」 두 상자 옆에 빨간 「Pending」이 붙는다. 아래 줄 「보호를 먼저 풀면」 옆에 청록 「보호: media-gate 해제」가 뜨고, 「웹 PR · 미디어 워크플로 생략」 옆에 회색 「media-ci 체크 0개」, 「미디어 PR · check 실행」 옆에 청록 「check 1개 성공」이 붙는 장면",
+    "sha256": "1211e3e11fb58a225807c6a9c86ecfe20aa5354bc8ad2f25a11e69f20e9d0b2c",
+    "bytes": 220788,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/media-ci-path-filter-required-check-tradeoff-protection-first-order-poster.jpg",
+    "mobile": {
+      "sha256": "5db355b22b4173c95f5395bc4087f60352ce83f111092b24f8fb526a19f26552",
+      "bytes": 234423,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/media-ci-path-filter-required-check-tradeoff-protection-first-order-mobile-poster.jpg"
+    }
+  },
   "microphone-selection-without-always-on-vad-track-pick-in-clip": {
     "scene": "TrackPickInClip",
     "alt": "위 줄 「상시 전 트랙 VAD(뺀 설계)」에서 믹스 · 마이크 · 게임 등 트랙 줄을 스캐너가 계속 쓸고 지나가며 마이크와 게임 줄에 모두 「음성」이 뜨고 빨간 「게임 대사도 음성」이 붙는다. 아래 줄 「클립 구간 안에서 고르기」에서는 구간 괄호 안에만 트랙별 파형이 그려지고, 마이크 줄만 강조된 채 「한 트랙만 켜서 듣기」가 뜬 뒤 점선 「자막 입력(설계)」 상자로 화살표가 이어지는 장면",
@@ -947,6 +1025,32 @@
       "audio": 0,
       "faststart": true,
       "poster": "/images/pokeclip-storage-before-new-layer-batch-get-concurrency-mobile-poster.jpg"
+    }
+  },
+  "pokeclip-test-database-ownership-marker-decoy-db-guard": {
+    "scene": "DecoyDbGuard",
+    "alt": "왼쪽 「옛 판정 · 표 개수」에서 「① public 표 1개 → 테스트 DB로 봄」 「② 행 비우기」가 차례로 켜지자 「미끼 DB · stream_segments」 상자의 「행 하나」 칸이 빨간 「지워짐」으로 바뀌고 「미끼 DB의 행 삭제」가 뜬다. 오른쪽 「새 판정 · 소유 표식」에서 「① CREATE DATABASE → 이미 있음」 「② 소유 표식 확인 → 없음」이 켜지면 같은 모양의 미끼 DB 상자가 청록으로 바뀌고 「행 하나」 칸은 그대로 남은 채 「사용 · 정리 거부」가 뜨는 장면",
+    "sha256": "7e2157d6b53482a8024c37adee4dd054627539ff1ef2d9c42edabfba2d29ed32",
+    "bytes": 217256,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-test-database-ownership-marker-decoy-db-guard-poster.jpg",
+    "mobile": {
+      "sha256": "4dee862e9a04630c5bbe4383af99757964a6e4a638aaac633521ce79034bfbb5",
+      "bytes": 175261,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-test-database-ownership-marker-decoy-db-guard-mobile-poster.jpg"
     }
   },
   "pokeclip-upload-state-and-recovery-upload-crash-resume": {

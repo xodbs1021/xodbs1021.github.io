@@ -42,6 +42,10 @@ import { SECRET_PATH_ONE_CONNECTION_FRAMES, SecretPathOneConnection } from "./sc
 import { SEARCH_PATH_HIJACK_FRAMES, SearchPathHijack } from "./scenes/pokeclip-shared-db-login-privileges/SearchPathHijack";
 import { UPLOAD_REQUEST_PATH_FRAMES, UploadRequestPath } from "./scenes/pokeclip-editing-upload-authorization/UploadRequestPath";
 import { CHAT_SPIKE_TO_CARD_FRAMES, ChatSpikeToCard } from "./scenes/chat-highlight-research-and-fallback/ChatSpikeToCard";
+import { COVERAGE_GATE_RUNS_FRAMES, CoverageGateRuns } from "./scenes/coverage-gate-that-fails-when-tests-disappear/CoverageGateRuns";
+import { PROTECTION_FIRST_ORDER_FRAMES, ProtectionFirstOrder } from "./scenes/media-ci-path-filter-required-check-tradeoff/ProtectionFirstOrder";
+import { DECOY_DB_GUARD_FRAMES, DecoyDbGuard } from "./scenes/pokeclip-test-database-ownership-marker/DecoyDbGuard";
+import { SESSION_STATE_SPLIT_FRAMES, SessionStateSplit } from "./scenes/harness-session-isolation-worktree-root/SessionStateSplit";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
@@ -459,6 +463,46 @@ export const RemotionRoot: React.FC = () => (
       component={ChatSpikeToCard}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={CHAT_SPIKE_TO_CARD_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="CoverageGateRuns" component={CoverageGateRuns} durationInFrames={COVERAGE_GATE_RUNS_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="CoverageGateRunsMobile"
+      component={CoverageGateRuns}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={COVERAGE_GATE_RUNS_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="ProtectionFirstOrder" component={ProtectionFirstOrder} durationInFrames={PROTECTION_FIRST_ORDER_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="ProtectionFirstOrderMobile"
+      component={ProtectionFirstOrder}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={PROTECTION_FIRST_ORDER_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="DecoyDbGuard" component={DecoyDbGuard} durationInFrames={DECOY_DB_GUARD_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="DecoyDbGuardMobile"
+      component={DecoyDbGuard}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={DECOY_DB_GUARD_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="SessionStateSplit" component={SessionStateSplit} durationInFrames={SESSION_STATE_SPLIT_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="SessionStateSplitMobile"
+      component={SessionStateSplit}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={SESSION_STATE_SPLIT_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}
