@@ -85,7 +85,7 @@ const MOBILE: Layout = {
   volume: { x: 0, y: 184, w: 520, h: 156 },
   inline: true,
   writer: { x: 620, y: 184, w: 340, h: 156 },
-  writerLines: ["녹화기", "UID 10002"],
+  writerLines: ["UID 10002"],
   copyArrow: { x: 110, y1: 92, y2: 176, bar: 156 },
   copyTag: { x: 230, y: 97 },
   writeArrow: { x1: 612, y1: 262, x2: 528, y2: 262 },
@@ -105,7 +105,7 @@ const BOX_STYLE = {
   ink: { border: `3px solid ${COLOR.ink}`, background: COLOR.white },
   accent: { border: `5px solid ${COLOR.accent}`, background: COLOR.accentSoft },
   danger: { border: `5px solid ${COLOR.danger}`, background: COLOR.dangerSoft },
-  muted: { border: `3px dashed ${COLOR.muted}`, background: COLOR.surface },
+  muted: { border: `3px solid ${COLOR.muted}`, background: COLOR.surface },
 } as const;
 
 const TONE_COLOR = { ink: COLOR.ink, accent: COLOR.accent, danger: COLOR.danger, muted: COLOR.muted } as const;
@@ -239,7 +239,7 @@ export const VolumeFirstCopy: React.FC<Props> = ({ layout = "desktop" }) => {
             x2={o.x + a.x}
             y2={o.y + arrowEnd}
             color={c.copy === "copy" ? COLOR.accent : COLOR.muted}
-            dashed={c.copy === "none"}
+            dashed={false}
             draw={copyDraw}
           />
         ) : null}

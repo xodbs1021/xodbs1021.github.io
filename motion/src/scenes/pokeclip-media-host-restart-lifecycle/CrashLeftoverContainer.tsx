@@ -140,7 +140,7 @@ type Tone = "ink" | "accent" | "muted" | "danger";
 const BOX_STYLE = {
   ink: { border: `3px solid ${COLOR.ink}`, background: COLOR.white, color: COLOR.ink },
   accent: { border: `5px solid ${COLOR.accent}`, background: COLOR.accentSoft, color: COLOR.ink },
-  muted: { border: `3px dashed ${COLOR.muted}`, background: COLOR.surface, color: COLOR.muted },
+  muted: { border: `3px solid ${COLOR.muted}`, background: COLOR.surface, color: COLOR.muted },
   danger: { border: `5px solid ${COLOR.danger}`, background: COLOR.dangerSoft, color: COLOR.ink },
 } as const;
 
