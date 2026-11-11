@@ -1,7 +1,7 @@
 // 콘티: _workspace/blog/pokeclip-path-reconciler-design-history/storyboard.md 「영상 1」
 // 대안 T(연결마다 인증)를 MediaMTX 1.21.1 에서 잰 10월 5일 로컬 실측을 옮긴 개념도.
 // 송출 연결 10개가 동시에 들어오지만 HTTP 인증 응답(0.3초 지연 스텁)을 한 줄로 하나씩 기다려,
-// 첫 연결은 약 0.3초, 열 번째 연결은 3.057초에 수락된다. 끝에 새 HLS 세션 · 목록 API 요청도 같은 줄 끝에서 기다린다.
+// 첫 연결은 약 0.3초, 열 번째 연결은 3.057초에 수락된다. 새 HLS 세션 · 목록 API 요청도 진행 중인 인증이 끝날 때까지 기다린다.
 // 시간은 0–3.057초에 비례해 그린다(인증 한 번 = 3.057 / 10 초). 반복 클립, 생성 소재 없음.
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { Arrow, Label, Tag } from "../../components/Timeline";
@@ -52,6 +52,7 @@ type Layout = {
   readonly showZero: boolean;
   readonly requests: readonly (Box & { readonly text: string })[];
   readonly waitTag: Pos;
+  readonly waitText: string;
   readonly waitArrow: Line;
   readonly text: { readonly title: number; readonly label: number; readonly cell: number; readonly tag: number };
 };
@@ -78,6 +79,7 @@ const DESKTOP: Layout = {
     { x: 410, y: 466, w: 230, h: 84, text: "목록 API" },
   ],
   waitTag: { x: 120, y: 576 },
+  waitText: "진행 중인 인증이 끝날 때까지 대기(0.3초 지연에서 최대 약 1.2초)",
   waitArrow: { x1: 656, y1: 506, x2: 806, y2: 414 },
   text: { title: TEXT.title, label: TEXT.label, cell: TEXT.small, tag: TEXT.small },
 };
@@ -107,6 +109,7 @@ const MOBILE: Layout = {
     { x: 380, y: 512, w: 250, h: 88, text: "목록 API" },
   ],
   waitTag: { x: 60, y: 624 },
+  waitText: "인증이 끝날 때까지 대기 · 최대 약 1.2초",
   waitArrow: { x1: 644, y1: 540, x2: 750, y2: 474 },
   text: { title: MOBILE_TEXT.title, label: MOBILE_TEXT.label, cell: MOBILE_TEXT.small, tag: MOBILE_TEXT.small },
 };
@@ -324,7 +327,7 @@ export const AuthQueueSerial: React.FC<Props> = ({ layout = "desktop" }) => {
         {`${LAST_ACCEPT_SECONDS}초`}
       </Tag>
 
-      {/* 같은 줄 끝: 새 HLS 세션 · 목록 API 요청도 인증 차례를 기다린다. */}
+      {/* 새 HLS 세션 · 목록 API 요청도 진행 중인 인증이 끝날 때까지 기다린다(0.3초 지연, 겹쳐 쏜 12표본 최대 HLS 1.203초). */}
       {l.requests.map((r) => (
         <div
           key={r.text}
@@ -352,7 +355,7 @@ export const AuthQueueSerial: React.FC<Props> = ({ layout = "desktop" }) => {
       ))}
       {frame > T.requestsWait ? <Arrow {...l.waitArrow} color={COLOR.danger} dashed draw={progress(frame, T.requestsWait, FADE)} /> : null}
       <Tag x={l.waitTag.x} y={l.waitTag.y} tone="danger" size={l.text.tag} opacity={progress(frame, T.requestsWait, FADE)}>
-        새 HLS 세션 · 목록 API도 대기
+        {l.waitText}
       </Tag>
     </AbsoluteFill>
   );
