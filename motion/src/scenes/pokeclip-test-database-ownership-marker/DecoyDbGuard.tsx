@@ -1,6 +1,6 @@
 // 콘티: _workspace/blog/pokeclip-test-database-ownership-marker/storyboard.md 「영상 1」
 // 같은 미끼 DB(public 표가 stream_segments 하나뿐 — 공용 개발 DB와 모양이 같다)에 두 판정이 닿는다.
-// 왼쪽(옛 판정: 표 개수): 표가 1개라 테스트 DB로 보고 행을 비운다 → 미끼 행 삭제.
+// 왼쪽(옛 판정: 표 개수): 표가 1개라 테스트 DB로 보고 행을 비운다 → 미끼 행(하나) 삭제.
 // 오른쪽(새 판정: 소유 표식): CREATE DATABASE 가 「이미 있음」 → 표식 확인 → 없음 → 사용 · 정리 거부, 행 그대로.
 // PR #61 본문의 미끼 DB 반례(RED → GREEN)와 병합 코드 testdb_test.go 를 바탕으로 한 설명용 그림.
 // 반복 클립, 생성 소재 없음. layout="mobile" 은 1080×1350 휴대폰판(두 판정을 위아래로).
@@ -43,7 +43,8 @@ const desktopSide = (cx: number, header: string, steps: readonly [string, string
   ],
   db: { x: cx - 380, y: 452, w: 760, h: 380 },
   dbLabel: { x: cx - 350, y: 474 },
-  cells: [0, 1, 2].map((i) => ({ x: cx - 340, y: 556 + i * 86, w: 680, h: 64 })),
+  // 미끼 DB에는 행이 하나뿐이었다(PR #61 본문).
+  cells: [{ x: cx - 340, y: 610, w: 680, h: 96 }],
   tag: { x: cx - 380, y: 870, text: tag },
   deletes,
 });
@@ -64,7 +65,7 @@ const mobileSide = (top: number, header: string, step: string, tag: string, dele
   steps: [{ rect: { x: 60, y: top + 70, w: 960, h: 100 }, text: step }],
   db: { x: 60, y: top + 196, w: 960, h: 196 },
   dbLabel: { x: 90, y: top + 210 },
-  cells: [0, 1, 2].map((i) => ({ x: 90 + i * 306, y: top + 290, w: 286, h: 72 })),
+  cells: [{ x: 90, y: top + 290, w: 900, h: 72 }],
   tag: { x: 60, y: top + 412, text: tag },
   deletes,
 });
@@ -132,7 +133,7 @@ export const DecoyDbGuard: React.FC<Props> = ({ layout = "desktop" }) => {
               const gone = side.deletes ? progress(frame, start + RESULT_AT + i * 6, 8) : 0;
               return (
                 <div key={i}>
-                  <SegmentCell x={c.x} y={c.y} width={c.w} height={c.h} state="live" label="행" size={l.text.box} opacity={intro * (1 - gone)} />
+                  <SegmentCell x={c.x} y={c.y} width={c.w} height={c.h} state="live" label="행 하나" size={l.text.box} opacity={intro * (1 - gone)} />
                   <SegmentCell x={c.x} y={c.y} width={c.w} height={c.h} state="error" label="지워짐" size={l.text.box} opacity={gone} />
                 </div>
               );

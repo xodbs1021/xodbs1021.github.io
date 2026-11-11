@@ -14,7 +14,7 @@ portfolio_edition: "2026-10-15-v2"
 
 PokeClip은 웹, Spring 서비스, Go 미디어 코드를 한 저장소에 둡니다. 2026년 9월 초 팀원 두 명이 자기 영역 PR에도 미디어 CI가 뜬다며 불편을 말했습니다. 미디어 검사 본문은 이미 미디어가 바뀐 PR에서만 돌았지만, 브랜치 보호가 `media-gate`라는 체크를 필수로 기다렸기 때문에 모든 PR에 그 결과가 필요했습니다. 워크플로를 경로 필터(`paths`)로 좁혀 미디어와 무관한 PR에서 체크를 없앴고, 그 대가로 필수 체크를 풀었습니다. 지금은 미디어 검사가 실패해도 브랜치 보호가 병합을 막지 않습니다.
 
-2026년 9월 3일 네 가지 안 중 B안을 제가 골랐고, 「보호를 먼저 풀고 그다음 병합한다」는 순서도 제가 정했습니다. 구현은 AI(Claude Code)가 했고, 계획은 Claude Code와 Codex가 다섯 라운드 검토했습니다. Codex의 코드 검수는 [PR #163](https://github.com/3K-PokeClip/PokeClip-mono/pull/163)에서 `check` 잡 하나만 돌아 성공하는 것을 확인했습니다. PR #163은 제 승인 뒤 9월 4일 01시 12분(한국 시각)에 develop으로 병합됐습니다.
+2026년 9월 3일 네 가지 안 중 B안을 제가 골랐고, 계획 단계에서 나온 「보호를 먼저 풀고 그다음 병합한다」는 순서도 제가 승인해 확정했습니다. 구현은 AI(Claude Code)가 했고, 계획과 코드는 Claude Code와 Codex가 검토했습니다. Codex의 코드 검수는 [PR #163](https://github.com/3K-PokeClip/PokeClip-mono/pull/163)에서 `check` 잡 하나만 돌아 성공하는 것을 확인했습니다. PR #163은 제 승인 뒤 9월 4일 01시 12분(한국 시각)에 develop으로 병합됐습니다.
 
 ## 비싼 검사는 이미 미디어 변경에서만 돌고 있었습니다 {#비싼-테스트는-이미-조건부였다}
 
@@ -52,7 +52,7 @@ flowchart TB
 | C | develop 보호에서만 제거, main은 유지 | 기각 — 체크 줄은 그대로 뜨고, 미디어 결함이 develop에 쌓였다가 릴리스 PR에서 한꺼번에 막힘 |
 | D | 코드는 두고 팀에 「3~4초, 비용 0, 차단 0」을 설명 | 기각 — 불편의 실체는 비용이 아니라 보이는 것 |
 
-저장소 규칙(ruleset)의 「필수 워크플로」는 경로 필터로 건너뛴 실행을 통과로 치는지 문서로 확인하지 못해 범위 밖에 뒀습니다. B안을 고르면서 내용을 검사하는 필수 체크가 저장소에서 0개가 되는 것을 받아들였습니다. main에 남는 필수 체크 `main-source-gate`는 PR을 올린 브랜치가 develop이나 hotfix인지만 봅니다([`main-source.yml`](https://github.com/3K-PokeClip/PokeClip-mono/blob/2fc2323cbd84a683e935bfdf9f0171febf276535/.github/workflows/main-source.yml#L31-L43)).
+저장소 규칙(ruleset)의 「필수 워크플로」는 경로 필터로 건너뛴 실행을 통과로 치는지 문서로 확인하지 못해 범위 밖에 뒀습니다. B안을 고르면서 내용을 검사하는 필수 체크가 저장소에서 0개가 되는 것을 받아들였습니다. main에 남는 필수 체크 `main-source-gate`는 PR을 올린 브랜치가 develop이나 `hotfix/*`인지만 봅니다([`main-source.yml`](https://github.com/3K-PokeClip/PokeClip-mono/blob/2fc2323cbd84a683e935bfdf9f0171febf276535/.github/workflows/main-source.yml#L31-L43)).
 
 ## 보호를 먼저 풀고 병합했고, 되돌릴 때는 워크플로부터 되살립니다 {#적용과-롤백의-순서는-서로-반대다}
 
@@ -68,7 +68,7 @@ flowchart TB
 
 ## 검사 본문은 그대로 두고 워크플로만 229행에서 172행으로 줄었습니다
 
-바꾼 것은 「언제 돌릴지」뿐이고 「무엇을 검사할지」는 그대로입니다. 병합 커밋 `ce16cfc`의 `media-ci.yml`은 172행, 그 부모 `172f022`는 229행입니다. 옛 파일의 70–201행과 새 파일의 41–172행, 132행이 `check` 잡 본문이고 diff로 비교하면 같습니다. 줄어든 57행은 `changes`·`media-gate` 잡과 경로 판별 액션(`dorny/paths-filter`) 의존입니다.
+바꾼 것은 「언제 돌릴지」뿐이고 「무엇을 검사할지」는 그대로입니다. 병합 커밋 `ce16cfc`의 `media-ci.yml`은 172행, 그 부모 `172f022`는 229행입니다. 옛 파일의 70–201행과 새 파일의 41–172행, 132행이 `check` 잡 본문이고 diff로 비교하면 같습니다. 80행을 지우고 23행을 더해 57행이 줄었고, 지운 것은 `changes`·`media-gate` 잡과 경로 판별 액션(`dorny/paths-filter`) 의존입니다.
 
 | 확인한 것 | 결과 |
 |---|---|

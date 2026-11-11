@@ -65,6 +65,15 @@
       "bytes": 22663
     }
   },
+  "16a8f0d34788aa43": {
+    "source": "content/posts/0-to-1/harness-session-isolation-worktree-root.md",
+    "wide": {
+      "file": "16a8f0d34788aa43-wide.svg",
+      "width": 392,
+      "height": 989,
+      "bytes": 110493
+    }
+  },
   "18c1ace855c29607": {
     "source": "content/posts/tech-blurting/nvenc-gpu-transcoding.md",
     "wide": {
@@ -165,15 +174,6 @@
       "width": 408,
       "height": 998,
       "bytes": 24241
-    }
-  },
-  "34ea7dad1b51e0b0": {
-    "source": "content/posts/0-to-1/harness-session-isolation-worktree-root.md",
-    "wide": {
-      "file": "34ea7dad1b51e0b0-wide.svg",
-      "width": 392,
-      "height": 989,
-      "bytes": 110643
     }
   },
   "3d6abb2da49552db": {

@@ -1029,9 +1029,9 @@
   },
   "pokeclip-test-database-ownership-marker-decoy-db-guard": {
     "scene": "DecoyDbGuard",
-    "alt": "왼쪽 「옛 판정 · 표 개수」에서 「① public 표 1개 → 테스트 DB로 봄」 「② 행 비우기」가 차례로 켜지자 「미끼 DB · stream_segments」 상자의 「행」 세 칸이 빨간 「지워짐」으로 바뀌고 「미끼 DB의 행 삭제」가 뜬다. 오른쪽 「새 판정 · 소유 표식」에서 「① CREATE DATABASE → 이미 있음」 「② 소유 표식 확인 → 없음」이 켜지면 같은 모양의 미끼 DB 상자가 청록으로 바뀌고 「행」 세 칸은 그대로 남은 채 「사용 · 정리 거부」가 뜨는 장면",
-    "sha256": "4f9e722a23c7300670e3e0224eb78650a7080ea69d813d299b688e3b06a6d6e1",
-    "bytes": 234787,
+    "alt": "왼쪽 「옛 판정 · 표 개수」에서 「① public 표 1개 → 테스트 DB로 봄」 「② 행 비우기」가 차례로 켜지자 「미끼 DB · stream_segments」 상자의 「행 하나」 칸이 빨간 「지워짐」으로 바뀌고 「미끼 DB의 행 삭제」가 뜬다. 오른쪽 「새 판정 · 소유 표식」에서 「① CREATE DATABASE → 이미 있음」 「② 소유 표식 확인 → 없음」이 켜지면 같은 모양의 미끼 DB 상자가 청록으로 바뀌고 「행 하나」 칸은 그대로 남은 채 「사용 · 정리 거부」가 뜨는 장면",
+    "sha256": "7e2157d6b53482a8024c37adee4dd054627539ff1ef2d9c42edabfba2d29ed32",
+    "bytes": 217256,
     "codec": "h264",
     "pixFmt": "yuv420p",
     "width": 1920,
@@ -1041,8 +1041,8 @@
     "faststart": true,
     "poster": "/images/pokeclip-test-database-ownership-marker-decoy-db-guard-poster.jpg",
     "mobile": {
-      "sha256": "90695def31f71dadf1760d55a7ee867fea19a623e32dd9ca5e0822b56f8c0c18",
-      "bytes": 198065,
+      "sha256": "4dee862e9a04630c5bbe4383af99757964a6e4a638aaac633521ce79034bfbb5",
+      "bytes": 175261,
       "codec": "h264",
       "pixFmt": "yuv420p",
       "width": 1080,
