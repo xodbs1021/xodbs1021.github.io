@@ -14,7 +14,7 @@ portfolio_edition: "2026-10-15-v2"
 
 채팅이 평소보다 많이 올라오는 순간을 하이라이트 후보로 삼으면, 한 사람이 도배한 순간과 많은 시청자가 한꺼번에 반응한 순간이 메시지 수로는 똑같이 보입니다. PokeClip의 채팅 급증 판별 서버(chat-detector)는 아직 이 둘을 가르지 않습니다. 5초 창의 메시지 수가 최근 15분 중앙값의 3배 이상이고 10건 이상이면 급증으로 보고, 누르면 그 장면으로 재생 위치를 옮기는 점프 카드를 만듭니다. 두 기준값은 코드 주석에도 임시값으로 적혀 있고, 이 기본값 그대로 11월 3일 첫 출시본 v1.0.0 이미지에 들어갔습니다([PR #466](https://github.com/3K-PokeClip/PokeClip-mono/pull/466)). 판별이 빗나가거나 채팅이 적어 카드가 나오지 않아도 장면을 남길 수 있게, OBS 핫키와 웹 화면의 수동 표시가 같은 카드 표에 카드를 만듭니다.
 
-채팅 신호 연구는 7월 팀 연구 노트에 팀 실측과 보완 가설로 정리돼 있고, chat-detector는 팀원이 구현해 8월 26일 [PR #134](https://github.com/3K-PokeClip/PokeClip-mono/pull/134)로 병합했습니다. 7월 초에는 채팅을 영상·음성 분석의 관문으로 쓰는 구조도 제안했지만([v3→v4 기록](/posts/0-to-1/pokeclip-v3-to-v4-cascade/)), 출시본에 들어간 것은 채팅 급증 카드 하나입니다. 채널별 기준값과 고유 참여자 비교는 지금도 정하지 못했고, 탐지 정확도는 재지 않았습니다.
+채팅 신호 연구는 제가 7월 팀 연구 노트에 팀 실측과 보완 가설로 정리했고, 자동 판별이 빗나가도 손으로 표시한 장면이 남는 수동 표시 경로를 요구했으며, 8월 24일 채팅 시각과 영상 위치의 차이(3.9초)를 쟀습니다. chat-detector는 팀원이 구현해 8월 26일 [PR #134](https://github.com/3K-PokeClip/PokeClip-mono/pull/134)로 병합했습니다. 7월 초에는 채팅을 영상·음성 분석의 관문으로 쓰는 구조도 제안했지만([v3→v4 기록](/posts/0-to-1/pokeclip-v3-to-v4-cascade/)), 출시본에 들어간 것은 채팅 급증 카드 하나입니다. 채널별 기준값과 고유 참여자 비교는 지금도 정하지 못했고, 탐지 정확도는 재지 않았습니다.
 
 ## 메시지 수만 세면 도배와 넓은 반응이 섞입니다 {#메시지-수-하나로는-다른-원인이-섞인다}
 
@@ -57,7 +57,7 @@ portfolio_edition: "2026-10-15-v2"
 
 영상 위치로 바꾸는 호출은 사건마다 첫 급증 창의 시작 시각 하나로 한 번만 합니다. 채팅마다 물으면 수집 서버가 감당하지 못하기 때문이고, 나머지 끝점은 보정값이 같다고 보고 더해서 냅니다([HighlightPublisher.java 97–107행](https://github.com/3K-PokeClip/PokeClip-mono/blob/2fc2323cbd84a683e935bfdf9f0171febf276535/services/chat-detector/src/main/java/com/pokeclip/chat/detector/publish/HighlightPublisher.java#L97-L107), [143–144행](https://github.com/3K-PokeClip/PokeClip-mono/blob/2fc2323cbd84a683e935bfdf9f0171febf276535/services/chat-detector/src/main/java/com/pokeclip/chat/detector/publish/HighlightPublisher.java#L143-L144)). 대가로 녹화 조각 경계에 걸친 창은 카드 지점이 최대 1.5초 밀립니다([99–106행](https://github.com/3K-PokeClip/PokeClip-mono/blob/2fc2323cbd84a683e935bfdf9f0171febf276535/services/chat-detector/src/main/java/com/pokeclip/chat/detector/publish/HighlightPublisher.java#L99-L106)). 위치 변환을 수집 서버에 맡겼기 때문에, 판정 규칙을 바꿔도 카드를 받는 쪽은 채팅 시각을 해석하지 않아도 됩니다.
 
-## 자동 카드가 없어도 손으로 표시한 장면은 편집할 수 있습니다 {#자동-탐지가-실패해도-편집은-가능해야-했다}
+## 자동 카드가 없어도 손으로 표시한 장면은 같은 카드 표에 남습니다 {#자동-탐지가-실패해도-편집은-가능해야-했다}
 
 채팅이 적거나 자동 후보를 믿기 어려운 채널에 억지로 카드를 내면, 사용자가 잘못된 제안을 하나씩 열어 확인해야 합니다. 7월 연구 노트는 소형 채널에서 채팅만으로 하이라이트를 잡는 것을 「현재로선 불가」로 판단하고 핫키(수동) 모드로 맡겼습니다. 같은 달 설계 기록은 채널별 신뢰도가 낮으면 자동 탐지를 끄고 핫키를 안내하는 기능을 계획했습니다. 자동 탐지를 끄는 부분은 [Baseline.java 27–28행](https://github.com/3K-PokeClip/PokeClip-mono/blob/2fc2323cbd84a683e935bfdf9f0171febf276535/services/chat-detector/src/main/java/com/pokeclip/chat/detector/detect/Baseline.java#L27-L28)이 인용하고, 핫키 안내 부분은 비공개 기록에만 있습니다.
 
