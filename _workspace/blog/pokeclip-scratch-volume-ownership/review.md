@@ -14,3 +14,12 @@
 | 영상 포스터 | 휴대폰 webp 63.5KB → 점선 상자 · 점선 화살표를 실선으로, 휴대폰판 녹화기 이름표를 「UID 10002」로 줄여 통과 |
 
 그림: 영상 VolumeFirstCopy(9초, 휴대폰판), Mermaid fig-image-ownership(TB 392px).
+
+## 독립 리뷰 반영(2026-11-12, 코디네이터 경유)
+
+| 등급 | 지적 | 처리 |
+|---|---|---|
+| SHOULD | moby 고정을 실험 판으로 | v29.4.0 태그 커밋 daa0cb7f — create_unix.go 100–111, container_unix.go 374–388(직접 확인) |
+| SHOULD | 실험 UID | 영상 캡션에 「실험은 UID 10001, 그림은 운영 계정 10002」 |
+| NIT | 4,312ms 출처 | 「PR #62 검증에서」 + 같은 날 재측정 4,001–4,021ms |
+| NIT | Mermaid 화살표 | named volume 노드를 두고 사이드카 · janitor로 |

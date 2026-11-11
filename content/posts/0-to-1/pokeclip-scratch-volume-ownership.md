@@ -18,11 +18,11 @@ PokeClip 미디어 컨테이너(MediaMTX와 녹화 훅)를 root가 아닌 UID 10
 
 ## 이미지에 디렉터리가 없어 새 볼륨이 root 소유로 남았습니다 {#빈-볼륨의-첫-복사가-빠져-있었습니다}
 
-Docker는 빈 named volume을 컨테이너에 처음 붙일 때, 이미지의 같은 경로에 있던 내용을 볼륨으로 복사합니다([Docker 볼륨 문서](https://docs.docker.com/engine/storage/volumes/#mounting-a-volume-over-existing-data)). 문서는 내용 복사만 말하지만, moby 소스를 보면 소유권과 모드도 함께 옮깁니다. 이미지에 그 경로가 없으면 복사를 통째로 건너뛰고([`daemon/create_unix.go` 100–111행](https://github.com/moby/moby/blob/23ea0fa6461ec7455486441ae3a52b1235cdbec0/daemon/create_unix.go#L100-L111)), 볼륨이 비어 있을 때만 `copyExistingContents`가 복사합니다([`daemon/container/container_unix.go` 384–400행](https://github.com/moby/moby/blob/23ea0fa6461ec7455486441ae3a52b1235cdbec0/daemon/container/container_unix.go#L384-L400)). 복사는 디렉터리의 소유자와 모드를 볼륨 최상위에도 적용하므로, 소스가 빈 디렉터리여도 소유권은 옮겨집니다.
+Docker는 빈 named volume을 컨테이너에 처음 붙일 때, 이미지의 같은 경로에 있던 내용을 볼륨으로 복사합니다([Docker 볼륨 문서](https://docs.docker.com/engine/storage/volumes/#mounting-a-volume-over-existing-data)). 문서는 내용 복사만 말하지만, moby 소스를 보면 소유권과 모드도 함께 옮깁니다. 이미지에 그 경로가 없으면 복사를 통째로 건너뛰고([`daemon/create_unix.go` 100–111행](https://github.com/moby/moby/blob/daa0cb7f23594cdbcce5002e370027d3fd36ffd7/daemon/create_unix.go#L100-L111)), 볼륨이 비어 있을 때만 `copyExistingContents`가 복사합니다([`daemon/container/container_unix.go` 374–388행](https://github.com/moby/moby/blob/daa0cb7f23594cdbcce5002e370027d3fd36ffd7/daemon/container/container_unix.go#L374-L388)). 복사는 디렉터리의 소유자와 모드를 볼륨 최상위에도 적용하므로, 소스가 빈 디렉터리여도 소유권은 옮겨집니다.
 
 그래서 경우는 셋으로 갈립니다. [[fig-volume-first-copy]]의 세 칸이 그 차이입니다.
 
-{{< motion scene="VolumeFirstCopy" id="fig-volume-first-copy" kind="개념도" caption="빈 named volume이 처음 붙을 때 세 경우. 이미지에 경로가 없으면 복사할 것이 없어 볼륨이 root:root로 남고 UID 10002의 쓰기가 실패합니다. 이미지에 10002 소유 빈 디렉터리가 있으면 그 소유권이 볼륨으로 복사돼 쓰기가 성공합니다. 볼륨에 이미 데이터가 있으면 복사하지 않아 예전 소유권이 그대로 남습니다. 8월 16일 실험 E1 · E2 · E4를 옮긴 개념도입니다." >}}
+{{< motion scene="VolumeFirstCopy" id="fig-volume-first-copy" kind="개념도" caption="빈 named volume이 처음 붙을 때 세 경우. 이미지에 경로가 없으면 복사할 것이 없어 볼륨이 root:root로 남고 UID 10002의 쓰기가 실패합니다. 이미지에 10002 소유 빈 디렉터리가 있으면 그 소유권이 볼륨으로 복사돼 쓰기가 성공합니다. 볼륨에 이미 데이터가 있으면 복사하지 않아 예전 소유권이 그대로 남습니다. 8월 16일 실험 E1 · E2 · E4를 옮긴 개념도입니다. 실험은 UID 10001로 했고 그림은 운영 계정 10002로 옮겼습니다." >}}
 
 첫 칸은 실험 E1, 둘째 칸은 E2, 셋째 칸은 E4의 관측입니다. 실행 사용자만 바꾸면 첫 칸에 머뭅니다.
 
@@ -30,23 +30,25 @@ Docker는 빈 named volume을 컨테이너에 처음 붙일 때, 이미지의 �
 
 중간 단계인 prep 스테이지에서 빈 디렉터리 셋을 만들고, 최종 스테이지에서 `COPY --chown=10002:10002`로 옮겼습니다([`media/Dockerfile.mtxhook` 43–44행 · 99–102행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/Dockerfile.mtxhook#L99-L102)). 최종 이미지에는 `/etc/passwd`가 없어 `--chown`에 이름 대신 숫자만 씁니다. 최종 이미지에는 셸도 권한 도구도 넣지 않았습니다. [[fig-image-ownership]]이 지금의 층 구성입니다.
 
-```mermaid {#fig-image-ownership kind="재구성" caption="미디어 이미지의 층과 계정. build 스테이지가 만든 훅 실행 파일은 root 소유(--chown=0:0)로 /hooks-bin에 들어가고, prep 스테이지의 빈 디렉터리 셋은 10002 소유로 /recordings · /dvr · /hooks에 들어갑니다. 최종 이미지는 scratch 파생 MediaMTX 포크 이미지이며 USER 10002로 돕니다. 같은 볼륨을 사이드카(10001)는 읽기 전용으로, 정리 작업 janitor(10002)는 지우려고 붙습니다. PokeClip-mono develop 825a3dfe의 media/Dockerfile.mtxhook 19–102행과 infra/media-host/compose.yml.tmpl 재구성." source="https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/Dockerfile.mtxhook#L19-L102"}
+```mermaid {#fig-image-ownership kind="재구성" caption="미디어 이미지의 층과 계정. build 스테이지가 만든 훅 실행 파일은 root 소유(--chown=0:0)로 /hooks-bin에 들어가고, prep 스테이지의 빈 디렉터리 셋은 10002 소유로 /recordings · /dvr · /hooks에 들어갑니다. 최종 이미지는 scratch 파생 MediaMTX 포크 이미지이며 USER 10002로 돕니다. 빈 named volume 셋은 첫 복사로 10002 소유가 되고, 같은 볼륨을 사이드카(10001)는 읽기 전용으로, 정리 작업 janitor(10002)는 지우려고 붙습니다. PokeClip-mono develop 825a3dfe의 media/Dockerfile.mtxhook 19–102행과 infra/media-host/compose.yml.tmpl 재구성." source="https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/Dockerfile.mtxhook#L19-L102"}
 flowchart TB
   accTitle: 미디어 이미지의 층과 계정
-  accDescr: build 스테이지의 훅 실행 파일이 root 소유로 최종 이미지의 hooks-bin에 들어간다. prep 스테이지의 빈 디렉터리 셋이 10002 소유로 recordings, dvr, hooks에 들어간다. 최종 이미지는 scratch 파생 MediaMTX 포크 이미지이고 USER 10002로 돈다. 사이드카 10001은 볼륨을 읽기 전용으로, janitor 10002는 삭제용으로 붙는다.
+  accDescr: build 스테이지의 훅 실행 파일이 root 소유로 최종 이미지의 hooks-bin에 들어간다. prep 스테이지의 빈 디렉터리 셋이 10002 소유로 recordings, dvr, hooks에 들어간다. 최종 이미지는 scratch 파생 MediaMTX 포크 이미지이고 USER 10002로 돈다. 빈 named volume 셋이 첫 복사로 10002 소유가 되고, 사이드카 10001은 볼륨을 읽기 전용으로, janitor 10002는 삭제용으로 붙는다.
   build[build 스테이지<br/>훅 실행 파일 빌드]
   prep[prep 스테이지<br/>빈 디렉터리 셋 mkdir]
   final[최종 이미지<br/>MediaMTX 포크<br/>scratch 파생 · USER 10002]
   bin[hooks-bin<br/>훅 실행 파일<br/>--chown=0:0]
   dirs[recordings<br/>dvr · hooks<br/>--chown=10002:10002]
+  vol[(named volume 셋<br/>첫 복사로 10002 소유)]
   side[사이드카 10001<br/>읽기 전용]
   jan[janitor 10002<br/>삭제]
   build --> bin
   prep --> dirs
   bin --> final
   dirs --> final
-  final --> side
-  final --> jan
+  final --> vol
+  vol --> side
+  vol --> jan
   style dirs fill:#0a0c08,stroke:#0a0c07,stroke-width:3px
 ```
 
@@ -93,7 +95,7 @@ Docker는 비어 있지 않은 볼륨에는 아무것도 복사하지 않습니�
 
 ## macOS에서 녹화와 훅까지 확인했고 리눅스 상자는 뒤에 돌았습니다 {#검증은-사용자-이름에서-녹화훅까지-이어졌습니다}
 
-설정 검사에서 멈추지 않고, `USER`·`COPY` 소유권·볼륨·실행 파일 쓰기 금지·`NoNewPrivs`를 실제 녹화와 훅 실행까지 이어 확인했습니다. 실험 E7에서는 공식 MediaMTX 1.19.3을 10002로 띄워 리스너가 모두 뜨는 것을 봤습니다. 녹화 길이가 기준(3,900–4,100ms)을 넘어 최대 4,312ms인 조각이 있었지만, root로 돌린 대조군도 최대 4,312ms로 같았습니다. 권한 변경에서 생긴 회귀가 아니라는 근거입니다.
+설정 검사에서 멈추지 않고, `USER`·`COPY` 소유권·볼륨·실행 파일 쓰기 금지·`NoNewPrivs`를 실제 녹화와 훅 실행까지 이어 확인했습니다. 실험 E7에서는 공식 MediaMTX 1.19.3을 10002로 띄워 리스너가 모두 뜨는 것을 봤습니다. PR #62 검증에서 녹화 길이가 기준(3,900–4,100ms)을 넘어 최대 4,312ms인 조각이 있었지만, root로 돌린 대조군도 최대 4,312ms로 같았습니다. 같은 날 다시 재니 4,001–4,021ms로 기준 안이었습니다. 권한 변경에서 생긴 회귀가 아니라는 근거입니다.
 
 모든 실측은 개발자 맥의 Docker Desktop(Docker Engine 29.4.0, darwin/arm64)에서 했습니다. 리눅스는 그때 확인하지 않았습니다. Docker Desktop은 호스트 파일 bind mount의 소유권을 다시 매핑해서(실험 E8), 맥에서 통과한 것을 리눅스의 권한 경계까지 확인했다고 볼 수 없습니다. 11월 3일부터 운영 미디어 상자(리눅스 arm64)가 이 Dockerfile로 만든 이미지로 돕니다([`infra/media-host/README.md` 1145행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/README.md?plain=1#L1145)).
 
@@ -104,7 +106,7 @@ Docker는 비어 있지 않은 볼륨에는 아무것도 복사하지 않습니�
 - 실험 E1–E8: 2026년 8월 16일, 개발자 맥의 Docker Desktop(Docker Engine 29.4.0, darwin/arm64). AI가 수행했습니다. 실험 목록과 요약은 PR #62에 동봉된 팀 결정 문서에 있고, 원자료는 비공개입니다.
 - 녹화 길이 비교: 같은 날 같은 환경에서 비root와 root 대조군을 녹화해 조각 길이의 최댓값을 견줬습니다(PR #62 본문).
 - 리눅스에서의 소유권 측정은 하지 않았습니다.
-- 코드 인용은 PokeClip-mono develop `825a3dfe`(2026년 11월 11일), moby 소스는 `23ea0fa6`이고, PR 상태는 2026년 11월 11일에 확인했습니다.
+- 코드 인용은 PokeClip-mono develop `825a3dfe`(2026년 11월 11일), moby 소스는 실험 판 v29.4.0(`daa0cb7f`)이고, PR 상태는 2026년 11월 11일에 확인했습니다.
 
 ## 출처
 
@@ -113,7 +115,7 @@ Docker는 비어 있지 않은 볼륨에는 아무것도 복사하지 않습니�
 - [`media/Dockerfile.mtxhook`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/Dockerfile.mtxhook#L19-L102) — prep 스테이지, `--chown`, `USER 10002`
 - [`media/internal/mtxhook/runtime_identity_contract_test.go`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/mtxhook/runtime_identity_contract_test.go#L165-L183) — 훅 실행 파일 계약 검사
 - [팀 결정 문서 「media 비특권 전환」](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/docs/decisions/2026-08-17-media-%EB%B9%84%ED%8A%B9%EA%B6%8C-%EC%A0%84%ED%99%98.md?plain=1#L97-L141) — 실험 요약과 대안 평가
-- [moby `daemon/container/container_unix.go`](https://github.com/moby/moby/blob/23ea0fa6461ec7455486441ae3a52b1235cdbec0/daemon/container/container_unix.go#L384-L400) · [`daemon/create_unix.go`](https://github.com/moby/moby/blob/23ea0fa6461ec7455486441ae3a52b1235cdbec0/daemon/create_unix.go#L100-L111) — 빈 볼륨 첫 복사
+- [moby `daemon/container/container_unix.go`](https://github.com/moby/moby/blob/daa0cb7f23594cdbcce5002e370027d3fd36ffd7/daemon/container/container_unix.go#L374-L388) · [`daemon/create_unix.go`](https://github.com/moby/moby/blob/daa0cb7f23594cdbcce5002e370027d3fd36ffd7/daemon/create_unix.go#L100-L111) — 빈 볼륨 첫 복사
 - [Docker 문서 「Volumes」](https://docs.docker.com/engine/storage/volumes/#mounting-a-volume-over-existing-data) — 기존 데이터 위 볼륨 마운트
 - [Dockerfile 레퍼런스 「COPY --chown」](https://docs.docker.com/reference/dockerfile/#copy---chown) — 숫자 UID와 /etc/passwd
 
