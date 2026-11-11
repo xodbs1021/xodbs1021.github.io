@@ -9,7 +9,7 @@ description: "MediaMTX 재생 서버는 URL 경로가 아니라 쿼리의 path�
 draft: false
 ---
 
-PokeClip의 녹화 재생 요청은 `/playback/A/list?path=A`처럼 생겼습니다. 앞단 CloudFront의 서명 쿠키는 경로의 방송 A를 보고 통과시키지만, 뒤의 MediaMTX 재생 서버는 경로가 아니라 쿼리의 `path`로 읽을 녹화를 고릅니다. 그래서 `/A/list?path=B`를 그대로 넘기면 A를 볼 수 있는 사용자가 B의 녹화 목록을 읽습니다. nginx가 쿼리의 `path`가 정확히 하나이고 경로의 방송과 같을 때만 재생 서버로 넘기게 했고, 거절한 요청이 상류에 한 건도 닿지 않았는지 계약 시험으로 셌습니다. 11월 3일 운영 엣지 시험에서 경로 우회 15사례는 모두 거절됐고, 보호 대상 상류에 닿은 요청은 0건이었습니다.
+PokeClip의 녹화 재생 요청은 `/playback/A/list?path=A`처럼 생겼습니다. 앞단 CloudFront의 서명 쿠키는 경로의 방송 A를 보고 통과시키지만, 뒤의 MediaMTX 재생 서버는 경로가 아니라 쿼리의 `path`로 읽을 녹화를 고릅니다. 그래서 `/A/list?path=B`를 그대로 넘기면 A를 볼 수 있는 사용자가 B의 녹화 목록을 읽습니다. nginx가 쿼리의 `path`가 정확히 하나이고 경로의 방송과 같을 때만 재생 서버로 넘기게 했고, 거절한 요청이 상류에 한 건도 닿지 않았는지 계약 시험으로 셌습니다. 11월 3일 운영 엣지 시험에서 제어면 경로를 노린 경로 우회 15사례는 모두 거절됐고, 보호 대상 상류에 닿은 요청은 0건이었습니다.
 
 미디어 상자 앞에 nginx를 남기기로 한 것은 제 결정입니다. nginx의 필수 책임을 이 대조로 정리하고, 원문 경로·쿼리·내부 포트까지 검증 범위를 잡고, 대조 규칙과 원문 검사와 계약 시험을 만든 것은 AI입니다. 구현은 Claude Code, 리뷰는 Claude Code와 Codex가 했고, 변경은 10월 23일 [PR #311](https://github.com/3K-PokeClip/PokeClip-mono/pull/311)로 머지됐습니다.
 
@@ -38,7 +38,7 @@ flowchart TB
   style ngx fill:#0a0c08,stroke:#0a0c07,stroke-width:3px
 ```
 
-CloudFront는 `/playback/*`에 서명 쿠키를 요구하고, 쿼리는 그대로 원본에 넘깁니다([`cdn_media/policies.tf` 173–193행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/policies.tf#L173-L193)). 내부 ALB는 `/playback` 접두사만 떼고 상자로 보냅니다([`load_balancers.tf` 125–126행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/prod/platform/load_balancers.tf#L122-L127)). 쿠키 정책은 경로를 보고 쿼리는 보지 않으므로, 쿼리의 대상을 경로와 맞추는 일이 nginx에 남았습니다. nginx가 계정 권한을 새로 계산하지는 않습니다. 앞단이 허락한 경로의 방송과 재생 서버가 읽을 방송을 잇는 검사입니다. 로컬 개발용 웹 라우트도 같은 이유로 들어온 `path`를 버리고 경로의 키로 다시 채웁니다([`route.ts` 1–7행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/app/media/playback/%5Bkey%5D/%5Bop%5D/route.ts#L1-L7)). 이 라우트는 로컬에서만 켜지고 운영에서는 404입니다.
+CloudFront는 `/playback/*`에 서명 쿠키를 요구하고 함수는 붙이지 않으며([`cdn_media/main.tf` 87–96행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/main.tf#L87-L96)), 쿼리는 그대로 원본에 넘깁니다([`cdn_media/policies.tf` 173–193행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/policies.tf#L173-L193)). 내부 ALB는 `/playback` 접두사만 떼고 상자로 보냅니다([`load_balancers.tf` 122–127행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/prod/platform/load_balancers.tf#L122-L127)). 쿠키 정책은 경로를 보고 쿼리는 보지 않으므로, 쿼리의 대상을 경로와 맞추는 일이 nginx에 남았습니다. nginx가 계정 권한을 새로 계산하지는 않습니다. 앞단이 허락한 경로의 방송과 재생 서버가 읽을 방송을 잇는 검사입니다. 로컬 개발용 웹 라우트도 같은 이유로 들어온 `path`를 버리고 경로의 키로 다시 채웁니다([`route.ts` 1–7행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/app/media/playback/%5Bkey%5D/%5Bop%5D/route.ts#L1-L7)). 이 라우트는 로컬에서만 켜지고 운영에서는 404입니다.
 
 ## path가 하나이고 경로의 방송과 같을 때만 넘깁니다
 
@@ -60,11 +60,11 @@ CloudFront는 `/playback/*`에 서명 쿠키를 요구하고, 쿼리는 그대�
 
 첫 구현은 이 차이를 놓쳤습니다. 쿼리 대조를 정규화된 `$uri`로 했더니, 로컬에서 `/A/..%2fB/list?path=B`가 200으로 통과했습니다. 앞단은 원문의 `/A/…`를 보고 A의 쿠키로 허락하는데, nginx는 접힌 `/B/list`를 보고 `path=B`와 같다고 판단한 것입니다. 커밋 리뷰에서 Claude Code와 보안 리뷰가 같은 결함을 짚었고, 원문(`$request_uri`)이 `/{id}/list`·`/{id}/get` 꼴일 때만 통과하는 검사를 앞에 더했습니다([80–88행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/nginx/nginx.conf.tmpl#L80-L88)). 원문이 이 꼴이면 원문과 `$uri`가 같으므로, 앞단이 본 방송과 쿼리 대조의 방송이 같아집니다.
 
-라이브 LL-HLS와 제어면은 원문을 상류에 그대로 넘깁니다. 이쪽은 원문 경로에 인코딩한 점·슬래시·역슬래시·퍼센트, 빈 조각, 점 구간이 있으면 400으로 거절합니다([100–120행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/nginx/nginx.conf.tmpl#L100-L120)). 재생 요청의 거절은 403입니다. 판단은 정규화한 경로로 하고 전달은 다른 원문으로 하는 틈을 없애려는 규칙입니다. 다만 그 밖의 `%XX`와 `\`를 원문대로 넘기는 것은 상류가 Go `net/http`라는 전제에 기댑니다. 상류가 바뀌면 다시 판단해야 합니다.
+라이브 LL-HLS와 제어면은 원문을 상류에 그대로 넘깁니다. 이쪽은 원문 경로에 인코딩한 점·슬래시·역슬래시·퍼센트, 빈 조각, 점 구간이 있으면 400으로 거절합니다([100–120행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/nginx/nginx.conf.tmpl#L100-L120) · [148–178행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/nginx/nginx.conf.tmpl#L148-L178)). 재생 요청의 거절은 403입니다. 판단은 정규화한 경로로 하고 전달은 다른 원문으로 하는 틈을 없애려는 규칙입니다. 다만 그 밖의 `%XX`와 `\`를 원문대로 넘기는 것은 상류가 Go `net/http`라는 전제에 기댑니다. 상류가 바뀌면 다시 판단해야 합니다.
 
 ## 관리 API로 가는 길은 nginx에 만들지 않았습니다 {#전달-경로와-관리-경로를-구분했습니다}
 
-nginx는 MediaMTX와 같은 네트워크 네임스페이스를 씁니다([`compose.yml.tmpl` 164–166행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/compose.yml.tmpl#L164-L166)). 네트워크 네임스페이스는 컨테이너들이 같은 네트워크 공간(같은 루프백)을 쓰도록 묶는 단위입니다. MediaMTX의 HTTP 포트는 모두 루프백에만 열리고, 바깥에서는 nginx의 포트로만 들어옵니다([`mediamtx.yml.tmpl` 32–50행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/mediamtx.yml.tmpl#L32-L50)).
+nginx는 MediaMTX와 같은 네트워크 네임스페이스를 씁니다([`compose.yml.tmpl` 164–166행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/compose.yml.tmpl#L164-L166)). 네트워크 네임스페이스는 컨테이너들이 같은 네트워크 공간(같은 루프백)을 쓰도록 묶는 단위입니다. MediaMTX의 HTTP 포트는 모두 루프백에만 열리고, 바깥에서는 nginx의 포트로만 들어옵니다([`mediamtx.yml.tmpl` 32–50행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/mediamtx.yml.tmpl#L32-L50) · [125–126행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/mediamtx.yml.tmpl#L125-L126) · [145–149행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/mediamtx.yml.tmpl#L145-L149)).
 
 | 경로 | nginx가 맡은 일 |
 |---|---|
@@ -82,9 +82,9 @@ nginx는 MediaMTX와 같은 네트워크 네임스페이스를 씁니다([`compo
 
 영상은 시험 사례 다섯 개를 차례로 보냅니다. 청록으로 지나가는 것은 첫 요청 하나뿐이고, 나머지 넷은 nginx에서 멈춥니다.
 
-{{< motion scene="PlaybackQueryGuard" id="fig-playback-query-guard" kind="개념도" caption="재생 요청 다섯 개 가운데 경로와 쿼리의 방송이 같은 /A/list?path=A만 재생 서버(9996)에 닿습니다. 다른 방송을 지정한 path=B, 중복 path, 인코딩한 키 pa%74h, 원문에 ..%2f가 든 경로는 nginx가 403으로 멈추고, 재생 서버에 닿은 거절 요청은 0건입니다. 프록시 계약 시험의 사례를 옮긴 그림이며, 정규화 사례는 시험에서 ?path=B를 붙여 보냅니다." >}}
+{{< motion scene="PlaybackQueryGuard" id="fig-playback-query-guard" kind="개념도" caption="재생 요청 다섯 개 가운데 경로와 쿼리의 방송이 같은 /A/list?path=A만 재생 서버(9996)에 닿습니다. 다른 방송을 지정한 path=B, 중복 path, 인코딩한 키 pa%74h, 원문에 ..%2f가 든 /A/..%2fB/list?path=B는 nginx가 403으로 멈추고, 재생 서버에 닿은 거절 요청은 0건입니다. 프록시 계약 시험의 사례를 옮긴 그림입니다." >}}
 
-마지막 `/A/..%2fB/list`는 원문 검사만 잡을 수 있는 요청입니다. 풀어서 접으면 `/B/list?path=B`가 되어 쿼리 대조는 통과하기 때문입니다. 10월 22일 PR 직전 일괄 시험에서 이 계약 시험을 다섯 번 반복했고 모두 통과했습니다. 이 결과는 요청 계약의 검증이며, 운영의 공격 차단율이나 처리량 수치는 아닙니다.
+마지막 `/A/..%2fB/list?path=B`는 원문 검사만 잡을 수 있는 요청입니다. 풀어서 접으면 `/B/list?path=B`가 되어 쿼리 대조는 통과하기 때문입니다. 10월 22일 PR 직전 일괄 시험에서 이 계약 시험을 다섯 번 반복했고 모두 통과했습니다. 이 결과는 요청 계약의 검증이며, 운영의 공격 차단율이나 처리량 수치는 아닙니다.
 
 로그도 따로 봤습니다. 접근 로그에는 Authorization과 쿼리를 싣지 않고, 경로는 받은 원문 그대로 남깁니다. 거절한 우회 원문이 정상 경로처럼 남지 않게 하려는 것입니다. 오류 로그는 nginx가 형식을 정해서 요청 줄(쿼리 포함)과 Host·Referer가 실립니다([35–39행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/nginx/nginx.conf.tmpl#L35-L39)). 쿼리로 토큰을 받게 되면 다시 판단해야 합니다.
 

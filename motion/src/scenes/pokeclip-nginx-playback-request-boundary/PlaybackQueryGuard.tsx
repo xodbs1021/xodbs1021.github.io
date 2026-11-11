@@ -15,7 +15,7 @@ const REQUESTS = [
   { text: "/A/list?path=B", pass: false },
   { text: "/A/list?path=A&path=B", pass: false },
   { text: "/A/list?pa%74h=B&path=A", pass: false },
-  { text: "/A/..%2fB/list", pass: false },
+  { text: "/A/..%2fB/list?path=B", pass: false },
 ] as const;
 
 const T = {
