@@ -23,6 +23,10 @@ import { RECIPE_RERENDER_FRAMES, RecipeRerender } from "./scenes/clip-edit-recip
 import { BROADCAST_EVENT_FANOUT_FRAMES, BroadcastEventFanout } from "./scenes/pokeclip-language-ownership-boundaries/BroadcastEventFanout";
 import { DVR_WINDOW_SEEK_FRAMES, DvrWindowSeek } from "./scenes/pokeclip-mediamtx-build-or-adopt/DvrWindowSeek";
 import { MEDIA_BOX_REPLACE_FRAMES, MediaBoxReplace } from "./scenes/pokeclip-stateful-media-deployment/MediaBoxReplace";
+import { TFDT_STACK_SEEK_FRAMES, TfdtStackSeek } from "./scenes/pokeclip-zero-errors-missing-playback/TfdtStackSeek";
+import { TFDT_REBASE_ABC_FRAMES, TfdtRebaseAbc } from "./scenes/pokeclip-cdn-timeline-normalization/TfdtRebaseAbc";
+import { REMUX_INIT_DRIFT_FRAMES, RemuxInitDrift } from "./scenes/pokeclip-go-remux-same-io-benchmark/RemuxInitDrift";
+import { THREE_AXIS_UPLOAD_FRAMES, ThreeAxisUpload } from "./scenes/pokeclip-playback-producer-boundaries/ThreeAxisUpload";
 import { MOBILE_VIDEO, VIDEO } from "./theme";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
@@ -261,6 +265,46 @@ export const RemotionRoot: React.FC = () => (
       component={MediaBoxReplace}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={MEDIA_BOX_REPLACE_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="TfdtStackSeek" component={TfdtStackSeek} durationInFrames={TFDT_STACK_SEEK_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="TfdtStackSeekMobile"
+      component={TfdtStackSeek}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={TFDT_STACK_SEEK_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="TfdtRebaseAbc" component={TfdtRebaseAbc} durationInFrames={TFDT_REBASE_ABC_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="TfdtRebaseAbcMobile"
+      component={TfdtRebaseAbc}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={TFDT_REBASE_ABC_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="RemuxInitDrift" component={RemuxInitDrift} durationInFrames={REMUX_INIT_DRIFT_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="RemuxInitDriftMobile"
+      component={RemuxInitDrift}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={REMUX_INIT_DRIFT_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="ThreeAxisUpload" component={ThreeAxisUpload} durationInFrames={THREE_AXIS_UPLOAD_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="ThreeAxisUploadMobile"
+      component={ThreeAxisUpload}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={THREE_AXIS_UPLOAD_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}

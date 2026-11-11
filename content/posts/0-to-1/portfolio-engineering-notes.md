@@ -14,7 +14,7 @@
   "description": "공통 DB 인증, nginx 요청 검증, DVR 발행과 복구, MediaMTX 기여를 만든 판단과 검증을 연결한 기술 글 모음.",
   "draft": false,
   "portfolio_edition": "2026-10-15-v2",
-  "lastmod": "2026-10-28T19:27:14+09:00"
+  "lastmod": "2026-11-11T15:40:00+09:00"
 }
 
 방송 파일을 만들었고 요청도 성공했는데, 브라우저가 인식한 재생 구간은 목록보다 **61.94초 짧았습니다.** 오류 수는 0이었습니다. 이 차이를 추적하며 성공 응답 다음에 무엇을 확인해야 하는지 배웠습니다. 파일의 시간축과 브라우저가 받아들인 구간을 대조해야 사용자가 놓친 장면을 찾을 수 있었습니다.
@@ -37,7 +37,7 @@
 
 | 확인한 결과 | 그 전에 바꾼 판단 | 상세 글 |
 |---|---|---|
-| 재포장 p50 **23.43→3.05ms** | 매 조각의 FFmpeg 프로세스 기동을 상주 Go 호출로 변경. 같은 I/O·각 200회 대조 | [재포장 비교](https://xodbs1021.github.io/posts/0-to-1/pokeclip-go-remux-same-io-benchmark/) |
+| 재포장 p50 **23.43→3.05ms** | 조각마다 init이 달라지는 FFmpeg 재포장 계획을 녹화기와 같은 라이브러리의 Go 재포장으로 변경. 같은 읽기·쓰기 범위·각 200회 대조 | [재포장 비교](https://xodbs1021.github.io/posts/0-to-1/pokeclip-go-remux-same-io-benchmark/) |
 | 원본 미디어 요청 **1,254→28건** | 캐시 키와 원본 인증 전달을 분리. 50 VU·25초·각 조건 1회 | [CDN 실험과 97.95%의 분모](https://xodbs1021.github.io/posts/0-to-1/pokeclip-cdn-cache-auth-measurement/) |
 | **276파일, 누락·중복 0** | 완료 알림에만 의존하지 않고 파일·DB를 복구 기준으로 사용. 정상·알림 유실 4조건 | [파일 회수 검증](https://xodbs1021.github.io/posts/0-to-1/pokeclip-indexer-recovery-without-events/) |
 | **PR 4건 정식 릴리스 반영** | 설정 검증 시점, 명령 종료값, 소스 생명주기, 인증 기본값의 참조 경계 수정 | [MediaMTX 기여 모음](#opensource) |
@@ -66,12 +66,12 @@
 
 ## 재생 누락·시간축·재포장 {#playback}
 
-오류 수가 0이어도 영상 구간은 빠질 수 있었습니다. 재생 시간축을 고친 뒤 반복 프로세스 호출을 상주 함수로 옮겼고, 속도와 출력 정합성을 서로 다른 시험으로 확인했습니다.
+오류 수가 0이어도 영상 구간은 빠질 수 있었습니다. 원인을 파일 안 시각(tfdt)으로 좁힌 뒤 되감기용 조각을 따로 만들었고, 조각마다 init이 달라지는 FFmpeg 대신 Go 재포장을 골라 속도와 출력 정합성을 서로 다른 시험으로 확인했습니다.
 
-- **CASE 21** · [재생 조각이 만들어졌다는 것과 저장됐다는 것을 나누기](https://xodbs1021.github.io/posts/0-to-1/pokeclip-playback-producer-boundaries/)
-- **CASE 22** · [오류는 0건인데 61.94초가 보이지 않았습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-zero-errors-missing-playback/)
-- **CASE 23** · [시간값만 바꿨더니 8.10초가 39.87초가 됐습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-cdn-timeline-normalization/)
-- **CASE 24** · [재포장 23.43→3.05ms: 같은 I/O 범위로 다시 측정한 이유](https://xodbs1021.github.io/posts/0-to-1/pokeclip-go-remux-same-io-benchmark/)
+- **CASE 21** · [되감기 재포장 조각의 생성과 업로드 완료를 따로 확정했습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-playback-producer-boundaries/)
+- **CASE 22** · [HLS 오류는 0건인데 녹화 142초 중 62초가 사라졌습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-zero-errors-missing-playback/)
+- **CASE 23** · [HLS 녹화 재생을 가른 것은 init이 아니라 tfdt였습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-cdn-timeline-normalization/)
+- **CASE 24** · [FFmpeg 재포장은 조각마다 init이 달라 Go로 바꿨습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-go-remux-same-io-benchmark/)
 - **CASE 25** · [재접속의 0.2초 빈틈: 타임스탬프와 불연속 태그를 함께 바꾸기](https://xodbs1021.github.io/posts/0-to-1/pokeclip-reconnect-audio-gap/)
 
 ## 조회 계약과 식별자 전환 {#contracts}
