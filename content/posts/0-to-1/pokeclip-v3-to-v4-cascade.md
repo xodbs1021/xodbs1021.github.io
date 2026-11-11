@@ -3289,7 +3289,7 @@ MSI T1 경기의 치지직 채팅을 수집해서 분석했다. 2세션 65분, 1
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "grid": { "left": "22%", "right": "10%", "bottom": "12%", "top": "8%" },
-  "xAxis": { "type": "value", "name": "배율 (평소 대비)" },
+  "xAxis": { "type": "value", "name": "배율 (평소 대비)", "max": 5 },
   "yAxis": {
     "type": "category",
     "data": ["중앙값 기준선 (12 유지)", "평균 기준선 (12→31로 상승)"]
