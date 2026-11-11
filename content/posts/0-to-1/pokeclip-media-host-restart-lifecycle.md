@@ -13,7 +13,7 @@ PokeClip 미디어 상자는 systemd 유닛 하나가 docker compose 묶음 전�
 
 기동 모델(systemd 하나가 띄우고, MediaMTX와 nginx가 끝날 때만 묶음 전체를 다시 띄움)과 관리 API 비밀번호를 기동마다 만들고 저장하지 않는 방식은 제가 정했습니다. 이 크래시 경로를 처음 짚은 것은 AI 보안 리뷰였고, 10월 20일 재현 실험과 수정, 반복 시험은 AI가 했습니다. 구현은 Claude Code, 리뷰는 Claude Code와 Codex가 맡았습니다.
 
-## 녹화기와 nginx가 끝날 때만 상자 전체를 다시 띄웁니다 {#어떤-실패가-방송-전체를-다시-띄워야-하는가}
+## MediaMTX와 nginx가 끝날 때만 상자 전체를 다시 띄웁니다 {#어떤-실패가-방송-전체를-다시-띄워야-하는가}
 
 한 상자에서 MediaMTX는 SRT 수신·녹화·재생을, nginx는 HTTP 요청 검사와 전달을 맡습니다. 사이드카는 닫힌 녹화 조각을 장부에 적고 S3에 올립니다. 모두 같은 정책으로 다시 띄우면, DB 장애로 사이드카가 죽었을 때 멀쩡한 송출까지 끊깁니다.
 
@@ -23,17 +23,17 @@ PokeClip 미디어 상자는 systemd 유닛 하나가 docker compose 묶음 전�
 | 사이드카 · 인증 응답기 · 정리 작업 | Docker 엔진이 `on-failure`로 그 컨테이너만 다시 띄움 |
 | 운영자의 `systemctl stop` | 다시 띄우지 않음 |
 
-시작 스크립트는 마지막에 `docker compose up`으로 바뀌고, 출력은 MediaMTX와 nginx에만 붙습니다. 둘 중 하나가 끝나면 compose가 끝나고 `Restart=always`가 20초 뒤 전체를 다시 띄웁니다([`pokeclip-media.service` 4–7행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/systemd/pokeclip-media.service#L4-L7)). 두 핵심 서비스는 엔진 재시작을 끄고(`restart: "no"`), 나머지는 `on-failure`를 씁니다([`compose.yml.tmpl` 59–65행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/compose.yml.tmpl#L59-L65)). 20초는 시도 사이의 대기일 뿐 복구 시간의 상한이 아닙니다. 재시도 횟수에도 한도를 두지 않아, CDN 비밀 조회가 몇 분 끊겨도 유닛이 failed로 굳지 않습니다.
+시작 스크립트는 마지막에 `docker compose up`으로 바뀌고, 출력은 MediaMTX와 nginx에만 붙습니다. 둘 중 하나가 끝나면 compose가 끝나고 `Restart=always`가 20초 뒤 전체를 다시 띄웁니다([`pokeclip-media.service` 4–13행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/systemd/pokeclip-media.service#L4-L13)). 두 핵심 서비스는 엔진 재시작을 끄고(`restart: "no"`), 나머지는 `on-failure`를 씁니다([`compose.yml.tmpl` 59–65행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/compose.yml.tmpl#L59-L65)). 20초는 시도 사이의 대기일 뿐 복구 시간의 상한이 아닙니다. 재시도 횟수에도 한도를 두지 않아, CDN 비밀 조회가 몇 분 끊겨도 유닛이 failed로 굳지 않습니다.
 
 ## 비밀을 기동마다 새로 만들자 파일과 컨테이너의 수명이 갈렸습니다 {#비밀을-매번-만들면서-수명-문제가-생겼습니다}
 
-시작 스크립트는 Secrets Manager에서 CDN 비밀을 읽고, MediaMTX 관리 API 비밀번호는 기동마다 `/dev/urandom`에서 새로 만듭니다. 비밀번호는 어디에도 저장하지 않고, 두 비밀을 넣은 설정 파일은 `/run`의 tmpfs에 0400 권한으로만 렌더합니다([`start-media.sh` 14–23행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/bin/start-media.sh#L14-L23)). tmpfs는 메모리 위의 파일 시스템이라 재부팅하면 내용이 사라집니다. 컨테이너는 이 파일을 읽기 전용 bind mount로 받습니다.
+시작 스크립트는 Secrets Manager에서 CDN 비밀을 읽고, MediaMTX 관리 API 비밀번호는 기동마다 `/dev/urandom`에서 새로 만듭니다. 비밀번호는 어디에도 저장하지 않고, 두 비밀을 넣은 설정 파일은 `/run`의 tmpfs에 0400 권한으로만 렌더합니다([`start-media.sh` 14–23행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/bin/start-media.sh#L14-L23) · [61–63행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/bin/start-media.sh#L61-L63)). tmpfs는 메모리 위의 파일 시스템이라 재부팅하면 내용이 사라집니다. 컨테이너는 이 파일을 읽기 전용 bind mount로 받습니다.
 
 오래 사는 자격 증명은 줄었지만, 새 책임이 생겼습니다. 렌더 파일을 지우는 때와 그 파일을 마운트한 컨테이너를 내리는 때가 맞아야 합니다. 호스트에서 파일을 지워도 이미 돌고 있는 컨테이너는 옛 파일 내용을 그대로 들고 있습니다.
 
-## 플러그인을 죽이자 옛 비밀을 든 컨테이너가 헬스 200으로 남았습니다
+## 플러그인을 죽이자 옛 비밀을 든 컨테이너가 남고 헬스는 200이었습니다 {#플러그인을-죽이자-옛-비밀을-든-컨테이너가-헬스-200으로-남았습니다}
 
-10월 20일 오전 6시 54분부터 8시 28분까지 AI가 갈래 열 가지를 각각 세 번씩 돌렸습니다. 갈래는 무엇을 죽이느냐로 나눴습니다. 주 프로세스(docker CLI)만, compose 플러그인만, 유닛 cgroup 전체(`systemctl kill -s KILL`)에 SIGKILL을 보냈고, `down` 실패 주입, 전원 차단 뒤 재부팅, dockerd 강제 종료도 넣었습니다.
+10월 20일 오전 6시 54분부터 8시 28분까지 AI가 갈래 열 가지를 각각 세 번씩 돌렸습니다. 갈래는 무엇을 죽이느냐로 나눴습니다. 주 프로세스(docker CLI)만, compose 플러그인만, 유닛 cgroup 전체(`systemctl kill -s KILL`)에 SIGKILL을 보냈고, `down` 실패 주입, 전원 차단을 흉내 낸 재부팅(상자 컨테이너의 PID 1에 SIGKILL), dockerd 강제 종료도 넣었습니다.
 
 재현된 것은 compose 플러그인만 죽인 갈래와 cgroup 전체를 죽인 갈래였습니다. 순서는 [[fig-crash-leftover]]의 위 줄과 같습니다.
 
@@ -44,7 +44,7 @@ PokeClip 미디어 상자는 systemd 유닛 하나가 docker compose 묶음 전�
 
 그사이 MediaMTX 자리 컨테이너는 지워진 옛 렌더, 즉 옛 CDN 비밀을 마운트한 채 계속 돌았습니다. 상자의 헬스 경로는 200을 냈습니다. 이 200은 nginx가 상류를 부르지 않고 내는 고정 응답이라([`nginx.conf.tmpl` 181–190행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/nginx/nginx.conf.tmpl#L181-L190)), 안쪽 컨테이너가 옛 비밀로 돈다는 사실을 알려 주지 못했습니다. 운영자가 `systemctl restart`를 해도 풀리지 않았고, 디렉터리를 손으로 지우고 다시 띄우면 유닛은 active가 됐지만 MediaMTX 자리 컨테이너는 같은 id 그대로였습니다. 사이드카가 재시작하지 않는 판에서는 기동은 성공하는데 옛 컨테이너가 조용히 남았습니다.
 
-{{< motion scene="CrashLeftoverContainer" id="fig-crash-leftover" kind="개념도" caption="고치기 전(위)에는 유닛 cgroup이 SIGKILL로 끝나도 컨테이너가 살아남고 렌더 파일만 지워집니다. 사이드카가 다시 뜰 때 bind 원본 자리에 디렉터리가 생겨 다음 기동이 계속 실패하고, 옛 비밀을 든 컨테이너 옆에서 헬스 경로는 200을 냅니다. 고친 뒤(아래)에는 ExecStopPost가 compose를 내리고, 다음 기동이 --force-recreate와 create_host_path: false로 새 파일과 새 컨테이너를 만듭니다. 10월 20일 재현 실험을 옮긴 그림이며 시간 비율은 단순화했습니다." >}}
+{{< motion scene="CrashLeftoverContainer" id="fig-crash-leftover" kind="개념도" caption="고치기 전(위)에는 유닛 cgroup이 SIGKILL로 끝나도 MediaMTX 컨테이너가 옛 비밀을 든 채 살아남고 렌더 파일만 지워집니다. 사이드카가 다시 뜰 때 bind 원본 자리에 디렉터리가 생겨 다음 기동이 계속 실패하고, 그동안 nginx의 헬스 경로는 고정 200을 냅니다. 고친 뒤(아래)에는 ExecStopPost가 compose를 내립니다. 다음 기동은 시작 스크립트가 새 렌더 파일을 쓰고 --force-recreate로 새 컨테이너를 만듭니다. create_host_path: false는 그 사이 원본이 없을 때 디렉터리를 만들지 않게 막습니다. 10월 20일 재현 실험을 단순화한 개념도이며 시간 비율은 설명용입니다." >}}
 
 주 프로세스만 죽인 갈래는 회복됐습니다. 남은 compose 플러그인이 systemd의 SIGTERM을 받아 컨테이너를 스스로 멈췄기 때문입니다. 그래서 주 프로세스만 죽이는 시험은 이 결함을 놓치는 시험이었습니다([`unit_crash_cases.sh` 19–20행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/test/lib/unit_crash_cases.sh#L19-L20)).
 
@@ -78,7 +78,7 @@ flowchart TB
 
 ## 정리를 ExecStopPost로 옮기고 컨테이너를 늘 새로 만듭니다 {#정리마운트다음-기동을-함께-고쳤습니다}
 
-종료 경로 하나만 고쳐서는 부족했습니다. 정리가 실패한 다음 기동도 스스로 회복해야 했습니다. 고친 것은 넷입니다.
+종료 경로 하나만 고쳐서는 부족했습니다. 정리가 실패한 다음 기동도 스스로 회복해야 했습니다. 10월 20일 고친 것은 셋이고, 같은 PR에서 넷째로 `--remove-orphans`를 더했습니다.
 
 | 변경 | 막는 실패 |
 |---|---|
@@ -89,7 +89,7 @@ flowchart TB
 
 [Compose 문서](https://docs.docker.com/reference/compose-file/services/#volumes)대로 bind 원본이 없으면 짧은 문법은 디렉터리를 만들고, 긴 문법의 `create_host_path: false`가 이를 막습니다([`compose.yml.tmpl` 155–160행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/compose.yml.tmpl#L155-L160)). 이 옵션은 원본이 없을 때 그 컨테이너가 뜨지 못하게 할 뿐입니다. 새 파일과 새 컨테이너를 만드는 일은 다음 기동의 `--force-recreate`가 맡습니다([`start-media.sh` 766–770행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/bin/start-media.sh#L766-L770)). [정지 스크립트](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/bin/stop-media.sh#L18-L24)는 `down`이 실패하면 프로젝트 라벨로 남은 컨테이너를 찾아 지웁니다. 남으면 옛 비밀을 든 채 돌기 때문입니다.
 
-고친 뒤 같은 갈래(플러그인 SIGKILL, cgroup SIGKILL, 사이드카가 재시작하지 않는 판, `down` 실패 주입, 운영자 정지·시작)를 각각 세 번 돌렸고 모두 회복했습니다.
+고친 뒤(앞의 셋) 같은 갈래(플러그인 SIGKILL, cgroup SIGKILL, 사이드카가 재시작하지 않는 판, `down` 실패 주입, 운영자 정지·시작)를 각각 세 번 돌렸고 모두 회복했습니다.
 
 ## 정지는 TERM 뒤 30초를 기다리고 볼륨은 남깁니다
 

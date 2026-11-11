@@ -2,7 +2,8 @@
 // 위 줄(고치기 전): 유닛 cgroup에 SIGKILL → 정리가 컨테이너를 내리지 못해 MediaMTX가 옛 비밀을 든 채 헬스 200,
 // 렌더된 비밀 파일만 지워짐 → 사이드카 재시작이 bind 원본(파일) 자리에 디렉터리를 만듦 → 다음 기동 실패 반복.
 // 아래 줄(고친 뒤): ExecStopPost가 compose down으로 컨테이너를 내림 → 다음 기동이
-// create_host_path: false · --force-recreate로 새 비밀 파일과 새 컨테이너를 만든다.
+// --force-recreate로 새 컨테이너를 만든다(새 렌더 파일은 시작 스크립트가 쓴다). create_host_path: false는
+// 원본이 없을 때 bind 자리에 디렉터리를 만들지 않게 막는다. 「헬스 200」은 nginx의 고정 응답이다.
 // 같은 네 칸(유닛 · 컨테이너 · bind 원본 · 다음 기동)에서 강조만 옮긴다. 반복 클립, 생성 소재 없음.
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { Arrow, Label, Tag } from "../../components/Timeline";
@@ -16,9 +17,10 @@ const T = {
   kill: 20,
   health: 50,
   oldSecret: 75,
-  deleted: 105,
-  dir: 135,
-  fail: 165,
+  deleted: 100,
+  sidecar: 122,
+  dir: 144,
+  fail: 170,
   fixRow: 200,
   kill2: 210,
   down: 240,
@@ -54,6 +56,11 @@ type Layout = {
   readonly tagAnchor: "left" | "center";
   readonly arrows: boolean;
   readonly unitText: string;
+  readonly healthText: string;
+  readonly dirText: string;
+  /** 아래 줄 bind 칸의 이름표(데스크톱은 둘째 이름표가 따로 있다). */
+  readonly bindAfterTag: string;
+  readonly bindAfterTag2: Pos | null;
   readonly text: { readonly title: number; readonly label: number; readonly node: number; readonly tag: number };
 };
 
@@ -92,6 +99,10 @@ const DESKTOP: Layout = {
   tagAnchor: "center",
   arrows: true,
   unitText: "systemd 유닛",
+  healthText: "nginx 헬스 200(고정 응답)",
+  dirText: "사이드카 재시작 → 파일 자리에 디렉터리",
+  bindAfterTag: "create_host_path: false",
+  bindAfterTag2: { x: DESKTOP_AFTER.tags[2].x, y: 900 },
   text: { title: TEXT.title, label: TEXT.label, node: TEXT.label, tag: TEXT.small },
 };
 
@@ -121,13 +132,17 @@ const MOBILE: Layout = {
   titleX: 60,
   before: MOBILE_BEFORE,
   after: MOBILE_AFTER,
-  oldSecretTag: { x: 648, y: MOBILE_BEFORE.tags[1].y },
+  oldSecretTag: { x: 790, y: MOBILE_BEFORE.tags[1].y },
   dirTag: MOBILE_BEFORE.tags[2],
   separatorY: 738,
   separatorX: [60, 1020],
   tagAnchor: "left",
   arrows: false,
   unitText: "유닛",
+  healthText: "nginx 헬스 200",
+  dirText: "파일 자리에 디렉터리",
+  bindAfterTag: "디렉터리 생성 막음",
+  bindAfterTag2: null,
   text: { title: MOBILE_TEXT.title, label: MOBILE_TEXT.label, node: MOBILE_TEXT.label, tag: MOBILE_TEXT.small },
 };
 
@@ -159,6 +174,7 @@ export const CrashLeftoverContainer: React.FC<Props> = ({ layout = "desktop" }) 
   const health = at(T.health);
   const oldSecret = at(T.oldSecret);
   const deleted = at(T.deleted);
+  const sidecar = at(T.sidecar);
   const dir = at(T.dir);
   const fail = at(T.fail);
   const dirReplacesDeleted = l.dirTag.x === before.tags[2].x && l.dirTag.y === before.tags[2].y;
@@ -266,10 +282,11 @@ export const CrashLeftoverContainer: React.FC<Props> = ({ layout = "desktop" }) 
       {box(startBox, "다음 기동", startBefore, intro, "start-before")}
 
       {tag(before.tags[0], "SIGKILL", "danger", kill)}
-      {tag(before.tags[1], "헬스 200", "ink", health)}
+      {tag(before.tags[1], l.healthText, "ink", health)}
       {tag(l.oldSecretTag, "옛 비밀", "danger", oldSecret)}
-      {tag(before.tags[2], "비밀 파일 삭제", "muted", dirReplacesDeleted ? deleted * (1 - dir) : deleted)}
-      {tag(l.dirTag, "파일 자리에 디렉터리", "danger", dir)}
+      {tag(before.tags[2], "비밀 파일 삭제", "muted", dirReplacesDeleted ? deleted * (1 - sidecar) : deleted)}
+      {tag(l.dirTag, "사이드카 재시작", "ink", sidecar * (1 - dir))}
+      {tag(l.dirTag, l.dirText, "danger", dir)}
       {tag(before.tags[3], "기동 실패 반복", "danger", fail)}
 
       <div
@@ -301,12 +318,13 @@ export const CrashLeftoverContainer: React.FC<Props> = ({ layout = "desktop" }) 
         )}
         {box(after.boxes[0], l.unitText, unitAfter, 1, "unit-after")}
         {box(after.boxes[1], "MediaMTX", containerAfter, 1, "container-after")}
-        {box(after.boxes[2], reached(T.newFile) ? "새 비밀 파일" : "비밀 파일", bindAfter, 1, "bind-after")}
+        {box(after.boxes[2], "bind 원본", bindAfter, 1, "bind-after")}
         {box(after.boxes[3], reached(T.newContainer) ? "새 컨테이너" : "다음 기동", startAfter, 1, "start-after")}
 
         {tag(after.tags[0], "SIGKILL", "danger", kill2)}
         {tag(after.tags[1], "ExecStopPost → down", "accent", down)}
-        {tag(after.tags[2], "create_host_path: false", "accent", newFile)}
+        {tag(after.tags[2], l.bindAfterTag, "accent", newFile)}
+        {l.bindAfterTag2 ? tag(l.bindAfterTag2, "디렉터리 생성 막음", "accent", newFile) : null}
         {tag(after.tags[3], "--force-recreate", "accent", newContainer)}
       </div>
     </AbsoluteFill>

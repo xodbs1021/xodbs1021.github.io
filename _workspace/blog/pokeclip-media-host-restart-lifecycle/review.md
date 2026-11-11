@@ -12,3 +12,15 @@
 | 영상 포스터 | 휴대폰 webp 61.6KB → 흐린 상자 점선을 실선으로 바꿔 57.0KB |
 
 그림: 영상 CrashLeftoverContainer(12초, 휴대폰판), Mermaid fig-unit-stop-paths(TB 392px).
+
+## 독립 리뷰 반영(2026-11-12, 코디네이터 경유)
+
+| 등급 | 지적 | 처리 |
+|---|---|---|
+| MUST | 「헬스 200」 이름표가 MediaMTX 아래 | 장면 이름표 「nginx 헬스 200(고정 응답)」(휴대폰 「nginx 헬스 200」), alt 수정 |
+| MUST | create_host_path가 새 파일을 만드는 것처럼 읽힘 | 캡션 교체, 아래 줄 bind 칸을 「bind 원본」 + 「디렉터리 생성 막음」으로 |
+| SHOULD | 10/20 고친 것은 셋, `--remove-orphans`는 같은 PR에서 넷째 | 본문 · 「고친 뒤(앞의 셋)」 |
+| SHOULD | 소제목 | 「…남고 헬스는 200이었습니다」, 옛 id 유지 |
+| SHOULD | 「사이드카 재시작」 이름표 | 「파일 자리에 디렉터리」 앞에 추가 |
+| SHOULD | kind | 캡션을 「재현 실험을 단순화한 개념도」로 |
+| NIT | 소제목 「MediaMTX와 nginx」, 「전원 차단을 흉내 낸 재부팅」, 링크 범위 L4–13 · start-media.sh L61–63 | 반영 |
