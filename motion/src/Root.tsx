@@ -14,6 +14,10 @@ import { SESSION_URL_INHERIT_FRAMES, SessionUrlInherit } from "./scenes/pokeclip
 import { LATE_WRITER_FENCED_FRAMES, LateWriterFenced } from "./scenes/pokeclip-database-authoritative-manifest-publishing/LateWriterFenced";
 import { PUBLISH_BOUNDARY_FRAMES, PublishBoundary } from "./scenes/pokeclip-manifest-window-boundaries/PublishBoundary";
 import { DEPLOY_ORDER_FRAMES, DeployOrder } from "./scenes/stream-id-contract-compatible-migration/DeployOrder";
+import { LIVE_HANDOFF_FRAMES, LiveHandoff } from "./scenes/pokeclip-live-dvr-separation-handoff/LiveHandoff";
+import { LIVE_WINDOW_PAUSE_FRAMES, LiveWindowPause } from "./scenes/pokeclip-live-window-without-fork/LiveWindowPause";
+import { AUDIO_GAP_SEAM_FRAMES, AudioGapSeam } from "./scenes/pokeclip-reconnect-audio-gap/AudioGapSeam";
+import { OVERLAP_QUERY_FRAMES, OverlapQuery } from "./scenes/pokeclip-segment-overlap-contract/OverlapQuery";
 import { MOBILE_VIDEO, VIDEO } from "./theme";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
@@ -162,6 +166,46 @@ export const RemotionRoot: React.FC = () => (
       component={DeployOrder}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={DEPLOY_ORDER_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="LiveHandoff" component={LiveHandoff} durationInFrames={LIVE_HANDOFF_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="LiveHandoffMobile"
+      component={LiveHandoff}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={LIVE_HANDOFF_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="LiveWindowPause" component={LiveWindowPause} durationInFrames={LIVE_WINDOW_PAUSE_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="LiveWindowPauseMobile"
+      component={LiveWindowPause}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={LIVE_WINDOW_PAUSE_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="AudioGapSeam" component={AudioGapSeam} durationInFrames={AUDIO_GAP_SEAM_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="AudioGapSeamMobile"
+      component={AudioGapSeam}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={AUDIO_GAP_SEAM_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="OverlapQuery" component={OverlapQuery} durationInFrames={OVERLAP_QUERY_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="OverlapQueryMobile"
+      component={OverlapQuery}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={OVERLAP_QUERY_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}
