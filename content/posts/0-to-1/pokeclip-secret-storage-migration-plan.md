@@ -71,7 +71,7 @@ flowchart TB
   style M fill:#0a0c08,stroke:#0a0c07,stroke-width:3px
 ```
 
-## 운영은 처음부터 Secrets Manager였고 비밀은 Auth만 읽습니다
+## 운영은 처음부터 Secrets Manager였고 방송자 스트림 키 비밀은 Auth만 읽습니다 {#운영은-처음부터-secrets-manager였고-비밀은-auth만-읽습니다}
 
 운영 Terraform 정의는 Auth의 스트림 키 저장소를 처음부터 `aws`로 둡니다. 옮겨 올 PG 데이터가 없어 옛 암호를 지우는 곳도 Secrets Manager 하나입니다([`prod/platform/services.tf` 82–86행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/prod/platform/services.tf#L82-L86) · [`prod/platform/README.md` 208–209행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/prod/platform/README.md?plain=1#L208-L209)). Auth 작업 역할은 스트림 키 접두 아래 비밀에만 만들기 · 읽기 · 쓰기 · 지우기를 받습니다([`task_policies.tf` 16–31행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/prod/platform/task_policies.tf#L16-L31)). 그 접두는 와일드카드를 쓸 수 없게 검사합니다([`variables.tf` 281–292행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/prod/platform/variables.tf#L281-L292)).
 

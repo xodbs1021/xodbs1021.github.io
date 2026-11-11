@@ -1,7 +1,6 @@
 ---
 title: "공유 DB에선 로그인 뒤 권한과 함수 가로채기를 막았습니다"
-date: 2026-11-07T04:18:13+09:00
-lastmod: 2026-11-12T02:20:00+09:00
+date: 2026-11-12T03:42:44+09:00
 categories: ["projects"]
 tags: ["PokeClip", "보안", "RDS", "PostgreSQL", "search_path"]
 draft: false
