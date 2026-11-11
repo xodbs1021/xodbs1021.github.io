@@ -23,8 +23,8 @@
 | 티켓 원안 = t.Cleanup에서 자기 행 삭제 → 사용자가 「store도 그 별도 DB에서 돌리면 되는 거 아냐?」 제기, 전용 DB 통일로 확정 | PR #61 본문 14행, 비공개 명료화 문답 | 2026-11-12 | 결정 기록 | 사용자 결정 | |
 | 공용 DB의 기존 `itest-*` 잔여 1회 삭제 승인(로컬 compose · stream_segments · `stream_id LIKE 'itest-%'`) | 비공개 명료화 문답 | 2026-11-12 | 결정 기록 | 사용자 승인 | |
 | 기동 시 안전망 청소 기각: 전용 DB 통일로 존재 이유 소멸(YAGNI) | 비공개 결정 기록 Alternatives, 명료화 문답 | 2026-11-12 | 결정 기록 | — | PR 본문은 「C 안전망 sweep」 기각만 언급(30행) |
-| 구현은 AI(Claude Code), 계획 리뷰 Claude Code·Codex, 코드 검수 Claude Code·Codex·보안 검수 3축 | 비공개 진행 기록 | 2026-11-12 | 기록 | AI | 라운드 수는 공개 글에 「검수 2라운드」만(PR 본문에 공개된 표현) |
-| 검수 2라운드에서 AI 리뷰어(Claude Code)가 미끼 DB(표 `stream_segments` 1개, 행 1개)로 행 1→0 소실을 재현. 공용 DB도 public 표가 `stream_segments` 하나뿐 | 비공개 코드 리뷰 기록, PR #61 본문 28행 | 2026-11-12 | 실측(리뷰 중 재현) | AI(Claude Code) | Codex도 같은 라운드에 같은 계열 HIGH(교차) |
+| 구현은 AI(Claude Code), 계획 리뷰 Claude Code·Codex, 코드 검수 Claude Code·Codex·보안 검수 3축 | 비공개 진행 기록 | 2026-11-12 | 기록 | AI | 리뷰 회차는 공개 글에 쓰지 않음 |
+| 코드 리뷰 중 AI 리뷰어(Claude Code)가 미끼 DB(표 `stream_segments` 1개, 행 1개)로 행 1→0 소실을 재현. 공용 DB도 public 표가 `stream_segments` 하나뿐 | 비공개 코드 리뷰 기록, PR #61 본문 28행 | 2026-11-12 | 실측(리뷰 중 재현) | AI(Claude Code) | Codex도 같은 리뷰에 같은 계열 HIGH(교차) |
 | 빈 DB 이름 우회는 Codex·보안 검수가 교차 확인 | 비공개 진행 기록 | 2026-11-12 | 기록 | AI | |
 | 가드 3종: ① PG_TEST_DB = PG_DSN의 DB 이름이면 실패 ② PG_DSN에 DB 이름 없으면 실패 ③ 이미 있는 DB는 소유 표식 `pokeclip_testdb_marker`(열 0개 빈 표)가 있어야 채택, 표식은 새로 만들 때만 심음 | PR #61 본문 22–26행; testdb_test.go@7d7930c L40–L43(상수), L104–L106(②), L109–L112(①), L120–L126(CREATE DATABASE, 42P04면 createdDB=false), L143–L156(표식 심기/확인, to_regclass) | 2026-11-12 | 코드 | — | ②는 PGDATABASE가 설정되면 ①이 판정(L101–L103) |
 | PR 본문 실측: 가드 3종 음성 대조 모두 exit 1, 공용 DB 행수 0→0 | PR #61 본문 36–42행 | 2026-11-12 | 실측(PR 본문) | AI | |

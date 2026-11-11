@@ -17,7 +17,7 @@
 | 선택지 A·B·C·D와 사용자 선택 B(2026-09-03) | 공개 결정 기록 37·39–46행 · PR #163 본문 5행 | 2026-11-12 | 원자료 | 사용자 결정 | 표 아래 |
 | 순서 「보호 먼저 해제 → 병합」은 사용자가 정했고 실행은 AI | 비공개 명료화 기록(2026-09-03 사용자 답) · 공개 결정 기록 34–35행 · PR #163 본문 12–15행 | 2026-11-12 | 원자료 | 사용자 결정, AI 실행 | PR이 머지 전 BLOCKED인 것은 정상(본문 14행) |
 | 구현은 AI(Claude Code) | 비공개 진행 기록(Phase 3 「구현: 오케스트레이터 직접」) | 2026-11-12 | 원자료(비공개) | AI(Claude Code) | 공개 PR 작성자 표시만으로 사용자 구현이라 쓰지 않음 |
-| 계획 리뷰 Claude Code·Codex 5라운드 | 비공개 진행 기록(r1–r5) | 2026-11-12 | 원자료(비공개) | AI(Claude Code·Codex) | r1은 Claude 쪽 API 오류로 Codex 단독, r3은 Codex 서비스 장애로 Claude 단독. 5라운드에서 양측 동시 무지적 |
+| 계획 리뷰 Claude Code·Codex(여러 차례 반복, 한쪽만 참여한 회도 있음 — 공개 글에는 횟수를 쓰지 않음) | 비공개 진행 기록 | 2026-11-12 | 원자료(비공개) | AI(Claude Code·Codex) | 마지막 검토에서 양측 지적 없음 |
 | Codex 코드 검수가 PR #163의 Actions 실행에서 check 잡 하나만 생성·성공 확인 | 비공개 Codex 검수문(「현재 HEAD f2318fe의 GitHub media-ci 실행은 check 잡 하나만 생성되어 성공」) · 최종 head `f20b05f` check-runs: check success 15:58:08→15:59:38Z(1분 30초), changes·media-gate 없음 · PR 본문 26행 | 2026-11-12 | 실측(Actions API) + 원자료 | AI(Codex) 검수 | 최종 head 실행 URL `M/actions/runs/33775776891` |
 | 감지 경로는 당시 3종: `media/**`, `.github/workflows/media-ci.yml`, `docker-compose.yml` | 병합 커밋 `ce16cfc` media-ci.yml 12–19행 `M/blob/ce16cfc2e06cedc98c5fed7e5b6b1fcf1774b36a/.github/workflows/media-ci.yml#L10-L21` | 2026-11-12 | 코드 | — | compose는 media 계약 테스트 2개가 읽음(15–16행 주석) |
 | 지금 감지 경로는 5종(prod SQL `infra/terraform/prod/runtime/sql/**`, 런타임 런북 `infra/terraform/runbooks/runtime-1a.md` 추가) | `M/blob/2fc2323cbd84a683e935bfdf9f0171febf276535/.github/workflows/media-ci.yml#L12-L25` (13·14·19·22·25행) | 2026-11-12 | 코드 | — | 지금 파일 210행 |
