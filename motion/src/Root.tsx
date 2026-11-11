@@ -46,6 +46,9 @@ import { COVERAGE_GATE_RUNS_FRAMES, CoverageGateRuns } from "./scenes/coverage-g
 import { PROTECTION_FIRST_ORDER_FRAMES, ProtectionFirstOrder } from "./scenes/media-ci-path-filter-required-check-tradeoff/ProtectionFirstOrder";
 import { DECOY_DB_GUARD_FRAMES, DecoyDbGuard } from "./scenes/pokeclip-test-database-ownership-marker/DecoyDbGuard";
 import { SESSION_STATE_SPLIT_FRAMES, SessionStateSplit } from "./scenes/harness-session-isolation-worktree-root/SessionStateSplit";
+import { GENERATION_AND_PLAN_GATES_FRAMES, GenerationAndPlanGates } from "./scenes/shakedown-bounded-ai-image-generation/GenerationAndPlanGates";
+import { START_STOP_TIME_BUDGETS_FRAMES, StartStopTimeBudgets } from "./scenes/shakedown-plan-deployment-and-recovery/StartStopTimeBudgets";
+import { BROKEN_JAVA_GATE_FRAMES, BrokenJavaGate } from "./scenes/shakedown-java-syntax-before-security-scan/BrokenJavaGate";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
@@ -503,6 +506,36 @@ export const RemotionRoot: React.FC = () => (
       component={SessionStateSplit}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={SESSION_STATE_SPLIT_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="GenerationAndPlanGates" component={GenerationAndPlanGates} durationInFrames={GENERATION_AND_PLAN_GATES_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="GenerationAndPlanGatesMobile"
+      component={GenerationAndPlanGates}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={GENERATION_AND_PLAN_GATES_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="StartStopTimeBudgets" component={StartStopTimeBudgets} durationInFrames={START_STOP_TIME_BUDGETS_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="StartStopTimeBudgetsMobile"
+      component={StartStopTimeBudgets}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={START_STOP_TIME_BUDGETS_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="BrokenJavaGate" component={BrokenJavaGate} durationInFrames={BROKEN_JAVA_GATE_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="BrokenJavaGateMobile"
+      component={BrokenJavaGate}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={BROKEN_JAVA_GATE_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}
