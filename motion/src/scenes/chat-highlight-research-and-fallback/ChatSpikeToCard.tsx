@@ -1,8 +1,8 @@
 // 콘티: _workspace/blog/chat-highlight-research-and-fallback/storyboard.md 「영상 1」
 // 채팅 급증 카드 하나가 만들어지는 순서(PokeClip-mono develop 2fc2323c 기본값).
-// 5초 창 메시지 수 ≥ 최근 15분 중앙값 × 3 그리고 10건 이상 → 20초 안의 급증 창은 한 사건 →
-// 첫 급증 창 시작을 − 3.9초 옮겨 영상 위치 → 앞 15초 · 뒤 5초를 붙여 카드 구간 → 카드 목록.
-// 손으로 표시한 카드(OBS 핫키 · 웹 마킹)도 같은 목록에 들어온다.
+// 5초 창 메시지 수 ≥ 최근 15분 중앙값 × 3 그리고 10건 이상(점선) → 20초 안의 급증 창은 한 사건 →
+// 첫 급증 창 시작을 − 3.9초 옮겨 영상 위치 → 앞 15초 · 뒤 5초를 붙여 카드 구간 → 카드 표.
+// 손으로 표시한 카드(OBS 핫키 · 웹 마킹)도 같은 카드 표에 들어온다.
 // 막대 값과 기준선 6 은 설명용(실측 아님). 반복 클립, 생성 소재 없음.
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { Node } from "../../components/Flow";
@@ -186,6 +186,7 @@ export const ChatSpikeToCard: React.FC<Props> = ({ layout = "desktop" }) => {
 
   const thresholdY = countY(RATIO * BASELINE);
   const baselineY = countY(BASELINE);
+  const minCountY = countY(MIN_COUNT);
 
   return (
     <AbsoluteFill style={{ background: COLOR.white, fontFamily: FONT }}>
@@ -215,6 +216,8 @@ export const ChatSpikeToCard: React.FC<Props> = ({ layout = "desktop" }) => {
       <svg style={{ position: "absolute", inset: 0, opacity: lines }} width="100%" height="100%">
         <line x1={l.x0} y1={baselineY} x2={x1} y2={baselineY} stroke={COLOR.muted} strokeWidth={4} strokeDasharray="14 12" />
         <line x1={l.x0} y1={thresholdY} x2={x1} y2={thresholdY} stroke={COLOR.ink} strokeWidth={4} />
+        {/* 절대 하한 10건: 배율선과 따로 그린다(두 조건을 모두 넘어야 급증). */}
+        <line x1={l.x0} y1={minCountY} x2={x1} y2={minCountY} stroke={COLOR.ink} strokeWidth={3} strokeDasharray="4 10" strokeLinecap="round" />
       </svg>
       <Tag x={l.x0 + 4} y={baselineY - tagH - 6} tone="muted" size={l.text.tag} opacity={lines}>
         최근 15분 중앙값
@@ -226,7 +229,7 @@ export const ChatSpikeToCard: React.FC<Props> = ({ layout = "desktop" }) => {
       <div
         style={{
           position: "absolute",
-          top: thresholdY - tagH - 6,
+          top: minCountY - tagH - 6,
           right: canvasWidth - l.highTagRight,
           padding: "8px 22px",
           borderRadius: 999,
@@ -238,7 +241,7 @@ export const ChatSpikeToCard: React.FC<Props> = ({ layout = "desktop" }) => {
           opacity: lines,
         }}
       >
-        10건 이상
+        10건
       </div>
 
       {/* 20초 안의 급증 창은 한 사건. */}
@@ -287,7 +290,7 @@ export const ChatSpikeToCard: React.FC<Props> = ({ layout = "desktop" }) => {
         뒤 5초
       </Label>
 
-      {/* 카드 목록. */}
+      {/* 카드 표(자동 · 수동 카드가 함께 들어가는 곳). */}
       <div
         style={{
           ...box(l.panel.x, l.panel.y, l.panel.w, l.panel.h),
@@ -297,7 +300,7 @@ export const ChatSpikeToCard: React.FC<Props> = ({ layout = "desktop" }) => {
         }}
       />
       <Label x={l.listTitle.x} y={l.listTitle.y} size={l.text.head} weight={760} opacity={intro}>
-        카드 목록
+        카드 표
       </Label>
       {fly > 0 ? (
         <div style={{ opacity: flyIn }}>
