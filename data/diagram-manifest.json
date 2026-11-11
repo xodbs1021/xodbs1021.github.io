@@ -290,6 +290,15 @@
       "bytes": 26638
     }
   },
+  "4ec6e740ac6563b4": {
+    "source": "content/posts/0-to-1/shakedown-bounded-ai-image-generation.md",
+    "wide": {
+      "file": "4ec6e740ac6563b4-wide.svg",
+      "width": 392,
+      "height": 651,
+      "bytes": 25215
+    }
+  },
   "51494667ab3082d0": {
     "source": "content/posts/0-to-1/pokeclip-one-time-pairing-contract.md",
     "wide": {
@@ -552,6 +561,24 @@
       "width": 392,
       "height": 963,
       "bytes": 23273
+    }
+  },
+  "86baf8be3873b411": {
+    "source": "content/posts/0-to-1/shakedown-bounded-ai-image-generation.md",
+    "wide": {
+      "file": "86baf8be3873b411-wide.svg",
+      "width": 392,
+      "height": 465,
+      "bytes": 18829
+    }
+  },
+  "89626e418754e58c": {
+    "source": "content/posts/0-to-1/shakedown-java-syntax-before-security-scan.md",
+    "wide": {
+      "file": "89626e418754e58c-wide.svg",
+      "width": 417,
+      "height": 567,
+      "bytes": 22751
     }
   },
   "8aba81baaac30cf4": {
