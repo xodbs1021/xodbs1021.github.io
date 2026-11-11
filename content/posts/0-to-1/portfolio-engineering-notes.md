@@ -14,7 +14,7 @@
   "description": "공통 DB 인증, nginx 요청 검증, DVR 발행과 복구, MediaMTX 기여를 만든 판단과 검증을 연결한 기술 글 모음.",
   "draft": false,
   "portfolio_edition": "2026-10-15-v2",
-  "lastmod": "2026-11-11T18:16:30+09:00"
+  "lastmod": "2026-11-12T02:10:00+09:00"
 }
 
 방송 파일을 만들었고 요청도 성공했는데, 브라우저가 인식한 재생 구간은 목록보다 **61.94초 짧았습니다.** 오류 수는 0이었습니다. 이 차이를 추적하며 성공 응답 다음에 무엇을 확인해야 하는지 배웠습니다. 파일의 시간축과 브라우저가 받아들인 구간을 대조해야 사용자가 놓친 장면을 찾을 수 있었습니다.
@@ -61,8 +61,8 @@
 완료 알림을 놓쳤다고 디스크에 남은 방송 파일까지 사라진 것은 아닙니다. 파일·DB·객체 저장소가 어긋났을 때 어디서 사실을 확인하고 다시 처리할지 정했습니다.
 
 - **CASE 14** · [HTTP 200인데 검은 화면, 세 단계를 지나서야 재생됐습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-black-screen-three-causes/)
-- **CASE 15** · [276개 파일을 회수해도 p95만으로는 부족했습니다: 알림 유실을 견디는 인덱서](https://xodbs1021.github.io/posts/0-to-1/pokeclip-indexer-recovery-without-events/)
-- **CASE 16** · [S3에는 올라갔는데 DB는 pending: 업로드 복구의 기준을 정하다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-upload-state-and-recovery/)
+- **CASE 15** · [완료 알림이 사라져도 녹화 파일은 디스크 재스캔으로 찾습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-indexer-recovery-without-events/)
+- **CASE 16** · [업로드가 끝났는지는 S3 응답이 아니라 DB 장부로 봤습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-upload-state-and-recovery/)
 
 ## 재생 누락·시간축·재포장 {#playback}
 
@@ -85,8 +85,8 @@
 
 같은 URI를 캐시해도 되는지와 캐시된 파일을 누가 받을 수 있는지는 다른 질문이었습니다. 원본 요청·전송량·응답 시간을 나눠 측정하고, 저장 계층을 더 늘릴 필요가 있는지도 실측으로 검토했습니다.
 
-- **CASE 12** · [원본 요청 1,254건을 28건으로: 캐시 키와 인증 전달을 분리한 실험](https://xodbs1021.github.io/posts/0-to-1/pokeclip-cdn-cache-auth-measurement/)
-- **CASE 19** · [S3 파일 8개, 246.2→130.5ms: 새 저장 계층을 보류한 이유](https://xodbs1021.github.io/posts/0-to-1/pokeclip-storage-before-new-layer/)
+- **CASE 12** · [CDN 캐시 키와 원본 인증을 나누자 원본 요청이 줄었습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-cdn-cache-auth-measurement/)
+- **CASE 19** · [조각이 이미 4초 객체라 새 S3 저장 계층을 보류했습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-storage-before-new-layer/)
 
 ## 입력·권한·재생목록 발행 {#input}
 
