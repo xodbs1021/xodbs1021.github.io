@@ -686,15 +686,6 @@
       "bytes": 24855
     }
   },
-  "9db0b930611c4df2": {
-    "source": "content/posts/0-to-1/pokeclip-scratch-volume-ownership.md",
-    "wide": {
-      "file": "9db0b930611c4df2-wide.svg",
-      "width": 392,
-      "height": 453,
-      "bytes": 21986
-    }
-  },
   "9dd3e4c8c7810984": {
     "source": "content/posts/tech-blurting/abr-ladder-design.md",
     "wide": {
@@ -894,6 +885,15 @@
       "width": 392,
       "height": 741,
       "bytes": 24531
+    }
+  },
+  "cd415574b3740770": {
+    "source": "content/posts/0-to-1/pokeclip-scratch-volume-ownership.md",
+    "wide": {
+      "file": "cd415574b3740770-wide.svg",
+      "width": 392,
+      "height": 595,
+      "bytes": 24425
     }
   },
   "cf9d9cbff42e38c1": {
