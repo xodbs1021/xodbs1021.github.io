@@ -1211,9 +1211,9 @@
   },
   "shakedown-plan-deployment-and-recovery-start-stop-time-budgets": {
     "scene": "StartStopTimeBudgets",
-    "alt": "두 줄의 시간 막대. 위 「기동」 줄(0–150초)에서 「Spring 기동 약 41초」 막대가 위험색 세로선 「유예 30초」를 넘어 「태스크 교체」가 뜬 뒤, 세로선이 120초로 옮겨 가 강조색 「유예 120초」가 되고 「교체 없음」으로 바뀐다. 아래 「중지」 줄(0–700초)에서 「공개 경로 403」 뒤 중지 막대가 위험색 「제한 120초」를 넘어 「medium · 120초에 502」가 뜨고, 이어 강조색 세로선 「어댑터 600초」 · 「엔진 630초」가 서며 「large · 189.70초에 204」로 끝나는 장면",
-    "sha256": "51d585657679e22b36a86087b1306be4b25356ad130cd0d4266917c48edabb5b",
-    "bytes": 166723,
+    "alt": "두 줄의 시간 막대. 위 「기동」 줄(0–150초)에서 「Spring 기동 약 41초」 막대가 위험색 세로선 「유예 30초」를 넘어 「태스크 교체」가 뜬 뒤, 세로선이 120초로 옮겨 가 강조색 「유예 120초」가 되고 「유예 120초로 조정」으로 바뀐다. 아래 「중지」 줄(0–700초)에서 「공개 경로 403」 뒤 중지 막대가 위험색 「제한 120초」를 넘어 「medium · 120초에 502」가 뜨고, 이어 강조색 세로선 「어댑터 600초」 · 「엔진 630초」가 서며 「large · 189.70초에 204」로 끝나는 장면",
+    "sha256": "16672bcd819aed501b4ffe528aef861809cb830f39e7900868e8cca46c02d538",
+    "bytes": 173375,
     "codec": "h264",
     "pixFmt": "yuv420p",
     "width": 1920,
@@ -1223,8 +1223,8 @@
     "faststart": true,
     "poster": "/images/shakedown-plan-deployment-and-recovery-start-stop-time-budgets-poster.jpg",
     "mobile": {
-      "sha256": "4db462ea311d50c3d544dc43d15de42f95fad7fdd9f23d04e76f593e93ddb459",
-      "bytes": 203600,
+      "sha256": "ef71932941c378786016da6eac5dd10b483263543d1810a816f9a581d5467b24",
+      "bytes": 211108,
       "codec": "h264",
       "pixFmt": "yuv420p",
       "width": 1080,

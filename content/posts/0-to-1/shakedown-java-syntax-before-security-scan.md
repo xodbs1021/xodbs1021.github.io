@@ -12,7 +12,7 @@ portfolio_pages: [50]
 portfolio_edition: "2026-10-15-v2"
 ---
 
-괄호가 닫히지 않은 Java 코드 `class Broken { void broken( {`가 보안 검사를 통과했습니다. Shakedown은 SoftBank Hackathon 2026 예선 산출물로, 저장소를 검사하고 이미지를 만들어 배포하는 서비스입니다. 보안 게이트를 실제 Semgrep 1.180.0에 연결하자 이 입력에 검사 실패(`SCAN_FAILED`) 대신 다음 단계로 넘어가도 된다는 `ALLOW`가 나왔고, 게이트 회귀 시험은 340개 통과 · 2개 실패였습니다. Tree-sitter로 Java 구문을 먼저 읽는 검사를 Semgrep 앞에 두자 같은 입력이 `SCAN_FAILED`로 멈췄고, 실패하던 2개는 기대값을 바꾸지 않은 채 통과해 352개 통과가 됐습니다.
+괄호가 닫히지 않은 Java 코드 `class Broken { void broken( {`가 보안 검사를 통과했습니다. Shakedown은 SoftBank Hackathon 2026 예선 산출물로, 저장소를 검사하고 이미지를 만들어 배포하는 서비스입니다. 팀원이 만든 보안 게이트를 엔진에 연결해 실제 Semgrep 1.180.0으로 돌리자 이 입력에 검사 실패(`SCAN_FAILED`) 대신 다음 단계로 넘어가도 된다는 `ALLOW`가 나왔고, 게이트 회귀 시험은 340개 통과 · 2개 실패였습니다. Tree-sitter로 Java 구문을 먼저 읽는 검사를 Semgrep 앞에 두자 같은 입력이 `SCAN_FAILED`로 멈췄고, 실패하던 2개는 기대값을 바꾸지 않은 채 통과해 352개 통과가 됐습니다.
 
 테스트 기대값을 `ALLOW`로 낮추지 않기로 한 것은 제 결정입니다. 구현과 시험 실행은 개발에 쓴 AI(Codex와 Claude Code)가 했고, 초기 보안 게이트는 팀원이 만든 기반입니다.
 
@@ -22,7 +22,7 @@ portfolio_edition: "2026-10-15-v2"
 
 2026년 10월 10일 팀원이 만든 게이트를 엔진에 연결하고 실제 Semgrep과 Gitleaks로 돌리자 두 시험이 같은 이유로 실패했습니다([연동 보고서, 수정 전 판](https://github.com/SoftBankHackathon/shakedown/blob/a406376c72689e0a6f3462f850f8d18693f8cb9f/docs/experiments/2026-10-10-security-gate-integration.md#L19-L29)). 하나는 Java 지원 시나리오의 `invalid` 경우이고, 하나는 Semgrep 실연동의 구문 오류 경우입니다. Semgrep의 최적화를 끄는 설정도 시도했지만 결과가 같아 버렸습니다. 왜 Semgrep이 이 입력을 오류로 보고하지 않았는지는 확정하지 못했습니다.
 
-기대값을 `ALLOW`로 바꾸면 시험은 통과합니다. 그러면 「읽지 못한 입력은 통과시키지 않는다」는, 그 시험이 지키던 경계가 사라집니다. 그래서 기대값은 그대로 두고, Semgrep이 놓친 구문 오류를 다른 검사로 잡기로 했습니다.
+기대값을 `ALLOW`로 바꾸면 시험은 통과합니다. 그러면 「읽지 못한 입력은 통과시키지 않는다」는, 그 시험이 지키던 경계가 사라집니다. 그래서 저는 기대값을 그대로 두기로 했고, Semgrep이 놓친 구문 오류를 다른 검사로 잡았습니다. Tree-sitter 선택과 대안 비교는 개발에 쓴 AI가 했습니다.
 
 ## 컴파일하지 않고 Tree-sitter로 구문만 먼저 읽었습니다 {#컴파일러를-실행하지-않고-구문-경계를-보완했습니다}
 
@@ -41,7 +41,7 @@ Tree-sitter는 소스 코드를 구문 트리로 읽는 파서 라이브러리�
 
 판정은 아래 순서로 갈립니다. 청록 상자가 이번에 앞에 둔 검사이고, 점선은 같은 날 뒤이어 붙은 다국어 확장의 갈래입니다.
 
-```mermaid {#fig-java-syntax-gate-flow kind="재구성" caption="보안 게이트의 소스 판정 흐름. Java 소스는 Semgrep에 가기 전에 Tree-sitter 구문 검사를 지나고, 구문 오류(has_error)와 파서 없음 · 프로세스 종료 · 시간 초과는 모두 SCAN_FAILED입니다. 구문이 정상이면 Semgrep · Gitleaks가 ALLOW나 DENY를 냅니다. 점선은 같은 날 이어진 다국어 확장으로, 보안 규칙 없이 구문만 읽는 언어는 정상이어도 REVIEW입니다. ALLOW만 이미지 빌드로 넘어갑니다. PR #11의 3e9ed6d · 117d1df 코드와 보고서의 재구성입니다." source="https://github.com/SoftBankHackathon/shakedown/blob/3e9ed6d68a9de2c3a537acb9487da1ef49c739b5/apps/security-gate/security_gate/source_syntax.py#L73-L86"}
+```mermaid {#fig-java-syntax-gate-flow kind="재구성" caption="보안 게이트의 소스 판정 흐름. Java 소스는 Semgrep에 가기 전에 Tree-sitter 구문 검사를 지나고, 구문 오류(has_error)와 파서 없음 · 프로세스 종료 · 시간 초과는 모두 SCAN_FAILED입니다. 구문이 정상이면 Semgrep · Gitleaks가 ALLOW나 DENY를 냅니다. 점선은 같은 날 이어진 다국어 확장으로, 보안 규칙 없이 구문만 읽는 언어는 정상이어도 REVIEW입니다. 검사 범위 공백 같은 다른 REVIEW는 생략했습니다. ALLOW만 이미지 빌드로 넘어갑니다. PR #11의 3e9ed6d · 117d1df 코드와 보고서의 재구성입니다." source="https://github.com/SoftBankHackathon/shakedown/blob/3e9ed6d68a9de2c3a537acb9487da1ef49c739b5/apps/security-gate/security_gate/source_syntax.py#L73-L86"}
 flowchart TB
   accTitle: 보안 게이트의 소스 판정 흐름
   accDescr: Java 소스는 Tree-sitter 구문 검사를 먼저 지난다. 구문 오류(has_error), 파서 없음, 프로세스 종료, 시간 초과는 모두 SCAN_FAILED다. 구문이 정상이면 Semgrep과 Gitleaks가 위험이 없으면 ALLOW, 위험을 찾으면 DENY를 낸다. ALLOW만 이미지 빌드로 넘어간다. 점선은 이후 다국어 확장으로, 보안 규칙 없이 구문만 읽는 언어는 구문이 정상이면 REVIEW다.

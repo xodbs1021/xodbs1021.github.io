@@ -1,6 +1,6 @@
 // 콘티: _workspace/blog/shakedown-plan-deployment-and-recovery/storyboard.md
 // 기동과 중지의 시간 예산. 위 줄: Spring 기동 약 41초 막대가 유예 30초 세로선을 넘어 「태스크 교체」(위험색),
-// 세로선이 120초로 옮겨 가며 「교체 없음」(강조색). 아래 줄: 「공개 경로 403」 뒤 중지 막대가 120초 제한을 넘어
+// 세로선이 120초로 옮겨 가며 「유예 120초로 조정」(강조색). 아래 줄: 「공개 경로 403」 뒤 중지 막대가 120초 제한을 넘어
 // 「medium · 502」, 600초 · 630초 한도가 서고 「large · 204」. 두 줄의 가로 눈금은 다르다. 반복 클립, 생성 소재 없음.
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { Label, Tag } from "../../components/Timeline";
@@ -158,7 +158,7 @@ export const StartStopTimeBudgets: React.FC<Props> = ({ layout = "desktop" }) =>
         태스크 교체
       </Tag>
       <Tag x={layout === "mobile" ? l.x0 : l.x0 + 470} y={layout === "mobile" ? s.resultY + 90 : s.resultY} tone="accent" size={l.text.tag} opacity={progress(frame, T.notReplaced, 10)}>
-        교체 없음
+        유예 120초로 조정
       </Tag>
 
       {/* 중지: 공개 차단 → 막대(실제 중지 시간), 120초 제한 → 600 · 630초 */}

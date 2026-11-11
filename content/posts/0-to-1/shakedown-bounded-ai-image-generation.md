@@ -12,19 +12,19 @@ portfolio_pages: [46, 47]
 portfolio_edition: "2026-10-15-v2"
 ---
 
-저장소를 받아 컨테이너 이미지와 AWS 배포 구성으로 바꾸는 일을 모델에 통째로 맡기면, 이미 Dockerfile이 있는 저장소에도 모델이 새 파일을 지어내고 150 RPS가 필요한 서비스에 small 구성이 그대로 저장될 수 있습니다. Shakedown은 SoftBank Hackathon 2026 예선 산출물로, 저장소 분석 · 이미지 생성 · 배포 · HTTP 시운전을 잇는 서비스입니다. 저는 모델이 손댈 수 있는 범위를 먼저 정했습니다. Dockerfile은 기존 파일과 규칙을 먼저 쓰고 규칙이 실패할 때만 Claude를 한 번 부릅니다. 규모는 소 · 중 · 대 세 구성 가운데 규칙이 허용한 것만 고를 수 있습니다. 2026년 10월 9일 실제 호출에서 규칙 밖의 Flask 저장소는 엔진 API 왕복 3.679초 만에 Dockerfile을 받아 빌드와 HTTP 200까지 갔고, 150 RPS 요구에서 small을 고른 요청은 HTTP 400으로 거부됐습니다.
+저장소를 받아 컨테이너 이미지와 AWS 배포 구성으로 바꾸는 일을 모델에 통째로 맡기면, 이미 Dockerfile이 있는 저장소에도 모델이 새 파일을 지어내고 150 RPS가 필요한 서비스에 small 구성이 그대로 저장될 수 있습니다. Shakedown은 SoftBank Hackathon 2026 예선 산출물로, 저장소 분석 · 이미지 생성 · 배포 · HTTP 시운전을 잇는 서비스입니다. 저는 규칙으로 안 될 때만 모델을 부르고, 규모는 소 · 중 · 대 가운데서 고르게 하자고 요청했습니다. Dockerfile은 기존 파일과 규칙을 먼저 쓰고 규칙이 실패할 때만 Claude를 한 번 부릅니다. 규모는 소 · 중 · 대 세 구성 가운데 규칙이 허용한 것만 고를 수 있습니다. 2026년 10월 9일 실제 호출에서 규칙 밖의 Flask 저장소는 엔진 API 왕복 3.679초 만에 Dockerfile을 받아 빌드와 HTTP 200까지 갔고, 150 RPS 요구에서 small을 고른 요청은 HTTP 400으로 거부됐습니다.
 
-규칙으로 안 될 때만 모델을 부르고 실패 진단을 정해진 형식으로 넘기라는 것, 소 · 중 · 대 중에서 AI가 고르는 기능은 제가 요청하고 제안했습니다. 구현과 실제 호출 실행은 개발에 쓴 AI(Codex와 Claude Code)가 했습니다. 이 글에서 「Claude」는 제품 안에서 Dockerfile을 만들고 규모를 판단하는 모델(기록상 `claude-sonnet-5-5`)을 가리킵니다.
+규칙으로 안 될 때만 모델을 부르고 실패 진단을 정해진 형식으로 넘기라는 것, 소 · 중 · 대 중에서 AI가 고르는 기능은 제가 요청하고 제안했습니다. 구현과 실제 호출 실행은 개발에 쓴 AI(Codex와 Claude Code)가 했습니다. 「Claude」는 제품 안에서 Dockerfile을 만들고 규모를 판단하는 모델(기록상 `claude-sonnet-5-5`)입니다.
 
 ## Dockerfile이 있으면 모델을 부르지 않았습니다 {#dockerfile이-있는데도-모델부터-호출할-필요는-없었습니다}
 
-이미지 생성은 다섯 단계를 차례로 내려갑니다. 저장소에 Dockerfile이 있으면 그것을 씁니다. 없으면 지원 스택 규칙으로 만듭니다. 규칙이 실패하고 Claude가 연결돼 있을 때만 모델을 한 번 부르고, 모델이 준 Dockerfile을 검사한 뒤, 원본이 아닌 별도 사본에 써서 빌드합니다([`image_builder.py` 120–142행](https://github.com/SoftBankHackathon/shakedown/blob/44c92614047500f4278cb0af0beef3622f0cd09b/apps/engine/engine/image_builder.py#L120-L142)). 알려진 스택에까지 모델을 부르면 호출 비용과 지연이 붙고, 같은 저장소에서 매번 다른 파일이 나올 수 있습니다.
+이미지 생성은 다섯 단계를 차례로 내려갑니다. 저장소에 Dockerfile이 있으면 그것을 씁니다. 없으면 지원 스택 규칙으로 만듭니다. 규칙이 실패하고 Claude가 연결돼 있을 때만 모델을 한 번 부르고, 모델이 준 Dockerfile을 검사한 뒤, 원본이 아닌 별도 사본에 써서 빌드합니다([`image_builder.py` 120–142행](https://github.com/SoftBankHackathon/shakedown/blob/44c92614047500f4278cb0af0beef3622f0cd09b/apps/engine/engine/image_builder.py#L120-L142) · [173–183행](https://github.com/SoftBankHackathon/shakedown/blob/44c92614047500f4278cb0af0beef3622f0cd09b/apps/engine/engine/image_builder.py#L173-L183)). 알려진 스택에까지 모델을 부르면 호출 비용과 지연이 붙고, 같은 저장소에서 매번 다른 파일이 나올 수 있습니다.
 
 기존 Dockerfile이 있는데 읽지 못하거나 심볼릭 링크라서 규칙 단계가 실패해도 모델로 대체하지 않고 멈춥니다. 저장소가 정한 빌드 방법을 모델의 추측으로 덮어쓰지 않기 위해서입니다.
 
-모델에 넘기는 것은 저장소 전체가 아니라 규칙이 실패한 이유입니다. 요청 형식 `dockerfile-fallback.v1`에는 실패 코드 · 단계 · 상세와 제한된 프로젝트 정보, 허용 지시어 · 공식 베이스 이미지 · 비root 사용자 같은 제약이 들어갑니다([`image_prompt.py` 19–42행](https://github.com/SoftBankHackathon/shakedown/blob/44c92614047500f4278cb0af0beef3622f0cd09b/apps/engine/engine/image_prompt.py#L19-L42)). 원본 코드 · README 본문 · 환경변수 값은 통째로 보내지 않습니다. 응답은 Dockerfile 하나 또는 `null`만 받습니다. 근거가 모자라면 모델이 없는 의존성이나 시작 명령을 지어내는 대신 `null`을 돌려주게 했고, 그러면 생성은 실패로 끝납니다.
+모델에 넘기는 것은 저장소 전체가 아니라 규칙이 실패한 이유입니다. 요청 형식 `dockerfile-fallback.v1`에는 실패 코드 · 단계 · 상세와 제한된 프로젝트 정보, 허용 지시어 · 공식 베이스 이미지 · 비root 사용자 같은 제약이 들어갑니다([`image_prompt.py` 19–42행](https://github.com/SoftBankHackathon/shakedown/blob/44c92614047500f4278cb0af0beef3622f0cd09b/apps/engine/engine/image_prompt.py#L19-L42)). 원본 코드 · README 본문 · 환경변수 값은 통째로 보내지 않습니다([`docker_fallback.py` 15–49행](https://github.com/SoftBankHackathon/shakedown/blob/44c92614047500f4278cb0af0beef3622f0cd09b/apps/engine/engine/docker_fallback.py#L15-L49)). 응답은 Dockerfile 하나 또는 `null`만 받습니다. 근거가 모자라면 모델이 없는 의존성이나 시작 명령을 지어내는 대신 `null`을 돌려주게 했고, 그러면 생성은 실패로 끝납니다.
 
-갈래마다 어디서 멈추는지 그렸습니다. 청록 상자가 모델의 출력이 빌드로 가기 전에 지나는 검사이고, 점선은 모델을 부르지 않는 경로입니다.
+청록 상자가 모델의 출력이 빌드로 가기 전에 지나는 검사이고, 점선은 모델을 부르지 않는 경로입니다.
 
 ```mermaid {#fig-image-generation-order kind="재구성" caption="이미지 생성 순서. 기존 Dockerfile이나 지원 스택 규칙으로 만들 수 있으면 모델을 부르지 않고 별도 사본에서 빌드합니다. 규칙이 실패하면 Claude를 한 번 부르고, null이거나 형식 · 금지 요소 검사를 통과하지 못하면 생성 실패로 끝납니다. PR #11 병합본 image_builder.py의 재구성입니다." source="https://github.com/SoftBankHackathon/shakedown/blob/44c92614047500f4278cb0af0beef3622f0cd09b/apps/engine/engine/image_builder.py#L120-L142"}
 flowchart TB
@@ -45,9 +45,9 @@ flowchart TB
 
 ## 운영 요구는 사용자 입력으로 받았습니다 {#소스-코드만으로-운영-요구를-알아낼-수는-없었습니다}
 
-같은 코드라도 피크 트래픽과 허용할 수 있는 중단 시간은 서비스마다 다릅니다. 저장소에서 DB나 세션을 쓰는지는 읽을 수 있어도, 몇 명이 쓰는지는 읽을 수 없습니다. 그래서 규모 판단은 사용자가 넣은 피크 RPS · 가용성 요구 · 트래픽 변화를 받고, 이 값이 비어 있으면 계획을 저장하지 못하게 했습니다.
+같은 코드라도 피크 트래픽과 허용할 수 있는 중단 시간은 서비스마다 다릅니다. 저장소에서 DB나 세션을 쓰는지는 읽을 수 있어도, 몇 명이 쓰는지는 읽을 수 없습니다. 그래서 규모 판단은 사용자가 넣은 피크 RPS · 가용성 요구 · 트래픽 변화를 받고, 이 값이 비어 있으면 계획은 입력 대기(`needs_input`)로 남고 구성을 고를 수 없게 했습니다.
 
-판단은 규칙이 먼저 합니다. 피크가 100 RPS를 넘으면 large, 10 RPS를 넘으면 medium이 최소 등급이고, 높은 가용성이나 급증 트래픽을 고르면 최소 medium입니다([`architecture.py` 96–127행](https://github.com/SoftBankHackathon/shakedown/blob/3ffbcb046ea50676e3031e2ff5bd24296e360ef3/apps/engine/engine/architecture.py#L96-L127)). 최소 등급 이상의 구성만 허용 목록에 오르고, Claude는 그 목록 안에서 템플릿 id · 이유 · 분석 근거 id만 돌려줍니다. 목록 밖의 템플릿이나 존재하지 않는 근거 id를 답하면 응답 전체를 버립니다([153행](https://github.com/SoftBankHackathon/shakedown/blob/3ffbcb046ea50676e3031e2ff5bd24296e360ef3/apps/engine/engine/architecture.py#L153)). 사용자가 목록 밖의 구성을 고르면 서버가 HTTP 400으로 거부합니다([220행](https://github.com/SoftBankHackathon/shakedown/blob/3ffbcb046ea50676e3031e2ff5bd24296e360ef3/apps/engine/engine/architecture.py#L220) · [`api.py` 52–56행](https://github.com/SoftBankHackathon/shakedown/blob/3ffbcb046ea50676e3031e2ff5bd24296e360ef3/apps/engine/engine/api.py#L52-L56)).
+판단은 규칙이 먼저 합니다. 피크가 100 RPS를 넘으면 large, 10 RPS를 넘으면 medium이 최소 등급이고, 높은 가용성이나 급증 트래픽을 고르면 최소 medium입니다([`architecture.py` 96–127행](https://github.com/SoftBankHackathon/shakedown/blob/3ffbcb046ea50676e3031e2ff5bd24296e360ef3/apps/engine/engine/architecture.py#L96-L127)). 최소 등급 이상의 구성만 허용 목록에 오르고, Claude는 그 목록 안에서 템플릿 id · 이유 · 분석 근거 id만 돌려줍니다. 목록 밖의 템플릿이나 존재하지 않는 근거 id를 답하면 응답 전체를 버립니다([152–155행](https://github.com/SoftBankHackathon/shakedown/blob/3ffbcb046ea50676e3031e2ff5bd24296e360ef3/apps/engine/engine/architecture.py#L152-L155)). 사용자가 목록 밖의 구성을 고르면 서버가 HTTP 400으로 거부합니다([220행](https://github.com/SoftBankHackathon/shakedown/blob/3ffbcb046ea50676e3031e2ff5bd24296e360ef3/apps/engine/engine/architecture.py#L220) · [`api.py` 52–56행](https://github.com/SoftBankHackathon/shakedown/blob/3ffbcb046ea50676e3031e2ff5bd24296e360ef3/apps/engine/engine/api.py#L52-L56)).
 
 규모 선택에서는 규칙이 먼저 바닥을 정하고, 모델과 사용자는 그 위에서만 고릅니다. 청록 상자가 그 검사입니다.
 
@@ -70,7 +70,7 @@ flowchart TB
 | medium | 1 vCPU / 2 GiB | 2–4 | 2 |
 | large | 2 vCPU / 4 GiB | 3–12 | 3 |
 
-세 구성의 값과 10 · 100 RPS 경계는 첫 부하 시험 후보를 정하려고 둔 초기 가정입니다([카탈로그 24–34행](https://github.com/SoftBankHackathon/shakedown/blob/3ffbcb046ea50676e3031e2ff5bd24296e360ef3/apps/engine/engine/architecture.py#L24-L34)). large가 150 RPS를 처리한다는 시험 성적은 아닙니다. 임의의 IaC를 만들게 하는 것보다 고를 수 있는 폭은 좁지만, 모델이 제안할 수 있는 자원 · 권한 · 비용의 상한이 세 구성으로 정해지고 서버가 실행 전에 다시 볼 항목도 정해집니다. 지금 세 구성은 HTTP 컨테이너 서비스만 다루고, 워커 · 배치 · 정적 사이트는 판단을 막습니다.
+세 구성의 값과 10 · 100 RPS 경계는 첫 부하 시험 후보를 정하려고 둔 초기 가정입니다([카탈로그 24–34행](https://github.com/SoftBankHackathon/shakedown/blob/3ffbcb046ea50676e3031e2ff5bd24296e360ef3/apps/engine/engine/architecture.py#L24-L34) · [경계 104–107 · 125행](https://github.com/SoftBankHackathon/shakedown/blob/3ffbcb046ea50676e3031e2ff5bd24296e360ef3/apps/engine/engine/architecture.py#L104-L125)). large가 150 RPS를 처리한다는 시험 성적은 아닙니다. 임의의 IaC를 만들게 하는 것보다 고를 수 있는 폭은 좁지만, 모델이 제안할 수 있는 자원 · 권한 · 비용의 상한이 세 구성으로 정해지고 서버가 실행 전에 다시 볼 항목도 정해집니다. 지금 세 구성은 HTTP 컨테이너 서비스만 다루고, 워커 · 배치 · 정적 사이트는 판단을 막습니다.
 
 ## small 선택은 400으로 거부됐습니다 {#생성-성공과-잘못된-선택의-거부를-따로-확인했습니다}
 
@@ -93,9 +93,9 @@ flowchart TB
 
 세 판단은 모두 규칙이 계산한 최소 등급과 같은 답이었습니다. 그래서 이 시험은 모델이 범위 안에서 답하고 서버가 범위 밖 선택을 막는다는 것을 보여 줄 뿐, 모델이 규칙보다 나은 구성을 골랐다는 근거는 아닙니다. 시간은 모두 한 번씩 잰 값이라 지연 분포나 모델 품질을 비교하는 수치도 아닙니다. 토큰 사용량과 청구액은 엔진 응답에 없어 재지 못했습니다.
 
-## 팀원이 만든 기반 위에서 순서와 거부 조건을 정했습니다 {#팀-기반-위에서-맡은-경계}
+## 팀원이 만든 기반 위에 규칙 우선 생성과 소 · 중 · 대 판단을 올렸습니다 {#팀-기반-위에서-맡은-경계}
 
-이 기능은 팀원 세 명의 기반 위에 올렸습니다. HTTP 시운전과 원인 보고서, 초기 ECS · ALB · RDS 어댑터, 초기 보안 게이트가 팀원의 작업입니다([고정 커밋의 작업 회고](https://github.com/SoftBankHackathon/shakedown/blob/078cb687d516aa50a95f3994ba099f0ec776914a/docs/retrospectives/2026-10-10-taeyun-engineering.md)). 제 몫은 기존 파일 → 규칙 → 모델의 순서, 모델에 넘길 실패 진단, 운영 요구 입력, 서버가 거부할 선택을 정한 것입니다. 이미지 생성 변경은 [PR #11](https://github.com/SoftBankHackathon/shakedown/pull/11), 규모 판단과 배포 연결은 [PR #12](https://github.com/SoftBankHackathon/shakedown/pull/12)에 들어갔습니다. 두 PR은 2026년 10월 10일 13시 12분(KST)에 리뷰 0건으로 제가 직접 병합했습니다.
+이 기능은 팀원 세 명의 기반 위에 올렸습니다. HTTP 시운전과 원인 보고서, 초기 ECS · ALB · RDS 어댑터, 초기 보안 게이트가 팀원의 작업입니다([고정 커밋의 작업 회고](https://github.com/SoftBankHackathon/shakedown/blob/078cb687d516aa50a95f3994ba099f0ec776914a/docs/retrospectives/2026-10-10-taeyun-engineering.md)). 제 몫은 규칙으로 안 될 때만 모델을 부르고 실패 진단을 정해진 형식으로 넘기라고 요청한 것과, 소 · 중 · 대 중에서 AI가 고르게 하자고 제안한 것입니다. 운영 입력 검사와 서버 거부 조건을 포함한 구현은 개발에 쓴 AI가 했습니다. 이미지 생성 변경은 [PR #11](https://github.com/SoftBankHackathon/shakedown/pull/11), 규모 판단과 배포 연결은 [PR #12](https://github.com/SoftBankHackathon/shakedown/pull/12)에 들어갔습니다. 두 PR은 2026년 10월 10일 13시 12분(KST)에 리뷰 0건으로 제가 직접 병합했습니다.
 
 검증하지 않은 범위도 있습니다. Dockerfile 형식 검사는 실행 샌드박스가 아니고, 빌드가 실패했을 때 모델이 다시 고치는 반복도 없습니다. 이 시험은 AWS 자원을 만들지 않았고, 화면에서 시작해 보안 검사 · Claude · AWS 배포까지 한 번에 이어지는 시험도 아닙니다. 저장한 계획을 실제 AWS 자원으로 옮긴 결과는 [계획 적용 글](/posts/0-to-1/shakedown-plan-deployment-and-recovery/)에 있습니다.
 
