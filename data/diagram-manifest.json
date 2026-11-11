@@ -74,6 +74,15 @@
       "bytes": 23040
     }
   },
+  "1ccb6784f322c968": {
+    "source": "content/posts/0-to-1/chat-highlight-research-and-fallback.md",
+    "wide": {
+      "file": "1ccb6784f322c968-wide.svg",
+      "width": 426,
+      "height": 476,
+      "bytes": 22349
+    }
+  },
   "1cf72d3ce8553712": {
     "source": "content/posts/tech-blurting/codec-decision-and-debugging.md",
     "wide": {

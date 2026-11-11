@@ -1,9 +1,12 @@
 ---
 title: "채팅은 알고 있었다 - PokeClip 파이프라인을 갈아엎은 기록 (v3→v4)"
 date: 2026-07-03T16:30:00+09:00
+lastmod: "2026-11-12T05:01:14+09:00"
 categories: ["0-to-1"]
 draft: false
 ---
+
+> 2026년 7월 3일 제안을 담은 기록이며, 이 「채팅 우선 캐스케이드 · VLM」 구조는 출시되지 않았습니다. 11월 3일 첫 출시본(v1.0.0)에 들어간 것은 채팅 급증 카드 하나이고, 지금 구현은 [채팅 하이라이트 글](/posts/0-to-1/chat-highlight-research-and-fallback/)에서 다룹니다. 본문의 「채팅의 recall은 사실상 완벽」 · 「즉시 확정」 · 「GPU가 볼 분량이 20~25%로 준다」는 측정 근거가 없는 당시 추정입니다.
 
 지난 글에서 PokéClip의 v3 아키텍처를 소개했다. 영상(YOLO)·음성(Whisper)·채팅 세 신호를 병렬로 분석하고, 둘 이상이 임계치를 넘으면 하이라이트로 판정하는 "E 하이브리드" 구조였다.
 
@@ -3286,7 +3289,7 @@ MSI T1 경기의 치지직 채팅을 수집해서 분석했다. 2세션 65분, 1
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
   "grid": { "left": "22%", "right": "10%", "bottom": "12%", "top": "8%" },
-  "xAxis": { "type": "value", "name": "배율 (평소 대비)" },
+  "xAxis": { "type": "value", "name": "배율 (평소 대비)", "max": 5 },
   "yAxis": {
     "type": "category",
     "data": ["중앙값 기준선 (12 유지)", "평균 기준선 (12→31로 상승)"]
