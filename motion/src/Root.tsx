@@ -18,6 +18,11 @@ import { LIVE_HANDOFF_FRAMES, LiveHandoff } from "./scenes/pokeclip-live-dvr-sep
 import { LIVE_WINDOW_PAUSE_FRAMES, LiveWindowPause } from "./scenes/pokeclip-live-window-without-fork/LiveWindowPause";
 import { AUDIO_GAP_SEAM_FRAMES, AudioGapSeam } from "./scenes/pokeclip-reconnect-audio-gap/AudioGapSeam";
 import { OVERLAP_QUERY_FRAMES, OverlapQuery } from "./scenes/pokeclip-segment-overlap-contract/OverlapQuery";
+import { SEGMENT_THREE_WAYS_FRAMES, SegmentThreeWays } from "./scenes/pokeclip-live-editing-boundaries/SegmentThreeWays";
+import { RECIPE_RERENDER_FRAMES, RecipeRerender } from "./scenes/clip-edit-recipe-render-boundary/RecipeRerender";
+import { BROADCAST_EVENT_FANOUT_FRAMES, BroadcastEventFanout } from "./scenes/pokeclip-language-ownership-boundaries/BroadcastEventFanout";
+import { DVR_WINDOW_SEEK_FRAMES, DvrWindowSeek } from "./scenes/pokeclip-mediamtx-build-or-adopt/DvrWindowSeek";
+import { MEDIA_BOX_REPLACE_FRAMES, MediaBoxReplace } from "./scenes/pokeclip-stateful-media-deployment/MediaBoxReplace";
 import { MOBILE_VIDEO, VIDEO } from "./theme";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
@@ -206,6 +211,56 @@ export const RemotionRoot: React.FC = () => (
       component={OverlapQuery}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={OVERLAP_QUERY_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="SegmentThreeWays" component={SegmentThreeWays} durationInFrames={SEGMENT_THREE_WAYS_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="SegmentThreeWaysMobile"
+      component={SegmentThreeWays}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={SEGMENT_THREE_WAYS_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="RecipeRerender" component={RecipeRerender} durationInFrames={RECIPE_RERENDER_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="RecipeRerenderMobile"
+      component={RecipeRerender}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={RECIPE_RERENDER_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="BroadcastEventFanout" component={BroadcastEventFanout} durationInFrames={BROADCAST_EVENT_FANOUT_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="BroadcastEventFanoutMobile"
+      component={BroadcastEventFanout}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={BROADCAST_EVENT_FANOUT_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="DvrWindowSeek" component={DvrWindowSeek} durationInFrames={DVR_WINDOW_SEEK_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="DvrWindowSeekMobile"
+      component={DvrWindowSeek}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={DVR_WINDOW_SEEK_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="MediaBoxReplace" component={MediaBoxReplace} durationInFrames={MEDIA_BOX_REPLACE_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="MediaBoxReplaceMobile"
+      component={MediaBoxReplace}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={MEDIA_BOX_REPLACE_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}

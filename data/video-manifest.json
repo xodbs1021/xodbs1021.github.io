@@ -25,6 +25,32 @@
       "poster": "/images/aws-gcp-bidirectional-cutover-experiment-cutover-queue-pause-mobile-poster.jpg"
     }
   },
+  "clip-edit-recipe-render-boundary-recipe-rerender": {
+    "scene": "RecipeRerender",
+    "alt": "영상 1과 소리 6 막대로 된 원본 조각은 그대로 둔 채 레시피가 v1(출력 1:1 · 음악 트랙 음량 1.0)에서 v2(출력 9:16 · 음악 트랙 음량 0)로 바뀐다. 음악 막대에서 렌더로 가는 선만 회색 점선이 되고, 같은 원본에서 새 9:16 출력이 나오며 앞 1:1 출력은 회색으로 남는 장면",
+    "sha256": "34a3deac521d088510ad0bd5692088704b17d94c3c4c6e5ce807f20e9308f47d",
+    "bytes": 184034,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/clip-edit-recipe-render-boundary-recipe-rerender-poster.jpg",
+    "mobile": {
+      "sha256": "73da6ad9323ee66ab793557361953169370c4497d617ad9ebd61b8338a54b2d6",
+      "bytes": 170701,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/clip-edit-recipe-render-boundary-recipe-rerender-mobile-poster.jpg"
+    }
+  },
   "multicloud-migration-film": {
     "sha256": "8ba874c5e8db0192a7218b5c362ce122ee466249875fbe5dc92bb0fe2b75d6ae",
     "bytes": 3228939,
@@ -115,6 +141,32 @@
       "poster": "/images/pokeclip-github-oidc-immutable-subject-ref-vs-environment-mobile-poster.jpg"
     }
   },
+  "pokeclip-language-ownership-boundaries-broadcast-event-fanout": {
+    "scene": "BroadcastEventFanout",
+    "alt": "Go 사이드카가 낸 방송 시작 봉투가 SNS FIFO를 지나 두 SQS FIFO로 나뉘고, Spring 서버 chat-collector와 clip에 도착한다. 두 서버 아래 뜬 봉투 카드가 보낸 쪽과 같은 streamId · ingestStreamId · eventId 세 칸을 청록으로 보여 주고 칸 이름 그대로 이름표가 뜨는 장면",
+    "sha256": "9ab14390f1ac6624faf225f127efdd3d5449bc64998090b2c98c65f47bd5633a",
+    "bytes": 226065,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-language-ownership-boundaries-broadcast-event-fanout-poster.jpg",
+    "mobile": {
+      "sha256": "d9b6989a6609c4ee31b211cfd980432cffd68671ba1f96f28c4fa0835e91e0a4",
+      "bytes": 252307,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-language-ownership-boundaries-broadcast-event-fanout-mobile-poster.jpg"
+    }
+  },
   "pokeclip-live-dvr-separation-handoff-live-handoff": {
     "scene": "LiveHandoff",
     "alt": "되감기 목록 끝 E 앞의 청록 띠로 재생점 P가 들어가고, 라이브 목록의 시작 하한이 P 이하라는 이름표가 선 뒤 P가 라이브 목록으로 내려간다. 첫 번째에는 확인 시한 막대가 다 차기 전에 이어 재생돼 확정 이름표가 뜨고, 두 번째에는 라이브가 이어지지 않은 채 시한 막대가 다 차 빨갛게 바뀐 뒤 P가 넘기기 전 자리의 되감기 목록으로 돌아가며, 시청자가 멈춰 뒀으면 멈춘 채 둔다는 글이 뜨는 장면",
@@ -139,6 +191,32 @@
       "audio": 0,
       "faststart": true,
       "poster": "/images/pokeclip-live-dvr-separation-handoff-live-handoff-mobile-poster.jpg"
+    }
+  },
+  "pokeclip-live-editing-boundaries-segment-three-ways": {
+    "scene": "SegmentThreeWays",
+    "alt": "녹화 조각이 하나씩 들어올 때마다 세 줄이 바뀐다. 라이브 목록은 정해진 창이 오른쪽으로 밀리며 가장 옛 조각이 회색으로 빠지고, 되감기 목록은 새 조각이 업로드 중 점선으로 있다가 업로드 확인 뒤에만 붙어 늘어나며, 편집 원본 줄은 [in, out) 구간의 두 조각을 끌어와 영상 1 · 소리 6 막대로 펼치는 장면",
+    "sha256": "dfbcdf6a83c4d937613269ecb1d9193a900d7a72edba0f98e9aef731375941a5",
+    "bytes": 219053,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-live-editing-boundaries-segment-three-ways-poster.jpg",
+    "mobile": {
+      "sha256": "18211ddffd0a0924789448b9277c03012b7e443185e882e28dddd2241f3e485f",
+      "bytes": 230998,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-live-editing-boundaries-segment-three-ways-mobile-poster.jpg"
     }
   },
   "pokeclip-live-window-without-fork-live-window-pause": {
@@ -217,6 +295,32 @@
       "audio": 0,
       "faststart": true,
       "poster": "/images/pokeclip-media-timeline-over-wall-clock-chapter-rule-mobile-poster.jpg"
+    }
+  },
+  "pokeclip-mediamtx-build-or-adopt-dvr-window-seek": {
+    "scene": "DvrWindowSeek",
+    "alt": "오른쪽 끝이 라이브 끝인 시간축 두 줄. 7월 24일 줄은 약 10초 창 밖으로 재생점을 끌자 라이브 끝으로 튕겨 빨간 이름표가 뜨고, 7월 25일 줄은 300초 창과 따라잡기를 끈 플레이어에서 재생점을 −178초로 끌자 그 자리에 머물러 청록 이름표가 뜨는 장면",
+    "sha256": "6e4a412ce11ffda8d6d7a58cc7f16eb250c6889c50c825e8694011148df5e61d",
+    "bytes": 133809,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-mediamtx-build-or-adopt-dvr-window-seek-poster.jpg",
+    "mobile": {
+      "sha256": "07ceb706b52c12fa070f2d5d316309e9f4d1a45a53b2dfd73bdbfd865ab112bd",
+      "bytes": 147282,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-mediamtx-build-or-adopt-dvr-window-seek-mobile-poster.jpg"
     }
   },
   "pokeclip-reconnect-audio-gap-audio-gap-seam": {
@@ -401,6 +505,32 @@
       "audio": 0,
       "faststart": true,
       "poster": "/images/pokeclip-srt-latency-late-retransmission-late-retransmit-mobile-poster.jpg"
+    }
+  },
+  "pokeclip-stateful-media-deployment-media-box-replace": {
+    "scene": "MediaBoxReplace",
+    "alt": "위 줄은 새 API 태스크가 정상이 된 뒤 요청 화살표가 옮겨 가고 옛 태스크가 빠져 새 태스크가 뜬 뒤 옛 태스크를 내린다는 이름표가 뜬다. 아래 줄은 미디어 상자에 TERM이 오고 최대 30초 막대가 찬 뒤 상자가 내려가 OBS의 UDP 선이 끊기고, 업로드 전 조각 둘이 볼륨으로 떨어져 남은 뒤 상자가 다시 떠 OBS가 송출이 끊긴 지 300초 안에 재접속해 앞 세션을 잇는 장면",
+    "sha256": "2fdc0facc1d7828e2f48852bf649bf115e73dcca4e75e5e21b004b95d9b07954",
+    "bytes": 223336,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 12,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-stateful-media-deployment-media-box-replace-poster.jpg",
+    "mobile": {
+      "sha256": "8b09c3872354c5cfd50e629d9baf432f3b7eb5d2962a7715200835b194f78a99",
+      "bytes": 245539,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 12,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-stateful-media-deployment-media-box-replace-mobile-poster.jpg"
     }
   },
   "rewind-missing-segment-refetch-flow": {

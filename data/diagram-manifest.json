@@ -398,6 +398,15 @@
       "bytes": 20556
     }
   },
+  "73bca6d78447174d": {
+    "source": "content/posts/0-to-1/pokeclip-stateful-media-deployment.md",
+    "wide": {
+      "file": "73bca6d78447174d-wide.svg",
+      "width": 417,
+      "height": 522,
+      "bytes": 22868
+    }
+  },
   "74aea08aff8bf4b0": {
     "source": "content/posts/projects/pokeclip-github-oidc-immutable-subject.md",
     "wide": {
@@ -429,6 +438,15 @@
       "width": 600,
       "height": 501,
       "bytes": 21489
+    }
+  },
+  "80f1c7018c20790e": {
+    "source": "content/posts/0-to-1/pokeclip-mediamtx-build-or-adopt.md",
+    "wide": {
+      "file": "80f1c7018c20790e-wide.svg",
+      "width": 392,
+      "height": 531,
+      "bytes": 20308
     }
   },
   "81d974d81d85157a": {
@@ -680,6 +698,15 @@
       "bytes": 21644
     }
   },
+  "d08d15bda13419ef": {
+    "source": "content/posts/0-to-1/pokeclip-language-ownership-boundaries.md",
+    "wide": {
+      "file": "d08d15bda13419ef-wide.svg",
+      "width": 392,
+      "height": 523,
+      "bytes": 21752
+    }
+  },
   "e3c79ac5c0e8907f": {
     "source": "content/posts/tech-blurting/cmaf-deep-dive.md",
     "wide": {
@@ -702,6 +729,15 @@
       "width": 356,
       "height": 583,
       "bytes": 19151
+    }
+  },
+  "e5f5fe236a0eed7a": {
+    "source": "content/posts/0-to-1/clip-edit-recipe-render-boundary.md",
+    "wide": {
+      "file": "e5f5fe236a0eed7a-wide.svg",
+      "width": 184,
+      "height": 862,
+      "bytes": 22748
     }
   },
   "e8601b55aee217b9": {
@@ -741,6 +777,15 @@
       "width": 600,
       "height": 634,
       "bytes": 22549
+    }
+  },
+  "f358f3b82c11b1d9": {
+    "source": "content/posts/0-to-1/pokeclip-live-editing-boundaries.md",
+    "wide": {
+      "file": "f358f3b82c11b1d9-wide.svg",
+      "width": 392,
+      "height": 486,
+      "bytes": 20949
     }
   },
   "fdc7e37322cf0959": {

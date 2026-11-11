@@ -49,12 +49,12 @@
 
 방송을 받는 서버를 교체하거나 클립을 렌더링하는 일이 현재 송출까지 끊어서는 안 됐습니다. 수신·재생·렌더의 수명을 나누고, 직접 만들 기능과 기존 도구에 맡길 기능을 정한 과정입니다.
 
-- **CASE 01** · [방송이 끝나기 전에 클립을 만들려면: 라이브·되감기·편집 경로 나누기](https://xodbs1021.github.io/posts/0-to-1/pokeclip-live-editing-boundaries/)
-- **CASE 02** · [미디어 서버를 전부 만들려던 계획을 바꾼 이유](https://xodbs1021.github.io/posts/0-to-1/pokeclip-mediamtx-build-or-adopt/)
-- **CASE 03** · [채팅 수집을 Spring으로 바꾼 이유: 언어보다 먼저 정할 책임](https://xodbs1021.github.io/posts/0-to-1/pokeclip-language-ownership-boundaries/)
-- **CASE 04** · [API처럼 교체할 수 없는 서버: 방송 상태를 가진 미디어의 배포 경계](https://xodbs1021.github.io/posts/0-to-1/pokeclip-stateful-media-deployment/)
+- **CASE 01** · [방송 중 클립을 위해 라이브·되감기·편집 경로를 나눴습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-live-editing-boundaries/)
+- **CASE 02** · [Go로 다 짜려던 미디어 서버를 MediaMTX에 맡겼습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-mediamtx-build-or-adopt/)
+- **CASE 03** · [채팅 수집 언어는 리뷰할 사람이 바뀌어 Spring이 됐습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-language-ownership-boundaries/)
+- **CASE 04** · [방송 중인 미디어 서버는 API처럼 갈아 끼울 수 없었습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-stateful-media-deployment/)
 - **CASE 29** · [6초 창 때문에 라이브러리를 포크할 필요가 있을까](https://xodbs1021.github.io/posts/0-to-1/pokeclip-live-window-without-fork/)
-- **CASE 30** · [클립을 파일로만 저장하지 않은 이유: 편집 레시피와 렌더의 경계](https://xodbs1021.github.io/posts/0-to-1/clip-edit-recipe-render-boundary/)
+- **CASE 30** · [클립은 완성 파일 대신 원본과 편집 레시피로 남겼습니다](https://xodbs1021.github.io/posts/0-to-1/clip-edit-recipe-render-boundary/)
 
 ## 파일 회수와 복구 기준 {#recovery}
 
