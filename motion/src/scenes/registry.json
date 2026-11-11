@@ -148,5 +148,45 @@
     "posterFrame": 315,
     "alt": "0–4초 A, 4–8초 B, 8–12초 C 조각 두 줄 위에 요청 [3.9, 8) 청록 띠가 놓인다. 위 BETWEEN 줄은 시작점 4와 8만 보고 B와 C를 고르며 A는 빠짐, C는 더 고름 이름표가 붙는다. 아래 겹침 줄은 A와 B를 고르고 끝점만 닿는 C를 제외하는 장면",
     "mobile": true
+  },
+  {
+    "id": "SegmentThreeWays",
+    "post": "pokeclip-live-editing-boundaries",
+    "kind": "video",
+    "posterFrame": 315,
+    "alt": "녹화 조각이 하나씩 들어올 때마다 세 줄이 바뀐다. 라이브 목록은 정해진 창이 오른쪽으로 밀리며 가장 옛 조각이 회색으로 빠지고, 되감기 목록은 새 조각이 업로드 중 점선으로 있다가 업로드 확인 뒤에만 붙어 늘어나며, 편집 원본 줄은 [in, out) 구간의 두 조각을 끌어와 영상 1 · 소리 6 막대로 펼치는 장면",
+    "mobile": true
+  },
+  {
+    "id": "RecipeRerender",
+    "post": "clip-edit-recipe-render-boundary",
+    "kind": "video",
+    "posterFrame": 315,
+    "alt": "영상 1과 소리 6 막대로 된 원본 조각은 그대로 둔 채 레시피가 v1(출력 1:1 · 음악 트랙 음량 1.0)에서 v2(출력 9:16 · 음악 트랙 음량 0)로 바뀐다. 음악 막대에서 렌더로 가는 선만 회색 점선이 되고, 같은 원본에서 새 9:16 출력이 나오며 앞 1:1 출력은 회색으로 남는 장면",
+    "mobile": true
+  },
+  {
+    "id": "BroadcastEventFanout",
+    "post": "pokeclip-language-ownership-boundaries",
+    "kind": "video",
+    "posterFrame": 315,
+    "alt": "Go 사이드카가 낸 방송 시작 봉투가 SNS FIFO를 지나 두 SQS FIFO로 나뉘고, Spring 서버 chat-collector와 clip에 도착한다. 두 서버 아래 뜬 봉투 카드가 보낸 쪽과 같은 streamId · ingestStreamId · eventId 세 칸을 청록으로 보여 주고 칸 이름 그대로 이름표가 뜨는 장면",
+    "mobile": true
+  },
+  {
+    "id": "DvrWindowSeek",
+    "post": "pokeclip-mediamtx-build-or-adopt",
+    "kind": "video",
+    "posterFrame": 315,
+    "alt": "오른쪽 끝이 라이브 끝인 시간축 두 줄. 7월 24일 줄은 약 10초 창 밖으로 재생점을 끌자 라이브 끝으로 튕겨 빨간 이름표가 뜨고, 7월 25일 줄은 300초 창과 따라잡기를 끈 플레이어에서 재생점을 −178초로 끌자 그 자리에 머물러 청록 이름표가 뜨는 장면",
+    "mobile": true
+  },
+  {
+    "id": "MediaBoxReplace",
+    "post": "pokeclip-stateful-media-deployment",
+    "kind": "video",
+    "posterFrame": 345,
+    "alt": "위 줄은 새 API 태스크가 정상이 된 뒤 요청 화살표가 옮겨 가고 옛 태스크가 빠져 새 태스크가 뜬 뒤 옛 태스크를 내린다는 이름표가 뜬다. 아래 줄은 미디어 상자에 TERM이 오고 최대 30초 막대가 찬 뒤 상자가 내려가 OBS의 UDP 선이 끊기고, 업로드 전 조각 둘이 볼륨으로 떨어져 남은 뒤 상자가 다시 떠 OBS가 송출이 끊긴 지 300초 안에 재접속해 앞 세션을 잇는 장면",
+    "mobile": true
   }
 ]
