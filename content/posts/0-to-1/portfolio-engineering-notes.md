@@ -14,7 +14,7 @@
   "description": "공통 DB 인증, nginx 요청 검증, DVR 발행과 복구, MediaMTX 기여를 만든 판단과 검증을 연결한 기술 글 모음.",
   "draft": false,
   "portfolio_edition": "2026-10-15-v2",
-  "lastmod": "2026-11-11T15:40:00+09:00"
+  "lastmod": "2026-11-11T18:16:30+09:00"
 }
 
 방송 파일을 만들었고 요청도 성공했는데, 브라우저가 인식한 재생 구간은 목록보다 **61.94초 짧았습니다.** 오류 수는 0이었습니다. 이 차이를 추적하며 성공 응답 다음에 무엇을 확인해야 하는지 배웠습니다. 파일의 시간축과 브라우저가 받아들인 구간을 대조해야 사용자가 놓친 장면을 찾을 수 있었습니다.
@@ -92,17 +92,17 @@
 
 트랙 6개를 받는 것만으로 음악 없는 클립이 완성되지는 않았습니다. 본방 믹스와 분리된 소리의 대응, 방송자의 기존 설정, 편집·게시 권한까지 이어서 봤습니다. 재생목록에서는 늦게 끝난 작업과 재접속이 기존 목록의 의미를 바꾸지 않도록 설계했습니다.
 
-- **CASE 05** · [소스 약 10개를 직접 추적하는 대신 OBS 6트랙을 선택한 이유](https://xodbs1021.github.io/posts/0-to-1/pokeclip-six-track-input-contract/)
-- **CASE 06** · [오디오 6개가 보인다고 검증이 끝난 것은 아니었다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-multiaudio-end-to-end-verification/)
-- **CASE 07** · [본방 인코더 하나로 SRT도 보내기: 시작과 종료가 더 어려웠다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-obs-shared-encoder-srt/)
-- **CASE 08** · [오디오 자동 배정이 방송자의 원래 설정을 망가뜨리지 않게 하기](https://xodbs1021.github.io/posts/0-to-1/pokeclip-audio-assignment-user-state/)
+- **CASE 05** · [소스 약 10개 대신 OBS 6트랙에 순서만 고정했습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-six-track-input-contract/)
+- **CASE 06** · [오디오 6트랙은 개수와 고르기와 소리 내용을 따로 검증했습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-multiaudio-end-to-end-verification/)
+- **CASE 07** · [본방 인코더를 SRT와 나눠 쓰자 GOP와 종료가 묶였습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-obs-shared-encoder-srt/)
+- **CASE 08** · [오디오 자동 배정은 끌 때 원래 OBS 체크로 돌아가야 했습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-audio-assignment-user-state/)
 - **CASE 09** · [해시로 충분한 값과 다시 읽어야 하는 비밀: SRT 키 저장을 바꿀 계획](https://xodbs1021.github.io/posts/0-to-1/pokeclip-secret-storage-migration-plan/)
 - **CASE 10** · [OBS 안에 OAuth를 다시 만들지 않고 계정을 연결하는 방법](https://xodbs1021.github.io/posts/0-to-1/pokeclip-one-time-pairing-contract/)
 - **CASE 11** · [편집을 맡긴다고 채널 게시까지 맡기는 것은 아니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-editing-upload-authorization/)
 - **CASE 20** · [늦게 끝난 writer가 새 재생목록을 덮는다면](https://xodbs1021.github.io/posts/0-to-1/pokeclip-database-authoritative-manifest-publishing/)
 - **CASE 26** · [끝난 재생목록은 다시 열지 않기로 했습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-session-url-and-endlist/)
 - **CASE 27** · [12번이 준비돼도 11번을 건너뛰면 안 됩니다: HLS 목록 경계 검증](https://xodbs1021.github.io/posts/0-to-1/pokeclip-manifest-window-boundaries/)
-- **CASE 31** · [마이크를 고르는 문제에 상시 VAD가 필요할까](https://xodbs1021.github.io/posts/0-to-1/microphone-selection-without-always-on-vad/)
+- **CASE 31** · [게임 대사도 음성이라 자막 트랙 선택에서 상시 VAD를 뺐습니다](https://xodbs1021.github.io/posts/0-to-1/microphone-selection-without-always-on-vad/)
 
 ## 테스트·실행 권한·CI·의존성 {#quality}
 

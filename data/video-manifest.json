@@ -51,6 +51,32 @@
       "poster": "/images/clip-edit-recipe-render-boundary-recipe-rerender-mobile-poster.jpg"
     }
   },
+  "microphone-selection-without-always-on-vad-track-pick-in-clip": {
+    "scene": "TrackPickInClip",
+    "alt": "위 줄 「상시 전 트랙 VAD(뺀 설계)」에서 믹스 · 마이크 · 게임 등 트랙 줄을 스캐너가 계속 쓸고 지나가며 마이크와 게임 줄에 모두 「음성」이 뜨고 빨간 「게임 대사도 음성」이 붙는다. 아래 줄 「클립 구간 안에서 고르기」에서는 구간 괄호 안에만 트랙별 파형이 그려지고, 마이크 줄만 강조된 채 「한 트랙만 켜서 듣기」가 뜬 뒤 점선 「자막 입력(설계)」 상자로 화살표가 이어지는 장면",
+    "sha256": "56721f5d6390f2597c43eafd2c8ab7bce1cd41c655876ea1a1b211c3dad6da86",
+    "bytes": 212427,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 12,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/microphone-selection-without-always-on-vad-track-pick-in-clip-poster.jpg",
+    "mobile": {
+      "sha256": "eeb5322d0e504cdd0515d26ae79eb8344c7e2d79efe674660ea17c0274dd0881",
+      "bytes": 201836,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 12,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/microphone-selection-without-always-on-vad-track-pick-in-clip-mobile-poster.jpg"
+    }
+  },
   "multicloud-migration-film": {
     "sha256": "8ba874c5e8db0192a7218b5c362ce122ee466249875fbe5dc92bb0fe2b75d6ae",
     "bytes": 3228939,
@@ -62,6 +88,32 @@
     "audio": 0,
     "faststart": true,
     "poster": "/images/multicloud-migration-film-poster.jpg"
+  },
+  "pokeclip-audio-assignment-user-state-auto-assign-restore": {
+    "scene": "AutoAssignRestore",
+    "alt": "컬렉션 A의 트랙 1–6 체크 격자(Tone · 마이크 모두 전부 체크)가 자동 배정으로 Tone 1·3, 마이크 1·2로 바뀌고 원래 체크 백업 상자에 A가 생긴다. 컬렉션 B(마이크 원래 1·2·3)도 같은 배정으로 바뀌고 백업에 B가 더해진다. 리플레이 버퍼 중에 자동 배정을 끄자 「되돌리기 보류」가 뜨고, 버퍼가 멈추자 B가 원래 체크로 돌아오며 백업의 B만 지워진다. A로 넘어가자 A도 원래 체크로 돌아오고 「각자 원래 체크로」 이름표가 뜨는 장면",
+    "sha256": "60d2e444ce36309439cb9e2194763c725016da1afc5b844f25969763647e7e63",
+    "bytes": 340819,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 12,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-audio-assignment-user-state-auto-assign-restore-poster.jpg",
+    "mobile": {
+      "sha256": "e745e0e00c607e5dc4032e16b023ddc0d71fc2b886e07c710a086e19919b02b7",
+      "bytes": 338362,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 12,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-audio-assignment-user-state-auto-assign-restore-mobile-poster.jpg"
+    }
   },
   "pokeclip-black-screen-three-causes-stage-unblock": {
     "scene": "StageUnblock",
@@ -375,6 +427,58 @@
       "poster": "/images/pokeclip-mediamtx-build-or-adopt-dvr-window-seek-mobile-poster.jpg"
     }
   },
+  "pokeclip-multiaudio-end-to-end-verification-multiaudio-stage-proof": {
+    "scene": "MultiaudioStageProof",
+    "alt": "열 「fMP4 녹화 · HLS 목록 · hls.js 선택 · -map 추출 · DB 장부 · 소리 내용」과 행 「시험 1 ffmpeg 2트랙 · 시험 2 ffmpeg 6트랙 · 시험 3 OBS 6트랙(무음) · 시험 4 ffmpeg 6트랙 300초 · 톤 시험(9월, 팀원)」의 표가 왼쪽 열부터 하나씩 켜진다. 오디오 2 · 6, 목록 2 · 6, 6번째 · 200, 추출 1, 15 = 15 · 61 = 61이 차고, 마지막 「소리 내용」 열은 시험 1–4가 「안 봄」, 톤 시험만 −24.1dB로 켜진 뒤 「개수 · 고르기 · 내용은 다른 시험」 이름표가 뜨는 장면",
+    "sha256": "aeb0bf28d2041a57f51a442b1f95ac962812f58aaa425b2c07258954ca5fe5d8",
+    "bytes": 233085,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 12,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-multiaudio-end-to-end-verification-multiaudio-stage-proof-poster.jpg",
+    "mobile": {
+      "sha256": "98600cf926e9992eb5e0aa2ec86c4e65c3055478c615d7c342ae3f85550626b4",
+      "bytes": 201830,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 12,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-multiaudio-end-to-end-verification-multiaudio-stage-proof-mobile-poster.jpg"
+    }
+  },
+  "pokeclip-obs-shared-encoder-srt-shared-encoder-start": {
+    "scene": "SharedEncoderStart",
+    "alt": "위에 「프로필 설정 적용」 「STREAMING_STARTING · keyint 2」 「인코더 생성」 「출력 시작」 네 상자가 차례로 강조되고, 아래 「x264 1개」 상자에서 RTMP → 치지직과 SRT → PokeClip 두 줄로 같은 점이 함께 흐른다. 「본방 정지」에 두 줄이 같이 멈추고 「SRT도 함께 정지」가 뜬다. 이어 「녹화 중 · keyint ≠ 2」 상태에서 다시 시작하자 STREAMING_STARTING 상자에 빨간 「실행 중 GOP 변경 불가」가, SRT 줄 끝에 빨간 「SRT 시작 거절」이 뜨고 RTMP 줄만 흐르는 장면",
+    "sha256": "021b060b052acbe44b256819dc83fd29dce0bb19c0737b4d0136eb8cf0db80b5",
+    "bytes": 266366,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 12,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-obs-shared-encoder-srt-shared-encoder-start-poster.jpg",
+    "mobile": {
+      "sha256": "9de795ef0b4a549d889737b5cb284d1ee43b7b2ede7c1a2fea0eb61d3661e793",
+      "bytes": 311561,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 12,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-obs-shared-encoder-srt-shared-encoder-start-mobile-poster.jpg"
+    }
+  },
   "pokeclip-playback-producer-boundaries-three-axis-upload": {
     "scene": "ThreeAxisUpload",
     "alt": "녹화 조각에서 ② 원본, ③ 재포장, init 세 줄로 점이 갈라져 PUT과 장부 CAS 칸을 지나 「확정」 이름표를 받는다. ③ 점은 회색 점선 「init 대기」 칸에서 멈춰 있다가 init 줄이 확정되자 청록 점선이 이어지며 풀려난다. 다음 조각에서는 ③ 점이 PUT에서 빨간 「PUT 실패」를 받고, 「스위퍼 30초마다 다시 집음」 이름표가 뜬 뒤 그 줄만 다시 올라가 확정되는 장면",
@@ -558,6 +662,32 @@
     "audio": 0,
     "faststart": true,
     "poster": "/images/pokeclip-shared-db-auth-iam-tls-token-to-verified-db-poster.jpg"
+  },
+  "pokeclip-six-track-input-contract-six-track-funnel": {
+    "scene": "SixTrackFunnel",
+    "alt": "왼쪽 소스 10개(마이크 · 게임 · 디스코드 · BGM · 알림 · 브라우저 · 미디어 · 데스크탑 · 인트로 영상 · 효과음)가 처음에는 각자 트랙 1–10 점선 칸으로 선을 긋고 7–10칸에 빨간 「OBS 믹서 밖」 이름표가 뜬다. 점선 칸이 사라지고 OBS 믹서 6칸이 서며, 모든 소스가 트랙 1 「본방 믹스」로 모이고 마이크 · 게임 · 디스코드 · BGM은 트랙 2–5, 나머지 여섯은 트랙 6 「기타」로 이어진 뒤 오른쪽에 audio1–audio6과 「믹스 1 + 소스별 5」 이름표가 뜨는 장면",
+    "sha256": "edf7344e1379bc77b52b3c49a64f2877da4ef8e7b27480930ad7ad64073fb24f",
+    "bytes": 488879,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-six-track-input-contract-six-track-funnel-poster.jpg",
+    "mobile": {
+      "sha256": "ac554b7f1df581ad5b5792290f7b7925177566b12e0a4d91c5145c13636cdd92",
+      "bytes": 399224,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-six-track-input-contract-six-track-funnel-mobile-poster.jpg"
+    }
   },
   "pokeclip-srt-latency-late-retransmission-late-retransmit": {
     "scene": "LateRetransmit",
