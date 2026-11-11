@@ -14,7 +14,7 @@
   "description": "공통 DB 인증, nginx 요청 검증, DVR 발행과 복구, MediaMTX 기여를 만든 판단과 검증을 연결한 기술 글 모음.",
   "draft": false,
   "portfolio_edition": "2026-10-15-v2",
-  "lastmod": "2026-11-12T02:10:00+09:00"
+  "lastmod": "2026-11-12T02:20:00+09:00"
 }
 
 방송 파일을 만들었고 요청도 성공했는데, 브라우저가 인식한 재생 구간은 목록보다 **61.94초 짧았습니다.** 오류 수는 0이었습니다. 이 차이를 추적하며 성공 응답 다음에 무엇을 확인해야 하는지 배웠습니다. 파일의 시간축과 브라우저가 받아들인 구간을 대조해야 사용자가 놓친 장면을 찾을 수 있었습니다.
@@ -25,7 +25,7 @@
 
 ## 10월 28일 추가한 플랫폼 개발 기록
 
-- [미디어 서버에서 DB 비밀번호를 없앤 방법](/posts/0-to-1/pokeclip-shared-db-auth-iam-tls/): 연결마다 만드는 IAM 토큰, verify-full, 로그인 뒤 권한, 공식 15분과 다른 실측 약 20분(1회). (11월 7일 새로 씀)
+- [DB 비밀번호 대신 연결마다 RDS IAM 토큰을 만들었습니다](/posts/0-to-1/pokeclip-shared-db-auth-iam-tls/): 연결마다 만드는 IAM 토큰, verify-full, 공식 15분과 다른 실측 약 20분(1회). (11월 7일 새로 씀) 로그인 뒤 권한과 함수 가로채기는 [공유 DB에선 로그인 뒤 권한과 함수 가로채기를 막았습니다](/posts/0-to-1/pokeclip-shared-db-login-privileges/)로 나눴습니다(11월 12일).
 - [작업 세션과 worktree의 검토 상태를 분리한 이유](/posts/0-to-1/harness-session-isolation-worktree-root/): 상태 누출 방지, 시작 위치 고정, 회귀·변이 검사의 범위.
 - [시작되지 않은 watcher의 종료를 기다리던 교착](/posts/open-source-analysis/mediamtx-certloader-no-watcher-shutdown/): MediaMTX #6427의 원인, 최소 수정과 재현 조건.
 
@@ -96,9 +96,9 @@
 - **CASE 06** · [오디오 6트랙은 개수와 고르기와 소리 내용을 따로 검증했습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-multiaudio-end-to-end-verification/)
 - **CASE 07** · [본방 인코더를 SRT와 나눠 쓰자 GOP와 종료가 묶였습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-obs-shared-encoder-srt/)
 - **CASE 08** · [오디오 자동 배정은 끌 때 원래 OBS 체크로 돌아가야 했습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-audio-assignment-user-state/)
-- **CASE 09** · [해시로 충분한 값과 다시 읽어야 하는 비밀: SRT 키 저장을 바꿀 계획](https://xodbs1021.github.io/posts/0-to-1/pokeclip-secret-storage-migration-plan/)
-- **CASE 10** · [OBS 안에 OAuth를 다시 만들지 않고 계정을 연결하는 방법](https://xodbs1021.github.io/posts/0-to-1/pokeclip-one-time-pairing-contract/)
-- **CASE 11** · [편집을 맡긴다고 채널 게시까지 맡기는 것은 아니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-editing-upload-authorization/)
+- **CASE 09** · [SRT 암호를 PG 밖 Secrets Manager로 옮겼습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-secret-storage-migration-plan/)
+- **CASE 10** · [OBS 계정 연결을 OAuth 대신 8자 일회용 코드로 했습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-one-time-pairing-contract/)
+- **CASE 11** · [편집자와 방송자를 나누려던 업로드 권한은 하나로 합쳐졌습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-editing-upload-authorization/)
 - **CASE 20** · [늦게 끝난 writer가 새 재생목록을 덮는다면](https://xodbs1021.github.io/posts/0-to-1/pokeclip-database-authoritative-manifest-publishing/)
 - **CASE 26** · [끝난 재생목록은 다시 열지 않기로 했습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-session-url-and-endlist/)
 - **CASE 27** · [12번이 준비돼도 11번을 건너뛰면 안 됩니다: HLS 목록 경계 검증](https://xodbs1021.github.io/posts/0-to-1/pokeclip-manifest-window-boundaries/)

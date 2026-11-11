@@ -37,6 +37,10 @@ import { UPLOAD_CRASH_RESUME_FRAMES, UploadCrashResume } from "./scenes/pokeclip
 import { HOOK_LOSS_RESCAN_FRAMES, HookLossRescan } from "./scenes/pokeclip-indexer-recovery-without-events/HookLossRescan";
 import { BATCH_GET_CONCURRENCY_FRAMES, BatchGetConcurrency } from "./scenes/pokeclip-storage-before-new-layer/BatchGetConcurrency";
 import { CACHE_KEY_VS_ORIGIN_FORWARD_FRAMES, CacheKeyVsOriginForward } from "./scenes/pokeclip-cdn-cache-auth-measurement/CacheKeyVsOriginForward";
+import { PAIRING_CODE_LIFETIME_FRAMES, PairingCodeLifetime } from "./scenes/pokeclip-one-time-pairing-contract/PairingCodeLifetime";
+import { SECRET_PATH_ONE_CONNECTION_FRAMES, SecretPathOneConnection } from "./scenes/pokeclip-secret-storage-migration-plan/SecretPathOneConnection";
+import { SEARCH_PATH_HIJACK_FRAMES, SearchPathHijack } from "./scenes/pokeclip-shared-db-login-privileges/SearchPathHijack";
+import { UPLOAD_REQUEST_PATH_FRAMES, UploadRequestPath } from "./scenes/pokeclip-editing-upload-authorization/UploadRequestPath";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
@@ -404,6 +408,46 @@ export const RemotionRoot: React.FC = () => (
       component={CacheKeyVsOriginForward}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={CACHE_KEY_VS_ORIGIN_FORWARD_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="PairingCodeLifetime" component={PairingCodeLifetime} durationInFrames={PAIRING_CODE_LIFETIME_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="PairingCodeLifetimeMobile"
+      component={PairingCodeLifetime}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={PAIRING_CODE_LIFETIME_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="SecretPathOneConnection" component={SecretPathOneConnection} durationInFrames={SECRET_PATH_ONE_CONNECTION_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="SecretPathOneConnectionMobile"
+      component={SecretPathOneConnection}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={SECRET_PATH_ONE_CONNECTION_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="SearchPathHijack" component={SearchPathHijack} durationInFrames={SEARCH_PATH_HIJACK_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="SearchPathHijackMobile"
+      component={SearchPathHijack}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={SEARCH_PATH_HIJACK_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="UploadRequestPath" component={UploadRequestPath} durationInFrames={UPLOAD_REQUEST_PATH_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="UploadRequestPathMobile"
+      component={UploadRequestPath}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={UPLOAD_REQUEST_PATH_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}

@@ -17,6 +17,15 @@
       "bytes": 17214
     }
   },
+  "0dc3490e437f99cb": {
+    "source": "content/posts/0-to-1/pokeclip-shared-db-login-privileges.md",
+    "wide": {
+      "file": "0dc3490e437f99cb-wide.svg",
+      "width": 241,
+      "height": 862,
+      "bytes": 22494
+    }
+  },
   "0e691a1aad8fd420": {
     "source": "content/posts/tech-blurting/h264-deep-dive.md",
     "wide": {
@@ -122,6 +131,15 @@
       "bytes": 23192
     }
   },
+  "2fd826ede2c54c66": {
+    "source": "content/posts/0-to-1/pokeclip-secret-storage-migration-plan.md",
+    "wide": {
+      "file": "2fd826ede2c54c66-wide.svg",
+      "width": 392,
+      "height": 531,
+      "bytes": 22445
+    }
+  },
   "2fffa46d92b6eca7": {
     "source": "content/posts/projects/pokeclip-media-timeline-over-wall-clock.md",
     "wide": {
@@ -188,6 +206,15 @@
       "bytes": 19874
     }
   },
+  "467fdf85cefdc568": {
+    "source": "content/posts/0-to-1/pokeclip-editing-upload-authorization.md",
+    "wide": {
+      "file": "467fdf85cefdc568-wide.svg",
+      "width": 386,
+      "height": 750,
+      "bytes": 27471
+    }
+  },
   "48675b3ff0fcfc15": {
     "source": "content/posts/0-to-1/pokeclip-black-screen-three-causes.md",
     "wide": {
@@ -243,6 +270,15 @@
       "width": 808,
       "height": 558,
       "bytes": 26638
+    }
+  },
+  "51494667ab3082d0": {
+    "source": "content/posts/0-to-1/pokeclip-one-time-pairing-contract.md",
+    "wide": {
+      "file": "51494667ab3082d0-wide.svg",
+      "width": 430,
+      "height": 663,
+      "bytes": 29396
     }
   },
   "553ce9f103f4cd13": {

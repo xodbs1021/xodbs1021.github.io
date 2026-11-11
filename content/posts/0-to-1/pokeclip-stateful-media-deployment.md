@@ -101,7 +101,7 @@ flowchart TB
 - [AWS 문서 「What is a Network Load Balancer?」](https://docs.aws.amazon.com/elasticloadbalancing/latest/network/introduction.html) — NLB의 UDP 리스너
 - [AWS 문서 「Gateway endpoints for Amazon S3」](https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-s3.html) — S3 게이트웨이 엔드포인트
 - [Amazon ECS 문서 「Deploy Amazon ECS services by replacing tasks」](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-type-ecs.html) — 롤링 교체의 최소 · 최대 비율
-- [미디어 서버에서 DB 비밀번호를 없앴다](/posts/0-to-1/pokeclip-shared-db-auth-iam-tls/) — RDS IAM DB 인증
+- [DB 비밀번호 대신 연결마다 RDS IAM 토큰을 만들었습니다](/posts/0-to-1/pokeclip-shared-db-auth-iam-tls/) — RDS IAM DB 인증
 - 팀 내부 결정 · 스파이크 기록(비공개) — 7월 20 · 27일 배치 결정, 8월 1일 RDS 결정, 8월 3일 NLB 경로 스파이크
 
 ---
