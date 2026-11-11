@@ -41,7 +41,7 @@ YouTube에 영상을 올리려면 채널 주인이 동의한 OAuth 토큰이 있
 
 ## 승인 대기함은 8월 30일 결정으로 만들지 않았습니다 {#요청을-막는-대신-대기-상태를-두는-비용을-택했습니다}
 
-8월 4일 Auth를 구현하던 팀원이 이의를 냈습니다. 권한 등급을 두지 말고, 초대된 편집자는 그 방송자에 대해 전부 할 수 있게 하자는 것이었습니다. 8월 26일의 첫 권한 코드는 방송 자격을 한 자리에서 판정하면서 방송자와 편집자를 가르지 않았습니다(커밋 [`256856a7`](https://github.com/3K-PokeClip/PokeClip-mono/commit/256856a7)). 8월 30일 팀은 승인 게이트를 두지 않기로 했고, clip 서버 문서는 「승인 상태 칸은 만들지 않는다(편집자 · 스트리머 둘 다 업로드한다)」고 적었습니다([`services/README.md` 2851–2852행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/services/README.md?plain=1#L2851-L2852)).
+8월 4일 Auth를 구현하던 팀원이 이의를 냈습니다. 권한 등급을 두지 말고, 초대된 편집자는 그 방송자에 대해 전부 할 수 있게 하자는 것이었습니다. 8월 26일의 첫 권한 코드는 방송 자격을 한 자리에서 판정하면서 방송자와 편집자를 가르지 않았습니다(커밋 [`256856a7`](https://github.com/3K-PokeClip/PokeClip-mono/commit/256856a7)). 8월 30일 팀은 승인 게이트를 두지 않기로 했고, clip 서버 문서는 「승인 상태 칸은 만들지 않는다(… 승인 게이트 없음 — 편집자 · 스트리머 둘 다 업로드한다)」고 적었습니다([`services/README.md` 2851–2852행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/services/README.md?plain=1#L2851-L2852)).
 
 근거는 「누가 매일 쓰나」였습니다. 돈을 내는 쪽(방송자)과 매일 쓰는 쪽(전담 편집자)이 다르고, 방송자만 할 수 있게 하면 방송자가 매번 대신 눌러 줘야 해서 편집자를 두는 의미가 없어진다는 것입니다. 좁은 권한에서 넓혀 가는 편이 안전해 보이지만, 여기서는 좁게 시작하면 제품이 돌지 않는다고 봤습니다. 응답의 `relation` 칸은 「내 방송」과 「내가 편집하는 방송」을 다르게 그리는 표시일 뿐 권한이 아닙니다([1749–1760행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/services/README.md?plain=1#L1749-L1760)). 10월 22일에는 이 방침이 「권한이 같다」는 결정으로 굳었고, 방송 자격 판정 코드의 주석에 남았습니다([`BroadcastAccessGuard.java` 17–19행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/services/clip/src/main/java/com/pokeclip/clip/delegation/BroadcastAccessGuard.java#L17-L19)).
 
@@ -73,7 +73,7 @@ stateDiagram-v2
   class checking accent
 ```
 
-자동 업로드도 권한과 상관없는 모양으로 들어갔습니다. 10월 8일부터 「영상 만들기」를 누를 때 업로드 정보를 함께 적으면, 렌더가 성공하는 순간 clip 서버가 스스로 업로드를 시작합니다([`services/README.md` 2539–2545행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/services/README.md?plain=1#L2539-L2545)). 사람이 렌더 끝을 기다렸다 다시 누르지 않는다는 뜻이고, 7월의 토글 ②처럼 따로 허락받는 권한은 아닙니다. 편집할 수 있는 사람이면 누구나 이렇게 주문할 수 있습니다.
+자동 업로드도 권한과 상관없는 모양으로 들어갔습니다. 10월 8일부터(커밋 [`3de48385`](https://github.com/3K-PokeClip/PokeClip-mono/commit/3de48385)) 「영상 만들기」를 누를 때 업로드 정보를 함께 적으면, 렌더가 성공하는 순간 clip 서버가 스스로 업로드를 시작합니다([`services/README.md` 2539–2545행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/services/README.md?plain=1#L2539-L2545)). 사람이 렌더 끝을 기다렸다 다시 누르지 않는다는 뜻이고, 7월의 토글 ②처럼 따로 허락받는 권한은 아닙니다. 편집할 수 있는 사람이면 누구나 이렇게 주문할 수 있습니다.
 
 ## 권한을 합친 대가는 방송자가 게시를 미리 막을 수 없다는 점입니다
 
@@ -86,7 +86,7 @@ stateDiagram-v2
 ## 출처
 
 - PokeClip-mono develop `825a3dfe` — [`BroadcastAccessGuard.java` 17–19행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/services/clip/src/main/java/com/pokeclip/clip/delegation/BroadcastAccessGuard.java#L17-L19) · [`services/README.md` 「OWNER와 EDITOR를 가르지 않는다」](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/services/README.md?plain=1#L1749-L1760) · [같은 문서 「영상 만들기」](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/services/README.md?plain=1#L2539-L2545) · [같은 문서 보관함 상태 표](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/services/README.md?plain=1#L2838-L2852) · [`UploadProcessor.java` 147행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/workers/upload/src/main/java/com/pokeclip/upload/work/UploadProcessor.java#L147) · [`ResumableUploader.java`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/workers/upload/src/main/java/com/pokeclip/upload/youtube/ResumableUploader.java#L24-L33) · [`V213__upload_requests_and_upload_metadata.sql`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/services/clip/src/main/resources/db/migration/V213__upload_requests_and_upload_metadata.sql#L21)
-- PokeClip-mono 커밋 [`256856a7`](https://github.com/3K-PokeClip/PokeClip-mono/commit/256856a7) — 방송 자격 판정을 한 자리로, 주인과 편집자를 가르지 않음(2026-08-26) · [`ba94ecdd`](https://github.com/3K-PokeClip/PokeClip-mono/commit/ba94ecdd) — 업로드 일꾼 첫 판(2026-09-26)
+- PokeClip-mono 커밋 [`256856a7`](https://github.com/3K-PokeClip/PokeClip-mono/commit/256856a7) — 방송 자격 판정을 한 자리로, 주인과 편집자를 가르지 않음(2026-08-26) · [`ba94ecdd`](https://github.com/3K-PokeClip/PokeClip-mono/commit/ba94ecdd) — 업로드 일꾼 첫 판(2026-09-26) · [`3de48385`](https://github.com/3K-PokeClip/PokeClip-mono/commit/3de48385) — 업로드 정보 · 렌더 성공 뒤 자동 업로드(2026-10-08)
 - Google, [YouTube Data API — Implementing OAuth 2.0 Authorization](https://developers.google.com/youtube/v3/guides/authentication) · [Resumable Uploads](https://developers.google.com/youtube/v3/guides/using_resumable_upload_protocol)
 - 팀 내부 결정 기록(비공개) — 7월 20일 계정 · 권한 설계, 8월 4일 이의, 8월 30일 승인 게이트 없음, 10월 22일 권한 같음
 

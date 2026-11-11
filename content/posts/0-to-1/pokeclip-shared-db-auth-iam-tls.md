@@ -30,9 +30,9 @@ IAM 전환, TLS 검증 강도, CA 인증서를 싣는 방식, 실제 RDS로 검�
 
 DB 사용자에 `rds_iam`을 주고 실행 역할에 `rds-db:connect`를 주는 것이 흔히 말하는 「IAM 권한을 붙인다」입니다. 하지만 프로그램 쪽에서는 아무것도 바뀌지 않습니다. 비밀번호로 붙던 프로그램은 접속 문자열(DSN)에 비밀번호를 넣어 연결하고, IAM 정책이 생긴 줄 모릅니다. 그래서 애플리케이션 코드가 직접 세 가지를 해야 합니다.
 
-1. 지금 실행 중인 AWS 역할의 자격 증명을 찾는다(SDK 기본 자격 증명 체인 — 운영에서는 인스턴스 역할).
-2. 그 자격으로 DB 호스트 · 포트 · 사용자 · 리전에 대한 토큰을 서명한다. 서명은 로컬 계산이다.
-3. 토큰을 비밀번호 자리에 넣어 로그인한다.
+1. 지금 실행 중인 AWS 역할의 자격 증명 찾기(SDK 기본 자격 증명 체인 — 운영에서는 인스턴스 역할)
+2. 그 자격으로 DB 호스트 · 포트 · 사용자 · 리전에 대한 토큰 서명(로컬 계산)
+3. 토큰을 비밀번호 자리에 넣어 로그인
 
 Go로 작성된 미디어 쪽은 이 일을 새 패키지 [`media/internal/pgconf`](https://github.com/3K-PokeClip/PokeClip-mono/tree/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/media/internal/pgconf)에 모았습니다. 사이드카의 두 연결 풀과 janitor 풀이 모두 이 패키지로 설정을 만들고, 따로 있던 DSN 조립 코드 두 벌은 지웠습니다. 이 패키지에서 AWS SDK를 import하는 곳은 [`iam.go`](https://github.com/3K-PokeClip/PokeClip-mono/blob/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/media/internal/pgconf/iam.go) 한 파일뿐입니다. `POSTGRES_AUTH`가 비었거나 `password`이면 예전처럼 비밀번호로 붙으므로 로컬 개발 환경은 바뀌지 않습니다.
 
@@ -175,7 +175,7 @@ Java 앱 서버 네 대(auth, clip, chat-collector, chat-detector — Spring Boo
 - **토큰 시점 — 같습니다.** Hikari의 `HikariCredentialsProvider`에 AWS SDK `RdsUtilities`로 서명한 토큰을 넣어 새 연결마다 만듭니다([`RdsIamCredentialsProvider`](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/services/db-support/src/main/java/com/pokeclip/db/RdsIamCredentialsProvider.java)). 토큰 생성 상한도 10초입니다. 팀원의 스파이크(10월 23일)에서 연결 수명을 2분으로 줄이고 32분을 돌려, 토큰 187개를 발급하는 동안 실패 0을 확인했습니다.
 - **구현 방식 — AWS 공식 JDBC 래퍼는 쓰지 않았습니다.** 결정 당시(10월 23일) chat 두 서버는 응답 없는 연결을 `socketTimeout: 10`(초)으로 끊었습니다(지금은 auth · clip도 같은 10초입니다 — [auth](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/services/auth/src/main/resources/application.yml#L35) · [clip](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/services/clip/src/main/resources/application.yml#L28) 설정). 결정 당시 래퍼는 이 값을 밀리초로 받아 pgjdbc에 초로 넘겼고, 1초 미만은 경고 없이 0으로 잘렸습니다. pgjdbc는 0을 「시한 없음」으로 봅니다([aws-advanced-jdbc-wrapper#2157](https://github.com/aws/aws-advanced-jdbc-wrapper/issues/2157)). 경고만 더하는 수정([#2198](https://github.com/aws/aws-advanced-jdbc-wrapper/pull/2198))은 한국 시간 10월 23일에 병합됐고 이슈는 11월 5일에 닫혔습니다. 변환 방식은 하위 호환을 위해 그대로입니다.
 - **토큰을 건넬 상대 — Java라서 구멍이 하나 더 있었습니다.** Java도 `verify-full`을 강제하고 Go와 같은 CA 번들을 씁니다(두 번들의 바이트가 같은지 시험이 확인합니다). 그런데 JDBC는 URL 쿼리와 드라이버 속성으로 접속을 바꿀 수 있습니다. `sslfactory=org.postgresql.ssl.NonValidatingFactory`는 `verify-full`을 둔 채 인증서 검증을 건너뛰고([pgJDBC 문서](https://jdbc.postgresql.org/documentation/ssl/)), `password=`는 IAM 토큰 대신 URL의 비밀번호를 드라이버에 넘기게 하고, `PGHOST=`는 서명한 호스트와 실제 접속 대상을 가릅니다. 막을 키를 고르는 방식은 리뷰에서 우회로가 두 번 연달아 나와, IAM 모드에서는 URL 쿼리를 통째로 거부하고 드라이버 속성은 `socketTimeout` 하나만 받는 허용 목록으로 바꿨습니다([`DataSourceLoginConfiguration`](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/services/db-support/src/main/java/com/pokeclip/db/DataSourceLoginConfiguration.java)). Go 쪽은 DSN을 개별 환경 변수로 직접 조립하고, DSN에 넣은 값이 pgx가 읽는 `PG*` 환경 변수보다 우선해서([pgx v5.10.0 `ParseConfig`](https://github.com/jackc/pgx/blob/v5.10.0/pgconn/config.go#L356-L363)) IAM 경로에 이런 통로가 없습니다.
-- **로그인 뒤 권한 — 서버마다 사용자를 따로 뒀습니다.** 남의 표를 읽는 권한은 그 표의 주인이 주게 했습니다. 이 내용도 [로그인 뒤 권한 글](/posts/0-to-1/pokeclip-shared-db-login-privileges/#서버마다-사용자를-따로-두고-남의-표-읽기는-표-주인이-줬습니다)에 있습니다.
+- **로그인 뒤 권한 — 서버마다 사용자를 따로 뒀습니다.** 서버별 사용자는 제가 IAM 적용과 함께 제안한 방향이고 팀원이 구현했으며, 남의 표를 읽는 권한은 그 표의 주인이 주게 했습니다. 이 내용도 [로그인 뒤 권한 글](/posts/0-to-1/pokeclip-shared-db-login-privileges/#서버마다-사용자를-따로-두고-남의-표-읽기는-표-주인이-줬습니다)에 있습니다.
 - **판정 — 같습니다.** `auth` · `sslmode` · `tls` 등 공통 칸의 `db_connected` 줄을 남기고, `tls`도 실제 연결 기준입니다.
 
 네 결정은 언어가 바뀌어도 같았고, 달라진 것은 구멍이 생기는 자리였습니다.
