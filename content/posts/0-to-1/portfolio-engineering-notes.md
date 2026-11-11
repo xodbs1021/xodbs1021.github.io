@@ -144,7 +144,7 @@
 현재 구현에 쓰지 않는 경로 조정 설계와 아직 검증하지 못한 하이라이트 연구도 있습니다. 부분 목록으로 방송을 삭제하지 않는 원칙과, 자동 탐지가 실패해도 수동 편집으로 이어지는 선택은 다음 설계에도 참고할 수 있어 남겼습니다.
 
 - **CASE 13** · [부분 목록으로 방송을 지우지 않기: 폐기한 경로 조정 설계에서 남은 판단](https://xodbs1021.github.io/posts/0-to-1/pokeclip-path-reconciler-design-history/)
-- **CASE 32** · [채팅이 많으면 하이라이트일까: 자동 탐지의 가설과 수동 대체 경로](https://xodbs1021.github.io/posts/0-to-1/chat-highlight-research-and-fallback/)
+- **CASE 32** · [채팅 급증 판별은 임시 기준이라 수동 표시 경로를 함께 뒀습니다](https://xodbs1021.github.io/posts/0-to-1/chat-highlight-research-and-fallback/)
 
 ## 상태와 자료를 읽는 기준 {#source}
 

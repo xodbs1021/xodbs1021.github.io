@@ -887,6 +887,15 @@
       "bytes": 20949
     }
   },
+  "f887e270db9e82bd": {
+    "source": "content/posts/0-to-1/chat-highlight-research-and-fallback.md",
+    "wide": {
+      "file": "f887e270db9e82bd-wide.svg",
+      "width": 392,
+      "height": 574,
+      "bytes": 20888
+    }
+  },
   "fdc7e37322cf0959": {
     "source": "content/posts/tech-blurting/cmaf-deep-dive.md",
     "wide": {

@@ -41,6 +41,7 @@ import { PAIRING_CODE_LIFETIME_FRAMES, PairingCodeLifetime } from "./scenes/poke
 import { SECRET_PATH_ONE_CONNECTION_FRAMES, SecretPathOneConnection } from "./scenes/pokeclip-secret-storage-migration-plan/SecretPathOneConnection";
 import { SEARCH_PATH_HIJACK_FRAMES, SearchPathHijack } from "./scenes/pokeclip-shared-db-login-privileges/SearchPathHijack";
 import { UPLOAD_REQUEST_PATH_FRAMES, UploadRequestPath } from "./scenes/pokeclip-editing-upload-authorization/UploadRequestPath";
+import { CHAT_SPIKE_TO_CARD_FRAMES, ChatSpikeToCard } from "./scenes/chat-highlight-research-and-fallback/ChatSpikeToCard";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
@@ -448,6 +449,16 @@ export const RemotionRoot: React.FC = () => (
       component={UploadRequestPath}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={UPLOAD_REQUEST_PATH_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="ChatSpikeToCard" component={ChatSpikeToCard} durationInFrames={CHAT_SPIKE_TO_CARD_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="ChatSpikeToCardMobile"
+      component={ChatSpikeToCard}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={CHAT_SPIKE_TO_CARD_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}
