@@ -33,6 +33,10 @@ import { SHARED_ENCODER_START_FRAMES, SharedEncoderStart } from "./scenes/pokecl
 import { AUTO_ASSIGN_RESTORE_FRAMES, AutoAssignRestore } from "./scenes/pokeclip-audio-assignment-user-state/AutoAssignRestore";
 import { MULTIAUDIO_STAGE_PROOF_FRAMES, MultiaudioStageProof } from "./scenes/pokeclip-multiaudio-end-to-end-verification/MultiaudioStageProof";
 import { TRACK_PICK_IN_CLIP_FRAMES, TrackPickInClip } from "./scenes/microphone-selection-without-always-on-vad/TrackPickInClip";
+import { UPLOAD_CRASH_RESUME_FRAMES, UploadCrashResume } from "./scenes/pokeclip-upload-state-and-recovery/UploadCrashResume";
+import { HOOK_LOSS_RESCAN_FRAMES, HookLossRescan } from "./scenes/pokeclip-indexer-recovery-without-events/HookLossRescan";
+import { BATCH_GET_CONCURRENCY_FRAMES, BatchGetConcurrency } from "./scenes/pokeclip-storage-before-new-layer/BatchGetConcurrency";
+import { CACHE_KEY_VS_ORIGIN_FORWARD_FRAMES, CacheKeyVsOriginForward } from "./scenes/pokeclip-cdn-cache-auth-measurement/CacheKeyVsOriginForward";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
@@ -360,6 +364,46 @@ export const RemotionRoot: React.FC = () => (
       component={TrackPickInClip}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={TRACK_PICK_IN_CLIP_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="UploadCrashResume" component={UploadCrashResume} durationInFrames={UPLOAD_CRASH_RESUME_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="UploadCrashResumeMobile"
+      component={UploadCrashResume}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={UPLOAD_CRASH_RESUME_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="HookLossRescan" component={HookLossRescan} durationInFrames={HOOK_LOSS_RESCAN_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="HookLossRescanMobile"
+      component={HookLossRescan}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={HOOK_LOSS_RESCAN_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="BatchGetConcurrency" component={BatchGetConcurrency} durationInFrames={BATCH_GET_CONCURRENCY_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="BatchGetConcurrencyMobile"
+      component={BatchGetConcurrency}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={BATCH_GET_CONCURRENCY_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="CacheKeyVsOriginForward" component={CacheKeyVsOriginForward} durationInFrames={CACHE_KEY_VS_ORIGIN_FORWARD_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="CacheKeyVsOriginForwardMobile"
+      component={CacheKeyVsOriginForward}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={CACHE_KEY_VS_ORIGIN_FORWARD_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}
