@@ -887,15 +887,6 @@
       "bytes": 24531
     }
   },
-  "cd415574b3740770": {
-    "source": "content/posts/0-to-1/pokeclip-scratch-volume-ownership.md",
-    "wide": {
-      "file": "cd415574b3740770-wide.svg",
-      "width": 392,
-      "height": 595,
-      "bytes": 24425
-    }
-  },
   "cf9d9cbff42e38c1": {
     "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
     "wide": {
@@ -978,6 +969,15 @@
       "width": 430,
       "height": 646,
       "bytes": 25212
+    }
+  },
+  "ec83684892b0a5b7": {
+    "source": "content/posts/0-to-1/pokeclip-scratch-volume-ownership.md",
+    "wide": {
+      "file": "ec83684892b0a5b7-wide.svg",
+      "width": 392,
+      "height": 595,
+      "bytes": 24425
     }
   },
   "ed88d5fe785fe73f": {

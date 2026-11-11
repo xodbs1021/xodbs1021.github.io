@@ -38,7 +38,7 @@ flowchart TB
   prep[prep 스테이지<br/>빈 디렉터리 셋 mkdir]
   final[최종 이미지<br/>MediaMTX 포크<br/>scratch 파생 · USER 10002]
   bin[hooks-bin<br/>훅 실행 파일<br/>--chown=0:0]
-  dirs[recordings<br/>dvr · hooks<br/>--chown=10002:10002]
+  dirs[recordings<br/>dvr · hooks<br/>--chown=<br/>10002:10002]
   vol[(named volume 셋<br/>첫 복사로 10002 소유)]
   side[사이드카 10001<br/>읽기 전용]
   jan[janitor 10002<br/>삭제]
