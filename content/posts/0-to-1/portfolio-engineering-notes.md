@@ -53,7 +53,7 @@
 - **CASE 02** · [Go로 다 짜려던 미디어 서버를 MediaMTX에 맡겼습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-mediamtx-build-or-adopt/)
 - **CASE 03** · [채팅 수집 언어는 리뷰할 사람이 바뀌어 Spring이 됐습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-language-ownership-boundaries/)
 - **CASE 04** · [방송 중인 미디어 서버는 API처럼 갈아 끼울 수 없었습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-stateful-media-deployment/)
-- **CASE 29** · [6초 창 때문에 라이브러리를 포크할 필요가 있을까](https://xodbs1021.github.io/posts/0-to-1/pokeclip-live-window-without-fork/)
+- **CASE 29** · [LL-HLS 라이브 창은 지연이 아니라 복귀 여유를 정했습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-live-window-without-fork/)
 - **CASE 30** · [클립은 완성 파일 대신 원본과 편집 레시피로 남겼습니다](https://xodbs1021.github.io/posts/0-to-1/clip-edit-recipe-render-boundary/)
 
 ## 파일 회수와 복구 기준 {#recovery}

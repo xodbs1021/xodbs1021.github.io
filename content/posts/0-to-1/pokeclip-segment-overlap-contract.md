@@ -98,7 +98,7 @@ flowchart TB
 
 - 10월 6일 정확성 시험: 격리한 PostgreSQL 17에서 Java `StreamSegmentReader`의 상대 PTS 쿼리와 재생 시각 쿼리를 그대로 뽑아 자리표시자만 바꿔 실행했습니다. 4초 조각 8개와 다른 스트림 조각 8개, NULL 대체, 벽시각 60초 차이, pending/failed를 넣었습니다. 축마다 시작 오프셋 4,000개와 경계 10개입니다. AI 에이전트가 수행했고 원자료는 비공개입니다.
 - 별도 경계 재현: PostgreSQL 16.15, 경계 8개, 삽입 순서를 섞음.
-- 코드 인용은 PR #120 머지 뒤 판과 PokeClip-mono develop `825a3dfe`(2026년 11월 10일)입니다.
+- 코드 인용은 PR #120 머지 뒤 판과 PokeClip-mono develop `825a3dfe`(2026년 11월 11일)입니다.
 
 ## 출처
 
