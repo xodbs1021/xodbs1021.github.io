@@ -41,7 +41,7 @@ AWS 문서의 [캐시 키 정책](https://docs.aws.amazon.com/AmazonCloudFront/l
 원본은 서울 리전 EC2의 MediaMTX 1.20.1 컨테이너(CPU 1개, 메모리 384MiB 제한)였습니다. 입력은 720p30 H.264 약 1.5Mbps와 AAC 128kbps, GOP 2초였고 조각도 약 2초였습니다. 같은 Mac의 k6로 세 구성마다 1·10·25·50 VU를 25초씩 한 번 차례로 돌렸습니다. [[fig-cdn-origin-requests]]는 50 VU에서 원본이 받은 미디어 요청 수입니다.
 
 {{< chart id="fig-cdn-origin-requests" kind="실측" caption="50 VU·25초에서 원본이 받은 미디어 요청 수. 시청자별 캐시 비교군은 1,254건, 캐시 키에서 세션을 빼고 원본 전달은 남긴 공유 캐시는 28건이었습니다. 2026-10-05 임시 AWS 실험, MediaMTX 1.20.1, 각 조건 1회." source="팀 내부 실측(비공개 원시 묶음), 포트폴리오 요약 2026-10-15판 21쪽" height="200px" >}}
-{"grid":{"left":8,"right":64,"top":16,"bottom":8,"containLabel":true},"xAxis":{"type":"value","name":"건","min":0,"max":1400,"interval":350},"yAxis":{"type":"category","inverse":true,"data":["시청자별 캐시","공유 캐시"]},"series":[{"name":"원본 미디어 요청","type":"bar","barWidth":22,"label":{"show":true,"position":"right","formatter":"{c}건"},"data":[{"value":1254,"itemStyle":{"color":"#7a8a9b"},"label":{"formatter":"1,254건"}},{"value":28,"itemStyle":{"color":"#087f8b"}}]}]}
+{"grid":{"left":8,"right":64,"top":16,"bottom":8,"containLabel":true},"xAxis":{"type":"value","name":"건","min":0,"max":1750,"interval":350},"yAxis":{"type":"category","inverse":true,"data":["시청자별 캐시","공유 캐시"]},"series":[{"name":"원본 미디어 요청","type":"bar","barWidth":22,"label":{"show":true,"position":"right","formatter":"{c}건"},"data":[{"value":1254,"itemStyle":{"color":"#7a8a9b"},"label":{"formatter":"1,254건"}},{"value":28,"itemStyle":{"color":"#087f8b"}}]}]}
 {{< /chart >}}
 
 요청 수는 줄었지만 바이트와 지연은 따로 읽어야 했습니다. 단위가 서로 달라 표로 둡니다.
@@ -89,23 +89,23 @@ AWS 문서의 [캐시 키 정책](https://docs.aws.amazon.com/AmazonCloudFront/l
 | 256KiB | 54.0ms | 14.2ms |
 | 4MiB | 52.9ms | 15.0ms |
 
-모두 110요청이었고, 전송량은 미리 잡아 둔 2GiB 상한 안이었습니다. 첫 두 요청이 Miss였던 내부 원인은 확정하지 못했습니다. 시간 경과와 앞선 두 요청이 함께 달라서, 캐시 전파 지연인지 필요한 요청 횟수인지 가를 수 없었습니다. 위 시간 차이는 S3 원본 전송 절감률이나 영상 재생 지연을 뜻하지 않습니다.
+모두 110요청이었고, 10월 6일 실험 전체의 전송 예약은 2GiB 안에 잡았습니다. 첫 두 요청이 Miss였던 내부 원인은 확정하지 못했습니다. 시간 경과와 앞선 두 요청이 함께 달라서, 캐시 전파 지연인지 필요한 요청 횟수인지 가를 수 없었습니다. 위 시간 차이는 S3 원본 전송 절감률이나 영상 재생 지연을 뜻하지 않습니다.
 
 ## 운영 배포는 세션 쿠키 대신 CDN 비밀을 원본에 넘깁니다 {#앞선-로컬-실험은-성능-개선율이-아니라-비교의-기준선입니다}
 
-지금 운영 엣지는 실험의 「세션 쿠키·쿼리를 원본에 넘김」 대신 MediaMTX의 CDN 모드를 씁니다. 라이브 경로의 CloudFront 함수가 원본으로 가는 요청의 `Authorization` 머리를 키-값 저장소(KVS)에 둔 CDN 비밀로 늘 덮어쓰고, MediaMTX는 그 비밀(`hlsCDNSecret`)로 CDN이 보낸 요청인지 확인합니다([`live-auth.js` 머리 주석](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/functions/live-auth.js#L1-L21), [`mediamtx.yml.tmpl` 143행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/mediamtx.yml.tmpl#L143)). 비밀을 못 읽으면 원본으로 넘기지 않고 503을 돌려줍니다. 원본에는 `Host`와 `Authorization`만 가고 쿠키는 가지 않으며, 시청자 인증은 엣지의 서명 쿠키가 맡습니다([`policies.tf` 128–149행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/policies.tf#L128-L149)).
+지금 운영 엣지는 실험의 「세션 쿠키·쿼리를 원본에 넘김」 대신 MediaMTX의 CDN 모드를 씁니다. 라이브 경로의 CloudFront 함수가 원본으로 가는 요청의 `Authorization` 머리를 키-값 저장소(KVS)에 둔 CDN 비밀로 늘 덮어쓰고, MediaMTX는 그 비밀(`hlsCDNSecret`)로 CDN이 보낸 요청인지 확인합니다([`live-auth.js` 머리 주석](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/functions/live-auth.js#L1-L21), [`mediamtx.yml.tmpl` 143행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/mediamtx.yml.tmpl#L143)). 비밀을 못 읽으면 원본으로 넘기지 않고 503을 돌려줍니다. 원본에는 `Host`와 `Authorization`(라이브 목록은 `_HLS_*` 쿼리도)만 가고 쿠키와 그 밖의 시청자 머리는 가지 않으며, 시청자 인증은 엣지의 서명 쿠키가 맡습니다([`policies.tf` 128–149행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/policies.tf#L128-L149)).
 
-| 경로 | 캐시 키 · 보관 | 원본에 가는 것 |
-|---|---|---|
-| `/live/*.m3u8` 라이브 목록 | `_HLS_msn` · `_HLS_part` · `_HLS_skip`만 키, 엣지 1초 | `Host`, CDN 비밀을 담은 `Authorization` |
-| `/live/*` 조각 · 파트 · init | 쿠키 · 쿼리 없음, 원본 Cache-Control을 따르되 최대 3,600초 | 같음 |
-| 되감기 목록 | 원본이 `public, max-age=1` | S3, 원본 보호 계층(Origin Shield) 서울 |
-| 되감기 ③ 조각 · init | 원본이 1년 `immutable` | 같음 |
-| VOD 문서 | 원본이 3,600초 | 같음 |
+| 경로 | 원본 | 캐시 키 · 보관 | 원본에 넘기는 값 |
+|---|---|---|---|
+| `/live/*.m3u8` 라이브 목록 | 미디어 ALB(VPC 원본) | `_HLS_msn` · `_HLS_part` · `_HLS_skip`만 키, 엣지 1초 | `Host`, CDN 비밀을 담은 `Authorization`, `_HLS_*` 쿼리 |
+| `/live/*` 조각 · 파트 · init | 같음 | 쿠키 · 쿼리 없음, 원본 Cache-Control을 따르되 최대 3,600초 | `Host`, CDN 비밀을 담은 `Authorization` |
+| 되감기 목록 | S3(Origin Shield 서울) | 원본이 `public, max-age=1` | 없음(OAC 서명) |
+| 되감기 ③ 조각 · init | 같음 | 원본이 1년 `immutable`(엣지는 최대 1일) | 같음 |
+| VOD 문서 | 같음 | 원본이 3,600초 | 같음 |
 
-근거는 [`policies.tf` 33–57행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/policies.tf#L33-L57)(라이브 목록), [61–81행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/policies.tf#L61-L81)(라이브 조각), [`s3store.go` 29–30행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/rewind/publish/s3store.go#L29-L30)(되감기 목록 · VOD 문서), [`upload/s3.go` 30행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/upload/s3.go#L30)(③ 조각 · init), [`main.tf` 154–156행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/main.tf#L154-L156)(되감기 원본의 Origin Shield)입니다. 실험이 「Origin Shield 없음」, 「목록 TTL 0」, 「조각 TTL 120초」였던 것과 다릅니다.
+근거는 [`policies.tf` 33–57행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/policies.tf#L33-L57)(라이브 목록), [61–81행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/policies.tf#L61-L81)(라이브 조각), [`s3store.go` 29–30행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/rewind/publish/s3store.go#L29-L30)(되감기 목록 · VOD 문서), [`upload/s3.go` 30행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/upload/s3.go#L30)(③ 조각 · init), [`variables.tf` 92–103행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/variables.tf#L92-L103)(되감기 · VOD 엣지 상한 1일), [`main.tf` 154–156행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/main.tf#L154-L156)(되감기 원본의 Origin Shield)입니다. 실험이 「Origin Shield 없음」, 「목록 TTL 0」, 「조각 TTL 120초」였던 것과 다릅니다.
 
-캐시 키와 원본 전달을 나눈다는 실험의 결론은 그대로 두고, 원본에 넘기는 값을 시청자 세션에서 CDN 공용 비밀로 바꾼 것입니다. 시청자마다 다른 값을 원본에 넘기지 않고, 원본은 그 비밀로 CDN을 거친 요청인지 확인합니다. 이 구성에서 원본 요청이 얼마나 줄었는지는 재지 않았습니다. 미디어 서버를 NLB 뒤 프라이빗 EC2에 둔 배치는 [미디어 서버 배치 글](/posts/0-to-1/pokeclip-stateful-media-deployment/)에 있습니다.
+캐시 키와 원본 전달을 나눈다는 실험의 결론은 그대로 두고, 원본에 넘기는 값을 시청자 세션에서 CDN 공용 비밀로 바꾼 것입니다. 시청자마다 다른 값을 원본에 넘기지 않고, 원본은 그 비밀로 CDN을 거친 요청인지 확인합니다. 이 구성에서 원본 요청이 얼마나 줄었는지는 재지 않았습니다. 라이브 경로의 CDN 원본은 VPC 원본으로 붙인 미디어 ALB이고, 송출을 NLB 뒤 프라이빗 EC2로 받는 배치는 [미디어 서버 배치 글](/posts/0-to-1/pokeclip-stateful-media-deployment/)에 있습니다.
 
 포트폴리오 요약(2026-10-15판) 20쪽의 「목록 TTL 0, 조각 TTL 120초, 세션 쿠키·쿼리 원본 전달」은 10월 5일 실험 조건이고 지금 운영 구성이 아닙니다. 21·22쪽의 「내 판단·변경」, 「내가 확인 대상으로 삼은 실패」는 비교군과 채택 정책을 정한 제 몫을 적은 것이고, 정책 구성과 계측·분석은 AI(Codex)가 했습니다.
 
