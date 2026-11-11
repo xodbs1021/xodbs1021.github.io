@@ -30,3 +30,11 @@
 ## 지운 옛 자산(의도)
 
 kty 지시(2026-11-07 「기존꺼 삭제하고 이거 올려」)로 PR #21 글을 버리고 같은 주소에 새로 썼다. 옛 글만 쓰던 자산 셋을 지웠다 — `static/images/pokeclip-shared-db-auth-iam-tls-access-illustration.png` · `…-iam-connection-lifetime-poster.jpg` · `static/videos/…-iam-connection-lifetime.mp4` 와 장면 `IamConnectionLifetime`. 사이트 안 참조 0건(git grep). 외부에서 이 파일 주소를 직접 건 경우는 깨질 수 있다(되살리려면 main 이력에서 복원).
+
+## 2026-11-12 다시 씀(묶음 9)
+
+- 제목 「DB 비밀번호 대신 연결마다 RDS IAM 토큰을 만들었습니다」, '~습니다' 통일, 옛 소제목 id 10개 순서 보존 + `측정-조건` 추가.
+- ⑥절은 요약 + 새 글 `pokeclip-shared-db-login-privileges` 링크로 줄임. Java 항목의 서버별 사용자도 새 글로.
+- ADR 번호 → 날짜(10월 23일 결정 기록). 원시 `<figure><video>` → `{{< motion >}}`, 차트에 `kind="실측"` · `id` · `source` → `data/legacy-figure-gaps.json`에서 이 글 항목 삭제.
+- 상류 상태 재확인(2026-11-12): pgx#2545 열림, aws-jdbc#2157 2026-11-04T16:29Z 닫힘, #2198 2026-10-22T19:42Z 머지, #314 2026-10-22T16:52Z 머지.
+- 역할: 네 결정과 Java 적용 제안은 글쓴이, Go 구현 · 실험은 AI(AWS 쓰기는 글쓴이 승인), 11/3 인프라 적용은 글쓴이 직접, Java 구현은 팀원.
