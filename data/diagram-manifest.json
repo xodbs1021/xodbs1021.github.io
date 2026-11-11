@@ -167,6 +167,15 @@
       "bytes": 24241
     }
   },
+  "34ea7dad1b51e0b0": {
+    "source": "content/posts/0-to-1/harness-session-isolation-worktree-root.md",
+    "wide": {
+      "file": "34ea7dad1b51e0b0-wide.svg",
+      "width": 392,
+      "height": 989,
+      "bytes": 110643
+    }
+  },
   "3d6abb2da49552db": {
     "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
     "wide": {
@@ -435,6 +444,15 @@
       "width": 392,
       "height": 712,
       "bytes": 21359
+    }
+  },
+  "70f76eb873d6b0c8": {
+    "source": "content/posts/0-to-1/media-ci-path-filter-required-check-tradeoff.md",
+    "wide": {
+      "file": "70f76eb873d6b0c8-wide.svg",
+      "width": 392,
+      "height": 782,
+      "bytes": 110906
     }
   },
   "71f319ce47cd4e30": {
@@ -885,6 +903,15 @@
       "width": 600,
       "height": 634,
       "bytes": 22549
+    }
+  },
+  "f214404ff20a8c89": {
+    "source": "content/posts/0-to-1/pokeclip-test-database-ownership-marker.md",
+    "wide": {
+      "file": "f214404ff20a8c89-wide.svg",
+      "width": 392,
+      "height": 833,
+      "bytes": 22677
     }
   },
   "f358f3b82c11b1d9": {

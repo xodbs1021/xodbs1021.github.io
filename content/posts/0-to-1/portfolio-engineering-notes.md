@@ -26,7 +26,7 @@
 ## 10월 28일 추가한 플랫폼 개발 기록
 
 - [DB 비밀번호 대신 연결마다 RDS IAM 토큰을 만들었습니다](/posts/0-to-1/pokeclip-shared-db-auth-iam-tls/): 연결마다 만드는 IAM 토큰, verify-full, 공식 15분과 다른 실측 약 20분(1회). (11월 7일 새로 씀) 로그인 뒤 권한과 함수 가로채기는 [공유 DB에선 로그인 뒤 권한과 함수 가로채기를 막았습니다](/posts/0-to-1/pokeclip-shared-db-login-privileges/)로 나눴습니다(11월 12일).
-- [작업 세션과 worktree의 검토 상태를 분리한 이유](/posts/0-to-1/harness-session-isolation-worktree-root/): 상태 누출 방지, 시작 위치 고정, 회귀·변이 검사의 범위.
+- [워크트리를 나눠도 섞이던 하네스 검사 상태를 세션별로 나눴습니다](/posts/0-to-1/harness-session-isolation-worktree-root/): 세션별 상태 폴더, 첫 훅에서 고정한 작업 루트, 커밋 가드 회귀, 변이 32개 중 31개 검출. (11월 12일 새로 씀)
 - [시작되지 않은 watcher의 종료를 기다리던 교착](/posts/open-source-analysis/mediamtx-certloader-no-watcher-shutdown/): MediaMTX #6427의 원인, 최소 수정과 재현 조건.
 
 - [MediaMTX 앞 nginx의 요청 대상 검증](/posts/0-to-1/pokeclip-nginx-playback-request-boundary/): 경로·쿼리 일치와 정규화 우회 차단.
@@ -106,12 +106,12 @@
 
 ## 테스트·실행 권한·CI·의존성 {#quality}
 
-테스트가 실제 DB에 가짜 실패 행을 남기거나, 테스트가 사라졌는데도 CI가 초록색이 되는 경우를 확인했습니다. 일부러 오류를 넣거나 테스트를 제거해 검사가 실제로 실패하는지 대조했습니다.
+테스트가 개발 DB에 잔여 행을 남기거나, 테스트가 사라졌는데도 CI가 초록색이 되는 경우를 확인했습니다. 일부러 오류를 넣거나 테스트를 제거해 검사가 실제로 실패하는지 대조했습니다.
 
-- **CASE 17** · [가짜 실패 행 1,121개가 남았다: 테스트 DB의 소유권부터 확인하기](https://xodbs1021.github.io/posts/0-to-1/pokeclip-test-database-ownership-marker/)
+- **CASE 17** · [통합 테스트 잔여 행을 전용 DB와 소유 표식으로 막았습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-test-database-ownership-marker/)
 - **CASE 18** · [USER만 바꾸면 녹화가 깨진다: scratch와 새 볼륨의 권한 설계](https://xodbs1021.github.io/posts/0-to-1/pokeclip-scratch-volume-ownership/)
-- **CASE 34** · [CI 경로 필터를 바꾸려면 브랜치 보호부터 바꿔야 했다](https://xodbs1021.github.io/posts/0-to-1/media-ci-path-filter-required-check-tradeoff/)
-- **CASE 35** · [테스트가 모두 통과해도 CI를 실패시켜야 할 때](https://xodbs1021.github.io/posts/0-to-1/coverage-gate-that-fails-when-tests-disappear/)
+- **CASE 34** · [미디어 CI를 경로 필터로 좁히자 필수 체크를 포기해야 했습니다](https://xodbs1021.github.io/posts/0-to-1/media-ci-path-filter-required-check-tradeoff/)
+- **CASE 35** · [테스트 파일을 빼도 통과하던 CI를 커버리지 게이트로 막았습니다](https://xodbs1021.github.io/posts/0-to-1/coverage-gate-that-fails-when-tests-disappear/)
 - **후속 기록** · [MediaMTX 업그레이드에서 이미지만 바꾸면 놓치는 것들](https://xodbs1021.github.io/posts/0-to-1/pokeclip-dependency-upgrade-contracts/)
 
 ## MediaMTX 기여와 리뷰에서 바뀐 판단 {#opensource}
