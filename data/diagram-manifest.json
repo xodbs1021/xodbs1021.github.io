@@ -98,6 +98,15 @@
       "bytes": 28639
     }
   },
+  "2d8b574f04ff3307": {
+    "source": "content/posts/0-to-1/pokeclip-audio-assignment-user-state.md",
+    "wide": {
+      "file": "2d8b574f04ff3307-wide.svg",
+      "width": 392,
+      "height": 485,
+      "bytes": 21839
+    }
+  },
   "2f654ce58e7b04e9": {
     "source": "content/posts/tech-blurting/codec-decision-and-debugging.md",
     "wide": {
@@ -357,6 +366,15 @@
       "width": 184,
       "height": 452,
       "bytes": 15744
+    }
+  },
+  "6cfae3d038c3b8b0": {
+    "source": "content/posts/0-to-1/microphone-selection-without-always-on-vad.md",
+    "wide": {
+      "file": "6cfae3d038c3b8b0-wide.svg",
+      "width": 392,
+      "height": 569,
+      "bytes": 20585
     }
   },
   "6e543ce8143b4cc2": {
@@ -656,6 +674,15 @@
       "bytes": 20875
     }
   },
+  "bc8032e64af90e79": {
+    "source": "content/posts/0-to-1/pokeclip-obs-shared-encoder-srt.md",
+    "wide": {
+      "file": "bc8032e64af90e79-wide.svg",
+      "width": 417,
+      "height": 511,
+      "bytes": 20874
+    }
+  },
   "c1159dd16ef82875": {
     "source": "content/posts/tech-blurting/cmaf-deep-dive.md",
     "wide": {
@@ -723,6 +750,15 @@
       "width": 392,
       "height": 523,
       "bytes": 21752
+    }
+  },
+  "e15178edd37d55ae": {
+    "source": "content/posts/0-to-1/pokeclip-six-track-input-contract.md",
+    "wide": {
+      "file": "e15178edd37d55ae-wide.svg",
+      "width": 417,
+      "height": 255,
+      "bytes": 19006
     }
   },
   "e3c79ac5c0e8907f": {

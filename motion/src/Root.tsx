@@ -28,6 +28,11 @@ import { TFDT_REBASE_ABC_FRAMES, TfdtRebaseAbc } from "./scenes/pokeclip-cdn-tim
 import { REMUX_INIT_DRIFT_FRAMES, RemuxInitDrift } from "./scenes/pokeclip-go-remux-same-io-benchmark/RemuxInitDrift";
 import { THREE_AXIS_UPLOAD_FRAMES, ThreeAxisUpload } from "./scenes/pokeclip-playback-producer-boundaries/ThreeAxisUpload";
 import { MOBILE_VIDEO, VIDEO } from "./theme";
+import { SIX_TRACK_FUNNEL_FRAMES, SixTrackFunnel } from "./scenes/pokeclip-six-track-input-contract/SixTrackFunnel";
+import { SHARED_ENCODER_START_FRAMES, SharedEncoderStart } from "./scenes/pokeclip-obs-shared-encoder-srt/SharedEncoderStart";
+import { AUTO_ASSIGN_RESTORE_FRAMES, AutoAssignRestore } from "./scenes/pokeclip-audio-assignment-user-state/AutoAssignRestore";
+import { MULTIAUDIO_STAGE_PROOF_FRAMES, MultiaudioStageProof } from "./scenes/pokeclip-multiaudio-end-to-end-verification/MultiaudioStageProof";
+import { TRACK_PICK_IN_CLIP_FRAMES, TrackPickInClip } from "./scenes/microphone-selection-without-always-on-vad/TrackPickInClip";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
@@ -305,6 +310,56 @@ export const RemotionRoot: React.FC = () => (
       component={ThreeAxisUpload}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={THREE_AXIS_UPLOAD_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="SixTrackFunnel" component={SixTrackFunnel} durationInFrames={SIX_TRACK_FUNNEL_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="SixTrackFunnelMobile"
+      component={SixTrackFunnel}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={SIX_TRACK_FUNNEL_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="SharedEncoderStart" component={SharedEncoderStart} durationInFrames={SHARED_ENCODER_START_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="SharedEncoderStartMobile"
+      component={SharedEncoderStart}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={SHARED_ENCODER_START_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="AutoAssignRestore" component={AutoAssignRestore} durationInFrames={AUTO_ASSIGN_RESTORE_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="AutoAssignRestoreMobile"
+      component={AutoAssignRestore}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={AUTO_ASSIGN_RESTORE_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="MultiaudioStageProof" component={MultiaudioStageProof} durationInFrames={MULTIAUDIO_STAGE_PROOF_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="MultiaudioStageProofMobile"
+      component={MultiaudioStageProof}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={MULTIAUDIO_STAGE_PROOF_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="TrackPickInClip" component={TrackPickInClip} durationInFrames={TRACK_PICK_IN_CLIP_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="TrackPickInClipMobile"
+      component={TrackPickInClip}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={TRACK_PICK_IN_CLIP_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}
