@@ -1,377 +1,171 @@
 ---
-title: "HLS의 25초 지연을 2초로 — LL-HLS는 무엇을 바꿨나"
+title: "LL-HLS는 부분 조각과 보류 응답으로 목록 대기를 줄입니다"
 date: 2026-06-20T09:20:35+09:00
+lastmod: "2026-11-12T22:00:00+09:00"
+description: "일반 HLS는 조각이 다 만들어져야 목록에 올리고, 플레이어는 목록 끝에서 목표 길이 세 배 뒤에 섭니다. LL-HLS는 조각을 부분 조각(파트)으로 먼저 올리고, _HLS_msn · _HLS_part로 다음 목록을 걸어 두는 보류 응답, PRELOAD-HINT, 화질 보고, _HLS_skip 델타 목록으로 그 대기를 줄입니다. PART-HOLD-BACK 규칙(개정 초안 2배 · 3배, 애플 3배)과 PokeClip의 2.5배, 파트 전송 규칙, HTTP/2 이상과 대기 요청 합치기를 요구하는 서버 구성, LHLS · LL-DASH와의 차이를 규격과 소스로 확인했습니다."
 categories: ["tech-blurting"]
+tags: ["LL-HLS", "HLS", "저지연", "PART-HOLD-BACK", "CDN", "PokeClip"]
 draft: false
 ---
 
-라이브 방송을 보다가 채팅이 영상보다 빠른 경험, 게임 스포일러가 채팅으로 먼저 새는 경험, 다 해봤을 거다. 이게 일반 HLS의 18~25초 지연 때문이다.
+일반 HLS에서 새 조각은 다 만들어진 뒤에야 목록에 오르고, 플레이어는 목록 끝에서 목표 길이 세 배 뒤에 섭니다. 목표 길이가 6초면 조각을 만드는 6초와 시작 거리 18초가 지연에 들어갑니다. Apple이 2019년 WWDC에서 발표한 LL-HLS(Low-Latency HLS)는 조각을 더 작은 부분 조각(Partial Segment, 이하 파트)으로 먼저 목록에 올리고, 플레이어가 다음 목록과 다음 파트를 미리 요청해 두면 서버가 준비되는 순간 답하게 했습니다. 재생 위치는 파트 길이를 기준으로 한 `PART-HOLD-BACK`이 정합니다. Apple 문서는 이 방식이 공용 인터넷에서 지연을 일반 TV 방송 수준으로 낮춘다고 설명합니다. 대신 서버와 CDN은 HTTP/2 이상, 보류 요청 처리, 같은 요청 합치기를 갖춰야 합니다.
 
-Apple이 2019년 WWDC에서 발표한 **LL-HLS (Low-Latency HLS)** 가 이걸 2초까지 줄였다. **10배 이상의 개선**. 그런데 HTTP 위에서 동작한다는 HLS의 본질은 그대로다.
+## 일반 HLS는 조각이 다 만들어져야 목록에 올립니다 {#1-일반-hls의-25초-지연은-정확히-어디서-나오나}
 
-[지난 글](../dash-vs-hls/)에서 HLS와 DASH의 두 표준이 어떻게 공존하는지 봤다면, 이번 글은 **HLS가 자체 한계인 지연을 어떻게 깨려고 시도했는지** 정리한 노트다. Partial Segment, Blocking Playlist Reload, Preload Hint, Rendition Report — 네 가지 새 기술이 어떻게 맞물려서 동작하는지.
+개정 초안 22판 3.2절은 라이브 지연의 한 몫을 「게시 지연」이라고 부릅니다. 조각은 완전히 인코딩되고 포장되기 전에는 배포할 수 없고, 실시간으로 만드는 긴 조각은 그 길이만큼 지연을 만든다는 것입니다([개정 초안 22판](https://www.ietf.org/archive/id/draft-pantos-hls-rfc8216bis-22.txt)). 여기에 플레이어가 목록 끝에서 목표 길이 세 배 뒤에 서는 시작 거리가 더해집니다([일반 HLS 지연 글](/posts/tech-blurting/hls-deep-dive/)).
 
----
+### 조각만 짧게 줄이면 키프레임과 요청이 늘어납니다 {#그냥-세그먼트를-짧게-만들면-안-되나}
 
-## 1. 일반 HLS의 25초 지연은 정확히 어디서 나오나
+조각을 1초로 줄이면 두 몫이 함께 줄지만, 조각마다 IDR 프레임으로 시작해야 하므로(애플 저작 규격 7.4) 키프레임이 1초마다 들어가고, 시청자마다 조각 요청과 목록 요청이 늘어납니다. 개정 초안 4.4.3.8절도 목표 길이를 줄이면 버퍼가 줄고 화질 적응이 불리해지며 전달 부담이 커진다고 적습니다. 저지연 구성에서도 권장 목표 길이는 6초, 권장 GOP는 1–2초입니다(부록 B.1). 조각은 길게 두고, 조각보다 작은 단위를 따로 내는 쪽이 LL-HLS입니다.
 
-먼저 지연 구조부터 정확히 분해해보자.
+## 부분 조각은 부모 조각과 같은 표본을 먼저 나눠 올립니다 {#2-partial-segment--ll-hls의-첫-번째-핵심-기술}
 
-```
-[일반 HLS 라이브 지연]
-인코더가 6초어치 인코딩 후 세그먼트 출력: 0~6초
-세그먼트 업로드 + CDN 전파: ~1초
-플레이리스트 갱신 + 플레이어 폴링 발견: 0~6초
-플레이어 버퍼 (보통 3개 세그먼트 = 18초): 18초
-─────────────────────────────
-총 지연: 평균 ~25초
-```
+파트는 라이브 끝에서만 쓰는 병렬 통로입니다. 개정 초안 3.2절에 따르면 파트는 부모 조각(Parent Segment) 표본의 일부를 담고, 부모 조각과 그 파트 전부는 같은 표본을 같은 시각으로 담아야 합니다(MUST). 파트에는 0부터 세는 파트 번호가 있고, 조각 번호(MSN)는 부모 조각과 같습니다. 서버는 `EXT-X-PART-INF:PART-TARGET`으로 파트 목표 길이를 알리고, 파트 길이는 그 값 이하이면서 85% 이상이어야 합니다(독립 프레임으로 시작하는 파트, 부모의 마지막 파트 등은 예외, 4.4.4.9절).
 
-지연의 절반 이상이 **플레이어 버퍼 18초**다. 왜 18초나 잡냐? 안 잡으면 네트워크 흔들릴 때 바로 끊긴다. **버퍼 길이 = 안정성**의 트레이드오프 ([지난 글](../buffering-deep-dive/)에서 다룬 것).
-
-### 그냥 세그먼트를 짧게 만들면 안 되나?
-
-직관적인 해결: "6초 세그먼트를 1초로 줄이면 지연도 1/6 되겠지."
-
-안 된다. 이유 세 가지.
-
-**1. 매니페스트 폴링 빈도 증가**
-6초 → 1초로 줄이면 플레이리스트도 매 1초마다 갱신. 시청자 100만 명이 1초마다 폴링 = **초당 100만 RPS**. Origin 죽음.
-
-**2. CDN 캐시 효율 폭락**
-같은 시청자 수에 세그먼트 수 6배. 각 파일의 캐시 히트율 떨어짐.
-
-**3. 키프레임 간격 문제**
-각 세그먼트는 IDR(키프레임)로 시작해야 함. GOP가 1초면 같은 비트레이트에서 화질이 떨어짐. 키프레임이 자주 박힐수록 압축 효율 안 좋음.
-
-### Apple의 2019년 답 — 발상의 전환
-
-세그먼트를 짧게 만드는 게 아니라, **세그먼트를 만드는 도중에 부분적으로 미리 전송**하자.
-
-![HLS 25초 vs LL-HLS 2초 지연 분해](/images/hls-vs-llhls-latency-breakdown.png)
-
-```
-[LL-HLS 라이브 지연]
-인코더 partial 출력 (200ms 단위): ~0.2초
-CDN chunked transfer: ~0.3초
-플레이어 partial 버퍼 (보통 1~2초): ~1.5초
-─────────────────────────────
-총 지연: 평균 ~2초
-```
-
-10배 개선. 그것도 HLS의 핵심(HTTP + CDN 호환성)을 깨지 않고.
-
----
-
-## 2. Partial Segment — LL-HLS의 첫 번째 핵심 기술
-
-가장 중요한 발상.
-
-**6초짜리 세그먼트를 만드는 동안, 200ms 단위로 잘라서 미리 보낸다.**
-
-![Partial Segment 분할](/images/partial-segment-breakdown.png)
-
-```
-[일반 HLS]
-6초 인코딩 완료 → seg_42.m4s (6초 분량) 한 번에 전송
-
-[LL-HLS]
-0~0.2초 인코딩 → part_1.m4s (200ms) 즉시 전송
-0.2~0.4초 → part_2.m4s 즉시 전송
+```m3u8
+#EXT-X-TARGETDURATION:4
+#EXT-X-PART-INF:PART-TARGET=0.5
+#EXT-X-SERVER-CONTROL:CAN-BLOCK-RELOAD=YES,PART-HOLD-BACK=1.5,CAN-SKIP-UNTIL=24
 ...
-5.8~6.0초 → part_30.m4s 즉시 전송
-이 30개를 합치면 seg_42.m4s
+#EXT-X-PART:DURATION=0.5,URI="seg42.p0.mp4",INDEPENDENT=YES
+#EXT-X-PART:DURATION=0.5,URI="seg42.p1.mp4"
+#EXT-X-PRELOAD-HINT:TYPE=PART,URI="seg42.p2.mp4"
 ```
 
-세그먼트가 완성될 때까지 안 기다린다. **200ms 분량씩 미리 받음** = 6초 - 0.2초 = 5.8초 단축.
+Apple 문서의 예는 6초 조각에 200밀리초 파트 30개입니다. 파트는 부모 조각이 완성된 뒤에도 잠시 목록에 남고, 서버는 라이브 끝에서 목표 길이 세 배보다 오래된 파트를 목록에서 뺍니다([Apple, Enabling Low-Latency HLS](https://developer.apple.com/documentation/http-live-streaming/enabling-low-latency-http-live-streaming-hls)).
 
-### INDEPENDENT 플래그가 왜 중요한가
+「LL-HLS는 fMP4만 된다」는 말도 규격과 다릅니다. 개정 초안은 파트가 3.1절의 조각 형식 가운데 하나이면 된다고 정하므로 MPEG-2 TS 파트도 규격 안입니다. 실제로는 CMAF 청크(moof+mdat)를 파트로 쓰는 구성이 흔하고, 그 구조는 [CMAF 글](/posts/tech-blurting/cmaf-deep-dive/)에 있습니다.
 
-ABR로 화질 전환할 때 시청자가 부드럽게 넘어가려면 키프레임이 있어야 한다. 모든 partial이 키프레임으로 시작할 수는 없으니 (압축 효율 폭락), **일부만 INDEPENDENT 플래그**를 단다.
+### INDEPENDENT=YES 파트에서만 화질을 바꿔 들어갑니다 {#independent-플래그가-왜-중요한가}
 
-```
-#EXT-X-PART:DURATION=0.2,URI="part_1.m4s",INDEPENDENT=YES
-#EXT-X-PART:DURATION=0.2,URI="part_2.m4s"
-#EXT-X-PART:DURATION=0.2,URI="part_3.m4s"
-#EXT-X-PART:DURATION=0.2,URI="part_4.m4s"
-#EXT-X-PART:DURATION=0.2,URI="part_5.m4s",INDEPENDENT=YES
-```
+파트마다 IDR 프레임을 넣지는 않습니다. 독립 프레임이 없는 파트는 앞 파트 없이 디코딩할 수 없으므로, 재생을 시작하거나 다른 화질로 옮겨 갈 때는 독립 프레임으로 시작하는 파트부터 받아야 합니다. 개정 초안은 독립 프레임을 담은 파트마다 `INDEPENDENT=YES`를 달라고 권고(SHOULD)하고, 그 이유를 「클라이언트가 렌디션에 합류하고 전환하는 효율을 높이기 위해」라고 적습니다(4.4.4.9절). 그래서 화질별 변형의 키프레임 위치와 파트 경계를 맞춰 두어야 전환이 빨라집니다.
 
-플레이어가 화질 전환할 때 INDEPENDENT partial부터 시작.
+## 플레이어는 _HLS_msn · _HLS_part로 다음 목록을 걸어 둡니다 {#3-blocking-playlist-reload--두-번째-핵심-기술}
 
-### Partial 전송 — HTTP/1.1 Chunked Transfer Encoding
+일반 HLS 플레이어는 목록을 정해진 간격으로 다시 받으므로, 새 파트가 올라와도 다음 요청 때까지 모릅니다. 보류 목록 재요청(Blocking Playlist Reload)에서는 플레이어가 기다리는 다음 위치를 쿼리로 보냅니다. `CAN-BLOCK-RELOAD=YES`를 광고한 서버는 그 조각 · 파트가 목록에 들어갈 때까지 응답을 미룹니다(MUST). 아래 영상에서 목록 요청과 다음 파트 요청이 서버에 걸려 있다가, 파트가 완성되는 순간 둘 다 풀리는 순서를 보십시오.
 
-partial을 보내는 방식이 흥미롭다.
+{{< motion scene="BlockingPartFlow" id="fig-blocking-part-flow" kind="개념도" caption="플레이어는 _HLS_msn · _HLS_part로 다음 파트가 들어간 목록을 요청하고, 직전 목록의 PRELOAD-HINT가 가리킨 그 파트도 함께 요청합니다. 서버는 두 요청을 붙잡아 두었다가 파트가 완성되는 순간 둘 다 답하고, 플레이어는 곧바로 다음 파트로 같은 요청을 겁니다. 개정 초안 22판 6.2.5.2 · 6.2.6절을 따라 그린 설명용 그림입니다." >}}
 
-```
-GET /part_15.m4s HTTP/1.1
-
-Transfer-Encoding: chunked
-
-[chunk 1 - 첫 50ms 디코딩된 데이터]
-[chunk 2 - 다음 50ms]
-[chunk 3 - 다음 50ms]
-[chunk 4 - 다음 50ms]
+```http
+GET /live/index.m3u8?_HLS_msn=42&_HLS_part=2
 ```
 
-partial 자체도 chunked로 전송. 인코더가 partial을 만드는 *도중*에도 만들어진 부분을 보낼 수 있다. **세그먼트 안에 partial 안에 chunk** — 3중 계층.
+서버가 지킬 규칙은 개정 초안 6.2.5.2절에 모여 있습니다.
 
-이게 CMAF chunked의 기반이고 ([지난 시리즈에서 다룬 그거](../../)), HTTP/1.1의 기능을 그대로 활용했다는 게 핵심 — CDN과 100% 호환.
+| 경우 | 서버 동작 |
+|---|---|
+| `_HLS_msn=M`만 있음 | MSN M 이상의 조각이 목록에 들어갈 때까지 미룸 |
+| `_HLS_msn=M&_HLS_part=N` | MSN M의 파트 N(또는 그 뒤)이 목록에 들어갈 때까지 미룸 |
+| 파트 번호가 부모의 마지막 파트보다 큼 | 다음 부모 조각의 파트 0 요청으로 봄 |
+| 요청한 조각이 이미 목록에서 빠짐 | 그래도 목록 전체를 돌려줌(MUST) |
+| MSN이 목록 마지막 + 2보다 큼, 파트가 한도보다 앞섬 | 곧바로 400(SHOULD) |
+| `_HLS_part`만 있고 `_HLS_msn`이 없음 | 400(MUST) |
+| 목표 길이 3배 넘게 기다려도 못 줌 | 503(SHOULD) |
 
-### Partial 크기 트레이드오프
+여기서 한도(Advance Part Limit)는 파트 목표 길이가 1초 미만이면 3 ÷ 파트 목표 길이, 아니면 3입니다. 서버가 목록에 `EXT-X-ENDLIST`가 있으면 두 쿼리를 무시합니다. 「요청한 조각이 목록에서 빠져도 목록 전체를 돌려준다」는 규칙은 구현마다 다릅니다. PokeClip이 쓰는 MediaMTX의 gohlslib은 창 밖으로 밀린 조각 번호의 보류 요청에 400을 돌려줍니다([라이브 창 글](/posts/0-to-1/pokeclip-live-window-without-fork/)).
 
-```
-[Partial 200ms]
-지연: 200ms 이하
-부하: 평소 6배 요청
+## 다음 파트는 PRELOAD-HINT로 먼저 요청합니다 {#4-preload-hint--세-번째-핵심-기술}
 
-[Partial 1초]
-지연: 1초 이하
-부하: 평소 2배
-```
+목록을 받고 나서 새 파트를 요청하면 왕복이 한 번 더 듭니다. `EXT-X-PRELOAD-HINT`는 아직 없는 다음 파트(또는 init)의 주소를 알려, 플레이어가 그것이 준비되기 전에 요청을 보내 두게 합니다. 서버는 그 요청을 붙잡아 두었다가 응답할 수 있을 때 답합니다(4.4.5.3절). Apple 문서는 이것을 전 세계 규모에서 저지연을 내려면 꼭 없애야 하는 불필요한 왕복을 줄이는 장치로 설명합니다. 연결을 미리 맺으려는 장치가 아닙니다. 저지연 서버 구성에서는 `EXT-X-PART`가 있고 `EXT-X-ENDLIST`가 없는 목록마다 다음 파트를 가리키는 `PRELOAD-HINT`를 넣어야 합니다(부록 B.1).
 
-업계 표준 200~500ms. CDN 비용 대비 지연 단축의 균형점.
+### 파트는 다 준비될 때까지 한 바이트도 보내지 않습니다 {#partial-전송--http11-chunked-transfer-encoding}
 
----
+「파트를 HTTP/1.1 chunked 전송으로 만들면서 흘려보낸다」는 설명은 규격과 반대입니다. 개정 초안 6.2.6절은 아직 다 준비되지 않은 파트를 포함하는 요청(`PRELOAD-HINT`로 미리 보낸 요청 등)에 대해, 서버가 그 파트의 모든 바이트를 클라이언트까지 링크 속도로 보낼 수 있을 때까지 그 파트의 어떤 바이트도 보내지 않아야 한다(MUST)고 정합니다. 이유는 클라이언트가 정확한 대역폭을 재서 화질을 고르게 하려는 것입니다. 요청 범위에 파트가 여럿이면 파트마다 이 보장을 지킵니다. 만드는 도중의 바이트를 흘려보내는 방식은 LL-DASH의 chunked 전송에 가깝습니다.
 
-## 3. Blocking Playlist Reload — 두 번째 핵심 기술
+## 목록 델타와 화질 보고로 목록 크기와 전환 왕복을 줄입니다 {#5-rendition-report--네-번째-핵심-기술}
 
-partial을 만들었어도 플레이어가 그걸 *알아야* 받을 수 있다. 매니페스트에 적혀야 함.
+다른 화질로 옮겨 가려면 그 화질의 최신 목록이 필요합니다. 그냥 받으면 CDN 캐시에 남은 낡은 목록을 받을 수 있어, 최신 목록을 얻는 절차(부록 C의 튠인)를 거쳐야 합니다. `EXT-X-RENDITION-REPORT`는 지금 받는 목록 안에 다른 렌디션의 마지막 조각 번호(`LAST-MSN`)와 파트 번호(`LAST-PART`)를 적어 줍니다(4.4.5.4절). 플레이어는 그 값으로 다른 화질 목록을 곧바로 보류 요청할 수 있어 튠인 왕복을 건너뜁니다. 저지연 서버 구성은 다변형 목록의 다른 렌디션마다 이 태그를 하나씩 넣으라고 요구합니다(부록 B.1, MUST).
 
-일반 HLS는 플레이어가 1~6초마다 매니페스트를 폴링한다. 새 partial이 나와도 다음 폴링 때까지 모름.
-
-LL-HLS의 답: **Long Polling**.
-
-![Blocking Playlist Reload](/images/blocking-playlist-reload.png)
-
-### HLS_MSN과 HLS_PART 쿼리
-
-플레이어가 다음 매니페스트를 요청할 때 **"내가 기다리는 시점"을 쿼리에 박는다**.
-
-```
-GET /playlist.m3u8?_HLS_msn=42&_HLS_part=15
+```m3u8
+#EXT-X-RENDITION-REPORT:URI="../720p/index.m3u8",LAST-MSN=42,LAST-PART=1
 ```
 
-"세그먼트 시퀀스 42, partial 15보다 새 게 나올 때까지 기다려줘."
+### `_HLS_skip`은 CAN-SKIP-UNTIL 앞부분을 생략합니다 {#skip-메커니즘--매니페스트-크기-줄이기}
 
-### 서버의 동작
+파트 줄이 붙고 목록을 자주 받으니 목록 전송량이 커집니다. 서버가 `CAN-SKIP-UNTIL`(건너뛰기 경계, 초)을 광고하고 플레이어가 `_HLS_skip=YES`를 보내면, 서버는 목록 끝에서 그 경계보다 오래된 조각과 태그를 `EXT-X-SKIP` 한 줄로 바꾼 델타 목록을 돌려줘야 합니다(6.2.5.1절, MUST). 경계는 목표 길이의 6배 이상이어야 하고(4.4.3.8절), `EXT-X-SKIP`을 담은 목록은 프로토콜 버전 9 이상을 적어야 합니다(`_HLS_skip=v2`로 날짜 범위까지 생략하면 10 이상, 8절). 애플 저작 규격 14.4는 목록 창이 2분보다 긴 서비스에 델타 목록을 권합니다(SHOULD).
 
-```python
-def get_playlist(target_msn, target_part):
-    while True:
-        current_msn, current_part = get_latest()
-        if (current_msn > target_msn or 
-            (current_msn == target_msn and current_part > target_part)):
-            return build_playlist()
-        time.sleep(0.05)  # 50ms마다 확인
+PokeClip의 MediaMTX(gohlslib)는 이 광고를 조건 없이 냅니다. 4초 조각 7개 창에서 `CAN-SKIP-UNTIL`은 24초(4 × 6)였습니다. 같은 실측 기록에는 gohlslib이 LL-HLS 목록에 조각 7개 미만을 허용하지 않는 하한도 있습니다([라이브 창 글](/posts/0-to-1/pokeclip-live-window-without-fork/)).
+
+## 재생 위치는 PART-HOLD-BACK이 정합니다 {#7-ll-hls-지연-전체-흐름--종합}
+
+저지연 모드의 플레이어는 목록 끝에서 `PART-HOLD-BACK`보다 가까운 곳에서 재생을 시작하거나 찾아가지 않아야 합니다(개정 초안 6.3.3절). 이 값의 하한은 기준마다 다릅니다.
+
+| 기준 | PART-HOLD-BACK | 파트 목표 길이 |
+|---|---|---|
+| 개정 초안 22판 4.4.3.8 | 파트 목표 길이의 2배 이상(MUST), 3배 이상(SHOULD) | 상한 규칙 없음 |
+| 애플 저작 규격 14.2–14.3 | 파트 목표 길이의 3배 이상(MUST) | P95 왕복 시간 이상(MUST), 그 3배 이상(SHOULD), 권장 1초 |
+| PokeClip(MediaMTX · gohlslib) | 1.25초 = 파트의 2.5배 | 0.5초 |
+
+PokeClip 값은 [라이브 창 글](/posts/0-to-1/pokeclip-live-window-without-fork/)의 실측입니다. 2.5배는 MediaMTX가 쓰는 gohlslib이 파트 목표 길이에 곱하는 고정 계수입니다([`muxer_stream.go` 468행](https://github.com/bluenviron/gohlslib/blob/v2.4.3/muxer_stream.go#L468)). 개정 초안의 하한(2배)은 넘지만 권고(3배)와 애플 저작 규격 14.3의 3배에는 못 미칩니다. 애플 기기를 기준으로 맞추려면 파트 길이를 바꾸는 것만으로는 비율이 그대로이므로, 계수를 바꾸거나 값을 덮어쓰는 방법을 따로 찾아야 합니다.
+
+파트 길이를 왕복 시간보다 짧게 잡으면 파트 하나를 받는 데 걸리는 왕복이 파트 길이를 넘어 따라잡지 못합니다. 애플 규격이 P95 왕복 시간을 하한으로 두는 이유입니다. 「200–500밀리초가 업계 표준」이라는 기준은 규격에 없습니다. Apple 문서의 200밀리초는 예시이고, 저작 규격의 권장값은 1초입니다.
+
+## 서버와 CDN은 HTTP/2 이상과 대기 요청 합치기를 갖춰야 합니다 {#cdn과의-충돌-문제}
+
+LL-HLS 문법은 일반 HLS와 호환되므로, 서버가 요건을 못 채우면 플레이어는 일반 지연으로 되돌아가야 합니다. 그 요건이 개정 초안 부록 B.1의 저지연 서버 구성입니다.
+
+- 목록과 조각을 HTTP/2나 HTTP/3로 냅니다. HTTP/3에서는 RFC 9218 우선순위가 필수이고, 목록은 우선순위 1, 조각은 2–6입니다.
+- 서버 하나가 다변형 목록의 모든 변형을 냅니다. 화질을 바꿀 때 연결을 새로 맺지 않게 하려는 것입니다.
+- 목록 요청은 멱등이고, 목록은 GZIP으로 압축하며, 모든 렌디션을 파트 목표 길이 오차 안에서 함께 갱신합니다.
+- CDN과 프록시 캐시는 이미 캐시 채우기가 진행 중인 보류 요청을 알아보고 같은 요청을 그 채우기까지 붙잡아 둡니다. 캐시는 `Age` 응답 머리를 붙입니다.
+
+CDN 입장에서 같은 목록 주소라도 `_HLS_msn` · `_HLS_part` · `_HLS_skip`이 다르면 다른 응답입니다. 그래서 캐시 키에 이 쿼리를 넣어야 합니다. PokeClip의 CloudFront 라이브 목록 정책은 이 세 쿼리만 캐시 키에 넣고 엣지에 1초 보관합니다([CDN 캐시 실측 글](/posts/0-to-1/pokeclip-cdn-cache-auth-measurement/)). CDN 업체 GS네오텍의 고객 사례(2025-08-18)에 따르면, 치지직은 「LL-HLS 기반 스트리밍 도입」에 맞춰 「HLS 세그먼트 등을 1초 이내에 전달」하도록 CDN 캐시 정책을 다시 설계했습니다([GS네오텍 고객 사례](https://www.gsneotek.com/customer_case_CDN/?q=YToyOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjtzOjQ6InBhZ2UiO2k6MTt9&bmode=view&idx=167352811&t=board)).
+
+[[fig-ll-hls-cdn]]은 두 시청자가 같은 다음 목록을 보류 요청할 때 엣지와 원본이 하는 일입니다.
+
+```mermaid {#fig-ll-hls-cdn kind="개념도" caption="LL-HLS 보류 요청이 CDN을 지나는 순서. 엣지는 _HLS_* 쿼리까지 같은 요청을 하나로 합쳐 원본에 한 번만 보내고, 원본은 파트 2가 목록에 들어갈 때까지 응답을 미룹니다. 응답이 오면 엣지가 두 플레이어에게 같은 목록을 돌려줍니다. 개정 초안 22판 6.2.5.2절과 부록 B.1을 줄여 그렸습니다." source="https://www.ietf.org/archive/id/draft-pantos-hls-rfc8216bis-22.txt"}
+%%{init: {"sequence": {"width": 96, "actorMargin": 16}}}%%
+sequenceDiagram
+  accTitle: LL-HLS 보류 요청과 CDN
+  accDescr: 플레이어 1이 msn 42 part 2 목록을 요청하면 엣지가 원본에 같은 요청을 보낸다. 플레이어 2의 같은 요청은 엣지에서 기다린다. 원본은 파트 2가 생길 때까지 응답을 미루었다가 200을 돌려주고, 엣지가 두 플레이어에게 같은 목록을 준다.
+  participant P as 플레이어
+  participant E as 엣지
+  participant O as 원본
+  P->>E: 1 · part=2
+  E->>O: part=2
+  P->>E: 2 · part=2
+  Note over O: 보류
+  O->>E: 200
+  E->>P: 1 · 200
+  E->>P: 2 · 200
 ```
 
-요청을 **응답 보류**한 상태로 잡고 있다가, 새 partial이 생기는 순간 즉시 회신. 폴링 없이 **push 효과**.
+캐시를 거친 목록은 낡았을 수 있으므로, 플레이어는 처음 받은 목록의 `Age`를 보고 최신 목록을 얻을 때까지 한두 번 더 요청하는 튠인 절차를 씁니다(부록 C). 화질 보고가 이 절차를 건너뛰게 해 주는 이유이기도 합니다.
 
-### CDN과의 충돌 문제
+## LL-HLS는 LHLS · LL-DASH · WebRTC와 다른 방식입니다 {#ll-hls-vs-webrtc--누가-더-빠르나}
 
-이게 한 가지 까다로움 — Long polling은 CDN과 안 맞는다.
+이름이 비슷한 방식이 여럿이라 도구가 무엇을 지원하는지 따로 확인해야 합니다.
 
-```
-일반 CDN 동작:
-- 같은 URL 요청 → 캐시 응답 → 즉시 반환
-- Origin은 한 번만 호출
+| 방식 | 핵심 | 확인한 지원 |
+|---|---|---|
+| LL-HLS | 파트 · 보류 목록 · PRELOAD-HINT · 화질 보고 | hls.js 1.0.0(2021-04-01)부터 지원, MediaMTX(gohlslib)가 생성 |
+| LHLS | hls.js 쪽 커뮤니티 초안, `#EXT-X-PREFETCH`로 만드는 중인 조각을 미리 알림 | FFmpeg `dash` 묶개의 `-lhls`(실험 기능, 「Apple의 LHLS가 아님」) |
+| LL-DASH | CMAF 청크를 만들면서 chunked 전송 | FFmpeg `dash` 묶개 `-ldash`, Shaka Packager(LL-HLS는 아직 미지원) |
+| WebRTC | 시청자마다 RTP 세션 | CDN 캐시 대신 미디어 서버가 전송 |
 
-Blocking Reload 요구:
-- 같은 URL이라도 _HLS_msn에 따라 다른 응답
-- Origin 응답을 보류해야 함
-```
+FFmpeg 9.0.2의 `hls` 묶개 옵션에는 `EXT-X-PART`를 만드는 설정이 없습니다(`ffmpeg -h muxer=hls`로 확인). FFmpeg 문서는 `-lhls`가 hls.js 쪽의 공개 LHLS 초안을 따르려는 실험 기능이고 Apple의 방식이 아니라고 적습니다([FFmpeg 형식 문서](https://ffmpeg.org/ffmpeg-formats.html#dash-2)). Shaka Packager 3.9.3 문서도 「LL-DASH만 지원하고 LL-HLS 지원은 아직」이라고 적습니다([low_latency.rst](https://github.com/shaka-project/shaka-packager/blob/v3.9.3/docs/source/tutorials/low_latency.rst)). WebRTC 시청의 비용 구조는 [WHIP · WHEP 글](/posts/tech-blurting/whip-whep-modern-ingest/)에 있습니다.
 
-해결책: CDN이 LL-HLS 인지 + chunked transfer 지원. **Akamai, CloudFront, Cloudflare가 공식 지원**. 작은 CDN은 미지원이라 도입 발목.
+## LL-HLS는 fMP4 전용도, 파트를 흘려 보내는 방식도 아닙니다 {#정리하면}
 
-### Skip 메커니즘 — 매니페스트 크기 줄이기
+- **「LL-HLS는 지연을 2초로, 10배 줄인다」** — 규격은 지연 수치를 약속하지 않습니다. 재생 위치는 `PART-HOLD-BACK`이 정하고, 그 하한은 파트 길이와 왕복 시간에 묶입니다.
+- **「파트는 HTTP/1.1 chunked로 흘려보내 CDN과 100% 호환된다」** — 파트는 다 준비된 뒤 한 번에 보내고(6.2.6절), 저지연 구성은 HTTP/2 이상과 보류 요청을 이해하는 CDN을 요구합니다.
+- **「서버는 50밀리초마다 확인한다」** — 규격은 확인 방법이 아니라 응답 조건을 정합니다. 미룰 조건, 400 · 503을 돌려줄 조건이 6.2.5.2절에 있습니다.
+- **「PRELOAD-HINT는 연결을 미리 맺는 장치」** — 아직 없는 다음 파트를 미리 요청해 두고 준비되면 바로 받게 하는 장치입니다.
+- **「LL-HLS는 fMP4만」** — 파트는 일반 조각 형식이면 되고 TS도 규격 안입니다.
+- **「FFmpeg로 LL-HLS를 만든다」** — FFmpeg의 `hls` 묶개는 `EXT-X-PART`를 만들지 않습니다. `-lhls`는 다른 초안입니다.
 
-LL-HLS 매니페스트는 일반 HLS보다 훨씬 큼 (각 partial마다 한 줄). 6초 세그먼트에 30개 partial = 매니페스트 30배.
+LL-HLS를 들이려면 플레이어보다 서버와 CDN이 보류 요청, `_HLS_*` 캐시 키, 같은 요청 합치기를 지원하는지 먼저 확인하십시오. 그다음 파트 길이를 시청자 왕복 시간 기준으로 잡고, `PART-HOLD-BACK`이 그 세 배 이상인지 보십시오.
 
-해결: 클라이언트가 이미 본 부분 스킵.
+## 출처
 
-```
-GET /playlist.m3u8?_HLS_msn=42&_HLS_part=15&_HLS_skip=YES
-→ 새로운 부분만 응답
-```
+- [draft-pantos-hls-rfc8216bis-22: HTTP Live Streaming 2nd Edition](https://www.ietf.org/archive/id/draft-pantos-hls-rfc8216bis-22.txt) (2026-05-01) — 3.2 파트, 4.4.3.8 SERVER-CONTROL, 4.4.4.9 EXT-X-PART, 4.4.5.2–4.4.5.4 SKIP · PRELOAD-HINT · RENDITION-REPORT, 6.2.5 전달 지시, 6.2.6 미리 알림과 파트 전송, 6.3.3 재생 위치, 8절 버전, 부록 B.1 · C · [datatracker 상태](https://datatracker.ietf.org/doc/draft-pantos-hls-rfc8216bis/)
+- [Apple, Enabling Low-Latency HTTP Live Streaming (HLS)](https://developer.apple.com/documentation/http-live-streaming/enabling-low-latency-http-live-streaming-hls) (2024-05-21 개정)
+- [Apple, HLS Authoring Specification for Apple Devices](https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html) (개정 2025-06-26) — 7.4, 14.1–14.5
+- [bluenviron/gohlslib v2.4.3 `muxer_stream.go`](https://github.com/bluenviron/gohlslib/blob/v2.4.3/muxer_stream.go#L468) — PART-HOLD-BACK = 파트 목표 길이 × 2.5
+- [hls.js v1.0.0 릴리스](https://github.com/video-dev/hls.js/releases/tag/v1.0.0) (2021-04-01, Apple Low-Latency HLS 지원)
+- [FFmpeg 형식 문서 — dash 묶개 `-lhls` · `-ldash`](https://ffmpeg.org/ffmpeg-formats.html#dash-2) · 로컬 FFmpeg 9.0.2 `ffmpeg -h muxer=hls`(2026-11-12)
+- [Shaka Packager v3.9.3 low_latency.rst](https://github.com/shaka-project/shaka-packager/blob/v3.9.3/docs/source/tutorials/low_latency.rst)
+- [GS네오텍 고객 사례 「치지직(Chzzk) | 초저지연 실시간 스트리밍을 위한 LL-HLS 기반 CDN 최적화」](https://www.gsneotek.com/customer_case_CDN/?q=YToyOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjtzOjQ6InBhZ2UiO2k6MTt9&bmode=view&idx=167352811&t=board) (2025-08-18, 2026-11-12 확인)
+- PokeClip 기록: [라이브 창](/posts/0-to-1/pokeclip-live-window-without-fork/) · [CDN 캐시 키와 원본 인증](/posts/0-to-1/pokeclip-cdn-cache-auth-measurement/)
 
-매니페스트 크기 90% 절감.
-
----
-
-## 4. Preload Hint — 세 번째 핵심 기술
-
-partial을 받는 사이에 시간이 흐른다. 다음 partial을 받을 때 HTTP 연결 다시 맺고 (TCP handshake, TLS) → 200~500ms 추가 지연.
-
-해결: **미리 다음 partial URL을 알려주고, 클라이언트가 미리 연결**.
-
-![Preload Hint + Rendition Report](/images/llhls-preload-rendition-report.png)
-
-매니페스트에 추가:
-
-```
-#EXT-X-PART:DURATION=0.2,URI="part_15.m4s"
-#EXT-X-PART:DURATION=0.2,URI="part_16.m4s"
-#EXT-X-PRELOAD-HINT:TYPE=PART,URI="part_17.m4s"
-```
-
-플레이어가 `part_17.m4s`를 **존재하기 전에** 미리 GET 요청 시작. 서버는 요청을 보류했다가 partial 생기는 즉시 response.
-
-```
-실제 시퀀스:
-t=0.0초: 플레이어가 part_17.m4s 미리 GET (서버에 도착, 응답 보류)
-t=0.2초: 인코더가 part_17.m4s 만듦
-t=0.2초: 서버가 즉시 응답 → 플레이어에 도착
-```
-
-TCP 연결 셋업 시간이 partial 생성 전에 끝나 있어서 **추가 지연 0**.
-
----
-
-## 5. Rendition Report — 네 번째 핵심 기술
-
-ABR 전환할 때 다른 화질로 점프해야 한다. 일반 HLS에서는:
-
-```
-1. 720p 매니페스트 보고 있음
-2. 대역폭 떨어짐 → 480p 선택
-3. 480p 매니페스트 새로 GET
-4. 480p에서 가장 최신 partial 위치 알아냄
-5. 점프
-```
-
-매니페스트 새로 받는 시간 = 추가 1초.
-
-LL-HLS의 답: **다른 화질의 현재 상태를 매니페스트에 같이 박음**.
-
-```
-#EXT-X-RENDITION-REPORT:URI="720p/playlist.m3u8",LAST-MSN=42,LAST-PART=15
-#EXT-X-RENDITION-REPORT:URI="480p/playlist.m3u8",LAST-MSN=42,LAST-PART=15
-#EXT-X-RENDITION-REPORT:URI="360p/playlist.m3u8",LAST-MSN=42,LAST-PART=15
-```
-
-지금 보고 있는 화질의 매니페스트에 **다른 화질의 진행 상황까지 적혀있음**. 전환 시 매니페스트 새로 받을 필요 없이 바로 점프.
-
-### 모든 화질의 partial 경계가 맞아야 한다
-
-전환이 매끄러우려면 모든 화질의 partial이 **같은 시점에** 생성돼야 한다. 그러려면:
-
-- 모든 화질의 GOP 정렬 (`-g`, `-keyint_min` 같게 — [예전 글에서 다룬 거](../video-quality-bitrate-abr/))
-- 모든 화질의 partial duration 동일 (200ms)
-- 모든 화질의 partial 출력 동기화
-
-이게 ABR ladder 운영의 핵심 까다로움.
-
----
-
-## 6. fMP4 강제 — CMAF로 가는 길
-
-LL-HLS는 컨테이너를 **fMP4 (CMAF)** 만 허용한다. .ts 안 됨.
-
-이유:
-- chunked 전송이 fMP4 구조에서만 자연스러움
-- DASH와 통합 (한 미디어 파일을 HLS/DASH가 공유, [이전 글](../dash-vs-hls/)에서 본 그것)
-- 더 작은 오버헤드
-
-```
-LL-HLS 표준 명령:
-ffmpeg -i input \
-  -c:v libx264 -preset veryfast \
-  -hls_time 6 \
-  -hls_segment_type fmp4 \      # 강제
-  -hls_fmp4_init_filename init.mp4 \
-  ...
-```
-
-레거시 .ts 기반 HLS 인프라는 LL-HLS 가려면 컨테이너 재인코딩.
-
----
-
-## 7. LL-HLS 지연 전체 흐름 — 종합
-
-네 가지 기술이 맞물려서 동작.
-
-```
-인코더 partial 생성 (~200ms)
-   ↓
-Blocking Reload 응답 보내짐
-   ↓
-플레이어 매니페스트 수신
-   ↓
-Preload Hint로 미리 열린 연결로 partial 도착
-   ↓
-플레이어가 다른 화질 변경 시 Rendition Report로 즉시 점프
-   ↓
-시청자 화면
-```
-
-각 단계가 개별적으로 ~200ms, 총 합쳐서 **1.5~2초 지연** 달성.
-
----
-
-## 8. LL-HLS 도입 비용 — 누가 쓰는가
-
-장점 명확. 그런데 도입 비용도 크다.
-
-```
-[기존 HLS 인프라 → LL-HLS 전환 시]
-- 인코더 교체 (FFmpeg 표준 + Shaka Packager 또는 OvenMediaEngine)
-- 컨테이너 전환 (.ts → fMP4)
-- CDN 재계약 (LL-HLS 지원 CDN으로)
-- Origin 서버 재구축 (long polling 지원)
-- 플레이어 업그레이드 (hls.js v1.1+)
-- CDN 비용 약 30% 증가 (요청 수 증가)
-```
-
-도입한 곳:
-- **Twitch**: 이미 LL-HLS. 게이밍 라이브엔 채팅 동기화 필수
-- **Youtube Live**: LL-HLS 옵션 제공
-- **AWS IVS**: 자체 저지연 프로토콜로 LL-HLS 수준 달성
-- **치지직**: 일부 인기 스트리머 한정 베타 추정
-
-도입 안 한 곳:
-- 일반 OTT (Netflix, Disney+): VOD 위주, 저지연 불필요
-- 작은 라이브 서비스: CDN 비용/엔지니어링 부담
-
-### LL-HLS vs WebRTC — 누가 더 빠르나
-
-```
-[지연 비교]
-일반 HLS:   18~25초
-LL-HLS:     1~3초
-WebRTC:     0.1~0.5초
-```
-
-WebRTC가 더 빠르다. 그런데 WebRTC는 UDP 기반 + 별도 시그널링 필요. CDN 활용 불가.
-
-```
-인터랙티브 (경매, 화상회의): WebRTC
-일반 라이브 (게임, 스포츠): LL-HLS
-VOD: 일반 HLS
-```
-
-각자 영역. 다음 글에서 WebRTC를 본다.
-
----
-
-## 정리하면
-
-LL-HLS는 "HLS의 본질을 깨지 않으면서 지연을 1/10로" 라는 야심 찬 목표를 달성했다.
-
-1. **Partial Segment** — 6초 세그먼트를 200ms 단위로 잘라서 미리 전송
-2. **Blocking Playlist Reload** — 플레이어 폴링을 long polling으로 (`_HLS_msn`, `_HLS_part`)
-3. **Preload Hint** — 다음 partial URL을 미리 알려주고 클라이언트가 미리 연결
-4. **Rendition Report** — 다른 화질의 진행 상황을 같이 박아 ABR 즉시 점프
-5. **fMP4 강제** — chunked 전송 + CMAF 통합
-6. **도입 비용** — CDN 약 30% 증가, 인프라 전반 재구축
-7. **누가 쓰나** — Twitch가 표준 도입, 일반 OTT는 불필요
-
-다음 글에선 진짜 저지연이 필요한 영역 — **WebRTC**를 본다. UDP 기반 P2P 라이브.
-
----
-
-**참고**
-- [Apple WWDC 2019 Introducing Low-Latency HLS](https://developer.apple.com/videos/play/wwdc2019/502/)
-- [HLS 표준 (RFC 8216)](https://datatracker.ietf.org/doc/html/rfc8216)
-- [hls.js LL-HLS 지원](https://github.com/video-dev/hls.js)
-- [Twitch Low Latency Engineering](https://blog.twitch.tv/en/2017/12/12/low-latency-video-transcoding-at-scale-3479f49ee1d1/)
+다음 편: [CMAF는 HLS와 DASH가 같은 조각 파일을 쓰게 합니다](/posts/tech-blurting/cmaf-deep-dive/)
