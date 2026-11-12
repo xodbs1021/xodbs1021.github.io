@@ -1,445 +1,162 @@
 ---
-title: "RTMP를 IETF가 끝내려고 하는 중 — WHIP/WHEP"
+title: "WHIP은 POST 한 번으로 WebRTC 송출 세션을 엽니다"
 date: 2026-06-20T10:12:18+09:00
+lastmod: "2026-11-12T14:14:56+09:00"
+description: "WebRTC는 시그널링을 정하지 않아 송출기와 서버가 서로 맞지 않았습니다. WHIP(RFC 9725, 2025년 3월)은 SDP 제안을 HTTP POST로 보내고 201 응답의 SDP와 Location으로 세션을 엽니다. 그 뒤에도 ICE와 DTLS 왕복이 남는다는 점, 종료와 Trickle ICE, Enhanced RTMP 이후의 코덱 비교, 아직 초안인 WHEP, CDN 캐시를 못 쓰는 시청 비용, 날짜를 확인한 도입 현황을 RFC와 공식 문서로 정리했습니다."
 categories: ["tech-blurting"]
+tags: ["WHIP", "WHEP", "WebRTC", "RFC 9725", "OBS", "라이브 송출"]
 draft: false
 ---
 
-[지난 시리즈](../rtmp-still-alive/)에서 RTMP가 20년이 지나도 안 죽는 이유를 봤다. 도입 비용 0, 호환성 100%, 생태계 관성.
+WebRTC는 SDP 제안과 응답을 어떻게 주고받을지 정하지 않아, 송출기마다 서버마다 따로 연동해야 했습니다. WHIP(WebRTC-HTTP Ingestion Protocol)은 SDP 제안을 HTTP POST 본문으로 보내고 `201 Created` 응답의 SDP와 `Location` 헤더로 세션을 여는 규칙으로 이 칸을 메웠고, 2025년 3월 RFC 9725(Proposed Standard)가 됐습니다. OBS는 그보다 앞선 30.0(2023-11)에서 WHIP 출력을 넣었습니다. 다만 HTTP 요청 한 번 뒤에도 ICE 연결 확인과 DTLS 핸드셰이크 왕복이 남습니다. 미디어 전까지 응답을 기다리는 왕복은 RTMP와 WHIP 모두 네 번 안팎이라, 「WHIP 1왕복 대 RTMP 5왕복」이라는 비교는 맞지 않습니다. 시청 쪽 짝인 WHEP은 2026년 10월 기준 아직 인터넷 드래프트입니다.
 
-근데 그 글 마지막에서 **"진짜 후계자 후보는 WHIP"** 이라고 언급했었다. 2023년 IETF가 RFC 9725로 표준화한 신생 프로토콜. **OBS 30부터 기본 지원**. YouTube, Twitch가 베타 운영 중.
+## WebRTC는 시그널링을 정하지 않아 송출기와 서버가 서로 맞지 않았습니다 {#1-문제의-본질--webrtc가-표준화-안-한-영역}
 
-그리고 그 짝인 WHEP — WHIP의 시청자 측 버전 — 도 이미 표준화됐다. WHIP은 송출(ingest), WHEP은 시청(egress).
+WebRTC는 연결에 필요한 부품을 표준으로 정해 둡니다. 미디어 조건은 SDP 제안·응답(JSEP, [RFC 8829](https://www.rfc-editor.org/rfc/rfc8829.html))으로 합의하고, NAT 너머 경로는 ICE([RFC 8445](https://www.rfc-editor.org/rfc/rfc8445.html))로 찾고, 암호 키는 DTLS-SRTP([RFC 5764](https://www.rfc-editor.org/rfc/rfc5764.html))로 나눕니다. 그런데 SDP 제안을 상대에게 어떻게 전달할지는 정하지 않았습니다. RFC 9725 서론은 「WebRTC는 응용 계층의 시그널링 전송을 일부러 정하지 않았다」고 쓰고, 이 빈칸이 WebRTC를 송출(ingest) 규약으로 쓰는 데 걸림돌이었다고 적습니다([RFC 9725 1절](https://www.rfc-editor.org/rfc/rfc9725.html#section-1)).
 
-[지난 글](../webrtc-deep-dive/)에서 WebRTC의 P2P 통신 표준을 봤다면, 이번 글은 **그 WebRTC를 라이브 방송 산업에 표준 적용하려는 IETF의 시도**를 정리한 노트다. 왜 만들어졌고, 진짜 RTMP를 대체할 수 있는지, 그리고 현실의 하이브리드 아키텍처는 어떻게 구성되는지.
+화상회의 서비스는 자기 웹 앱과 자기 서버만 맞으면 되므로 WebSocket이든 무엇이든 고르면 됐습니다. 방송은 송출기(OBS, 하드웨어 인코더)와 받는 서버를 만드는 회사가 다릅니다. 송출기가 서버마다 다른 시그널링을 따로 구현해야 한다면, 주소와 키만 넣으면 되는 RTMP를 대신하기 어렵습니다. WHIP은 이 송출 방향 하나만 HTTP로 정합니다.
 
----
+## WHIP은 2025년 3월 RFC 9725가 됐습니다 {#2-whip의-발표--2023년-ietf-rfc-9725}
 
-## 1. 문제의 본질 — WebRTC가 표준화 안 한 영역
+WHIP은 IETF WISH 작업 그룹의 draft-ietf-wish-whip이 2025년 3월 RFC 9725로 나온 것입니다. 표준 트랙의 Proposed Standard이고, 저자는 Sergio Garcia Murillo와 Alexandre Gouaillard입니다([datatracker](https://datatracker.ietf.org/doc/rfc9725/)). 예전 글은 「2023년 RFC 9725」라고 적었는데, 2023년은 OBS 30.0이 드래프트를 따라 WHIP 출력을 넣은 해입니다([OBS 30.0 릴리스 노트](https://github.com/obsproject/obs-studio/releases/tag/30.0.0), 2023-11-12).
 
-WebRTC는 강력한 표준이지만 **시그널링은 표준에 포함 안 됨**. 이게 라이브 도입의 핵심 발목.
+구현이 RFC보다 먼저 나왔기 때문에, 지금도 드래프트 판을 기준으로 적힌 문서가 남아 있습니다. Cloudflare Stream 문서는 2026년 10월 27일 판에서도 `draft-ietf-wish-whip-06`을 쓴다고 적습니다([Cloudflare Stream WebRTC](https://developers.cloudflare.com/stream/webrtc-beta/)). 서로 다른 구현을 이을 때는 상대가 어느 판을 따르는지 확인해야 합니다.
 
-```
-[WebRTC가 정의하는 것]
-- 미디어 협상 (SDP)
-- NAT 통과 (ICE/STUN/TURN)
-- 미디어 전송 (SRTP)
-- DataChannel
+## HTTP 한 번 뒤에도 ICE와 DTLS 왕복이 남습니다 {#rtmp와-비교}
 
-[WebRTC가 정의 안 하는 것]
-- 두 피어가 어떻게 만나는지 (시그널링)
-- SDP를 어떻게 교환하는지
-- Authorization 방식
-```
+RFC 9725의 순서는 POST와 `201 Created`, 그다음 ICE·STUN 연결 확인, DTLS 설정, 그리고 RTP·RTCP 미디어입니다(1절 그림 1). 영상에서 미디어가 흐르기 전에 왕복 카운터가 몇까지 오르는지 보십시오.
 
-각 회사가 자체 WebSocket/Firebase/REST로 처리. 그래서 **A의 WHIP 클라이언트가 B의 서버에 송출 못 함**. 호환성 0.
+{{< motion scene="WhipRoundTrips" id="fig-whip-round-trips" kind="개념도" caption="WHIP은 POST 한 번으로 SDP를 주고받지만, 미디어가 흐르기 전에 ICE 연결 확인과 DTLS 핸드셰이크까지 합쳐 왕복 4번이 지나갑니다. DTLS 1.2 전체 핸드셰이크 기준이고, HTTPS 연결을 새로 여는 왕복은 뺐습니다." >}}
 
-라이브 방송 산업에서 OBS, 인코더, 플랫폼이 다 다른 회사 제품인데 시그널링 표준이 없으면 RTMP 대체 못 한다. 이게 2010년대 내내 WebRTC가 라이브 시장 못 깬 이유.
-
----
-
-## 2. WHIP의 발표 — 2023년 IETF RFC 9725
-
-해법은 단순했다. **"SDP 교환을 HTTP POST 한 번으로 끝내자"**.
-
-```
-[WHIP의 정의 - RFC 9725]
-WHIP = WebRTC HTTP Ingestion Protocol
-스트리머 → 서버: HTTP POST /whip with SDP Offer
-서버 → 스트리머: HTTP 201 with SDP Answer
-이후: ICE 연결 + WebRTC 미디어 전송
-```
-
-이게 전부다. 별도 시그널링 서버 X, WebSocket X, 복잡한 인증 핸드셰이크 X.
-
-![WHIP vs RTMP 핸드셰이크 대조](/images/whip-vs-rtmp-handshake.png)
-
-### RTMP와 비교
+두 규약이 미디어 전까지 응답을 기다리는 왕복을 사양 순서대로 세면 아래와 같습니다. 실측이 아니라 사양의 순서를 센 값입니다.
 
 | 단계 | RTMP | WHIP |
 |---|---|---|
-| 1 | TCP SYN/SYN-ACK/ACK | HTTP POST /whip + SDP Offer + Bearer Token |
-| 2 | RTMP Handshake (C0+C1 / S0+S1+S2 / C2, 9KB 교환) | HTTP 201 Created + SDP Answer |
-| 3 | NetConnection.connect("live") | ICE Connectivity Check |
-| 4 | NetStream.createStream | DTLS Handshake |
-| 5 | NetStream.publish(streamkey) | **RTP 미디어 전송 시작** |
-| 6 | Video Messages 전송 시작 | |
-| 총 RTT | 5회 (~135ms) | 1회 (~50ms) |
+| 연결 | TCP 1 | (HTTPS를 새로 열면 TCP 1 + TLS 1.3 1) |
+| 세션 합의 | 핸드셰이크 1, `connect` 1, `createStream` 1 | POST · 201 1 |
+| 경로 · 암호 | (RTMPS면 TLS가 더 붙음) | ICE 연결 확인 1 이상, DTLS 1.2 2 |
+| 합계 | 4 | 4, 새 HTTPS 연결이면 6 |
 
-WHIP의 1라운드트립 vs RTMP의 5라운드트립.
+RTMP는 S2를 받은 뒤에야 다른 데이터를 보낼 수 있고([RTMP 사양 5.2.1절](https://veovera.github.io/enhanced-rtmp/docs/legacy/rtmp-v1-0-spec.pdf)), 송출 흐름 예시에서 송출기는 `publish` 응답 전에 데이터를 보내기 시작합니다(7.3.1절). DTLS 1.2 전체 핸드셰이크는 쿠키 교환 없이 왕복 2번입니다([RFC 6347 4.2절](https://www.rfc-editor.org/rfc/rfc6347.html#section-4.2)). 결국 연결을 여는 비용은 비슷합니다. WHIP의 차이는 연결 수보다, 미디어가 TCP가 아닌 UDP 위 RTP로 흘러 손실이 뒤 데이터를 붙잡지 않는다는 데 있습니다.
 
-### 실제 HTTP 요청
+## SDP 제안을 POST하고 201 응답의 Location으로 세션을 다룹니다 {#실제-http-요청}
+
+송출기는 WHIP 엔드포인트 주소로 SDP 제안을 POST합니다. 본문 형식은 `application/sdp`이고, 송출기는 `sendonly`를, 서버의 응답은 `recvonly`를 씁니다([4.2절](https://www.rfc-editor.org/rfc/rfc9725.html#section-4.2)). 아래는 RFC 그림 2의 머리를 옮기고 SDP 본문을 줄인 것입니다.
 
 ```http
-POST /whip/live/streamkey-abc123 HTTP/1.1
-Host: ingest.example.com
+POST /whip/endpoint HTTP/1.1
+Host: whip.example.com
 Content-Type: application/sdp
-Authorization: Bearer eyJhbGc...
+Authorization: Bearer <토큰>
 
 v=0
-o=- 12345 2 IN IP4 127.0.0.1
-s=-
-m=video 9 UDP/TLS/RTP/SAVPF 96
-a=rtpmap:96 H264/90000
-a=sendonly
+...
 m=audio 9 UDP/TLS/RTP/SAVPF 111
-a=rtpmap:111 opus/48000/2
+a=sendonly
+m=video 9 UDP/TLS/RTP/SAVPF 96
 a=sendonly
 ```
 
 ```http
 HTTP/1.1 201 Created
-Location: /whip/live/streamkey-abc123/resource/xyz789
+ETag: "xyzzy"
 Content-Type: application/sdp
+Location: https://whip.example.com/session/id
 
 v=0
-o=- 67890 2 IN IP4 server-public-ip
-s=-
-m=video 9 UDP/TLS/RTP/SAVPF 96
-a=rtpmap:96 H264/90000
-a=recvonly
 ...
+a=recvonly
 ```
 
-핵심 디자인:
-- **Bearer Token** 표준 인증 (RTMP의 스트림 키 → JWT)
-- **Location 헤더**로 리소스 URL 반환 (이후 ICE Trickle/종료 시 사용)
-- 모든 게 HTTP니까 **방화벽 통과, CDN 호환, 디버깅 쉬움**
+`Location`이 가리키는 세션 주소가 이후 모든 조작의 대상입니다. 인증은 HTTP 인증을 따르고, Bearer 토큰([RFC 6750](https://www.rfc-editor.org/rfc/rfc6750.html))은 모든 구현이 지원해야 합니다. 토큰의 형식과 나눠 주는 방식은 사양 밖입니다([4.7절](https://www.rfc-editor.org/rfc/rfc9725.html#section-4.7)). HTTP라서 기존 장치를 그대로 씁니다. 엔드포인트는 `307 Temporary Redirect`로 요청을 다른 미디어 서버에 넘겨 부하를 나눌 수 있고, 과부하면 `503`과 `Retry-After`로 답합니다. `301`·`302`는 쓰면 안 됩니다.
 
-### 종료도 HTTP
+ICE 후보를 나중에 보내는 Trickle ICE와 ICE 재시작은 세션 주소에 `PATCH`(`application/trickle-ice-sdpfrag`)로 보냅니다. 송출기는 `201` 응답을 받을 때까지 모은 후보를 붙잡아 두었다가 한 번에 보냅니다. 성공하면 Trickle은 `204 No Content`, 재시작은 새 ETag와 함께 `200 OK`를 받습니다([4.3절](https://www.rfc-editor.org/rfc/rfc9725.html#section-4.3)). RFC는 이 기능을 한 절에서는 권장, 다른 절에서는 선택이라고 적어, 구현마다 지원이 다를 수 있습니다.
 
-```http
-DELETE /whip/live/streamkey-abc123/resource/xyz789 HTTP/1.1
-Authorization: Bearer eyJhbGc...
+## 끝낼 때는 Location에 DELETE를 보냅니다 {#종료도-http}
 
-HTTP/1.1 200 OK
-```
+송출을 끝낼 때 송출기는 세션 주소로 `DELETE`를 보내야 하고, 서버는 미디어 자원을 놓고 ICE와 DTLS 세션을 닫습니다. 예고 없이 끊긴 경우는 ICE의 동의 확인(consent freshness, [RFC 7675](https://www.rfc-editor.org/rfc/rfc7675.html))이 응답 없음을 알아챕니다. RTMP에도 `deleteStream` 명령이 있지만(사양 7.2.2.3절), 송출기가 죽으면 서버는 TCP 연결 종료로 알게 됩니다. [[fig-whip-session]]은 WHIP 세션 하나의 처음과 끝입니다.
 
-RTMP는 명시적 종료가 없어서 TCP 끊김으로 추정. WHIP은 **DELETE로 명확히 종료**.
-
-```mermaid
+```mermaid {#fig-whip-session kind="개념도" caption="WHIP 세션 하나의 순서. POST와 201로 SDP를 주고받은 뒤 선택 사항인 PATCH로 ICE 후보를 더 보내고, ICE 연결 확인과 DTLS를 거쳐 RTP를 보내다가 Location 주소에 DELETE를 보내 끝냅니다. POST에는 Bearer 토큰이 붙고, PATCH와 DELETE는 201 응답의 Location 주소로 보냅니다. RFC 9725 1절 그림 1과 4.2·4.3절을 줄여 다시 그렸습니다." source="https://www.rfc-editor.org/rfc/rfc9725.html#section-1"}
+%%{init: {"sequence": {"width": 96, "actorMargin": 16}}}%%
 sequenceDiagram
-  autonumber
-  participant OBS as Streamer (OBS)
-  participant Srv as WHIP Server
-  participant ICE as STUN/TURN
-
-  OBS->>Srv: POST /whip + SDP Offer + Bearer Token
-  Srv-->>OBS: 201 Created + SDP Answer + Location
-  par ICE Trickle
-    OBS->>ICE: STUN 요청 / 후보 수집
-    OBS->>Srv: PATCH /whip/resource (추가 ICE candidate)
-  end
-  Note over OBS,Srv: DTLS handshake + ICE connectivity
-  rect rgb(220, 245, 220)
-    Note over OBS,Srv: RTP 미디어 전송 시작 (지연 ~50ms)
-  end
-  OBS->>Srv: DELETE /whip/resource (방송 종료)
-  Srv-->>OBS: 200 OK
+  accTitle: WHIP 세션의 시작과 끝
+  accDescr: 송출기가 SDP 제안을 POST하고 서버가 201 Created와 SDP 응답, Location을 돌려준다. 송출기는 선택적으로 PATCH로 ICE 후보를 더 보내고 204를 받는다. ICE 연결 확인과 DTLS 핸드셰이크 뒤 RTP 미디어를 보내고, 끝낼 때 Location 주소에 DELETE를 보내 200을 받는다.
+  participant O as 송출기
+  participant S as WHIP 서버
+  O->>S: POST · SDP 제안
+  S->>O: 201 · SDP 응답<br/>Location
+  O->>S: PATCH<br/>후보(선택)
+  S->>O: 204
+  O->>S: STUN 확인
+  S->>O: 응답
+  O->>S: DTLS
+  S->>O: DTLS
+  O->>S: RTP · RTCP
+  O->>S: DELETE
+  S->>O: 200 OK
 ```
 
----
+## 코덱 자유는 이제 WHIP만의 장점이 아닙니다 {#3-whip의-단순함이-가져온-큰-가치}
 
-## 3. WHIP의 단순함이 가져온 큰 가치
+WHIP의 코덱은 SDP 제안과 응답이 정합니다. 송출기가 가능한 코덱을 적어 보내면 서버가 그 가운데서 고릅니다. 예전에는 이것이 「RTMP는 H.264뿐이고 WHIP은 AV1·HEVC도 된다」는 큰 차이로 소개됐지만, 지금은 Enhanced RTMP가 HEVC·AV1·VP9와 Opus를 사양에 넣었습니다([RTMP 글](/posts/tech-blurting/rtmp-still-alive/)). 어느 쪽이든 실제로 쓸 수 있는 코덱은 받는 서버가 정합니다.
 
-```
-[WHIP 도입 효과]
-1. 인증/방화벽 = 기존 HTTPS 그대로
-2. 디버깅 = curl, Postman으로 가능
-3. 부하 분산 = HTTP load balancer로 가능
-4. 모바일 SDK = 간단 (HTTP + WebRTC만)
-5. 코덱 자유 = VP9, AV1, H.265 가능 (RTMP는 H.264만)
-```
-
-특히 **5번 코덱 자유도**가 중요. 
-
-RTMP는 Adobe가 스펙 업데이트 중단해서 H.265/AV1 비표준. WHIP은 SDP로 어떤 코덱이든 협상 가능 → **AV1 송출이 RTMP에선 불가능했는데 WHIP으로 처음 가능해짐**.
-
-NVIDIA RTX 4000+ 보유자가 AV1 NVENC로 송출하면 같은 화질에 비트레이트 30% 절감. **CDN 비용 직결**.
-
----
-
-## 4. WHEP — WHIP의 짝, 시청자 측 표준
-
-WHIP만으로는 부족했다. 송출이 표준화되어도 시청자가 받을 표준이 없으면 무용지물.
-
-```
-[WHIP만 있던 상태]
-스트리머 → WHIP → 서버 → ??? → 시청자
-                       각자 다른 방식 (WebSocket, 자체 프로토콜)
-```
-
-해법: WHEP. **WebRTC HTTP Egress Protocol**.
-
-```
-[WHEP의 정의]
-시청자 → 서버: HTTP POST /whep with SDP Offer
-서버 → 시청자: HTTP 201 with SDP Answer
-이후: WebRTC로 미디어 시청
-```
-
-WHIP과 정확히 대칭. 다른 점은 SDP의 `a=sendonly` → `a=recvonly` 한 줄 차이.
-
-### WHEP의 사용 시나리오
-
-```javascript
-// 시청자 측 코드 (브라우저)
-const pc = new RTCPeerConnection({
-  iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
-});
-
-pc.addTransceiver('video', { direction: 'recvonly' });
-pc.addTransceiver('audio', { direction: 'recvonly' });
-
-const offer = await pc.createOffer();
-await pc.setLocalDescription(offer);
-
-const response = await fetch('https://server.example.com/whep/live/streamkey', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/sdp', 'Authorization': 'Bearer ...' },
-  body: offer.sdp
-});
-
-const answer = await response.text();
-await pc.setRemoteDescription({ type: 'answer', sdp: answer });
-
-pc.ontrack = (event) => {
-  document.querySelector('video').srcObject = event.streams[0];
-};
-```
-
-**브라우저 video 태그로 ~300ms 지연 라이브 시청**. HLS의 1/70.
-
----
-
-## 5. WHEP의 진짜 한계 — 시청자 확장
-
-저지연이 강점이지만 **시청자 수가 늘어나면 폭발**한다.
-
-{{< chart caption="시청자 수에 따른 서버 부하 (개념적 비교, 로그 스케일)" >}}
-{
-  "tooltip": { "trigger": "axis" },
-  "legend": { "data": ["WHEP (SFU 직접)", "LL-HLS (CDN)", "HLS (CDN)"], "top": 0 },
-  "grid": { "left": "12%", "right": "10%", "bottom": "12%", "top": "18%" },
-  "xAxis": {
-    "type": "category",
-    "data": ["10", "100", "1K", "10K", "100K", "1M"],
-    "name": "동시 시청자"
-  },
-  "yAxis": {
-    "type": "log",
-    "name": "월 인프라 비용 (USD)",
-    "min": 100
-  },
-  "series": [
-    {
-      "name": "WHEP (SFU 직접)",
-      "type": "line",
-      "smooth": true,
-      "itemStyle": { "color": "#10b981" },
-      "data": [200, 800, 5000, 50000, 500000, 5000000]
-    },
-    {
-      "name": "LL-HLS (CDN)",
-      "type": "line",
-      "smooth": true,
-      "itemStyle": { "color": "#f59e0b" },
-      "data": [500, 600, 1500, 8000, 50000, 400000]
-    },
-    {
-      "name": "HLS (CDN)",
-      "type": "line",
-      "smooth": true,
-      "itemStyle": { "color": "#3b82f6" },
-      "data": [500, 550, 900, 4000, 25000, 200000]
-    }
-  ]
-}
-{{< /chart >}}
-
-```
-[SFU 한 대당 동시 시청자]
-일반 SFU 노드: 500~1000명
-고성능 SFU 노드 (전용 하드웨어): 2000~3000명
-
-[WebRTC 트래픽의 CDN 캐시 불가]
-WebRTC는 UDP + 양방향 연결
-정적 파일이 아니라 캐시 불가능
-시청자마다 SFU 연결 별도 유지
-```
-
-10만 명 시청자면 SFU 100~200대 필요. 인프라 비용이 HLS의 10~30배. WHEP의 본질적 비용 구조.
-
----
-
-## 6. 해답은 하이브리드 — 시청자가 골라 본다
-
-이래서 산업이 한 프로토콜만 쓰지 않는다. **시청자 환경/용도에 맞춰 다른 프로토콜로 분기**.
-
-![하이브리드 라이브 아키텍처](/images/hybrid-live-architecture.png)
-
-```
-[송출은 WHIP 하나로 통일]
-스트리머 → WHIP → 미디어 서버
-
-[시청은 3갈래로 분기]
-1. 인터랙티브 시청자 → WHEP (지연 300ms, 시청자 1K 미만)
-2. 일반 라이브 시청자 → LL-HLS (지연 2초, CDN, 시청자 100K급)
-3. 대규모 시청자 → HLS (지연 22초, CDN 최적, 시청자 1M+)
-```
-
-각 시청자가 자기 환경/취향에 따라 선택. 또는 플랫폼이 자동 라우팅.
-
-### 사용 케이스별 매핑
-
-| 케이스 | 프로토콜 | 이유 |
+| 받는 쪽 | WHIP 영상 · 오디오 | 확인한 문서 |
 |---|---|---|
-| 라이브 경매 | WHEP | 입찰 지연이 비즈니스 핵심 |
-| 라이브 쇼핑 (1:多 진행자) | WHEP | "남은 1개" 같은 실시간 정보 |
-| 음성 채팅방 (Twitter Spaces) | WHEP | 양방향 발언 |
-| 게임 방송 (Twitch/치지직) | LL-HLS | 채팅 동기화 + 대규모 |
-| 스포츠 중계 | LL-HLS | 채팅 + 100만 시청자 |
-| 대규모 콘서트/이벤트 | HLS | 1000만 시청자, 지연 무관 |
-| VOD 다시보기 | HLS | 시청자 1억, 지연 무관 |
+| Cloudflare Stream | VP9 · VP8 · H.264(Constrained Baseline, Level 3.1), 오디오는 Opus 권장 | [Cloudflare Stream WebRTC](https://developers.cloudflare.com/stream/webrtc-beta/)(2026-10-27 판) |
+| MediaMTX | AV1 · VP9 · VP8 · H.265 · H.264, Opus · G.722 · G.711 | [MediaMTX WebRTC 문서](https://github.com/bluenviron/mediamtx/blob/main/docs/3-publish/03-webrtc.md) |
 
-### Twitch의 실전 구현 (2024)
+WHIP이 지금도 RTMP와 다른 점은 셋입니다. 인증 · 리디렉션 · 부하 분산을 HTTP 장치로 하고, 미디어가 UDP 위 RTP로 흘러 손실이 뒤 패킷을 붙잡지 않으며, 암호화(DTLS-SRTP)가 선택이 아니라 필수입니다. 대신 WebRTC가 필수로 정한 오디오 코덱은 Opus와 G.711이라([RFC 7874](https://www.rfc-editor.org/rfc/rfc7874.html)) RTMP에서 쓰던 AAC를 그대로 넘기지 못하는 경우가 많고, Cloudflare처럼 H.264 프로필을 제한하는 서버도 있습니다.
 
-```
-[Twitch의 단계적 도입]
-2023: WHIP 베타 (스트리머 100명 한정)
-2024: WHIP 일반 공개 (OBS 30+ 자동 감지)
-2024: WHEP "저지연 모드" 베타 (시청자 5K 미만 채널)
-2025 (예정): WHEP 일반 + AV1 자동 활성화
-```
+## WHEP는 아직 초안입니다 {#4-whep--whip의-짝-시청자-측-표준}
 
-**RTMP는 계속 유지**. 5~10년 뒤에도 같이 갈 것.
+WHEP(WebRTC-HTTP Egress Protocol)은 같은 방식을 시청 쪽에 쓰는 규약입니다. 2026년 11월 12일에 확인한 최신판은 draft-ietf-wish-whep-05(2026-10-11)이고, 작업 그룹 상태는 「IESG에 발행 요청」, IESG 상태는 「AD 검토 · 수정판 필요」입니다. 목표 지위는 Proposed Standard이고 만료일은 2027년 4월 14일입니다([datatracker](https://datatracker.ietf.org/doc/draft-ietf-wish-whep/)). 예전 글은 「이미 표준화됐다」고 적었는데, 아직 RFC가 아닙니다.
 
----
+흐름은 WHIP과 같은 모양입니다. 재생기가 늘 먼저 SDP 제안(`recvonly` 권장)을 POST하고, 서버가 `201 Created`와 SDP 응답, `Location`으로 답합니다. 서버가 제안을 받아들이지 않으면 `406 Not Acceptable`에 자기 쪽 제안을 실어 돌려줄 수 있고, 재생기는 그 답을 `PATCH`로 보냅니다. 끝낼 때는 `DELETE`를 보내지만, 서버는 `DELETE`를 받지 못해도 ICE 동의 만료나 DTLS 종료로 자원을 정리해야 합니다([draft-05 4.3–4.4절](https://datatracker.ietf.org/doc/html/draft-ietf-wish-whep-05#section-4.3)).
 
-## 7. 실전 구축 — OvenMediaEngine 예시
+## 시청 쪽 비용은 CDN 캐시를 못 쓰는 데서 커집니다 {#5-whep의-진짜-한계--시청자-확장}
 
-오픈소스 WHIP/WHEP 서버. 한국의 AirenSoft가 개발.
+HLS 조각은 HTTP로 받는 파일이라, CDN 가장자리 서버가 한 번 받아 둔 사본을 많은 시청자에게 그대로 줄 수 있습니다. WebRTC 시청은 시청자마다 ICE 경로와 DTLS 세션이 따로 있고, SRTP 키도 세션마다 다릅니다. 같은 영상이라도 시청자에게 나가는 패킷은 세션마다 따로 암호화돼야 하므로, 미디어 서버(SFU)가 시청자 수만큼 패킷을 만들어 보내야 합니다.
 
-```yaml
-# OvenMediaEngine 설정
-<Bind>
-  <Providers>
-    <WebRTC>
-      <Signalling>
-        <Port>3333</Port>
-      </Signalling>
-      <IceCandidates>
-        <IceCandidate>*:10000-10010/udp</IceCandidate>
-      </IceCandidates>
-    </WebRTC>
-  </Providers>
-</Bind>
+| 항목 | HLS · LL-HLS | WHEP(WebRTC) |
+|---|---|---|
+| 전달 단위 | HTTP로 받는 조각 · 재생 목록 | 세션별 RTP 패킷 |
+| 공용 캐시 | 같은 조각을 CDN이 여러 시청자에게 줌 | 시청자마다 암호 세션이 달라 공유 사본이 없음 |
+| 시청자가 늘면 | CDN 가장자리 전송량이 늘어남 | 미디어 서버의 세션 · 전송량이 함께 늘어남 |
+| 지연을 정하는 것 | 조각 · 부분 조각 길이와 재생 목록 갱신 | 망 왕복과 지터 버퍼 |
 
-<Applications>
-  <Application>
-    <Name>app</Name>
-    <Type>live</Type>
-    <Providers>
-      <WebRTC>
-        <SignallingPaths>
-          <WHIPPath>/whip/{stream}</WHIPPath>
-        </SignallingPaths>
-      </WebRTC>
-    </Providers>
-    <Publishers>
-      <WebRTC>
-        <SignallingPaths>
-          <WHEPPath>/whep/{stream}</WHEPPath>
-        </SignallingPaths>
-      </WebRTC>
-      <LLHLS>
-        <SegmentDuration>0.2</SegmentDuration>
-      </LLHLS>
-      <HLS>
-        <SegmentDuration>6</SegmentDuration>
-      </HLS>
-    </Publishers>
-  </Application>
-</Applications>
-```
+그래서 WebRTC로 많은 시청자를 받으려면 미디어 서버를 여러 지역에 늘어놓고 서로 잇는 구조를 따로 운영해야 합니다. 이 비용이 HLS의 몇 배인지는 서비스 구조와 요금에 따라 달라 한 숫자로 말할 수 없습니다. 예전 글의 「10–30배」·「100배」 같은 배수는 근거가 없어 지웠습니다. 실제 제품 조건의 예로, Cloudflare Stream은 2026년 10월 15일부터 WebRTC 전송을 따로 과금하고, WHIP으로 받은 송출은 WHEP으로만 볼 수 있으며 녹화와 HLS 재생은 아직 지원하지 않는다고 적습니다.
 
-**한 송출(WHIP) → 세 시청 방식(WHEP/LL-HLS/HLS) 동시 제공**. 시청자가 선택.
+## 도입 현황은 확인한 날짜와 함께만 씁니다 {#8-산업-도입-현황-2024-기준}
 
-### OBS에서 WHIP 송출
+아래는 2026년 11월 12일에 공식 문서 · 릴리스 노트 · 소스로 확인한 것만 적었습니다.
 
-```
-OBS 30+ 설정:
-서비스: Custom
-서버: WHIP
-URL: https://server.example.com/whip/mystream
-Bearer Token: <발급받은 토큰>
-인코더: NVIDIA NVENC AV1 (RTX 4000+ 필요)
-```
+| 대상 | 확인한 내용 | 근거 |
+|---|---|---|
+| OBS Studio | 30.0(2023-11-12)에서 WHIP 출력 추가 | [릴리스 노트](https://github.com/obsproject/obs-studio/releases/tag/30.0.0) |
+| FFmpeg | 2025년 5월 WHIP 묶개(muxer) 추가, 로컬 9.0.2(Homebrew)에서 `-h muxer=whip` 확인(2026-11-12) | [커밋 기록](https://github.com/FFmpeg/FFmpeg/commits/master/libavformat/whip.c) |
+| Cloudflare Stream | WHIP · WHEP 정식 제공(GA), WebRTC 전송 과금 2026-10-15부터 | [문서](https://developers.cloudflare.com/stream/webrtc-beta/)(2026-10-27 판) |
+| MediaMTX | `/<경로>/whip` 주소로 WHIP 송출 수신 | [문서](https://github.com/bluenviron/mediamtx/blob/main/docs/3-publish/03-webrtc.md) |
 
-스트리머는 URL + 토큰만 입력. RTMP와 같은 단순함.
+예전 글의 Twitch 연도별 도입 일정, YouTube · AWS IVS 상태 표, 「WHIP Compatibility Suite」, OvenMediaEngine 설정 예시는 공식 문서로 확인하지 못해 지웠습니다. 국내 라이브 플랫폼의 WHIP 도입 여부도 공개 근거가 없어 적지 않았습니다. OBS 32.0.0에 들어 있는 서비스 목록에는 WHIP 주소로 등록된 서비스가 없습니다([services.json](https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/rtmp-services/data/services.json)).
 
----
+## WHIP을 고를 때는 연결 수보다 받는 쪽 조건을 봅니다
 
-## 8. 산업 도입 현황 (2024 기준)
+- **「WHIP은 1왕복, RTMP는 5왕복」** — HTTP 교환만 센 비교입니다. ICE와 DTLS까지 세면 미디어 전 왕복은 RTMP와 비슷합니다.
+- **「WHIP을 쓰면 AV1을 쓸 수 있다」** — 받는 서버가 그 코덱을 받아야 합니다. Cloudflare Stream은 2026-10-27 판 문서 기준 AV1을 받지 않습니다.
+- **「WHIP · WHEP 모두 표준이다」** — WHIP은 RFC 9725이고, WHEP은 2026-10 기준 드래프트 -05입니다.
+- **「WHIP으로 받으면 시청도 저지연이 된다」** — 송출 규약과 시청 규약은 따로 고릅니다. 시청까지 WebRTC로 하면 CDN 캐시 대신 미디어 서버 전송 비용을 집니다.
 
-| 회사/플랫폼 | WHIP | WHEP | 상태 |
-|---|---|---|---|
-| **Twitch** | ✅ 일반 공개 | 🟡 베타 | 점진적 |
-| **YouTube Live** | 🟡 베타 | ❌ | 신중 |
-| **Cloudflare Stream** | ✅ 일반 | ✅ 일반 | 적극 |
-| **AWS IVS** | ✅ 일반 | ✅ 일반 | 적극 |
-| **Daily.co** | ✅ | ✅ | 표준 |
-| **LiveKit** | ✅ | ✅ | 표준 |
-| **치지직 (네이버)** | ❌ | ❌ | 미도입 (추정) |
-| **SOOP** | ❌ | ❌ | 미도입 (추정) |
-| **OvenMediaEngine** | ✅ | ✅ | 표준 |
+송출기와 서버 사이 망에서 손실이 잦고 받는 서버가 WHIP을 지원한다면 WHIP이 맞을 수 있습니다. 받는 서비스가 RTMP만 받는다면 규약을 바꿀 수 없으니, 먼저 받는 쪽이 무엇을 받는지 확인하십시오.
 
-**Cloudflare가 가장 적극적**. CDN 회사로서 WebRTC의 CDN 부재 문제를 직접 해결하려는 의지.
+## 출처
 
-한국 라이브 플랫폼은 보수적. RTMP + HLS 인프라 안정성 우선. WHIP 도입은 차후.
+- [RFC 9725: WebRTC-HTTP Ingestion Protocol (WHIP)](https://www.rfc-editor.org/rfc/rfc9725.html) (2025-03, Proposed Standard) · [datatracker](https://datatracker.ietf.org/doc/rfc9725/)
+- [draft-ietf-wish-whep-05: WebRTC-HTTP Egress Protocol (WHEP)](https://datatracker.ietf.org/doc/html/draft-ietf-wish-whep-05) (2026-10-11) · [datatracker 상태](https://datatracker.ietf.org/doc/draft-ietf-wish-whep/)(2026-11-12 확인)
+- [RFC 8829 (JSEP)](https://www.rfc-editor.org/rfc/rfc8829.html) · [RFC 8445 (ICE)](https://www.rfc-editor.org/rfc/rfc8445.html) · [RFC 5764 (DTLS-SRTP)](https://www.rfc-editor.org/rfc/rfc5764.html) · [RFC 6347 (DTLS 1.2)](https://www.rfc-editor.org/rfc/rfc6347.html) · [RFC 7874 (WebRTC 오디오 코덱)](https://www.rfc-editor.org/rfc/rfc7874.html) · [RFC 7675 (Consent Freshness)](https://www.rfc-editor.org/rfc/rfc7675.html) · [RFC 6750 (Bearer Token)](https://www.rfc-editor.org/rfc/rfc6750.html)
+- [Adobe's Real Time Messaging Protocol (2012), Veovera 보관 사본](https://veovera.github.io/enhanced-rtmp/docs/legacy/rtmp-v1-0-spec.pdf)
+- [OBS Studio 30.0 릴리스 노트](https://github.com/obsproject/obs-studio/releases/tag/30.0.0) · [OBS 32.0.0 `services.json`](https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/rtmp-services/data/services.json)
+- [Cloudflare Stream — WebRTC](https://developers.cloudflare.com/stream/webrtc-beta/) (2026-10-27 판, 2026-11-12 확인)
+- [bluenviron/mediamtx 「WebRTC clients」 문서](https://github.com/bluenviron/mediamtx/blob/main/docs/3-publish/03-webrtc.md) (2026-11-12 확인)
+- [FFmpeg `libavformat/whip.c` 커밋 기록](https://github.com/FFmpeg/FFmpeg/commits/master/libavformat/whip.c)
 
----
-
-## 9. WHIP/WHEP 표준 vs 실제 구현 차이
-
-표준은 깔끔하지만 실제 구현에는 호환성 이슈.
-
-```
-[자주 만나는 호환성 문제]
-1. ICE Trickle 처리 방식 다름 (PATCH vs Re-POST)
-2. 코덱 협상 우선순위 다름 (서버마다 다름)
-3. Bearer Token 검증 형식 다름 (JWT vs custom)
-4. simulcast 표현 다름
-5. 에러 응답 형식 다름 (RFC는 단순, 실제는 풍부)
-```
-
-OBS WHIP 송출이 한 플랫폼에선 되는데 다른 플랫폼에선 안 되는 경우가 흔함. **2024년 현재 표준 적합성 테스트 도구 부재**.
-
-해결책: 큰 플랫폼이 호환성 표준 만들기. **WHIP Compatibility Suite**가 IETF에서 작업 중.
-
----
-
-## 정리하면
-
-WHIP/WHEP은 **IETF가 RTMP를 천천히 끝내려는 표준 시도**다.
-
-1. **출신** — 2023년 IETF RFC 9725. WebRTC의 시그널링 비표준 문제 해결
-2. **핵심 단순함** — HTTP POST 1번 + SDP 교환 = 끝. 5라운드트립 → 1라운드트립
-3. **WHIP** — 송출 표준 (RTMP 대체 시도). OBS 30+ 기본 지원
-4. **WHEP** — 시청 표준 (HLS 대체 시도). 300ms 지연
-5. **코덱 자유** — AV1, VP9, H.265 다 가능. RTMP의 H.264 족쇄 해방
-6. **WHEP 한계** — CDN 캐시 불가, 시청자 수 ↑ 시 비용 폭발
-7. **하이브리드 미래** — WHIP 송출 + WHEP/LL-HLS/HLS 시청자별 분기
-8. **산업 도입** — Cloudflare/AWS/Twitch가 선도, 한국 플랫폼 보수적
-9. **RTMP 공존** — 5~10년에 걸쳐 점진 대체. 즉시 사라지지 않음
-
-스트리밍 프로토콜 시리즈는 여기까지. 다음 글부터는 **비디오/오디오 코덱** — H.264가 어떻게 영상을 압축하는지부터 — 본다.
-
----
-
-**참고**
-- [WHIP RFC 9725](https://datatracker.ietf.org/doc/html/rfc9725)
-- [WHEP IETF Draft](https://datatracker.ietf.org/doc/draft-murillo-whep/)
-- [OvenMediaEngine](https://github.com/AirenSoft/OvenMediaEngine)
-- [LiveKit (WHIP/WHEP 지원 SFU)](https://github.com/livekit/livekit)
-- [Cloudflare Stream WHIP/WHEP](https://developers.cloudflare.com/stream/webrtc-beta/)
+다음 편: [373MB/s에서 6Mbps로 — 조건을 명시하고 이해하는 H.264 압축](/posts/tech-blurting/h264-deep-dive/)
