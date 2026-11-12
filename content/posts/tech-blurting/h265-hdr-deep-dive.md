@@ -1,7 +1,7 @@
 ---
 title: "H.265의 HDR은 PQ와 HLG 두 전달 곡선으로 나뉩니다"
 date: 2026-06-20T14:42:30+09:00
-lastmod: "2026-11-13T07:20:00+09:00"
+lastmod: "2026-11-13T07:55:32+09:00"
 description: "H.265(HEVC)를 고를 때는 압축률보다 디코더·라이선스·HDR 신호를 먼저 봐야 합니다. JCT-VC 검증 시험의 59% 절감이 어떤 조건의 값인지, 64×64 CTU와 4분 트리, Via LA와 Access Advance로 모인 특허 풀, FFmpeg가 hev1로 적는 태그와 애플의 hvc1 권고, 4K60의 레벨 5.1, PQ와 HLG의 곡선·메타데이터 차이와 VIDEO-RANGE, 아이폰 HDR이 HLG인 이유를 1차 문서로 확인했습니다. Sintel 예고편으로 같은 VMAF 93에서 x264·x265·SVT-AV1의 비트레이트와 CPU 시간을 직접 쟀습니다."
 categories: ["tech-blurting"]
 tags: ["HEVC", "H.265", "HDR", "PQ", "HLG", "x265", "VMAF"]
@@ -32,9 +32,9 @@ H.265는 H.264처럼 ITU-T와 ISO/IEC가 함께 만든 규격입니다. ITU-T �
 
 ### 64×64 CTU를 4분 트리로 쪼개 큰 평면을 한 블록으로 씁니다 {#h265가-h264보다-좋은-이유}
 
-H.264는 화면을 16×16 매크로블록으로 나눕니다. HEVC는 16–64 크기의 CTU(Coding Tree Unit)로 나누고, CTU 하나를 4분 트리로 다시 쪼개 8×8까지 내려갑니다([FFmpeg hevc.h 130–131행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/hevc/hevc.h#L130-L131)). 아래 영상에서 질감이 많은 곳만 잘게 쪼개지는 모습을 보십시오.
+H.264는 화면을 16×16 매크로블록으로 나눕니다. HEVC는 16–64 크기의 CTU(Coding Tree Unit)로 나누고, CTU 하나를 4분 트리로 다시 쪼개 8×8까지 내려갑니다([FFmpeg hevc.h 130–131행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/hevc/hevc.h#L130-L131)). 인코더는 블록마다 쪼갰을 때와 그대로 둘 때의 비트와 왜곡을 견줘 분할을 고르고, 그 결과 가장자리 · 질감이 많은 곳이 잘게 쪼개지기 쉽습니다. 아래 영상은 그 모양을 단순화한 것입니다.
 
-{{< motion scene="CtuQuadtree" id="fig-ctu-quadtree" kind="개념도" caption="64×64 CTU는 가장자리와 질감이 있는 곳만 32 → 16 → 8로 쪼개지고, 평평한 곳은 64×64 한 블록으로 남습니다." >}}
+{{< motion scene="CtuQuadtree" id="fig-ctu-quadtree" kind="개념도" caption="64×64 CTU는 가장자리와 질감이 있는 곳만 32 → 16 → 8로 쪼개지고, 평평한 곳은 64×64 한 블록으로 남습니다. 원호가 걸친 블록을 쪼개는 설명용 분할이며, 실제 인코더는 율 · 왜곡 비용으로 분할을 고릅니다." >}}
 
 평평한 하늘은 64×64 하나로 예측 정보를 한 번만 보냅니다. 인트라 예측 방향은 H.264의 9개에서 35개(planar · DC · 각도 33개)로 늘었고([hevcdec.h 125–159행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/hevc/hevcdec.h#L125-L159)), 움직임 정보는 이웃 블록의 것을 그대로 물려받는 병합(merge) 모드나 후보 목록에서 예측값을 고르는 AMVP로 보냅니다.
 
@@ -42,11 +42,11 @@ H.264는 화면을 16×16 매크로블록으로 나눕니다. HEVC는 16–64 �
 
 HEVC 특허는 여러 창구에서 따로 허락받아야 했습니다. 2023년 5월 2일 Via Licensing과 MPEG LA가 합쳐 Via Licensing Alliance(Via LA)가 됐고([Via LA](https://www.via-la.com/via-licensing-and-mpeg-la/)), 2025년 12월 15일에는 Access Advance가 Via LA의 HEVC/VVC 프로그램을 인수했습니다([Via LA 프로그램 안내](https://www.via-la.com/licensing-programs/hevc-vvc/), [Access Advance 보도문](https://accessadvance.com/2025/12/15/access-advance-and-via-licensing-alliance-announce-hevc-vvc-program-acquisition/)). 보도문은 HEVC·VVC 자산을 한 관리자 아래 모았다고만 적고, 두 풀을 하나로 합칠지와 기존 계약의 이행 방식은 밝히지 않았습니다.
 
-스트리밍 쪽에는 새 창구가 생겼습니다. Access Advance는 2025년 1월 16일 인터넷 영상 배포에 HEVC·VVC·AV1·VP9를 한 라이선스로 묶는 VDP(Video Distribution Patent) 풀을 발표했습니다([보도문](https://accessadvance.com/2025/01/16/access-advance-announces-video-distribution-patent-pool-in-response-to-market-demand/)). 로열티 없는 코덱으로 알려진 AV1이 같은 풀에 들어간 사정은 [AV1 글](/posts/tech-blurting/av1-vp9-deep-dive/#15-sisvel--av1에-대한-라이센스-위협)에서 다룹니다.
+스트리밍 쪽에는 새 창구가 생겼습니다. Access Advance는 2025년 1월 16일 인터넷 영상 배포에 HEVC·VVC·AV1·VP9를 한 라이선스로 묶는 VDP(Video Distribution Patent) 풀을 발표했습니다([보도문](https://accessadvance.com/2025/01/16/access-advance-announces-video-distribution-patent-pool-in-response-to-market-demand/)). 요율표와 AV1이 같은 풀에 들어간 사정은 [AV1 글](/posts/tech-blurting/av1-vp9-deep-dive/#15-sisvel--av1에-대한-라이센스-위협)에서 다룹니다.
 
 ### 비용은 기기·서비스·계약마다 단위가 다릅니다 {#비용-예시}
 
-기기 풀은 제품 한 대마다, VDP는 배포사의 사업 규모 등급마다 값을 매기고, VDP 요율은 발표 뒤 시장과 협의해 공개한다고 했습니다. 「시청자 수 × 대당 로열티」로 서비스 비용을 추정할 수 없고, 풀 밖 특허권자와의 개별 계약도 남습니다.
+기기 풀은 제품 한 대마다, VDP는 배포사의 사업 규모 등급마다 값을 매깁니다([VDP 요율](https://accessadvance.com/vdp-pool-royalty/)). 「시청자 수 × 대당 로열티」로 서비스 비용을 추정할 수 없고, 풀 밖 특허권자와의 개별 계약도 남습니다.
 
 ## x265는 같은 VMAF에서 x264보다 CPU 시간을 더 씁니다 {#4-인코딩-비용--h264-대비-큰-부담}
 
@@ -79,7 +79,7 @@ Sintel 예고편 10초(1080p 24fps)를 인코더마다 CRF를 이분 탐색해, 
 | SVT-AV1 preset 8 | 39 | 1,201 | 28.3 | 93.07 | 77.01 | 2 |
 | SVT-AV1 preset 4 | 41 | 867 | 93.2 | 93.19 | 75.44 | 2 |
 
-x265는 x264보다 비트를 34% 덜 쓰고 CPU 시간을 2.3배 썼습니다. x265의 CRF 29는 VMAF 92.86(1,055kbps)이라 93을 넘는 점은 94.00뿐이었고, 그만큼 x265 쪽 비트가 조금 많게 잡혔습니다. SVT-AV1 preset 8은 x265와 비슷한 비트를 x264보다 적은 CPU 시간으로 냈고, preset 4는 비트를 더 줄이는 대신 CPU 시간을 x265보다 더 썼습니다. 하위 1%(프레임별 VMAF에서 240프레임 중 세 번째로 낮은 값)는 SVT-AV1이 가장 낮았습니다. SVT-AV1 4.2.0의 기본 튜닝이 VMAF가 아닌 PSNR이라는 점과 함께 읽어야 합니다.
+x265는 x264보다 비트를 34% 덜 쓰고 CPU 시간을 2.3배 썼습니다. x265의 CRF 29는 VMAF 92.86(1,055kbps)이라 93을 넘는 점은 94.00뿐이었고, 그만큼 x265 쪽 비트가 조금 많게 잡혔습니다. SVT-AV1 preset 8은 x265와 비슷한 비트를 x264보다 적은 CPU 시간으로 냈고, preset 4는 비트를 더 줄이는 대신 CPU 시간을 x265보다 더 썼습니다. 하위 1%(프레임별 VMAF에서 240프레임 중 세 번째로 낮은 값)는 SVT-AV1이 가장 낮았습니다. SVT-AV1 4.2.0의 기본 튜닝이 VMAF가 아닌 PSNR이라 그 영향일 수 있지만, 이 측정으로 원인을 가리지는 않았습니다(추정).
 
 이 비교는 인코더 기본값의 비교일 뿐 최적 설정의 비교가 아닙니다. 영상 하나, 각 1회이고, 키프레임 간격 기본값도 다릅니다(x264·x265는 최대 250프레임에 장면 전환 키프레임, SVT-AV1은 161프레임). 측정 중 기계 부하가 크게 오르내렸습니다(아래 「측정 조건」). 라이브라면 소프트웨어 인코딩보다 GPU 인코더가 현실적인데, NVENC의 HEVC 지원과 세대별 차이는 [NVENC 글](/posts/tech-blurting/nvenc-gpu-transcoding/)에 있습니다.
 
@@ -132,7 +132,7 @@ PQ는 부호값 0.58 근처에서 기준 흰색 203cd/m²에 닿고, 그 위 0.4
 | HLG | HLG | 없음 | [BT.2100](https://www.itu.int/rec/R-REC-BT.2100) |
 | Dolby Vision | 프로파일마다 다름(8.1은 HDR10 호환, 8.4는 HLG 호환) | Dolby Vision 동적 메타데이터 | [Dolby 비트스트림 프로파일](https://ott.dolby.com/OnDelKits/Dolby_Vision_Online_Delivery_Kit/v1/Documentation/Specs/Visio_Profiles/help_files/topics/c_dovi_profiles_public.html) |
 
-HDR10+는 로열티가 없지만 채택사 종류에 따라 연 관리비(예: 화면 제조사 $10,000, SoC $4,000, 콘텐츠사 없음)가 있습니다. Dolby Vision의 배포용 프로파일 5·8·10은 모두 10비트 단일 층이고, 5와 8은 HEVC, 10은 AV1입니다.
+HDR10+는 로열티가 없지만 채택사 종류에 따라 연 관리비(예: 화면 제조사 $10,000, SoC $4,000, 콘텐츠사 없음)가 있습니다([HDR10+ 라이선스](https://hdr10plus.org/#licenses)). Dolby Vision의 배포용 프로파일 5·8·10은 모두 10비트 단일 층이고, 5와 8은 HEVC, 10은 AV1입니다.
 
 ### HLG는 메타데이터 없이 SDR 화면에서도 보입니다 {#왜-hlg가-라이브에-적합}
 
@@ -142,7 +142,7 @@ PQ가 라이브에 못 쓰인다는 뜻은 아닙니다. HDR10의 정적 메타�
 
 ## PQ는 10,000니트까지 펼쳐 10비트가 필요합니다 {#8-10-bit-색심도--hdr의-필수-조건}
 
-PQ는 0–10,000cd/m²를 부호값 하나에 펼치므로 계단 하나의 폭이 넓습니다. 제한 범위 휘도 부호로 계산하면 100cd/m² 근처의 인접 부호값 간격은 10비트(64–940)에서 약 1.1%, 8비트(16–235)에서 약 4.7%입니다(계산값). 8비트는 같은 곳에서 네 배 거친 계단을 밟으므로 하늘 같은 완만한 그러데이션에 띠가 생기기 쉽습니다. 그래서 HDR10 정의는 10비트를 요구하고, Dolby Vision 배포용 프로파일도 10비트입니다. x265는 `-pix_fmt yuv420p10le -profile:v main10`으로 10비트를 냅니다.
+PQ는 0–10,000cd/m²를 부호값 하나에 펼치므로 계단 하나의 폭이 넓습니다. 제한 범위 휘도 부호로 계산하면 100cd/m² 근처의 인접 부호값 간격은 10비트(64–940)에서 약 1.1%, 8비트(16–235)에서 약 4.7%입니다(계산값). 8비트는 같은 곳에서 네 배 거친 계단을 밟으므로 하늘 같은 완만한 그러데이션에 띠가 생기기 쉽습니다. 그래서 HDR10 정의는 10비트를 요구하고, Dolby Vision 배포용 프로파일 5 · 8 · 10도 10비트입니다(9는 8비트 AVC). x265는 `-pix_fmt yuv420p10le -profile:v main10`으로 10비트를 냅니다.
 
 ## 4:2:0은 색 표본을 네 화소에 하나만 둡니다 {#9-chroma-subsampling--왜-420이-표준인가}
 
@@ -190,9 +190,9 @@ HLS 다변형 목록의 `VIDEO-RANGE` 속성은 `SDR`·`HLG`·`PQ` 가운데 하
 
 ## 아이폰 HDR 영상은 HLG라 PQ 태그만 붙이면 틀립니다 {#16-iphone-hdr-영상의-처리--실무-케이스}
 
-애플은 아이폰 12부터 HDR 영상을 Dolby Vision 프로파일 8.4로 녹화한다고 밝혔습니다([Apple Developer, Support HDR video playback, editing, and export in your app](https://developer.apple.com/news/?id=rwbholxw)). Dolby 프로파일 표에서 8은 10비트 HEVC 단일 층이고, 호환 표시 4는 전달 특성 18, 곧 HLG입니다. Dolby Vision 메타데이터를 쓰지 않는 기기에서는 이 HLG 기본 층이 영상이 됩니다.
+애플은 2021년 2월 12일 아이폰 12 · 12 Pro가 HDR 영상을 Dolby Vision 프로파일 8.4(호환 ID 4, HLG)로, 10비트 HEVC에 녹화한다고 밝혔습니다([Apple Developer, Support HDR video playback, editing, and export in your app](https://developer.apple.com/news/?id=rwbholxw), [보관본](https://web.archive.org/web/20220426033633/https://developer.apple.com/news/?id=rwbholxw)). Dolby 프로파일 표에서 8은 10비트 HEVC 단일 층이고, 호환 표시 4는 전달 특성 18, 곧 HLG입니다. Dolby Vision 메타데이터를 쓰지 않는 기기에서는 이 HLG 기본 층이 영상이 됩니다.
 
-이 파일에 `-color_trc smpte2084`와 PQ 메타데이터만 붙이면 HLG 부호값을 PQ 곡선으로 읽게 됩니다. [[fig-pq-hlg-sdr]]에서 같은 부호값 0.75가 HLG(1,000cd/m² 화면)로는 203cd/m², PQ로는 983cd/m²입니다. HDR10이 필요하면 HLG에서 PQ로 곡선을 실제로 바꿔야 하고, 아니면 `VIDEO-RANGE=HLG` 변형으로 내보내는 편이 단순합니다. SDR로 내리는 FFmpeg `tonemap` 필터는 기본값이 `none`이고 linear·gamma·clip·reinhard·hable·mobius 중 하나를 고르게 되어 있어, 어느 하나가 표준이 아닙니다.
+이 파일에 `-color_trc smpte2084`와 PQ 메타데이터만 붙이면 HLG 부호값을 PQ 곡선으로 읽게 됩니다. [[fig-pq-hlg-sdr]]에서 같은 부호값 0.75가 HLG(1,000cd/m² 화면)로는 203cd/m², PQ로는 983cd/m²입니다. HDR10이 필요하면 HLG에서 PQ로 곡선을 실제로 바꿔야 하고, 아니면 `VIDEO-RANGE=HLG` 변형으로 내보내는 편이 단순합니다. SDR로 내리는 FFmpeg `tonemap` 필터는 기본값이 `none`이고([vf_tonemap.c 286–293행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavfilter/vf_tonemap.c#L286-L293)) linear·gamma·clip·reinhard·hable·mobius 중 하나를 고르게 되어 있어, 어느 하나가 표준이 아닙니다.
 
 ## HEVC는 압축률보다 디코더와 라이선스 범위를 먼저 봅니다 {#정리하면}
 
@@ -206,6 +206,7 @@ HLS 다변형 목록의 `VIDEO-RANGE` 속성은 `SDR`·`HLG`·`PQ` 가운데 하
 
 - 수행: AI(Claude Code)가 2026년 11월 13일 06:34–06:52(KST)에 실행했습니다. 인코딩과 VMAF 측정은 각 1회입니다.
 - 기종: MacBook Air(Mac17,3, Apple M5 고성능 4 · 효율 6코어, 32GB, 팬 없음), macOS 27.0.1. 같은 기계에서 다른 세션의 작업(다른 인코딩 실험, 렌더, 브라우저)이 함께 돌았습니다. 1분 load average는 측정 시작 때 26.28, 인코더 비교 구간에 41.29–174.77, 끝에 약 220이었고(측정 자신의 스레드 포함), x264 → x265 → SVT-AV1 순서라 뒤쪽일수록 부하가 높았습니다. 그래서 벽시계가 아니라 CPU 시간(user + sys, 자식 프로세스 rusage)으로 비교했습니다. 성능·효율 코어가 섞인 칩이라 CPU 시간도 부하의 영향을 완전히 피하지는 못합니다.
+- 재현성: 같은 인코딩의 CPU 시간은 재실행에서 약 ±10% 흔들렸습니다. 리뷰 단계의 독립 재측정(load 28–46)에서는 x265 / x264 CPU 시간 비가 2.37배, SVT-AV1 preset 4 / 8이 2.99배였습니다.
 - 도구: FFmpeg 9.0.2(Homebrew 9.0.2_1), x264 core 165 r3222, x265 4.3+1-e9b8812, SVT-AV1 v4.2.0, libvmaf 3.2.1(모델 vmaf_v0.6.1).
 - 입력: [Sintel 예고편](https://durian.blender.org/sharing/) 1080p(© copyright Blender Foundation | durian.blender.org, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)), `https://download.blender.org/durian/trailer/sintel_trailer-1080p.mp4`, sha256 `34bbd52a4b89fdf63c8ace50b268da26653a59508288100cd3c23de276db7931`. 원본 자체가 H.264 약 2.1Mbps라 이미 한 번 압축된 영상이고, 위아래 검은 띠가 있습니다(`cropdetect` 결과 대부분 1920×818).
   - `ffmpeg -ss 20 -i sintel_trailer-1080p.mp4 -t 10 -an -c:v ffv1 ref.mkv` (1920×1080, 24fps, 240프레임)
