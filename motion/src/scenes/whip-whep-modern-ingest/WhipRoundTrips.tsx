@@ -1,6 +1,7 @@
 // 콘티: _workspace/blog/whip-whep-modern-ingest/storyboard.md 「영상 1」
-// WHIP 은 HTTP POST 한 번으로 SDP 를 주고받지만, 미디어가 흐르기 전에 ICE 연결 확인과 DTLS 핸드셰이크 왕복이 더 남는다.
-// RFC 9725 Figure 1 순서: POST/201 → ICE/STUN → DTLS → RTP/RTCP. 시퀀스도(시간은 위 → 아래), 단계가 끝날 때마다 왕복 카운터가 1 → 2 → 4.
+// WHIP 은 HTTP POST 한 번으로 SDP 를 주고받지만, 미디어가 흐르기 전에 HTTPS 연결 · ICE 연결 확인 · DTLS 핸드셰이크 왕복이 더 있다.
+// RTMP 글과 같은 셈(처음 연결부터): TCP 1 + TLS 1.3 1 → POST/201 1 → ICE/STUN 1 → DTLS 1.2 2 → RTP. 카운터 2 → 3 → 4 → 6.
+// RFC 9725 Figure 1 순서: POST/201 → ICE/STUN → DTLS → RTP/RTCP.
 // 반복 클립, 생성 소재 없음. layout="mobile" 은 1080×1350 휴대폰판(WhipRoundTripsMobile) — 세로선 간격을 좁히고 카운터를 위로.
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { Box } from "../../components/Stations";
@@ -11,38 +12,44 @@ import { COLOR, MOBILE_TEXT, TEXT } from "../../theme";
 export const WHIP_ROUND_TRIPS_FRAMES = 330;
 
 /** 화살표 하나가 그려지는 프레임 수. */
-const DRAW = 14;
-const DTLS_DRAW = 12;
+const DRAW = 12;
+const DTLS_DRAW = 10;
 const INTRO = 15;
 /** RTP 화살표 셋이 차례로 그려지기 시작하는 프레임. */
-const MEDIA_START = 224;
-const RTP_STAGGER = 13;
+const MEDIA_START = 240;
+const RTP_STAGGER = 12;
 /** RTP 점선 무늬가 프레임마다 앞으로 가는 거리(px). */
 const RTP_FLOW_SPEED = 3;
 
 type Dir = "right" | "left";
-type PhaseKey = "http" | "ice" | "dtls";
+type PhaseKey = "tls" | "http" | "ice" | "dtls";
 
 /** 화살표 차례와 시작 프레임. 이름표 글자는 배치표가 정한다. */
 const STEPS: readonly { readonly phase: PhaseKey; readonly dir: Dir; readonly start: number; readonly draw: number }[] = [
-  { phase: "http", dir: "right", start: 16, draw: DRAW },
-  { phase: "http", dir: "left", start: 33, draw: DRAW },
-  { phase: "ice", dir: "right", start: 78, draw: DRAW },
-  { phase: "ice", dir: "left", start: 94, draw: DRAW },
-  { phase: "dtls", dir: "right", start: 139, draw: DTLS_DRAW },
-  { phase: "dtls", dir: "left", start: 153, draw: DTLS_DRAW },
-  { phase: "dtls", dir: "right", start: 167, draw: DTLS_DRAW },
-  { phase: "dtls", dir: "left", start: 181, draw: DTLS_DRAW },
+  { phase: "tls", dir: "right", start: 14, draw: DTLS_DRAW },
+  { phase: "tls", dir: "left", start: 26, draw: DTLS_DRAW },
+  { phase: "tls", dir: "right", start: 38, draw: DTLS_DRAW },
+  { phase: "tls", dir: "left", start: 50, draw: DTLS_DRAW },
+  { phase: "http", dir: "right", start: 80, draw: DRAW },
+  { phase: "http", dir: "left", start: 95, draw: DRAW },
+  { phase: "ice", dir: "right", start: 128, draw: DRAW },
+  { phase: "ice", dir: "left", start: 143, draw: DRAW },
+  { phase: "dtls", dir: "right", start: 176, draw: DTLS_DRAW },
+  { phase: "dtls", dir: "left", start: 188, draw: DTLS_DRAW },
+  { phase: "dtls", dir: "right", start: 200, draw: DTLS_DRAW },
+  { phase: "dtls", dir: "left", start: 212, draw: DTLS_DRAW },
 ];
 
 /** 단계가 끝나 카운터가 오르는 프레임과 그때의 왕복 수. 오른 뒤 30프레임(1초) 멈춘다. */
 const COUNTS: readonly { readonly at: number; readonly value: number }[] = [
-  { at: 48, value: 1 },
-  { at: 109, value: 2 },
-  { at: 194, value: 4 },
+  { at: 62, value: 2 },
+  { at: 110, value: 3 },
+  { at: 158, value: 4 },
+  { at: 224, value: 6 },
 ];
 
 const PHASES: readonly { readonly key: PhaseKey; readonly tag: string }[] = [
+  { key: "tls", tag: "TCP·TLS" },
   { key: "http", tag: "HTTP" },
   { key: "ice", tag: "ICE" },
   { key: "dtls", tag: "DTLS" },
@@ -73,9 +80,13 @@ const DESKTOP: Layout = {
   leftX: 360,
   rightX: 1180,
   head: { y: 90, w: 340, h: 88 },
-  lifelineBottom: 1050,
-  stepYs: [212, 292, 392, 472, 572, 652, 732, 812],
+  lifelineBottom: 1060,
+  stepYs: [236, 276, 350, 390, 460, 530, 600, 670, 740, 780, 820, 860],
   stepLabels: [
+    "TCP 연결",
+    "",
+    "TLS 1.3",
+    "",
     "POST · SDP 제안",
     "201 Created · SDP 응답 · Location",
     "STUN 연결 확인",
@@ -89,10 +100,10 @@ const DESKTOP: Layout = {
   labelGap: 52,
   phaseTagX: 150,
   bracketX: 290,
-  rtpYs: [912, 962, 1012],
+  rtpYs: [940, 985, 1030],
   rtpLabel: "RTP 미디어",
   counter: { x: 1270, y: 360, size: 88, tagGap: 26 },
-  note: { x: 1270, y: 490, lines: ["DTLS 1.2 기준", "HTTPS 연결 수립 제외"], lineGap: 50 },
+  note: { x: 1270, y: 490, lines: ["TLS 1.3 · DTLS 1.2 기준", "HTTP 연결 재사용 시 4"], lineGap: 50 },
   text: { head: TEXT.label, arrow: TEXT.small, phase: TEXT.small, tag: TEXT.label, note: TEXT.small },
 };
 
@@ -101,17 +112,17 @@ const MOBILE: Layout = {
   leftX: 310,
   rightX: 870,
   head: { y: 300, w: 360, h: 92 },
-  lifelineBottom: 1310,
-  stepYs: [430, 518, 622, 710, 814, 902, 990, 1078],
-  stepLabels: ["POST · 제안", "201 · 응답", "STUN 확인", "응답", "DTLS", "", "", ""],
+  lifelineBottom: 1330,
+  stepYs: [470, 515, 595, 640, 720, 800, 880, 960, 1040, 1080, 1120, 1160],
+  stepLabels: ["TCP", "", "TLS 1.3", "", "POST · 제안", "201 · 응답", "STUN 확인", "응답", "DTLS", "", "", ""],
   slant: 12,
   labelGap: 66,
   phaseTagX: 110,
   bracketX: 230,
-  rtpYs: [1180, 1230, 1280],
+  rtpYs: [1240, 1275, 1310],
   rtpLabel: "RTP",
   counter: { x: 60, y: 40, size: 80, tagGap: 26 },
-  note: { x: 60, y: 160, lines: ["DTLS 1.2 기준 · HTTPS 연결 수립 제외"], lineGap: 0 },
+  note: { x: 60, y: 160, lines: ["TLS 1.3 · DTLS 1.2 기준"], lineGap: 0 },
   text: { head: MOBILE_TEXT.label, arrow: MOBILE_TEXT.small, phase: MOBILE_TEXT.small, tag: MOBILE_TEXT.label, note: MOBILE_TEXT.small },
 };
 
@@ -214,7 +225,7 @@ export const WhipRoundTrips: React.FC<Props> = ({ layout = "desktop" }) => {
         );
       })}
 
-      {/* 제어 화살표 8개: HTTP 왕복 · ICE 왕복 · DTLS 왕복 둘. */}
+      {/* 제어 화살표 12개: TCP · TLS 왕복 둘 · HTTP 왕복 · ICE 왕복 · DTLS 왕복 둘. */}
       {STEPS.map((s, i) => {
         const y = l.stepYs[i];
         const [x1, x2] = s.dir === "right" ? [l.leftX, l.rightX] : [l.rightX, l.leftX];
