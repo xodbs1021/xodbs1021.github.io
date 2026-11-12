@@ -1,0 +1,24 @@
+# E 사다리 명령 확인 (2026-11-13, AI 실행, FFmpeg 9.0.2, x264 core 165)
+ffmpeg -f lavfi -i testsrc2=size=1920x1080:rate=30 -t 12 -filter_complex "[0:v]split=3[v0][v1][v2];[v1]scale=1280:720[v1o];[v2]scale=960:540[v2o]" -map "[v0]" -map "[v1o]" -map "[v2o]" -c:v libx264 -preset veryfast -threads 4 -g 60 -sc_threshold 0 -b:v:0 6000k -maxrate:v:0 6000k -bufsize:v:0 6000k -b:v:1 3000k -maxrate:v:1 3000k -bufsize:v:1 3000k -b:v:2 2000k -maxrate:v:2 2000k -bufsize:v:2 2000k -f hls -hls_time 6 -hls_playlist_type vod -hls_segment_filename "v%v_%03d.ts" -var_stream_map "v:0 v:1 v:2" -master_pl_name master.m3u8 "v%v.m3u8"
+x264 머리말:
+bitrate=6000	vbv_maxrate=6000	vbv_bufsize=6000
+bitrate=3000	vbv_maxrate=3000	vbv_bufsize=3000
+bitrate=2000	vbv_maxrate=2000	vbv_bufsize=2000
+master.m3u8:
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-STREAM-INF:BANDWIDTH=6456170,AVERAGE-BANDWIDTH=6315421,RESOLUTION=1920x1080,CODECS="avc1.640028"
+v0.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=3265936,AVERAGE-BANDWIDTH=3179957,RESOLUTION=1280x720,CODECS="avc1.64001f"
+v1.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=2184560,AVERAGE-BANDWIDTH=2123397,RESOLUTION=960x540,CODECS="avc1.64001f"
+v2.m3u8
+변형별 키프레임 pts(초, TS 시작 오프세트 1.4667 포함):
+v0: 1.466667 3.466667 5.466667 7.466667 9.466667 11.466667 
+v1: 1.466667 3.466667 5.466667 7.466667 9.466667 11.466667 
+v2: 1.466667 3.466667 5.466667 7.466667 9.466667 11.466667 
+조각 길이: #EXTINF:6.000000, #EXTINF:6.000000, 
+
+홀수 폭: ffmpeg -f lavfi -i testsrc2=size=1280x720:rate=30 -t 1 -vf scale=853:480 -c:v libx264 odd.mp4 -> [libx264] width not divisible by 2 (853x480) / Error while opening encoder
+scale=-2:480 -> 854x480
+sps: width_mbs 120 -> 1920, height_map_units 68 -> 1088, crop_bottom 4 (x2 chroma) = 8 rows

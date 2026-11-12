@@ -1,0 +1,9 @@
+# E1 해상도 × 비트레이트 격자의 VMAF (2026-11-13 새벽, 결과 표 기록 02:57:56 KST, AI(Claude Code) 실행)
+기종: MacBook Air(Apple M5, 고성능 4·효율 6코어, 32GB, 팬 없음), macOS 27.0.1, FFmpeg 9.0.2, x264 core 165 r3222, libvmaf 3.2.1(vmaf_v0.6.1)
+입력 ref.mkv: Sintel 예고편 1080p(Blender Foundation, CC BY 3.0) 20초부터 10초, FFV1 무손실, 1920x1080 24fps 240프레임. 원본이 H.264 약 2.1Mbps로 이미 압축된 영상, 위아래 검은 띠, 한 장면 묶음 10초.
+인코딩: ffmpeg -i ref.mkv -vf scale=W:H:flags=bicubic -c:v libx264 -preset medium -threads 4 -b:v Bk -maxrate Bk -bufsize 2Bk e_H_B.mp4
+  W:H = 640:360, 960:540, 1280:720, 1920:1080 / B = 300 600 1000 1600 2500 4000 6000
+VMAF: ffmpeg -i e_H_B.mp4 -i ref.mkv -lavfi "[0:v]scale=1920:1080:flags=bicubic,setpts=N/24/TB[d];[1:v]setpts=N/24/TB[r];[d][r]libvmaf=log_fmt=json:log_path=v.json:n_threads=4" -f null -
+각 점 1회. e1-vmaf-grid.csv 열: res, 목표 kbps, 파일 바이트, 실제 kbps(바이트×8/10초), VMAF 평균, 인코딩 CPU 초(디코딩·확대 포함).
+윗선(격자 점 기준 최고 해상도): 300→540p(55.90, 360p 54.98) / 600→540p(73.60, 720p 72.87) / 1000→720p(83.66, 1080p 82.21) / 1600·2500·4000·6000→1080p
+교차점(로그 가로축 직선 보간 대신 kbps 직선 보간): 540p→720p 약 700kbps, 720p→1080p 약 1,200kbps. 360p는 격자 범위에서 윗선에 오르지 않음.

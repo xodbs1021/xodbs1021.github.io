@@ -1,0 +1,10 @@
+# A2 -ss 위치와 첫 프레임 (2026-11-13, AI 실행, FFmpeg 9.0.2)
+입력 src.mp4: testsrc2 1280x720 30fps 10초, libx264 -g 60 -keyint_min 60 -sc_threshold 0 -bf 0 (키프레임 0·2·4·6·8초)
+판정: 출력 첫 디코딩 프레임의 framemd5를 원본 프레임 번호와 대조(인코딩은 -qp 0 무손실로 대조)
+
+ffmpeg -ss 3.3 -i src.mp4 -t 2 -c:v libx264 -preset veryfast -qp 0 encL_before.mkv  -> 60프레임, 첫 프레임 = 원본 #99 (3.300초)
+ffmpeg -i src.mp4 -ss 3.3 -t 2 -c:v libx264 -preset veryfast -qp 0 encL_after.mkv   -> 60프레임, 첫 프레임 = 원본 #99 (3.300초)
+ffmpeg -ss 3.3 -i src.mp4 -t 2 -c copy copy_before.ts   -> 99프레임, 첫 프레임 = 원본 #60 (2.000초, 앞 키프레임)
+ffmpeg -i src.mp4 -ss 3.3 -t 2 -c copy copy_after.ts    -> 39프레임, 첫 프레임 = 원본 #120 (4.000초, 다음 키프레임)
+참고: copy_before를 mp4로 쓰면 첫 패킷 pts -1.3초(2.0초 키프레임)부터 들어가고 앞 1.3초는 discard 표시(편집 목록) — 디코더는 #99부터 보여 주지만 파일에는 2.0초부터의 데이터가 담김.
+FFmpeg 9.0.2 fftools/ffmpeg_opt.c:146 o->accurate_seek = 1 (기본 켬)

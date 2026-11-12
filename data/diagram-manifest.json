@@ -1,13 +1,4 @@
 {
-  "02d2832c29297cc6": {
-    "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
-    "wide": {
-      "file": "02d2832c29297cc6-wide.svg",
-      "width": 808,
-      "height": 456,
-      "bytes": 22292
-    }
-  },
   "07db9356d4914fc3": {
     "source": "content/posts/0-to-1/pokeclip-reconnect-audio-gap.md",
     "wide": {
@@ -15,6 +6,15 @@
       "width": 392,
       "height": 321,
       "bytes": 17214
+    }
+  },
+  "0ce27a5f60ec8476": {
+    "source": "content/posts/tech-blurting/ffmpeg-hls-dash-muxer.md",
+    "wide": {
+      "file": "0ce27a5f60ec8476-wide.svg",
+      "width": 392,
+      "height": 328,
+      "bytes": 17784
     }
   },
   "0dc3490e437f99cb": {
@@ -41,21 +41,6 @@
       "bytes": 25576
     }
   },
-  "0eb7c67317ed321e": {
-    "source": "content/posts/tech-blurting/abr-ladder-design.md",
-    "wide": {
-      "file": "0eb7c67317ed321e-wide.svg",
-      "width": 1016,
-      "height": 239,
-      "bytes": 19415
-    },
-    "narrow": {
-      "file": "0eb7c67317ed321e-narrow.svg",
-      "width": 600,
-      "height": 535,
-      "bytes": 19522
-    }
-  },
   "12ec1e92c021bdff": {
     "source": "content/posts/projects/aws-gcp-bidirectional-cutover-experiment.md",
     "wide": {
@@ -72,15 +57,6 @@
       "width": 392,
       "height": 989,
       "bytes": 110493
-    }
-  },
-  "18c1ace855c29607": {
-    "source": "content/posts/tech-blurting/nvenc-gpu-transcoding.md",
-    "wide": {
-      "file": "18c1ace855c29607-wide.svg",
-      "width": 808,
-      "height": 490,
-      "bytes": 23040
     }
   },
   "1ccb6784f322c968": {
@@ -176,21 +152,6 @@
       "bytes": 24241
     }
   },
-  "3d6abb2da49552db": {
-    "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
-    "wide": {
-      "file": "3d6abb2da49552db-wide.svg",
-      "width": 1640,
-      "height": 91,
-      "bytes": 19474
-    },
-    "narrow": {
-      "file": "3d6abb2da49552db-narrow.svg",
-      "width": 184,
-      "height": 698,
-      "bytes": 19595
-    }
-  },
   "4187c5e2b25d2254": {
     "source": "content/posts/0-to-1/stream-id-contract-compatible-migration.md",
     "wide": {
@@ -198,30 +159,6 @@
       "width": 392,
       "height": 370,
       "bytes": 18281
-    }
-  },
-  "45a372d41c658f12": {
-    "source": "content/posts/tech-blurting/nvenc-gpu-transcoding.md",
-    "wide": {
-      "file": "45a372d41c658f12-wide.svg",
-      "width": 1442,
-      "height": 108,
-      "bytes": 19031
-    },
-    "narrow": {
-      "file": "45a372d41c658f12-narrow.svg",
-      "width": 184,
-      "height": 741,
-      "bytes": 19005
-    }
-  },
-  "462332f513042dd7": {
-    "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
-    "wide": {
-      "file": "462332f513042dd7-wide.svg",
-      "width": 392,
-      "height": 685,
-      "bytes": 19874
     }
   },
   "467fdf85cefdc568": {
@@ -251,28 +188,13 @@
       "bytes": 17899
     }
   },
-  "4a61b431f94d8e2b": {
-    "source": "content/posts/tech-blurting/ffmpeg-deep-dive.md",
-    "wide": {
-      "file": "4a61b431f94d8e2b-wide.svg",
-      "width": 1016,
-      "height": 75,
-      "bytes": 15724
-    },
-    "narrow": {
-      "file": "4a61b431f94d8e2b-narrow.svg",
-      "width": 184,
-      "height": 469,
-      "bytes": 15881
-    }
-  },
-  "4c359e4d8ddd5f4e": {
+  "4c2c05951f29b199": {
     "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
     "wide": {
-      "file": "4c359e4d8ddd5f4e-wide.svg",
-      "width": 600,
-      "height": 112,
-      "bytes": 15376
+      "file": "4c2c05951f29b199-wide.svg",
+      "width": 184,
+      "height": 564,
+      "bytes": 18589
     }
   },
   "4c5d4a43859670dc": {
@@ -315,66 +237,6 @@
       "width": 430,
       "height": 663,
       "bytes": 29396
-    }
-  },
-  "553ce9f103f4cd13": {
-    "source": "content/posts/tech-blurting/abr-ladder-design.md",
-    "wide": {
-      "file": "553ce9f103f4cd13-wide.svg",
-      "width": 1201,
-      "height": 157,
-      "bytes": 18976
-    },
-    "narrow": {
-      "file": "553ce9f103f4cd13-narrow.svg",
-      "width": 392,
-      "height": 465,
-      "bytes": 18967
-    }
-  },
-  "55779ce5b80d28e8": {
-    "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
-    "wide": {
-      "file": "55779ce5b80d28e8-wide.svg",
-      "width": 818,
-      "height": 272,
-      "bytes": 20859
-    },
-    "narrow": {
-      "file": "55779ce5b80d28e8-narrow.svg",
-      "width": 600,
-      "height": 406,
-      "bytes": 21169
-    }
-  },
-  "557f0a954bad976b": {
-    "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
-    "wide": {
-      "file": "557f0a954bad976b-wide.svg",
-      "width": 1196,
-      "height": 239,
-      "bytes": 23891
-    },
-    "narrow": {
-      "file": "557f0a954bad976b-narrow.svg",
-      "width": 600,
-      "height": 663,
-      "bytes": 23647
-    }
-  },
-  "5e175e38e9dd0aa0": {
-    "source": "content/posts/tech-blurting/ffmpeg-deep-dive.md",
-    "wide": {
-      "file": "5e175e38e9dd0aa0-wide.svg",
-      "width": 1224,
-      "height": 305,
-      "bytes": 23000
-    },
-    "narrow": {
-      "file": "5e175e38e9dd0aa0-narrow.svg",
-      "width": 600,
-      "height": 501,
-      "bytes": 23164
     }
   },
   "5efdefe49e60f0d1": {
@@ -422,51 +284,6 @@
       "bytes": 28629
     }
   },
-  "6725c73f796d2016": {
-    "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
-    "wide": {
-      "file": "6725c73f796d2016-wide.svg",
-      "width": 1450,
-      "height": 178,
-      "bytes": 25904
-    },
-    "narrow": {
-      "file": "6725c73f796d2016-narrow.svg",
-      "width": 392,
-      "height": 729,
-      "bytes": 25004
-    }
-  },
-  "683c0c7555e84dc8": {
-    "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
-    "wide": {
-      "file": "683c0c7555e84dc8-wide.svg",
-      "width": 1016,
-      "height": 91,
-      "bytes": 16863
-    },
-    "narrow": {
-      "file": "683c0c7555e84dc8-narrow.svg",
-      "width": 184,
-      "height": 469,
-      "bytes": 17051
-    }
-  },
-  "6c3d7efa72e17d92": {
-    "source": "content/posts/tech-blurting/ffmpeg-deep-dive.md",
-    "wide": {
-      "file": "6c3d7efa72e17d92-wide.svg",
-      "width": 1016,
-      "height": 91,
-      "bytes": 15590
-    },
-    "narrow": {
-      "file": "6c3d7efa72e17d92-narrow.svg",
-      "width": 184,
-      "height": 452,
-      "bytes": 15744
-    }
-  },
   "6cfae3d038c3b8b0": {
     "source": "content/posts/0-to-1/microphone-selection-without-always-on-vad.md",
     "wide": {
@@ -474,21 +291,6 @@
       "width": 392,
       "height": 569,
       "bytes": 20585
-    }
-  },
-  "6e543ce8143b4cc2": {
-    "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
-    "wide": {
-      "file": "6e543ce8143b4cc2-wide.svg",
-      "width": 1360,
-      "height": 209,
-      "bytes": 21392
-    },
-    "narrow": {
-      "file": "6e543ce8143b4cc2-narrow.svg",
-      "width": 392,
-      "height": 712,
-      "bytes": 21359
     }
   },
   "70f76eb873d6b0c8": {
@@ -509,21 +311,6 @@
       "bytes": 27306
     }
   },
-  "739f42862ff8619e": {
-    "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
-    "wide": {
-      "file": "739f42862ff8619e-wide.svg",
-      "width": 1014,
-      "height": 239,
-      "bytes": 20512
-    },
-    "narrow": {
-      "file": "739f42862ff8619e-narrow.svg",
-      "width": 600,
-      "height": 565,
-      "bytes": 20556
-    }
-  },
   "73bca6d78447174d": {
     "source": "content/posts/0-to-1/pokeclip-stateful-media-deployment.md",
     "wide": {
@@ -542,30 +329,6 @@
       "bytes": 18429
     }
   },
-  "7d101bec75286308": {
-    "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
-    "wide": {
-      "file": "7d101bec75286308-wide.svg",
-      "width": 1050,
-      "height": 529,
-      "bytes": 28359
-    }
-  },
-  "802d8a7b672cfa3b": {
-    "source": "content/posts/tech-blurting/abr-ladder-design.md",
-    "wide": {
-      "file": "802d8a7b672cfa3b-wide.svg",
-      "width": 1224,
-      "height": 272,
-      "bytes": 21504
-    },
-    "narrow": {
-      "file": "802d8a7b672cfa3b-narrow.svg",
-      "width": 600,
-      "height": 501,
-      "bytes": 21489
-    }
-  },
   "80f1c7018c20790e": {
     "source": "content/posts/0-to-1/pokeclip-mediamtx-build-or-adopt.md",
     "wide": {
@@ -573,15 +336,6 @@
       "width": 392,
       "height": 531,
       "bytes": 20308
-    }
-  },
-  "81d974d81d85157a": {
-    "source": "content/posts/tech-blurting/nvenc-gpu-transcoding.md",
-    "wide": {
-      "file": "81d974d81d85157a-wide.svg",
-      "width": 392,
-      "height": 535,
-      "bytes": 21252
     }
   },
   "86baf8be3873b411": {
@@ -629,24 +383,6 @@
       "bytes": 22461
     }
   },
-  "8f61df44c006ef0f": {
-    "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
-    "wide": {
-      "file": "8f61df44c006ef0f-wide.svg",
-      "width": 706,
-      "height": 560,
-      "bytes": 27755
-    }
-  },
-  "905096fd3e4bfc04": {
-    "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
-    "wide": {
-      "file": "905096fd3e4bfc04-wide.svg",
-      "width": 600,
-      "height": 601,
-      "bytes": 24490
-    }
-  },
   "915440bf74f7cace": {
     "source": "content/posts/tech-blurting/opus-deep-dive.md",
     "wide": {
@@ -671,24 +407,6 @@
       "bytes": 26908
     }
   },
-  "9c85092a1de84827": {
-    "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
-    "wide": {
-      "file": "9c85092a1de84827-wide.svg",
-      "width": 496,
-      "height": 1013,
-      "bytes": 24855
-    }
-  },
-  "9dd3e4c8c7810984": {
-    "source": "content/posts/tech-blurting/abr-ladder-design.md",
-    "wide": {
-      "file": "9dd3e4c8c7810984-wide.svg",
-      "width": 600,
-      "height": 223,
-      "bytes": 17640
-    }
-  },
   "9ee4a3f09e01e0e4": {
     "source": "content/posts/0-to-1/pokeclip-dependency-upgrade-contracts.md",
     "wide": {
@@ -707,21 +425,6 @@
       "bytes": 20578
     }
   },
-  "a374f5e1319ca955": {
-    "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
-    "wide": {
-      "file": "a374f5e1319ca955-wide.svg",
-      "width": 1613,
-      "height": 178,
-      "bytes": 21922
-    },
-    "narrow": {
-      "file": "a374f5e1319ca955-narrow.svg",
-      "width": 254,
-      "height": 860,
-      "bytes": 21701
-    }
-  },
   "a4bc57a598b092bc": {
     "source": "content/posts/0-to-1/pokeclip-playback-producer-boundaries.md",
     "wide": {
@@ -729,30 +432,6 @@
       "width": 392,
       "height": 614,
       "bytes": 19161
-    }
-  },
-  "a71cda3dc227b88e": {
-    "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
-    "wide": {
-      "file": "a71cda3dc227b88e-wide.svg",
-      "width": 888,
-      "height": 551,
-      "bytes": 27920
-    }
-  },
-  "ad65b53adabea8a2": {
-    "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
-    "wide": {
-      "file": "ad65b53adabea8a2-wide.svg",
-      "width": 1016,
-      "height": 124,
-      "bytes": 17362
-    },
-    "narrow": {
-      "file": "ad65b53adabea8a2-narrow.svg",
-      "width": 184,
-      "height": 551,
-      "bytes": 17585
     }
   },
   "afcaf6b41b61ee7b": {
@@ -791,21 +470,6 @@
       "bytes": 18104
     }
   },
-  "bb86789c059d560c": {
-    "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
-    "wide": {
-      "file": "bb86789c059d560c-wide.svg",
-      "width": 889,
-      "height": 195,
-      "bytes": 21056
-    },
-    "narrow": {
-      "file": "bb86789c059d560c-narrow.svg",
-      "width": 392,
-      "height": 536,
-      "bytes": 20875
-    }
-  },
   "bc8032e64af90e79": {
     "source": "content/posts/0-to-1/pokeclip-obs-shared-encoder-srt.md",
     "wide": {
@@ -822,21 +486,6 @@
       "width": 184,
       "height": 650,
       "bytes": 20140
-    }
-  },
-  "c5ea1f8bdcf32051": {
-    "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
-    "wide": {
-      "file": "c5ea1f8bdcf32051-wide.svg",
-      "width": 1290,
-      "height": 198,
-      "bytes": 21221
-    },
-    "narrow": {
-      "file": "c5ea1f8bdcf32051-narrow.svg",
-      "width": 392,
-      "height": 766,
-      "bytes": 20906
     }
   },
   "c7b7ae089120217c": {
@@ -857,15 +506,6 @@
       "bytes": 26312
     }
   },
-  "cf9d9cbff42e38c1": {
-    "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
-    "wide": {
-      "file": "cf9d9cbff42e38c1-wide.svg",
-      "width": 600,
-      "height": 650,
-      "bytes": 21644
-    }
-  },
   "d08d15bda13419ef": {
     "source": "content/posts/0-to-1/pokeclip-language-ownership-boundaries.md",
     "wide": {
@@ -873,6 +513,24 @@
       "width": 392,
       "height": 523,
       "bytes": 21752
+    }
+  },
+  "d14c2edda5b43837": {
+    "source": "content/posts/tech-blurting/ffmpeg-deep-dive.md",
+    "wide": {
+      "file": "d14c2edda5b43837-wide.svg",
+      "width": 279,
+      "height": 649,
+      "bytes": 20959
+    }
+  },
+  "da6655102c80c3fa": {
+    "source": "content/posts/tech-blurting/ffmpeg-deep-dive.md",
+    "wide": {
+      "file": "da6655102c80c3fa-wide.svg",
+      "width": 392,
+      "height": 419,
+      "bytes": 17309
     }
   },
   "dcb864a5a4959d04": {
@@ -891,21 +549,6 @@
       "width": 417,
       "height": 255,
       "bytes": 19006
-    }
-  },
-  "e4758cf5a68e113a": {
-    "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
-    "wide": {
-      "file": "e4758cf5a68e113a-wide.svg",
-      "width": 1196,
-      "height": 175,
-      "bytes": 19277
-    },
-    "narrow": {
-      "file": "e4758cf5a68e113a-narrow.svg",
-      "width": 356,
-      "height": 583,
-      "bytes": 19151
     }
   },
   "e5f5fe236a0eed7a": {
@@ -933,21 +576,6 @@
       "width": 347,
       "height": 651,
       "bytes": 28697
-    }
-  },
-  "e8601b55aee217b9": {
-    "source": "content/posts/tech-blurting/ffmpeg-deep-dive.md",
-    "wide": {
-      "file": "e8601b55aee217b9-wide.svg",
-      "width": 1432,
-      "height": 75,
-      "bytes": 17940
-    },
-    "narrow": {
-      "file": "e8601b55aee217b9-narrow.svg",
-      "width": 184,
-      "height": 633,
-      "bytes": 18066
     }
   },
   "e932f83607ca3ede": {

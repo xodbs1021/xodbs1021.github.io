@@ -1,585 +1,143 @@
 ---
-title: "NVENC와 x264의 비용을 비교하려면 — GPU 트랜스코딩의 조건"
+title: "NVENC는 CUDA 코어와 따로 도는 전용 인코딩 엔진입니다"
 date: 2026-06-22T02:22:28+09:00
+lastmod: "2026-11-13T03:51:32+09:00"
+description: "NVIDIA GPU의 H.264·HEVC·AV1 인코딩은 CUDA 코어가 아니라 칩 안의 전용 블록 NVENC가 맡고, 그 수와 세대는 GPU마다 다릅니다. 지원 매트릭스로 T4·A10·L4·A100·H100의 NVENC 수와 세션 한도를, NVENC 앱 노트 13.1로 엔진당 1080p H.264 처리량을 확인하고, FFmpeg 9.0.2 소스로 x264와 다른 옵션 체계, 9.0에서 사라진 cbr_hq·-2pass·-vsync, GPU 메모리 안에서 끝나는 디코딩·스케일·인코딩 경로, lookahead와 B 프레임의 지연, AV1 인코딩의 등장 순서, 인코더 사용률 지표를 정리했습니다."
 categories: ["tech-blurting"]
-illustrativeMetrics: true
-lastmod: 2026-10-29T09:00:00+09:00
+tags: ["NVENC", "NVIDIA", "FFmpeg", "GPU 트랜스코딩", "H.264", "AV1"]
 draft: false
 ---
 
-> **2026-10-29 정정** — 상충하는 서버 대수와 고정 비용 절감 주장을 철회했습니다. 남은 처리량·가격 그래프는 실측 원자료가 없으며 견적이나 용량 보장의 근거로 사용하지 않습니다.
+GPU로 영상을 인코딩한다고 하면 수천 개의 CUDA 코어가 압축을 나눠 맡는 모습을 떠올리기 쉽습니다. NVIDIA GPU에서 H.264·HEVC·AV1 인코딩을 맡는 것은 그 코어가 아니라 칩 안의 전용 블록 NVENC이고, 이 블록의 수와 세대는 GPU 모델마다 다릅니다. NVIDIA 지원 매트릭스(2026-11-13 확인)에서 T4와 A10은 7세대 NVENC가 1개, L4는 8세대가 2개이고, A100과 H100에는 NVENC가 없습니다. NVENC 앱 노트의 1080p H.264 표에서 엔진 하나는 가장 빠른 P1·CBR·저지연 설정에서 Ada(RTX 4090) 기준 초당 910프레임, 가장 느린 P7에서 247프레임을 냅니다. 엔진이 빨라도 디코딩한 프레임이 시스템 메모리를 오가면 GPU에 둔 이점이 줄고, FFmpeg 9.0에서는 예전 예제에 흔한 `cbr_hq`·`-2pass`·`-vsync` 옵션이 사라졌습니다. 이 글의 성능 수치는 모두 NVIDIA 문서의 문헌값이며, NVIDIA GPU로 직접 잰 값은 없습니다.
 
+## NVENC는 같은 칩 안의 전용 엔진이고 개수는 GPU마다 다릅니다 {#1-nvenc는-gpu의-별도-asic이다}
 
-NVENC의 비용을 x264와 비교하려면 **같은 입력·출력 사다리·화질 목표**에서 지속 처리량을 측정해야 한다. 동시 방송 1,000개와 5개 출력이 있다는 사실만으로 서버 대수를 결정할 수 없다. 5개 출력의 해상도와 처리 비용도 서로 다르다.
+NVIDIA의 [NVENC 앱 노트(Video Codec SDK 13.1)](https://docs.nvidia.com/video-technologies/video-codec-sdk/13.1/nvenc-application-note/index.html)는 NVENC를 "GPU 실리콘 다이 위의 전용 블록(a dedicated block on GPU silicon die)"이라고 설명합니다. 움직임 추정, 모드 결정, 움직임 보상과 잔차 부호화, 엔트로피 부호화를 이 블록이 하드웨어로 처리합니다. 그래서 NVENC가 인코딩하는 동안 CUDA 코어는 스케일링 필터나 추론 같은 다른 일을 할 수 있고, 반대로 CUDA 코어가 많은 GPU라도 NVENC가 적으면 인코딩 처리량은 늘지 않습니다.
 
-기존 도입부의 “서버 300대 대 50대”는 본문의 150~200대와도 맞지 않았고 측정 자료가 없어 철회했다. 만약 단순히 5,000개 동일 비용 출력을 서버당 8개로 나누는 가정이라면 산술 결과는 625대다. 이것 역시 실제 ABR 용량 산정은 아니다.
+칩 하나에 NVENC가 여러 개 있으면 드라이버가 인코딩 세션을 엔진들에 나눠 줍니다. 앱 노트의 성능 표는 엔진 하나의 값이고, 엔진 수를 곱한 합계는 세션 여러 개를 동시에 돌릴 때만 성립합니다. 세션 하나는 분할 프레임 인코딩(Split Frame Encoding, SDK 12.0부터 Ada의 HEVC·AV1)을 켜지 않는 한 엔진 하나의 성능을 넘지 못합니다.
 
-[NVIDIA Video Codec SDK](https://developer.nvidia.com/video-codec-sdk)는 NVENC를 전용 인코딩 엔진으로 설명한다. 그러나 스케일링·복사·디코딩까지 포함한 전체 파이프라인은 다른 자원도 쓴다. 아래 구성 예시는 GPU 모델·드라이버·SDK 조건을 확인하고 시험할 출발점이다.
+[[fig-nvenc-h264-fps]]는 앱 노트 13.1의 H.264 표에서 라이브 송출에 쓰는 CBR·저지연(LL) 줄만 옮긴 것입니다. 회색이 Turing, 청록이 Ada입니다.
 
----
-
-## 1. NVENC는 GPU의 별도 ASIC이다
-
-![NVIDIA GPU 내부에 NVENC는 CUDA와 별개의 ASIC](/images/nvenc-asic-inside-gpu.png)
-
-같은 GPU 안에 4개 칩이 따로 박혀있다.
-
-- **CUDA Cores** — 게임/AI 연산
-- **Tensor Cores** — AI 가속
-- **NVENC** — 인코딩 전용 ASIC (Application-Specific IC)
-- **NVDEC** — 디코딩 전용 ASIC
-
-ASIC이라서 GPU 사용률에 거의 영향 없음. **게임하면서 OBS NVENC 송출**이 부드러운 이유. CUDA 코어는 게임에, NVENC는 인코딩에 독립적으로 일함.
-
----
-
-## 2. x264 vs NVENC — 채널 처리량 차이
-
-{{< chart caption="설명용 가정 · 실측 근거 미확인: 1080p60 H.264 인코딩 — 서버 1대 동시 채널" >}}
-{
-  "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
-  "grid": { "left": "28%", "right": "10%", "bottom": "12%", "top": "8%" },
-  "xAxis": { "type": "value", "name": "동시 채널" },
-  "yAxis": {
-    "type": "category",
-    "data": ["x264 medium (CPU 32코어)", "x264 veryfast (CPU 32코어)", "NVENC RTX 4080", "NVENC T4 (데이터센터)"]
-  },
-  "series": [{
-    "type": "bar",
-    "data": [
-      { "value": 2, "itemStyle": { "color": "#94a3b8" } },
-      { "value": 8, "itemStyle": { "color": "#3b82f6" } },
-      { "value": 17, "itemStyle": { "color": "#10b981" } },
-      { "value": 18, "itemStyle": { "color": "#76b900" } }
-    ],
-    "label": { "show": true, "position": "right", "formatter": "{c}채널" }
-  }]
-}
+{{< chart id="fig-nvenc-h264-fps" kind="문헌값" caption="NVENC 엔진 하나의 1080p H.264 인코딩 속도(초당 프레임), CBR · 저지연(LL) 튜닝. NVIDIA 표의 조건: 1920×1080 YUV 4:2:0 8비트, Turing은 RTX 8000, Ada는 RTX 4090, nvidia-smi가 보고한 최고 영상 클럭(각 1950 · 2415MHz), Windows 11, Video Codec SDK 13.1. 엔진 하나 기준이며 디코딩 · 스케일 · 메모리 복사는 들어 있지 않습니다." source="https://docs.nvidia.com/video-technologies/video-codec-sdk/13.1/nvenc-application-note/index.html" height="340px" >}}
+{"grid":{"left":8,"right":56,"top":36,"bottom":8,"containLabel":true},"legend":{"top":0,"data":["Turing","Ada"]},"xAxis":{"type":"value","name":"fps","min":0},"yAxis":{"type":"category","inverse":true,"data":["P1","P3","P5","P7"]},"series":[{"name":"Turing","type":"bar","itemStyle":{"color":"#7a8a9b"},"label":{"show":true,"position":"right","formatter":"{c}"},"data":[855,600,271,229]},{"name":"Ada","type":"bar","itemStyle":{"color":"#087f8b"},"label":{"show":true,"position":"right","formatter":"{c}"},"data":[910,652,291,247]}]}
 {{< /chart >}}
 
-채널당 월 비용:
+P1에서 P7로 가면 엔진당 처리량이 Ada 기준 910에서 247프레임으로 약 3.7분의 1이 되고, 세대 차이는 같은 프리셋에서 6–9%입니다. 1080p30 출력 하나는 초당 30프레임이므로 P1의 910프레임은 계산상 출력 30개분입니다. 다만 앱 노트의 값은 Turing 열을 RTX 8000, Ada 열을 RTX 4090으로 각각 최고 영상 클럭에서 잰 것이고 다른 GPU는 클럭에 거의 비례해 달라진다고 적었습니다. 서버 한 대의 수용량은 실제 사다리와 입력으로 지속 부하를 걸어 재야 합니다([라이브 트랜스코딩 인프라 글](/posts/tech-blurting/live-transcoding-infrastructure/)).
 
-| 인프라 | 월 가격 | 채널/대 | **채널당** |
-|---|---|---|---|
-| x264 veryfast (32코어 CPU) | $500 | 8 | **$62** |
-| RTX 4080 (자체 서버) | $2,000 | 17 | $118 |
-| AWS g4dn.xlarge (T4) | $380 | 18 | **$21** |
+## A100·H100에는 NVENC가 없습니다 {#3-nvenc-세대--turing부터가-진짜}
 
-소비자 GPU는 오히려 비싸지만 **데이터센터 GPU (T4/A10)는 채널당 $21**. CPU의 1/3. 대형 플랫폼이 T4 클러스터로 간 이유.
+NVIDIA의 [Video Encode and Decode GPU Support Matrix](https://developer.nvidia.com/video-encode-and-decode-gpu-support-matrix-new)에서 데이터센터 GPU와 GeForce 한 종을 골라 옮기면 아래와 같습니다(2026-11-13 확인). 「제한 없음」은 매트릭스의 「Unrestricted」입니다.
 
----
+| GPU | 아키텍처 | NVENC 세대 | NVENC 수 | NVDEC 수 | AV1 인코딩 | 동시 인코딩 세션 |
+|---|---|---|---|---|---|---|
+| Tesla T4 | Turing | 7세대 | 1 | 2 | 아니오 | 제한 없음 |
+| NVIDIA A10 | Ampere | 7세대 | 1 | 2 | 아니오 | 제한 없음 |
+| NVIDIA L4 | Ada Lovelace | 8세대 | 2 | 4 | 예 | 제한 없음 |
+| NVIDIA A100 | Ampere | 7세대(엔진 0개) | 0 | 5 | — | — |
+| NVIDIA H100 PCIe | Hopper | N/A | 0 | 7 | — | — |
+| GeForce RTX 4080 16GB | Ada Lovelace | 8세대 | 2 | 1 | 예 | 12 |
 
-## 3. NVENC 세대 — Turing부터가 진짜
+A100과 H100은 학습·추론용 계산 GPU라 NVDEC(디코딩 엔진)는 5개, 7개가 있지만 NVENC는 0개입니다. 매트릭스의 A100 행은 엔진이 0개인데도 NVENC 세대 칸에 「7th Gen」을 적었고, H100 PCIe 행은 「N/A」입니다. 이 GPU로 트랜스코딩하면 디코딩은 GPU에서 할 수 있어도 인코딩은 CPU나 다른 장치가 맡아야 합니다. 「GPU 서버니까 인코딩도 빠르다」는 가정은 모델 이름을 매트릭스에서 확인하기 전에는 세우지 않는 편이 안전합니다.
 
-![NVENC 세대 진화 (Kepler 2012 → Ada 2022)](/images/nvenc-generation-timeline.png)
+세대 이름도 아키텍처와 일대일이 아닙니다. Turing과 Ampere는 같은 7세대 NVENC를 쓰고, 같은 Turing이라도 GTX 1650·T1000 같은 일부 제품은 6세대입니다. Turing NVENC의 화질은 NVIDIA가 두 번 비교해 발표했습니다. 2018년 9월 [아키텍처 소개 글](https://developer.nvidia.com/blog/nvidia-turing-architecture-in-depth/)은 Twitch·YouTube에서 흔한 송출 설정에서 Turing 인코더가 x264의 fast 설정보다 화질이 높다고 했고, 2019년 2월 [T4 글](https://developer.nvidia.com/blog/turing-h264-video-encoding-speed-and-quality/)은 고화질 모드에서 libx264 medium(`-tune psnr`)과 같거나 약간 낫다고 했습니다. 두 글 모두 NVIDIA가 고른 조건이고, T4 글의 화질 지표는 PSNR뿐입니다(FFmpeg 4.0.2, libx264 스레드 4개 제한).
 
-- **Kepler~Pascal (2012~2016)**: 화질 안 좋아서 라이브 인프라에선 안 씀
-- **Turing (RTX 2000, 2018)**: x264 veryfast 화질 도달 — **라이브 표준 시작점**
-- **Ampere (RTX 3000)**: Turing 개선
-- **Ada (RTX 4000, 2022)**: **AV1 인코딩 추가** — 차세대 코덱 실시간
+## GeForce는 동시 세션이 12개로 제한되고 데이터센터 GPU는 자원만큼입니다 {#20-nvenc-함정--라이브-운영에서-실제로-터지는-것}
 
-같은 GPU라도 NVENC 세대에 따라 화질이 다름. 인프라 도입 시 반드시 Turing 이상.
+앱 노트는 GPU를 「qualified」와 「non-qualified」로 나눕니다. qualified GPU의 동시 인코딩 세션은 인코더 용량·시스템 메모리·영상 메모리 같은 가용 자원이 정하고(limited by available system resources), GeForce 같은 non-qualified GPU는 **시스템 하나당** 12세션으로 묶입니다. 이 12는 카드마다가 아니라 시스템에 꽂힌 non-qualified 카드 전체의 합입니다. 매트릭스도 GeForce RTX 4080의 최대 세션을 12, T4·A10·L4를 「Unrestricted」로 적습니다.
 
----
+라이브 사다리에서는 화질 하나가 세션 하나입니다. 1080p·720p·480p 세 단계를 GPU로 만들면 채널 하나가 세션 3개를 쓰므로, GeForce 서버는 엔진이 남아도 채널 4개(12 ÷ 3)에서 막힙니다(계산값). 데이터센터 GPU로 바꾸면 이 숫자 한도는 사라지지만, 엔진 처리량과 메모리가 다음 한도가 됩니다.
 
-## 4. NVENC 화질 — VMAF로 본 현실
+## x264 옵션 이름이 NVENC에서 그대로 통하지 않습니다 {#5-nvenc-옵션--x264-옵션과의-매핑}
 
-{{< chart caption="설명용 가정 · 실측 근거 미확인: 1080p60 게임 영상, 6000 Kbps 동일 — VMAF 점수" >}}
-{
-  "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
-  "grid": { "left": "22%", "right": "10%", "bottom": "12%", "top": "8%" },
-  "xAxis": { "type": "value", "name": "VMAF", "min": 80, "max": 100 },
-  "yAxis": {
-    "type": "category",
-    "data": ["NVENC P4 (라이브)", "NVENC P7 (Ada)", "x264 veryfast", "NVENC P7 (Turing)", "x264 medium", "x264 slow"]
-  },
-  "series": [{
-    "type": "bar",
-    "data": [
-      { "value": 85, "itemStyle": { "color": "#94a3b8" } },
-      { "value": 89, "itemStyle": { "color": "#10b981" } },
-      { "value": 88, "itemStyle": { "color": "#3b82f6" } },
-      { "value": 87, "itemStyle": { "color": "#76b900" } },
-      { "value": 92, "itemStyle": { "color": "#f59e0b" } },
-      { "value": 95, "itemStyle": { "color": "#ef4444" } }
-    ],
-    "label": { "show": true, "position": "right", "formatter": "VMAF {c}" }
-  }]
-}
-{{< /chart >}}
+FFmpeg의 `libx264`와 `h264_nvenc`는 같은 H.264를 만들지만 옵션은 각 인코더의 전용 옵션이라 이름과 뜻이 다릅니다. 아래는 [FFmpeg 9.0.2 `nvenc_h264.c`](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/nvenc_h264.c#L28-L160)의 옵션 정의로 맞춘 대응입니다.
 
-**라이브에선 NVENC가 정답** — veryfast급 화질을 1/3 비용으로. **VOD 최고 화질엔 x264 slow** — VMAF 95는 NVENC가 못 따라옴.
-
----
-
-## 5. NVENC 옵션 — x264 옵션과의 매핑
-
-라이브 전환할 때 헷갈리는 부분.
-
-| x264 | NVENC | 의미 |
+| 하려는 일 | libx264 | h264_nvenc(FFmpeg 9.0.2) |
 |---|---|---|
-| `-preset veryfast` | `-preset p4` | 속도/화질 트레이드오프 |
-| `-tune zerolatency` | `-tune ll` | 저지연 |
-| `-crf 23` | `-cq 23` (constqp) | 품질 기반 |
-| `-b:v 6000k` | `-b:v 6000k` | 동일 |
-| `-maxrate / -bufsize` | `-maxrate / -bufsize` | 동일 |
-| `-sc_threshold 0` | `-no-scenecut 1` | **이름만 다름** |
-| `-g 120` | `-g 120` | 동일 |
-| `-bf 0` | `-bf 0` | 동일 |
+| 속도·화질 단계 | `-preset ultrafast` … `placebo` | `-preset p1` … `p7`(기본 p4) |
+| 용도 조정 | `-tune zerolatency` 등 | `-tune hq`·`ll`·`ull`·`lossless`(기본 hq) |
+| 품질 고정 | `-crf 23` | `-rc vbr -cq 23`(VBR 안의 품질 목표, 0이면 자동) |
+| QP 고정 | `-qp 23` | `-rc constqp -qp 23` |
+| 비트레이트 고정 | `-b:v`·`-maxrate`·`-bufsize` | `-rc cbr -b:v … -bufsize …` |
+| 장면 전환 키프레임 끄기 | `-sc_threshold 0` | `-no-scenecut 1`(lookahead를 켤 때만 의미) |
+| 재정렬 지연 없애기 | `-tune zerolatency`에 포함 | `-zerolatency 1` |
 
-`sc_threshold` → `no-scenecut`만 주의하면 거의 그대로 이동.
+틀리기 쉬운 것은 이름이 같은 프리셋입니다. `h264_nvenc`에 남아 있는 옛 이름 `-preset fast`는 x264의 중간 단계가 아니라 가장 빠른 P1로, `medium`은 P4로, `slow`는 P7에 2패스를 더한 설정으로 바뀝니다([`nvenc.c` 219–221행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/nvenc.c#L219-L221)). 반대로 `-crf`처럼 `h264_nvenc`에 없는 옵션을 주면 FFmpeg 9.0.2는 "has not been used for any stream"이라는 경고 한 줄만 남기고 인코딩을 계속합니다. 이 동작은 NVENC가 없는 이 맥에서 `h264_videotoolbox`에 `-crf 23`을 줘서 확인했습니다. 경고를 놓치면 품질 설정 없이 기본 율 제어로 나간 결과를 보게 됩니다.
 
----
+## p1–p7은 tune과 함께 정합니다 {#6-preset-p1p7--x264와-다른-체계}
 
-## 6. preset p1~p7 — x264와 다른 체계
+NVENC의 설정 단위는 프리셋 하나가 아니라 「튜닝 정보 + 프리셋」 쌍입니다. [NVENC 프로그래밍 가이드](https://docs.nvidia.com/video-technologies/video-codec-sdk/13.0/nvenc-video-encoder-api-prog-guide/index.html)는 고화질·저지연·초저지연·무손실 네 가지 튜닝마다 P1(가장 빠름)부터 P7(가장 느림)까지 일곱 프리셋을 둡니다. 앱 노트의 성능 표가 「프리셋 · 율 제어 · 튜닝」 세 칸으로 줄을 나누는 것도 그래서입니다. 같은 P4라도 `-tune hq`와 `-tune ll`은 다른 설정입니다.
 
-```
-NVENC preset 체계
-p1: 최고 속도, 최저 화질
-p2~p3:
-p4: 균형  ← 라이브 표준
-p5~p6:
-p7: 최저 속도, 최고 화질
+용도별 기준도 가이드에 있습니다. 클라우드 게임·스트리밍·화상 회의는 대역폭에 여유가 있으면 저지연 + CBR, 대역폭이 빡빡하면 초저지연 + CBR을 권합니다. 저지연과 초저지연 튜닝에서 P1–P4를 고르면 분할 프레임 인코딩이 저절로 켜진다고도 적혀 있는데, 조건이 붙습니다. 이 기능은 HEVC·AV1 전용이고, NVENC가 2개 이상인 GPU에서 프레임 높이가 HEVC는 2,112줄, AV1은 2,048줄 이상일 때만 켜집니다([프로그래밍 가이드 13.0 8.14절](https://docs.nvidia.com/video-technologies/video-codec-sdk/13.0/nvenc-video-encoder-api-prog-guide/index.html)). H.264에는 이 기능이 없습니다. FFmpeg에서는 `-tune ll` 또는 `-tune ull`에 `-rc cbr`을 함께 줍니다. 초고화질 튜닝 `uhq`는 FFmpeg 9.0.2에서 `hevc_nvenc`·`av1_nvenc`에만 있고 `h264_nvenc`에는 없습니다.
 
-x264 매핑 (대략)
-NVENC p1 ≈ x264 ultrafast
-NVENC p4 ≈ x264 veryfast
-NVENC p7 ≈ x264 medium
-```
+## FFmpeg 9.0에서 cbr_hq·2pass가 사라졌습니다 {#7-tune와-rc--라이브-모드-선택}
 
-**같은 화질을 NVENC가 10배 이상 빠르게.** 라이브 = p3~p4, VOD = p6~p7.
+NVENC 라이브 예제에 오래 쓰인 `-rc cbr_hq`, `-rc cbr_ld_hq`, `-2pass 1`, `-cbr 1`은 FFmpeg 9.0에서 지워졌습니다. 2026년 6월 24일 커밋 두 개가 옛 율 제어 값 일곱 개(`vbr_minqp`·`ll_2pass_quality`·`ll_2pass_size`·`vbr_2pass`·`cbr_ld_hq`·`cbr_hq`·`vbr_hq`)와 `-cbr`·`-2pass` 옵션을 없앴고([dcf339c413](https://github.com/FFmpeg/FFmpeg/commit/dcf339c413e8bd21b5ceae710be97bf2bf5f82ab), [2b054bc9e6](https://github.com/FFmpeg/FFmpeg/commit/2b054bc9e660513ab2acfcdc97cb118874102e80)), 두 커밋은 n8.0과 n9.0 태그 사이에 있습니다. 9.0.2의 `-rc`에는 `constqp`·`vbr`·`cbr`만 남았습니다.
 
----
-
-## 7. tune와 rc — 라이브 모드 선택
-
-| `-tune` | 용도 | 비고 |
-|---|---|---|
-| `hq` | VOD | 화질 우선 |
-| `ll` | 라이브 (HLS) | 저지연 |
-| `ull` | 화상회의 (WebRTC) | B-frame/lookahead 0, ~100ms |
-| `lossless` | 무손실 | 보관용 |
-
-| `-rc` | 모드 | 용도 |
-|---|---|---|
-| `cbr` | CBR | 라이브 기본 |
-| `cbr_hq` | CBR + 화질 향상 | **라이브 권장** (VMAF +1~2) |
-| `vbr` | VBR | VOD |
-| `constqp` | 양자화 고정 | 비트 예측 불가 |
-
-라이브 표준: `-tune ll -rc cbr_hq`. 그냥 `cbr`보다 화질 +1~2점, 추가 비용 없음.
-
----
-
-## 8. NVENC 라이브 표준 명령
+옛 값을 새 조합으로 옮기는 기준은 NVIDIA의 [프리셋 이전 안내](https://docs.nvidia.com/video-technologies/video-codec-sdk/13.0/nvenc-preset-migration-guide/index.html)에 있습니다. Turing·Ampere의 1080p H.264에서 옛 `LowLatencyHQ` 프리셋과 `CBR_LOWDELAY_HQ`는 저지연 튜닝 · CBR · 멀티패스 2 · P4로, `CBR_HQ`는 초저지연 튜닝 · CBR · 멀티패스 2 · P4로 옮기라고 합니다. 멀티패스 칸의 2를 API 열거형 값 `NV_ENC_TWO_PASS_FULL_RESOLUTION`(0x2)으로 읽으면 FFmpeg의 `-multipass fullres`입니다. 그래서 예전 `-preset llhq -rc cbr_ld_hq`는 9.0.2에서 대략 다음과 같습니다.
 
 ```bash
-ffmpeg \
-  -hwaccel cuda -hwaccel_output_format cuda \
-  -re -i rtmp://input/live/key \
-  \
-  -c:v h264_nvenc \
-  -preset p4 -tune ll -rc cbr_hq \
-  -b:v 6000k -maxrate 6000k -bufsize 12000k \
-  -g 120 -keyint_min 120 -no-scenecut 1 \
-  -bf 0 \
-  -profile:v high -level 4.0 -pix_fmt yuv420p \
-  \
-  -c:a aac -b:a 128k -ar 48000 \
-  -f flv rtmp://output/live/key
+ffmpeg -i input.mp4 -c:v h264_nvenc -preset p4 -tune ll -rc cbr -multipass fullres -b:v 6M -bufsize 6M -g 60 -c:a copy output.mp4
 ```
 
-`-hwaccel cuda` + `-hwaccel_output_format cuda`가 핵심. **디코딩→스케일→인코딩 전부 GPU 메모리 안에서**. CPU↔GPU 메모리 복사 없음.
+NVENC의 멀티패스는 파일 전체를 두 번 도는 x264의 2-pass와 다릅니다. 가이드는 이를 「프레임마다 2패스」로 설명합니다. 첫 패스에서 프레임의 복잡도를 추정해 비트 배분을 정하고 둘째 패스에서 그 배분으로 인코딩하므로 라이브에도 쓸 수 있지만, 1패스보다 성능이 낮습니다. `qres`는 첫 패스를 4분의 1 해상도로 돌려 더 큰 움직임 벡터를 잡고, `fullres`는 더 정확한 통계를 냅니다.
 
----
+## 디코딩부터 인코딩까지 GPU 메모리에 두려면 hwaccel 출력 형식과 scale_cuda가 필요합니다 {#8-nvenc-라이브-표준-명령}
 
-## 9. 진짜 화질 짜내기 — 라이브에서 가능한 2-pass
+`-hwaccel cuda`만 주면 NVDEC로 디코딩은 하지만, 디코딩한 프레임을 시스템 메모리로 내려받을 수 있습니다. FFmpeg 문서는 하드웨어 디코딩에서 "디코딩한 프레임을 GPU 메모리에서 시스템 메모리로 복사해야 하는 경우가 많아" 성능이 더 떨어진다고 적습니다([ffmpeg 문서의 `-hwaccel`](https://ffmpeg.org/ffmpeg.html#Advanced-Video-options)). 그 프레임을 CPU 필터 `scale`로 줄이고 NVENC에 넘기면, 프레임마다 GPU → CPU → GPU 복사가 한 번씩 들어갑니다. [[fig-gpu-memory-path]]의 앞 절반은 `-hwaccel_output_format cuda`로 프레임을 GPU 메모리에 둔 경로이고, 뒤 절반은 그 옵션이 없을 때의 경로입니다.
 
-x264 2-pass는 전체 영상 2번. 라이브 불가. NVENC는 **lookahead로 즉시 2-pass**.
+{{< motion scene="GpuMemoryPath" id="fig-gpu-memory-path" kind="개념도" caption="NVDEC가 디코딩한 프레임이 지나는 길. -hwaccel_output_format cuda를 주면 프레임이 GPU 메모리 안에서 scale_cuda를 거쳐 NVENC로 가고, 주지 않으면 시스템 메모리로 내려갔다가(CPU 스케일) 다시 GPU로 올라갑니다. 복사 시간 · 대역폭은 재지 않은 개념도입니다." >}}
+
+[NVIDIA의 FFmpeg 안내(SDK 13.0)](https://docs.nvidia.com/video-technologies/video-codec-sdk/13.0/ffmpeg-with-nvidia-gpu/index.html)는 이 두 옵션이 "프레임을 GPU 메모리에 둔다"고 설명하고, 스케일도 GPU 필터로 하면 "시스템 메모리와 영상 메모리 사이 전송이 사라진다"고 적습니다. 안내의 1:1 스케일 예제를 FFmpeg 9.0.2에 맞추면 다음과 같습니다.
 
 ```bash
-ffmpeg ... \
-  -c:v h264_nvenc -preset p4 -tune ll -rc cbr_hq \
-  -2pass 1 \
-  -rc-lookahead 32 \
-  -spatial-aq 1 -temporal-aq 1 -aq-strength 8 \
-  -weighted_pred 1 \
-  -b:v 6000k -maxrate 6000k -bufsize 12000k \
-  -g 120 -no-scenecut 1 -bf 0 \
-  ...
+ffmpeg -hwaccel cuda -hwaccel_output_format cuda -i input.mp4 -vf scale_cuda=1280:720 -fps_mode passthrough -c:a copy -c:v h264_nvenc -b:v 5M output.mp4
 ```
 
-옵션별 효과:
+안내의 원래 명령은 `-vsync 0`으로 시작하는데, FFmpeg 9.0에서 `-vsync`가 지워져([927ffd0930](https://github.com/FFmpeg/FFmpeg/commit/927ffd0930fa3f7a948d4ed30c67bd518f9549ce)) 그대로 실행하면 "Unrecognized option 'vsync'" 오류로 멈춥니다. 같은 뜻은 `-fps_mode passthrough`입니다. 다만 전역 옵션이던 `-vsync`와 달리 `-fps_mode`는 출력 옵션이라 `-i` 뒤, 출력 파일 앞에 둡니다. `-i` 앞에 두면 "cannot be applied to input url" 오류로 멈춥니다. 이 맥의 FFmpeg 9.0.2에서 위 명령이 옵션 해석을 모두 지나 `h264_nvenc` 인코더가 없다는 단계에서 멈추는 것까지는 확인했지만, NVIDIA GPU가 없어 끝까지 실행하지는 못했습니다. 예전 글에 흔하던 `-pix_fmt yuv420p`도 NVIDIA 안내의 GPU 경로 명령에는 없습니다. 출력 형식은 디코더가 정한 CUDA 표면을 그대로 넘기는 것이 이 경로의 전제입니다. 한 입력으로 여러 화질을 만들 때 디코딩을 한 번만 하는 방법은 [FFmpeg 글의 split 절](/posts/tech-blurting/ffmpeg-deep-dive/#9--filter_complex--멀티-입력출력)과 같고, 각 갈래의 스케일만 `scale_cuda`로 바꿉니다.
 
-| 옵션 | 효과 | 지연 추가 |
-|---|---|---|
-| `-2pass 1` | 즉시 2-pass | +50ms |
-| `-rc-lookahead 32` | 32프레임 미리 분석 | +500ms |
-| `-spatial-aq 1` | 평탄 영역 비트 절약, 텍스처에 투자 | 0 |
-| `-temporal-aq 1` | 정적 배경 절약, 움직임에 투자 | 0 |
-| `-weighted_pred 1` | 페이드/밝기 변화 효율 | 미미 |
+## lookahead와 B 프레임은 프레임 수만큼 지연을 더합니다 {#10-지연-vs-화질--옵션-조합의-트레이드오프}
 
----
+lookahead는 인코더가 프레임 몇 장을 미리 받아 두고 복잡도를 본 뒤 비트를 나누는 기능입니다. 프로그래밍 가이드는 깊이를 최대 32로 두고, 그만큼 프레임이 인코더 안에 쌓이는 동안 인코딩 함수가 「입력이 더 필요하다」를 돌려준다고 적습니다. 쌓인 프레임 수가 곧 출력 지연이므로, 32프레임은 60fps에서 약 0.53초, 30fps에서 약 1.07초입니다(계산값). FFmpeg 안내는 lookahead를 「B 프레임 수 + 1」 이상으로, 10–20프레임을 화질에 좋은 값으로 권합니다.
 
-## 10. 지연 vs 화질 — 옵션 조합의 트레이드오프
+B 프레임은 뒤 프레임을 참조하므로, 인코더는 B 프레임 다음의 P 프레임을 받은 뒤에야 B를 인코딩합니다. 연속 B가 3장이면 출력 순서를 맞추느라 적어도 3프레임(30fps에서 0.1초)이 더 늦어집니다(계산값). 그래서 FFmpeg 안내의 저지연 용도 설명은 B 프레임을 끄고 CBR과 아주 작은 VBV 버퍼를 쓰면 지연이 "16ms까지" 내려갈 수 있다고 하고, 지연을 견딜 수 있는 용도에서만 B 프레임·lookahead·VBR·큰 VBV 버퍼를 권합니다. 송출 쪽 권장값도 같은 방향입니다. OBS 32.0.0의 치지직 권장값은 B 프레임 0, 키프레임 1초입니다([services.json](https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/rtmp-services/data/services.json#L2580-L2605)).
 
-{{< chart caption="설명용 가정 · 실측 근거 미확인: 옵션 누적별 라이브 지연(ms) vs VMAF" >}}
-{
-  "tooltip": { "trigger": "axis" },
-  "legend": { "data": ["지연 (ms)", "VMAF"], "top": 0 },
-  "grid": { "left": "12%", "right": "12%", "bottom": "18%", "top": "18%" },
-  "xAxis": {
-    "type": "category",
-    "data": ["zerolatency", "+ cbr_hq", "+ 2pass", "+ lookahead 32", "+ B-frame 3"],
-    "axisLabel": { "rotate": 15 }
-  },
-  "yAxis": [
-    { "type": "value", "name": "지연 (ms)", "position": "left", "max": 800 },
-    { "type": "value", "name": "VMAF", "position": "right", "min": 80, "max": 95 }
-  ],
-  "series": [
-    { "name": "지연 (ms)", "type": "bar", "yAxisIndex": 0, "data": [150, 150, 200, 700, 800], "itemStyle": { "color": "#ef4444" } },
-    { "name": "VMAF", "type": "line", "smooth": true, "yAxisIndex": 1, "data": [85, 87, 88, 90, 91], "itemStyle": { "color": "#10b981" }, "lineStyle": { "width": 3 } }
-  ]
-}
-{{< /chart >}}
+## AV1 인코딩은 Ada·L4부터이고 Intel Arc가 먼저였습니다 {#11-nvenc-h265--av1--차세대-코덱-실시간}
 
-운영 선택:
-- **LL-HLS / WebRTC**: zerolatency만 (지연 150ms, VMAF 85)
-- **일반 HLS**: + cbr_hq + lookahead 32 (지연 700ms, VMAF 90) — 권장
-- **지연 무관 라이브**: 전부 적용 (지연 800ms, VMAF 91)
+매트릭스에서 AV1 인코딩이 「예」인 NVIDIA 제품은 8세대 NVENC(Ada)부터입니다. 위 표의 T4·A10은 「아니오」, L4와 RTX 4080은 「예」입니다. NVIDIA의 첫 AV1 인코더를 단 RTX 4090은 [2022년 10월 12일](https://www.nvidia.com/en-us/geforce/news/geforce-rtx-4090-out-now/) 나왔습니다. 그보다 앞선 [2022년 6월 14일](https://download.intel.com/newsroom/archive/2025/de-de-2022-06-14-intel-arc-a380-graphics-available-in-china.pdf) Intel은 데스크톱 Arc A380의 중국 출시를 발표하며 Xe 미디어 엔진의 하드웨어 AV1 인코딩을 「industry-first」라고 소개했습니다. 같은 Intel이라도 13세대 코어(Raptor Lake) 내장 그래픽은 AV1을 디코딩만 하고 인코딩하지 않습니다. Intel 미디어 드라이버의 코덱 표에서 Raptor Lake가 속한 TGLx 열은 AV1이 「D」, Arc의 DG2 열은 「D/E」입니다([intel/media-driver](https://github.com/intel/media-driver/blob/master/README.md)).
 
----
+AV1을 인코딩할 수 있어도 시청 플랫폼이 받는지는 따로 확인해야 합니다. Twitch는 [2024년 1월 8일](https://blog.twitch.tv/en/2024/01/08/introducing-the-enhanced-broadcasting-beta/) 송출자의 GPU 인코더로 여러 화질을 만들어 보내는 Enhanced Broadcasting을 비공개 베타로 열면서, AV1은 RTX 40 시리즈로 앞으로 가져올 일이라고 적었습니다. 맥에서 하드웨어 인코딩을 맡는 VideoToolbox 인코더(`h264_videotoolbox`·`hevc_videotoolbox`)는 macOS용 FFmpeg 빌드에만 있습니다. 이 글을 쓴 Apple M5 맥의 FFmpeg 9.0.2 인코더 목록에도 VideoToolbox는 H.264·HEVC·ProRes뿐이었습니다.
 
-## 11. NVENC H.265 / AV1 — 차세대 코덱 실시간
+## 인코더 부하는 GPU 사용률이 아니라 인코더 사용률로 봅니다 {#22-모니터링--알람-우선순위}
 
-같은 NVENC 칩으로 H.265, AV1까지 지원.
+[nvidia-smi 문서](https://docs.nvidia.com/deploy/nvidia-smi/)에서 GPU 사용률은 "표본 기간 동안 커널이 하나 이상 GPU에서 실행된 시간의 비율"이고, 인코더 사용률은 "GPU의 영상 인코더가 쓰인 시간의 비율"입니다. NVENC는 CUDA 커널이 아니므로, 인코딩만 하는 서버는 인코더가 거의 다 차 있어도 GPU 사용률이 낮게 나올 수 있습니다. 반대로 `scale_cuda` 같은 CUDA 필터를 많이 쓰면 GPU 사용률이 먼저 오릅니다.
 
-{{< chart caption="설명용 가정 · 실측 근거 미확인: 동일 화질(VMAF 88) 기준 코덱별 비트레이트 절감 (1080p60)" >}}
-{
-  "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
-  "grid": { "left": "20%", "right": "10%", "bottom": "12%", "top": "8%" },
-  "xAxis": { "type": "value", "name": "비트레이트 (Kbps)" },
-  "yAxis": {
-    "type": "category",
-    "data": ["AV1 NVENC (Ada+)", "H.265 NVENC", "H.264 NVENC"]
-  },
-  "series": [{
-    "type": "bar",
-    "data": [
-      { "value": 2500, "itemStyle": { "color": "#10b981" } },
-      { "value": 3500, "itemStyle": { "color": "#f59e0b" } },
-      { "value": 5000, "itemStyle": { "color": "#3b82f6" } }
-    ],
-    "label": { "show": true, "position": "right", "formatter": "{c}k" }
-  }]
-}
-{{< /chart>}}
+자동 증설이나 알람의 기준은 인코더 사용률로 잡습니다. DCGM에서는 `DCGM_FI_DEV_ENC_UTIL`(필드 206)이 인코더 사용률이고, 현재 [DCGM 헤더](https://github.com/NVIDIA/DCGM/blob/master/dcgmlib/dcgm_fields.h)는 이 필드를 「Deprecated」로 표시하고 `DCGM_FI_DEV_ENC_UTIL_RATIO`를 쓰라고 합니다. [dcgm-exporter 기본 지표 목록](https://github.com/NVIDIA/dcgm-exporter/blob/main/etc/default-counters.csv)에도 `DCGM_FI_DEV_ENC_UTIL_RATIO`와 디코더용 `DCGM_FI_DEV_DEC_UTIL_RATIO`가 들어 있습니다. 다만 사용률은 「얼마나 오래 바빴나」만 말해 줍니다. 인코더 사용률이 높지 않은데 조각이 늦게 나오면 디코딩, 메모리 복사, CPU 쪽 포장을 의심해야 하고, 판정은 결국 각 출력이 실시간 속도를 지키는지로 내립니다.
 
-```bash
-# H.265
-ffmpeg ... -c:v hevc_nvenc -preset p4 -tune ll -rc cbr_hq \
-  -b:v 3500k ... 
+## 측정 조건
 
-# AV1 (Ada / RTX 4000+)
-ffmpeg ... -c:v av1_nvenc -preset p4 -tune ll -rc cbr_hq \
-  -b:v 2500k ...
-```
+- 수행: AI(Claude Code)가 2026년 11월 13일 Apple M5 MacBook Air(macOS 27.0.1)의 FFmpeg 9.0.2(Homebrew)로 실행했습니다. NVIDIA GPU가 없어 NVENC 명령은 실행하지 않았습니다.
+- `-vsync` 제거 확인: `ffmpeg -vsync 0 -f lavfi -i testsrc2 -t 1 -f null -` → "Unrecognized option 'vsync'." / `ffmpeg -f lavfi -i testsrc2 -t 1 -fps_mode passthrough -f null -` → 정상 종료 / `ffmpeg -fps_mode passthrough -i input.mp4 -c:v libx264 -f null -` → "cannot be applied to input url" 오류.
+- 본문 GPU 경로 명령: 글의 명령 그대로(`ffmpeg -hwaccel cuda -hwaccel_output_format cuda -i input.mp4 -vf scale_cuda=1280:720 -fps_mode passthrough -c:a copy -c:v h264_nvenc -b:v 5M output.mp4`, 입력은 testsrc2로 만든 2초 mp4) → 옵션 해석은 통과하고 "Unknown encoder 'h264_nvenc'"에서 멈춤(이 빌드에 NVENC 없음). 같은 배치에서 `scale_cuda`·`h264_nvenc`만 `scale`·`libx264`로 바꾸면 종료 코드 0.
+- 쓰이지 않은 옵션 확인: `ffmpeg -f lavfi -i testsrc2 -t 1 -c:v h264_videotoolbox -crf 23 -f null -` → "Codec AVOption crf (Constant Rate Factor value) has not been used for any stream." 경고 뒤 종료 코드 0.
+- 인코더 목록: `ffmpeg -encoders`의 VideoToolbox 항목은 `h264_videotoolbox`·`hevc_videotoolbox`·`prores_videotoolbox`.
+- NVENC 옵션은 FFmpeg 태그 n9.0.2의 `libavcodec/nvenc_h264.c`·`nvenc_hevc.c`·`nvenc_av1.c`·`nvenc.c` 원문으로 확인했습니다.
 
-라이브 인프라가 H.265/AV1 안 쓰는 이유는 인코더가 아니라 **시청자 디코더 호환성**. 저가폰이 못 풀음. Twitch가 RTX 4000 보유 스트리머 대상 AV1 베타 시작 (호환성 자동 폴백). 점진적 도입.
+## 출처
 
----
+- [NVIDIA, NVENC Application Note (Video Codec SDK 13.1)](https://docs.nvidia.com/video-technologies/video-codec-sdk/13.1/nvenc-application-note/index.html) — 전용 블록, 엔진당 성능 표와 측정 조건, 세션 한도
+- [NVIDIA, Video Encode and Decode GPU Support Matrix](https://developer.nvidia.com/video-encode-and-decode-gpu-support-matrix-new) (2026-11-13 확인)
+- [NVIDIA, NVENC Video Encoder API Programming Guide (SDK 13.0)](https://docs.nvidia.com/video-technologies/video-codec-sdk/13.0/nvenc-video-encoder-api-prog-guide/index.html) — 튜닝 정보 · 프리셋, 멀티패스, lookahead
+- [NVIDIA, NVENC Preset Migration Guide (SDK 13.0)](https://docs.nvidia.com/video-technologies/video-codec-sdk/13.0/nvenc-preset-migration-guide/index.html)
+- [NVIDIA, Using FFmpeg with NVIDIA GPU Hardware Acceleration (SDK 13.0)](https://docs.nvidia.com/video-technologies/video-codec-sdk/13.0/ffmpeg-with-nvidia-gpu/index.html)
+- [nv-codec-headers `nvEncodeAPI.h`](https://github.com/FFmpeg/nv-codec-headers/blob/master/include/ffnvcodec/nvEncodeAPI.h) — `NV_ENC_MULTI_PASS` 값
+- FFmpeg n9.0.2 소스: [`nvenc_h264.c`](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/nvenc_h264.c) · [`nvenc_hevc.c`](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/nvenc_hevc.c) · [`nvenc.c`](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/nvenc.c) · 커밋 [dcf339c413](https://github.com/FFmpeg/FFmpeg/commit/dcf339c413e8bd21b5ceae710be97bf2bf5f82ab) · [2b054bc9e6](https://github.com/FFmpeg/FFmpeg/commit/2b054bc9e660513ab2acfcdc97cb118874102e80) · [927ffd0930](https://github.com/FFmpeg/FFmpeg/commit/927ffd0930fa3f7a948d4ed30c67bd518f9549ce)
+- [FFmpeg 문서 — Advanced Video options(`-hwaccel`)](https://ffmpeg.org/ffmpeg.html#Advanced-Video-options)
+- [NVIDIA, NVIDIA Turing Architecture In-Depth](https://developer.nvidia.com/blog/nvidia-turing-architecture-in-depth/) (2018-09-14) · [Turing H.264 Video Encoding Speed and Quality](https://developer.nvidia.com/blog/turing-h264-video-encoding-speed-and-quality/) (2019-02-13)
+- [NVIDIA, GeForce RTX 4090 Out Now](https://www.nvidia.com/en-us/geforce/news/geforce-rtx-4090-out-now/) (2022-10-12)
+- [Intel, Intel Arc A380 Graphics Available in China](https://download.intel.com/newsroom/archive/2025/de-de-2022-06-14-intel-arc-a380-graphics-available-in-china.pdf) (2022-06-14)
+- [intel/media-driver README](https://github.com/intel/media-driver/blob/master/README.md) — 플랫폼별 코덱 지원 표
+- [Twitch, Introducing the Enhanced Broadcasting Beta](https://blog.twitch.tv/en/2024/01/08/introducing-the-enhanced-broadcasting-beta/) (2024-01-08)
+- [OBS Studio 32.0.0 `services.json` 치지직 항목](https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/rtmp-services/data/services.json#L2580-L2605)
+- [NVIDIA, nvidia-smi 문서](https://docs.nvidia.com/deploy/nvidia-smi/) · [DCGM `dcgm_fields.h`](https://github.com/NVIDIA/DCGM/blob/master/dcgmlib/dcgm_fields.h) · [dcgm-exporter 기본 지표](https://github.com/NVIDIA/dcgm-exporter/blob/main/etc/default-counters.csv)
 
-## 12. 하드웨어 인코더 4진영 — NVENC만 있는 게 아니다
-
-![하드웨어 인코더 진영 — NVIDIA / Intel / AMD / Apple](/images/hardware-encoder-vendors.png)
-
-| 진영 | 위치 | 특징 |
-|---|---|---|
-| **NVIDIA NVENC** | T4/A10/H100 데이터센터 GPU | 라이브 인프라 메인 |
-| **Intel QSV / Arc** | CPU iGPU + Arc dGPU | **AV1 NVIDIA보다 먼저** (2022 Arc) |
-| **AMD AMF** | Radeon GPU | 클라우드 인스턴스 거의 없음 |
-| **Apple VideoToolbox** | M 시리즈, iPhone | 클라이언트 (OBS Mac, iOS 송출) |
-
-**의외 케이스**: Backblaze가 **M1 Mac mini 클러스터**로 트랜스코딩 운영. NVIDIA보다 와트당 효율 우수. 사물 인터넷 같은 한정 콘텐츠엔 답이 될 수 있음.
-
-Intel Arc는 **AV1 인코딩에서 NVIDIA보다 먼저** 양산. Twitch가 비용 압박으로 Arc 인프라 일부 도입.
-
----
-
-## 13. 인코더 비교 매트릭스
-
-| 인코더 | 화질 (VMAF) | 채널/대 1080p60 | AV1 | 용도 |
-|---|---|---|---|---|
-| NVENC (T4) | 87~89 | 15~20 | ❌ | 라이브 메인 |
-| NVENC (RTX 4080) | 87~89 | 15~17 | ✅ | 프리미엄/베타 |
-| QSV (13세대) | 85~87 | 5~8 | ✅ | 소규모 |
-| QSV (Arc A770) | 86~88 | 12~15 | ✅ | AV1 신규 |
-| AMD AMF | 85~86 | 10~12 | ✅ | 비주류 |
-| VideoToolbox (M2 Pro) | 87~88 | 8~10 | ❌ | 클라이언트 |
-| x264 veryfast (CPU) | 88 | 8 | - | 라이브 (CPU만) |
-| x264 medium (CPU) | 92 | 2 | - | VOD 화질 |
-
----
-
-## 14. 자체 GPU 인프라 vs 클라우드 트랜스코딩 — 손익분기
-
-{{< chart caption="설명용 가정 · 실측 근거 미확인: 채널 규모별 월 비용 — 자체 vs AWS MediaLive" >}}
-{
-  "tooltip": { "trigger": "axis" },
-  "legend": { "data": ["자체 GPU 인프라", "AWS MediaLive"], "top": 0 },
-  "grid": { "left": "14%", "right": "10%", "bottom": "12%", "top": "18%" },
-  "xAxis": { "type": "category", "data": ["100", "500", "1000", "5000", "10000"], "name": "동시 채널" },
-  "yAxis": { "type": "value", "name": "월 비용 (USD, log)", "type": "log" },
-  "series": [
-    { "name": "자체 GPU 인프라", "type": "line", "smooth": true, "data": [20000, 30000, 50000, 200000, 400000], "itemStyle": { "color": "#3b82f6" }, "lineStyle": { "width": 3 } },
-    { "name": "AWS MediaLive", "type": "line", "smooth": true, "data": [43200, 216000, 432000, 2160000, 4320000], "itemStyle": { "color": "#ef4444" }, "lineStyle": { "width": 3 } }
-  ]
-}
-{{< /chart >}}
-
-AWS MediaLive HD ABR ladder 1채널 = 약 $0.60/시간 × 720시간 = $432/월.
-
-```
-[손익분기]
-1000채널 기준: 자체 인프라 약 2개월에 본전
- 500채널 기준: 약 4개월
- 100채널 기준: 1년 이상
-
-치지직 규모 = 자체
-소형 OTT = 클라우드
-```
-
-대신 자체 인프라는 **엔지니어 2명 + 장애 대응 비용**이 들어감. 채널 1000개 미만이면 클라우드 답.
-
----
-
-## 15. 인제스트/트랜스코딩/패키저 분리 — 왜?
-
-```mermaid
-flowchart LR
-  S[스트리머] -->|RTMP/SRT| I[인제스트 클러스터<br/>CPU 중심<br/>네트워크 바운드]
-  I -->|내부 SRT| T[트랜스코딩 클러스터<br/>GPU 중심<br/>NVENC]
-  T --> P[패키저 클러스터<br/>CPU 중심<br/>Shaka]
-  P --> O[Origin Storage<br/>S3 + Redis]
-  O --> CDN[CDN<br/>멀티 벤더]
-```
-
-같은 노드에 인제스트+트랜스코딩 묶으면:
-- 인제스트는 네트워크 바운드, 트랜스코딩은 GPU 바운드 → **자원 사용 패턴 다름**
-- 한쪽만 늘리고 줄일 수 없음
-
-분리하면:
-- 인제스트: 10Gbps NIC, GPU 없음, CPU 16~32코어
-- 트랜스코딩: T4 GPU, NVMe 임시 스토리지
-- 패키저: CPU 8~16코어, 빠른 NVMe (세그먼트 IO)
-- **각 레이어 독립 스케일링**
-
----
-
-## 16. Kubernetes GPU 할당 — NVIDIA Device Plugin
-
-```yaml
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: transcoder
-spec:
-  replicas: 5
-  template:
-    spec:
-      nodeSelector:
-        gpu-type: nvidia-t4
-      containers:
-      - name: ffmpeg
-        image: registry/nvenc-transcoder:v1.2
-        resources:
-          limits:
-            nvidia.com/gpu: 1
-            cpu: 8
-            memory: 16Gi
-```
-
-**한 GPU 분할**은 NVIDIA MIG (Multi-Instance GPU, A100+):
-
-| MIG 슬라이스 | 1080p60 채널 |
-|---|---|
-| 1g.5gb (1/7) | 2채널 |
-| 3g.20gb (3/7) | 8채널 |
-| 7g.40gb (전체) | 20채널 |
-
-A100 1대를 7조각으로 쪼개서 채널 패킹 효율 극대화.
-
----
-
-## 17. HPA로 자동 스케일링
-
-```yaml
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-spec:
-  minReplicas: 5
-  maxReplicas: 100
-  metrics:
-  - type: External
-    external:
-      metric: { name: nvidia_gpu_utilization }
-      target: { type: AverageValue, averageValue: "70" }
-  behavior:
-    scaleUp:   { stabilizationWindowSeconds: 30 }   # 빨리 늘림
-    scaleDown: { stabilizationWindowSeconds: 300 }  # 천천히 줄임
-```
-
-**비대칭 스케일링이 핵심**. 늘릴 땐 30초 안에 (방송 시작 폭발), 줄일 땐 5분 천천히 (방송 중 종료 금지).
-
----
-
-## 18. 시간대별 트래픽 + Reserved/Spot 혼합
-
-{{< chart caption="설명용 가정 · 실측 근거 미확인: 치지직 추정 시간대별 채널 수 + 인스턴스 분배" >}}
-{
-  "tooltip": { "trigger": "axis" },
-  "legend": { "data": ["Reserved (상시)", "On-Demand (평균)", "Spot (피크)"], "top": 0 },
-  "grid": { "left": "10%", "right": "10%", "bottom": "12%", "top": "18%" },
-  "xAxis": { "type": "category", "data": ["3시", "8시", "12시", "14시", "18시", "20시", "22시", "1시"] },
-  "yAxis": { "type": "value", "name": "동시 채널" },
-  "series": [
-    { "name": "Reserved (상시)", "type": "line", "stack": "total", "areaStyle": {}, "data": [50, 200, 200, 200, 200, 200, 200, 200], "itemStyle": { "color": "#3b82f6" } },
-    { "name": "On-Demand (평균)", "type": "line", "stack": "total", "areaStyle": {}, "data": [0, 0, 200, 100, 100, 300, 300, 100], "itemStyle": { "color": "#10b981" } },
-    { "name": "Spot (피크)", "type": "line", "stack": "total", "areaStyle": {}, "data": [0, 0, 0, 0, 0, 500, 300, 100], "itemStyle": { "color": "#f59e0b" } }
-  ]
-}
-{{< /chart >}}
-
-피크/오프피크 비율 **20:1**. 피크 기준으로 인프라 잡으면 80% 시간 낭비.
-
-```
-Reserved (예약 인스턴스, 80% 할인): 200채널 상시 부하
-On-Demand: 평균 부하 채움
-Spot (90% 할인, 중단 가능): 피크 처리
-```
-
-**전체 비용 30~40% 절감**. Spot 중단 시 graceful drain — 새 노드로 마이그레이션 (5~10초 끊김).
-
----
-
-## 19. 장애 시나리오별 대응
-
-```mermaid
-flowchart TB
-  A[장애 감지] --> B{종류?}
-  B -->|트랜스코딩 노드 1대| C1[스케줄러가 영향 스트림<br/>다른 노드 재할당<br/>10~30초 끊김]
-  B -->|데이터센터 전체| C2[인제스트가 다른 region<br/>트랜스코딩으로 SRT 포워딩<br/>30~60초 끊김]
-  B -->|GPU 드라이버 hang| C3[출력 .ts mtime 10초 정지 감지<br/>NVIDIA 드라이버 재시작<br/>실패 시 노드 교체]
-  B -->|패키저 죽음| C4[트랜스코딩 살아있음<br/>세그먼트 큐 쌓임<br/>패키저 복구 시 catch-up]
-```
-
-핵심 헬스체크: **출력 파일 mtime**. GPU가 인코딩하는 척만 하고 실제 출력 안 나오는 좀비 상태 (드라이버 hang) 잡는 유일한 방법.
-
-```python
-def check_node_health(stream_dir):
-    latest = max(os.path.getmtime(f) for f in os.listdir(stream_dir))
-    return time.time() - latest < 10  # 10초 미생성 → 재시작
-```
-
----
-
-## 20. NVENC 함정 — 라이브 운영에서 실제로 터지는 것
-
-```mermaid
-flowchart LR
-  F1[preset p1 선택] --> X1[화질 너무 낮음<br/>시청자 불만]
-  F2[CBR 약하게] --> X2[NVENC 자체 판단<br/>비트 변동<br/>BANDWIDTH 잘못 측정]
-  F3[B-frame 켜기] --> X3[zerolatency 모드인데<br/>지연 증가]
-  F4[GeForce 8세션 한계] --> X4[9번째 채널 실패<br/>데이터센터 GPU 필수]
-  F5[세션 정리 안 함] --> X5[GPU 메모리 누수<br/>결국 OOM]
-```
-
-| 함정 | 해결 |
-|---|---|
-| preset 너무 빠름 | p4 기본 유지 |
-| 약한 CBR | `-maxrate -bufsize` 명시 |
-| B-frame in zerolatency | `-bf 0` 강제 |
-| GeForce 8세션 | T4/A10 데이터센터 GPU |
-| 메모리 누수 | FFmpeg 정상 종료 (SIGTERM 후 wait) |
-
----
-
-## 21. Multi-Vendor 추상화 — 벤더 락인 방어
-
-같은 FFmpeg 빌드에 모든 인코더 포함.
-
-```bash
-ffmpeg -encoders | grep -E "nvenc|qsv|amf|videotoolbox"
-
-V..... h264_nvenc / hevc_nvenc / av1_nvenc
-V..... h264_qsv   / hevc_qsv   / av1_qsv
-V..... h264_amf   / hevc_amf
-V..... h264_videotoolbox / hevc_videotoolbox
-```
-
-런타임에 가용 인코더 선택:
-
-```python
-def select_encoder():
-    if nvidia_available():    return "h264_nvenc"
-    elif intel_qsv_available(): return "h264_qsv"
-    elif apple_silicon():     return "h264_videotoolbox"
-    else:                      return "libx264"  # 폴백
-```
-
-대형 플랫폼은 보통:
-- **80%**: 자체 NVIDIA T4 클러스터
-- **20%**: AWS MediaLive 백업 (region 장애 시)
-- 인기 스트리머만 T4 → A10 업그레이드
-
----
-
-## 22. 모니터링 — 알람 우선순위
-
-| 레벨 | 지표 | 임계 | 대응 |
-|---|---|---|---|
-| **Critical (즉시)** | NVENC speed | < 1.0x | PagerDuty 호출 |
-| **Critical** | 인제스트 연결 실패율 | > 1% | PagerDuty |
-| **Critical** | 패키저 출력 지연 | > 10s | PagerDuty |
-| **Warning** | GPU 사용률 | > 90% | Slack, 확장 검토 |
-| **Warning** | VMAF 회귀 | -2점 | Slack |
-| **Info** | 채널당 평균 비용 | - | Grafana |
-
-비용 지표도 모니터링: **채널당 평균 비용**이 갑자기 튀면 누가 잘못 설정한 것. 자동 알람.
-
----
-
-## 정리하면
-
-GPU 트랜스코딩은 **인코더 칩 이해 + FFmpeg 옵션 + 인프라 운영**의 종합이다.
-
-1. **NVENC는 GPU 내 별도 ASIC** — CUDA와 독립, 게임하면서 인코딩 가능
-2. **Turing부터 라이브 표준** — x264 veryfast 화질 도달
-3. **Ada부터 AV1 NVENC** — 차세대 코덱 실시간
-4. **데이터센터 T4 = 채널당 $21** — CPU의 1/3
-5. **라이브 표준 옵션**: `p4 + ll + cbr_hq + no-scenecut 1 + bf 0`
-6. **전체 GPU 파이프라인**: `hwaccel cuda` + `scale_cuda` — CPU 사용률은 입출력·복사·필터 경로까지 측정
-7. **2-pass + lookahead + AQ + weighted_pred** — VMAF +5점, 지연 +500ms 트레이드오프
-8. **지연 vs 화질**: LL-HLS는 zerolatency만, 일반 HLS는 lookahead 32 권장
-9. **하드웨어 인코더 4진영**: NVIDIA 메인, Intel Arc AV1, Apple Silicon 클라이언트, AMD 비주류
-10. **자체 vs 클라우드 손익분기 = 1000채널 / 2개월**
-11. **3계층 분리**: 인제스트(네트워크) / 트랜스코딩(GPU) / 패키저(CPU)
-12. **K8s + NVIDIA device plugin + MIG**로 GPU 분할 패킹
-13. **비대칭 HPA**: 늘릴 땐 30초, 줄일 땐 5분
-14. **Reserved + On-Demand + Spot 혼합**으로 30~40% 비용 절감
-15. **헬스체크 = 출력 파일 mtime** — GPU 좀비 잡는 유일한 방법
-16. **Multi-Vendor 추상화**로 벤더 락인 방어
-17. **알람 = NVENC speed / 연결 실패율 / 출력 지연**이 Critical
-18. **VMAF 회귀**도 추적 — 인코더 옵션 회귀 자동 감지
-
-다음 글에선 **CDN 멀티 벤더 전략** — Origin Shield, 멀티 CDN 부하 분산, 비용 최적화 — 를 다룬다.
-
----
-
-**참고**
-- [NVIDIA Video Codec SDK 문서](https://docs.nvidia.com/video-technologies/video-codec-sdk/)
-- [FFmpeg NVENC 가이드](https://trac.ffmpeg.org/wiki/HWAccelIntro)
-- [Intel Quick Sync Video 문서](https://www.intel.com/content/www/us/en/architecture-and-technology/quick-sync-video/quick-sync-video-general.html)
-- [Apple VideoToolbox 문서](https://developer.apple.com/documentation/videotoolbox)
-- [AWS MediaLive 가격](https://aws.amazon.com/medialive/pricing/)
+다음 편: [라이브 트랜스코딩 서버는 실시간 배속으로 수용량을 잽니다](/posts/tech-blurting/live-transcoding-infrastructure/)

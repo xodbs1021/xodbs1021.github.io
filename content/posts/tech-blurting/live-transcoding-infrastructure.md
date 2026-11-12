@@ -1,1075 +1,126 @@
 ---
-title: "방송 시작부터 재생까지 — 가정으로 살펴보는 라이브 트랜스코딩 인프라"
+title: "라이브 트랜스코딩 서버는 실시간 배속으로 수용량을 잽니다"
 date: 2026-06-22T15:38:47+09:00
+lastmod: "2026-11-13T03:51:32+09:00"
+description: "라이브 트랜스코더 한 대에 넣을 채널 수는 CPU 사용률이 아니라 각 출력이 실시간 속도(speed 1.0)를 지키는지로 정합니다. 1080p30 입력을 세 화질로 인코딩하는 FFmpeg를 팬 없는 맥북에서 1개부터 8개까지 동시에 돌려 speed와 조각 지연을 쟀고, 같은 개수에서도 회차마다 결과가 크게 흔들린 것을 그대로 적었습니다. 수신·인코딩·포장을 나누는 이유, 디코딩을 한 번만 하는 사다리, GPU 서버의 세션·엔진 한도, 채우는 배치와 흩는 배치, 멈춘 인코더 감지, 재시작 뒤의 끊김 표시, 관리형 서비스의 과금 단위를 공식 문서로 정리했습니다."
 categories: ["tech-blurting"]
-illustrativeMetrics: true
-lastmod: 2026-10-29T09:00:00+09:00
+tags: ["라이브 트랜스코딩", "FFmpeg", "x264", "HLS", "NVENC", "Kubernetes"]
 draft: false
 ---
 
-> **2026-10-29 정정** — 치지직의 실제 구조·6.2초 측정값이라는 표현을 철회했습니다. 본문의 단계 시간·처리량·비용·할인·장애 복구 시간·A/B 결과는 검증된 실적이나 현재 가격이 아닌 설명용 가정입니다.
+라이브 트랜스코더 한 대에 채널을 몇 개 넣을지는 CPU 사용률이 아니라 각 인코더가 실시간 속도를 지키는지로 정합니다. FFmpeg의 `-progress`가 내는 `speed`가 1을 밑돌면 입력이 들어오는 속도보다 인코딩이 느린 것이고, 그 차이만큼 조각이 늦게 나옵니다. 1080p30 합성 입력을 1080p·720p·480p 세 화질로 x264 veryfast 인코딩하는 FFmpeg 프로세스를 팬 없는 MacBook Air(Apple M5)에서 1개부터 늘려 동시에 돌렸더니, 첫 회차는 3개까지 speed 1.01을 지켰고 4개에서 0.90, 6개에서 0.75, 8개에서 0.52로 내려갔습니다. 6개일 때 19번째 2초 조각은 실시간보다 14.2초 늦게 나왔습니다. 바로 이어 다시 재자 3개 0.98, 4개 0.70, 5개 0.52로, 같은 개수에서도 결과가 크게 달라졌습니다. 그래서 이 숫자는 「이 기계의 한계」가 아니라, 수용량은 목표 서버에서 지속 부하로 다시 재야 한다는 근거로만 씁니다.
 
+## 수신·인코딩·포장은 묶는 자원이 달라 나눕니다 {#1-7층-마이크로서비스--라이브-트랜스코딩의-전체-그림}
 
-이 글은 **가상의 라이브 파이프라인**을 구성해 책임과 비용을 비교하는 학습 노트다. 처음부터 등장하는 6.2초는 단계별 시간을 임의로 배정한 예시이며, 치지직이나 다른 서비스에서 측정한 시작 지연이 아니다.
+라이브 트랜스코딩은 세 일로 나뉩니다. 수신은 송출 프로그램의 RTMP·SRT 연결을 받아 스트림을 꺼내고, 트랜스코딩은 그 스트림을 디코딩해 화질별로 다시 인코딩하고, 포장은 결과를 조각과 재생 목록으로 써서 원본 저장소와 CDN에 넘깁니다. [[fig-transcode-layers]]에서 화살표를 하나 지날 때마다 그 단계를 묶는 자원이 바뀝니다.
 
-설명을 위해 **7개 층**으로 나누었다. 반드시 각각을 마이크로서비스로 배포해야 한다는 뜻은 아니다. 인제스트 / 트랜스코딩 / 패키저 / Origin / CDN / 관제 / 시청자 — 각 층이 다른 자원 패턴, 다른 인스턴스, 다른 스케일링 전략.
-
-이번 글은 [지난 글](../ffmpeg-deep-dive/)의 FFmpeg, [지난 글](../abr-ladder-design/)의 ABR Ladder, [지난 글](../nvenc-gpu-transcoding/)의 NVENC, [지난 글](../cmaf-deep-dive/)의 CMAF를 다 합쳐서 **라이브 트랜스코딩 인프라 운영의 모든 것** — 아키텍처 / 스케줄러 / 큐 / 장애 처리 / 비용 최적화 — 를 정리한 노트다.
-
----
-
-## 1. 7층 마이크로서비스 — 라이브 트랜스코딩의 전체 그림
-
-![라이브 트랜스코딩 7층 인프라](/images/live-transcoding-7layer-architecture.png)
-
-각 층은 자원 패턴이 다르다.
-
-| # | 층 | 자원 패턴 | 인스턴스 | 가격 (월) |
-|---|---|---|---|---|
-| 1 | Streamer | Client | OBS/XSplit | - |
-| 2 | Ingest | Network-bound (10 Gbps NIC) | c6i.4xlarge | $504 |
-| 3 | Transcoding | GPU-bound (NVENC) | g5.xlarge (A10) | $725 |
-| 4 | Packager | CPU-bound (가벼움) | c6i.2xlarge | $246 |
-| 5 | Origin Storage | I/O-bound | Redis Cluster + S3 | 가변 |
-| 6 | Origin Shield + CDN | 글로벌 분산 | Multi-CDN | 트래픽 비례 |
-| 7 | Viewer | Client | Player | - |
-
-**같은 노드에 묶으면 병목을 함께 관리해야 한다.** GPU 강한 노드에 인제스트 묶으면 NIC가 놀고, 인제스트 강한 노드에 트랜스코딩 넣으면 GPU 모자람. 분리해야 인스턴스 타입 맞추기 가능.
-
----
-
-## 2. 누적 시간을 6.2초로 가정한 예시
-
-![한 방송 첫 6초 여정 — Start 클릭부터 첫 시청자까지](/images/live-stream-first-6sec-journey.png)
-
-각 단계 누적 지연을 ECharts로 분해.
-
-{{< chart caption="설명용 가정 · 실측 근거 미확인: 방송 시작 시 단계별 누적 지연 (ms)" >}}
-{
-  "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
-  "grid": { "left": "25%", "right": "10%", "bottom": "12%", "top": "8%" },
-  "xAxis": { "type": "value", "name": "누적 지연 (ms)" },
-  "yAxis": {
-    "type": "category",
-    "data": ["8. 시청자 매니페스트 수신", "7. Origin Shield → Edge", "6. 첫 .m4s PUT", "5. 패키저 첫 출력", "4. FFmpeg + NVENC spawn", "3. 스케줄러 할당", "2. RTMP 인증", "1. OBS Start"]
-  },
-  "series": [{
-    "type": "bar",
-    "data": [
-      { "value": 6200, "itemStyle": { "color": "#10b981" } },
-      { "value": 6100, "itemStyle": { "color": "#10b981" } },
-      { "value": 6000, "itemStyle": { "color": "#3b82f6" } },
-      { "value": 1000, "itemStyle": { "color": "#3b82f6" } },
-      { "value": 500, "itemStyle": { "color": "#f59e0b" } },
-      { "value": 200, "itemStyle": { "color": "#f59e0b" } },
-      { "value": 100, "itemStyle": { "color": "#ef4444" } },
-      { "value": 0, "itemStyle": { "color": "#94a3b8" } }
-    ],
-    "label": { "show": true, "position": "right", "formatter": "{c}ms" }
-  }]
-}
-{{< /chart >}}
-
-이 예시에서 패키저 첫 출력은 1초, 첫 PUT은 6초이므로 두 점 사이를 5초로 배정했다. 이를 모든 서비스의 인코딩 대기로 해석할 수 없다. LL-HLS도 고정적으로 5초를 1초로 바꿔 주지 않는다. 아래 조작 모형에서 가정한 대기 예산을 따로 비교할 수 있다.
-
----
-
-## 3. 비용 분배 — 어디서 절감해야 ROI 큰가
-
-{{< chart caption="설명용 가정 · 실측 근거 미확인: 라이브 플랫폼 월 비용 분배 (가상 100만 시청자 시간 기준)" >}}
-{
-  "tooltip": { "trigger": "item", "formatter": "{b}: {c}% ({d}%)" },
-  "legend": { "orient": "vertical", "left": "left", "top": "middle" },
-  "series": [{
-    "name": "비용 분배",
-    "type": "pie",
-    "radius": ["40%", "70%"],
-    "center": ["62%", "50%"],
-    "data": [
-      { "value": 45, "name": "CDN 트래픽", "itemStyle": { "color": "#ef4444" } },
-      { "value": 25, "name": "트랜스코딩 GPU", "itemStyle": { "color": "#f59e0b" } },
-      { "value": 10, "name": "스토리지", "itemStyle": { "color": "#3b82f6" } },
-      { "value": 10, "name": "관제/네트워크", "itemStyle": { "color": "#a78bfa" } },
-      { "value": 5, "name": "인제스트", "itemStyle": { "color": "#10b981" } },
-      { "value": 5, "name": "패키저", "itemStyle": { "color": "#76b900" } }
-    ]
-  }]
-}
-{{< /chart >}}
-
-**CDN(45%) + 트랜스코딩(25%) = 70%.** 이 둘에서 절감해야 효과 큼. 인제스트/패키저 5%씩은 최적화 ROI 낮음.
-
----
-
-## 4. 인스턴스 가격 vs 처리량 — GPU 선택의 진실
-
-{{< chart caption="설명용 가정 · 실측 근거 미확인: 인스턴스별 1080p60 ABR Ladder 동시 채널 / 월 가격" >}}
-{
-  "tooltip": { "trigger": "axis" },
-  "legend": { "data": ["동시 채널", "월 가격 ($)"], "top": 0 },
-  "grid": { "left": "10%", "right": "12%", "bottom": "12%", "top": "18%" },
-  "xAxis": { "type": "category", "data": ["c6i.4xl x264 (32코어)", "g4dn.xlarge T4", "g5.xlarge A10", "RTX 4080 (자체)"] },
-  "yAxis": [
-    { "type": "value", "name": "동시 채널", "position": "left", "max": 12 },
-    { "type": "value", "name": "월 $", "position": "right", "max": 2500 }
-  ],
-  "series": [
-    { "name": "동시 채널", "type": "bar", "yAxisIndex": 0, "data": [1.6, 5, 10, 8.5], "itemStyle": { "color": "#3b82f6" } },
-    { "name": "월 가격 ($)", "type": "line", "smooth": true, "yAxisIndex": 1, "data": [504, 380, 725, 2000], "itemStyle": { "color": "#ef4444" }, "lineStyle": { "width": 3 } }
-  ]
-}
-{{< /chart >}}
-
-채널당 단가: T4 $76, A10 $73, RTX 4080 $235, c6i CPU $315. **A10이 처리량 2배에 가격 1.9배**. T4보다 약간 우위. 대형 인프라가 A10으로 옮겨가는 이유.
-
----
-
-## 5. 인제스트 클러스터
-
-| 항목 | 값 |
-|---|---|
-| 인스턴스 | c6i.4xlarge (16 vCPU, 32GB) |
-| NIC | 12.5 Gbps |
-| 가격 | $0.70/시간 ($504/월) |
-| 소프트웨어 | Nginx-RTMP / SRS / 자체 Go |
-| 한 노드 동시 인제스트 | ~200~300 채널 (RTMP 연결 수 한계) |
-
-부하는 네트워크보다 **TCP 연결 수**. Anycast IP로 지역별 라우팅.
-
-```nginx
-rtmp {
-  server {
-    listen 1935;
-    application live {
-      live on;
-      on_publish http://auth-service/verify;
-      push rtmp://transcoder-primary/live;
-      push rtmp://transcoder-backup/live;
-      record off;
-    }
-  }
-}
-```
-
-`on_publish`로 스트림 키 검증. `push` 두 개로 active-active.
-
----
-
-## 6. 트랜스코딩 클러스터 — A10이 가성비 정점
-
-```mermaid
-flowchart LR
-  S[Scheduler] -->|새 스트림| Q{큐 깊이?}
-  Q -->|여유| N[GPU 노드 풀<br/>T4 / A10]
-  Q -->|부하 큼| HPA[HPA<br/>스케일 업]
-  HPA --> NEW[새 노드 spawn]
-  NEW --> N
-  N --> FF[FFmpeg + NVENC<br/>ABR Ladder 5단]
-  FF --> PKG[패키저로 출력]
-```
-
-채널 패킹:
-```
-방송 1개 = ABR 5단 ladder
-= 1080p60 + 720p60 + 720p30 + 480p30 + 360p30
-≈ A10 NVENC 처리량 5/15 = 33%
-→ A10 1대당 방송 3개 (안전 마진)
-```
-
----
-
-## 7. 패키저 클러스터
-
-| 항목 | 값 |
-|---|---|
-| 인스턴스 | c6i.2xlarge (8 vCPU, 16GB) |
-| 가격 | $0.34/시간 ($246/월) |
-| 소프트웨어 | Shaka Packager + 매니페스트 생성기 (Go) |
-| 한 노드 처리 | 50~100 채널 |
-
-CMAF 변환 가벼움. 인스턴스 적게.
-
----
-
-## 8. Origin Storage — Hot/Warm/Cold 계층
-
-![스토리지 온도 계층 — Hot Warm Cold](/images/storage-tier-hot-warm-cold.png)
-
-| 계층 | 저장소 | 보관 기간 | 가격/GB/월 | 접근 |
-|---|---|---|---|---|
-| Hot | Redis / SSD | 라이브 + 1시간 | $0.100 | 즉시 |
-| Warm | S3 Standard | 7일 | $0.023 | 초 |
-| IA | S3 Infrequent Access | 30일 | $0.0125 | 초 |
-| Cold | S3 Glacier | 365일 | $0.004 | 분 |
-
-자동 라이프사이클:
-```yaml
-Rules:
-  - Hot → Standard after 1 hour
-  - Standard → IA after 7 days
-  - IA → Glacier after 30 days
-  - Expire after 365 days
-```
-
-```python
-# Pull Origin 통합 라우팅
-def get_segment(path):
-    if redis.exists(path): return redis.get(path)
-    if s3.exists(path):    return s3.get(path)
-    return 404
-```
-
----
-
-## 9. Multi-CDN GSLB 라우팅
-
-```mermaid
+```mermaid {#fig-transcode-layers kind="개념도" caption="라이브 트랜스코딩의 세 계층과 각 계층을 묶는 자원. 수신은 연결 수와 네트워크, 트랜스코딩은 CPU · GPU 연산, 포장은 디스크 쓰기와 HTTP 요청이 먼저 찹니다. 계층을 나누면 각 계층을 다른 기종 · 다른 대수로 늘릴 수 있습니다." source="이 글의 설명을 그린 개념도"}
 flowchart TB
-  V[시청자 DNS 쿼리] --> GSLB[GSLB / NS1<br/>지역+시간+가격 판단]
-  GSLB -->|한국 피크| AK[Akamai 국내 PoP]
-  GSLB -->|모바일| CF[Cloudflare HTTP/3]
-  GSLB -->|미국 서부| CW[CloudFront]
-  GSLB -->|한국 새벽| FA[Fastly]
-  AK --> ORG[Origin Shield]
-  CF --> ORG
-  CW --> ORG
-  FA --> ORG
+  accTitle: 라이브 트랜스코딩의 세 계층
+  accDescr: 송출 프로그램이 RTMP나 SRT로 보낸 스트림을 수신 계층이 받아 트랜스코딩 계층에 넘깁니다. 트랜스코딩 계층은 디코딩, 스케일, 인코딩으로 화질별 스트림을 만들고, 포장 계층이 조각과 재생 목록을 써서 원본 저장소와 CDN으로 보냅니다.
+  A["송출 프로그램<br/>OBS 등"] -->|RTMP · SRT| B["수신<br/>연결 수 · 네트워크"]
+  B --> C["트랜스코딩<br/>디코딩 · 스케일 · 인코딩<br/>CPU · GPU 연산"]
+  C --> D["포장<br/>조각 · 재생 목록<br/>디스크 쓰기 · HTTP"]
+  D --> E["원본 저장소 · CDN"]
 ```
 
-CDN 한 곳 장애 시 즉시 가중치 0으로 만들어 차단. 다른 CDN으로 100% 전환.
+수신 서버는 연결과 재접속을 다루지만 영상 자체는 거의 건드리지 않습니다. 트랜스코딩은 채널 수에 비례해 연산을 쓰고, 포장과 원본은 조각 수와 요청 수에 비례해 디스크와 네트워크를 씁니다. 묶는 자원이 다르니 한 기계에 몰아 두면 가장 먼저 차는 자원 하나가 나머지를 끌고 내려갑니다. 나누면 연산 계층만 늘리거나 GPU 기종으로 바꿀 수 있고, 대가로 계층 사이 전송과 타임스탬프·조각 길이 같은 경계 약속이 생깁니다. PokeClip은 수신 서버를 직접 짜지 않고 MediaMTX에 맡겼습니다([MediaMTX 채택 글](/posts/0-to-1/pokeclip-mediamtx-build-or-adopt/)).
 
----
+수신 계층에서 자주 섞이는 설정 하나가 있습니다. nginx-rtmp의 `push`는 받은 스트림을 원격 서버로 내보내는 지시어라([nginx-rtmp-module 지시어 문서](https://github.com/arut/nginx-rtmp-module/wiki/Directives#push)), `push` 줄을 두 개 쓰면 두 곳에 같은 스트림을 복제해 보냅니다. 한쪽이 죽었을 때 다른 쪽으로 넘기는 장애 전환이 아니고, 끊긴 `push`는 `push_reconnect`(기본 3초) 뒤 다시 연결을 시도할 뿐입니다.
 
-## 10. Origin Shield — 중간 캐시의 역할
+## 한 프로세스가 사다리 전체를 내면 디코딩과 스케일을 한 번만 합니다 {#6-트랜스코딩-클러스터--a10이-가성비-정점}
 
-![Origin Shield Funnel — Edge 100개 → Shield 5개 → Origin 1개](/images/origin-shield-funnel.png)
+화질마다 FFmpeg를 따로 띄우면 같은 입력을 화질 수만큼 디코딩합니다. Twitch는 2017년 글에서 FFmpeg 인스턴스 N개로 N개 화질을 만들면 "디코더 N개, 스케일러 N개, 인코더 N개"가 생긴다고 쓰고, 똑같은 디코더 N−1개는 없애야 한다는 점을 자체 트랜스코더(TwitchTranscoder)를 만든 이유 가운데 하나로 들었습니다([Twitch, FFmpeg vs TwitchTranscoder Part I](https://blog.twitch.tv/en/2017/10/10/live-video-transmuxing-transcoding-f-fmpeg-vs-twitch-transcoder-part-i-489c1c125f28/)). 같은 글은 HLS가 화질 사이의 조각 경계를 IDR 프레임에서 맞추라고 요구하는데, 원본을 재포장한 변형과 다시 인코딩한 변형은 IDR이 맞는다는 보장이 없다는 점도 짚습니다.
 
-```
-Edge 100개가 Origin 직접 Pull   →  Origin 트래픽 100배
-Edge 100개 → Shield 5개 → Origin → Origin 트래픽 1배
-```
+FFmpeg 하나로도 디코딩을 한 번으로 줄일 수 있습니다. `split` 필터로 디코딩한 프레임을 갈래마다 나눠 스케일하고, 갈래마다 인코더를 붙입니다. 아래 「측정 조건」의 채널 명령이 그 형태이고, CPU 시간 차이는 [FFmpeg 글의 split 절](/posts/tech-blurting/ffmpeg-deep-dive/#9--filter_complex--멀티-입력출력)에 있습니다. 세 인코더에 같은 `-g 60 -sc_threshold 0`을 주면 같은 프레임에서 키프레임을 만듭니다. 이 측정의 1080p·720p·480p 출력은 20조각씩, 모두 `EXTINF:2.000000`이었고, 6번째 조각의 키프레임은 세 화질 모두 11.466667초 위치에 있었습니다.
 
-Shield의 hit rate와 Origin 바이트 절감률은 같은 지표가 아니다. 캐시 키·TTL·요청 분포·객체 크기를 측정해야 비용 효과를 판단할 수 있다.
+## 서버 한 대에 넣을 채널 수는 speed가 1 아래로 떨어지기 직전까지입니다 {#4-인스턴스-가격-vs-처리량--gpu-선택의-진실}
 
----
+FFmpeg `-progress`의 `speed`는 처리한 미디어 시간을 흐른 벽시계 시간으로 나눈 값입니다. 입력을 `-re`로 실시간 속도에 맞춰 읽으면 인코더가 따라가는 동안 speed는 1 근처에 머물고, 따라가지 못하면 1 아래로 내려가며 출력이 그만큼 밀립니다. 이 값은 시작부터의 누적이라 처음에는 낮게 나옵니다. 채널 하나만 돌린 실행도 처음 두 보고가 0과 0.49였고, 끝날 무렵에야 0.98을 넘었습니다. 그래서 판정은 실행 끝의 값으로 했습니다.
 
-## 11. 스케줄러 4종 알고리즘 비교
+[[fig-speed-by-channels]]는 채널을 1개부터 8개까지 동시에 돌린 첫 회차와, 그 직후 3–6개를 다시 돌린 둘째 회차의 마지막 speed 평균입니다. 점선이 실시간 기준 1.0입니다.
 
-| 스케줄러 | 장점 | 단점 | 노드 활용률 |
-|---|---|---|---|
-| Round Robin | 단순 | 부하 무시, 죽은 노드 할당 | 균등 |
-| Least-Load | 부하 균등 | Bin packing 안 됨 | 균등 |
-| **Bin Packing** | **빈 노드 종료 → 30% 절감** | 한 노드 집중 부담 | 양극화 |
-| Tier | 인기 스트리머 우선 | 복잡 | 등급별 |
-
-```mermaid
-flowchart TB
-  S[새 스트림] --> T{Tier?}
-  T -->|Tier 1<br/>Top 1%| P1[Premium A10 풀]
-  T -->|Tier 2<br/>Top 10%| P2[Standard T4/A10 풀]
-  T -->|Tier 3| P3[Budget T4/x264 풀]
-  P1 --> L1[풀 내 Least-Load]
-  P2 --> L2[풀 내 Bin Packing]
-  P3 --> L3[풀 내 Bin Packing]
-  L1 --> N1[노드 할당]
-  L2 --> N2[노드 할당]
-  L3 --> N3[노드 할당]
-```
-
----
-
-## 12. Bin Packing vs Load Balancing — 빈 노드 끄기
-
-![Bin Packing 시각화 — 빈 노드 끄면 30% 절감](/images/bin-packing-vs-load-balancing.png)
-
-{{< chart caption="설명용 가정 · 실측 근거 미확인: 같은 워크로드 — 알고리즘별 노드 사용률 분포" >}}
-{
-  "tooltip": { "trigger": "axis" },
-  "legend": { "data": ["Load Balancing", "Bin Packing"], "top": 0 },
-  "grid": { "left": "10%", "right": "10%", "bottom": "12%", "top": "18%" },
-  "xAxis": { "type": "category", "data": ["노드 1", "노드 2", "노드 3", "노드 4", "노드 5"] },
-  "yAxis": { "type": "value", "name": "GPU 사용률 (%)", "max": 100 },
-  "series": [
-    { "name": "Load Balancing", "type": "bar", "data": [60, 60, 60, 60, 60], "itemStyle": { "color": "#3b82f6" } },
-    { "name": "Bin Packing", "type": "bar", "data": [85, 85, 85, 0, 0], "itemStyle": { "color": "#10b981" } }
-  ]
-}
+{{< chart id="fig-speed-by-channels" kind="실측" caption="동시 채널 수별 FFmpeg -progress의 마지막 speed(채널들의 평균). 채널 하나는 1080p30 합성 입력을 -re로 읽어 1080p · 720p · 480p로 x264 veryfast 인코딩하는 FFmpeg 프로세스이고 40초 동안 돌렸습니다. 청록은 첫 회차(N=1–6, 8), 회색은 바로 이어 돈 둘째 회차(N=3–6)입니다. 세로축은 0.4부터 시작합니다. 팬 없는 MacBook Air(Apple M5), 다른 세션의 작업이 함께 돌던 상태라 회차마다 값이 흔들렸습니다." source="로컬 실측(2026-11-13), 아래 「측정 조건」" height="340px" >}}
+{"grid":{"left":8,"right":24,"top":40,"bottom":8,"containLabel":true},"legend":{"top":0,"data":["첫 회차","둘째 회차"]},"xAxis":{"type":"category","name":"동시 채널 수","data":["1","2","3","4","5","6","8"]},"yAxis":{"type":"value","name":"speed","min":0.4,"max":1.1,"interval":0.1},"series":[{"name":"첫 회차","type":"line","symbolSize":10,"itemStyle":{"color":"#087f8b"},"lineStyle":{"color":"#087f8b","width":3},"label":{"show":true,"position":"top","formatter":"{c}"},"markLine":{"symbol":"none","silent":true,"lineStyle":{"color":"#172c40","type":"dashed","width":2},"label":{"show":false},"data":[{"yAxis":1}]},"data":[1.01,1.01,1.01,0.9,0.99,0.75,0.52]},{"name":"둘째 회차","type":"line","symbolSize":10,"itemStyle":{"color":"#7a8a9b"},"lineStyle":{"color":"#7a8a9b","width":3},"label":{"show":true,"position":"bottom","formatter":"{c}"},"data":[null,null,0.98,0.7,0.52,0.63,null]}]}
 {{< /chart >}}
 
-**Load Balancing: 5대 다 60%** → 끌 수 없음.
-**Bin Packing: 3대 85% + 2대 OFF** → 40% 비용 절감.
+첫 회차만 보면 3개까지는 실시간을 지키고 4개부터 무너졌지만, 5개(0.99)가 4개(0.90)보다 나았고 둘째 회차에서는 4개가 0.70, 5개가 0.52까지 떨어졌습니다. 같은 기계, 같은 명령인데 몇 분 사이에 결과가 이만큼 다릅니다. 이 맥북은 팬이 없어 부하가 길어지면 클럭을 낮출 수 있습니다. 둘째 회차 앞뒤에 잰 FFmpeg 밖 프로세스만 해도 CPU 4–5코어 분량을 쓰고 있었고, 같은 시기에 돌던 다른 FFmpeg 실험은 이 값에 들어 있지 않습니다. 첫 회차는 이 부하를 기록하지 않았습니다. 온도와 클럭도 기록하지 않았으므로 어느 쪽이 얼마나 기여했는지는 모릅니다.
 
-```python
-def assign(stream):
-    candidates = [(n, load(n)) for n in healthy() if load(n) < 0.85]
-    candidates.sort(key=lambda x: -x[1])  # 부하 높은 순
-    return candidates[0][0] if candidates else spawn_new()
+speed가 1을 밑돌 때 시청자에게 보이는 것은 조각이 늦게 나오는 일입니다. [[fig-speed-below-realtime]]은 첫 회차의 3개 실행과 6개 실행에서 채널 하나의 1080p 조각이 실제로 완성된 시각을 실시간 기준 시각(흐린 눈금) 위에 찍은 것입니다.
+
+{{< motion scene="SpeedBelowRealtime" id="fig-speed-below-realtime" kind="실측" caption="첫 회차의 동시 3개 · 6개 실행에서 채널 하나의 1080p 2초 조각이 완성된 벽시계 시각. 흐린 눈금은 실시간이면 조각이 끝날 수 있는 가장 이른 시각(2k+2초)입니다. 3개일 때는 모든 조각이 그 눈금보다 약 0.5초 뒤에 나왔고, 6개일 때는 점점 밀려 19번째 조각이 14.2초 늦게 나왔습니다." >}}
+
+3개일 때는 19개 조각이 모두 눈금보다 0.53–0.57초 뒤에 일정하게 나왔습니다. 6개일 때는 첫 조각부터 1.4초 늦었고 19번째에서는 14.2초가 늦었습니다. 8개에서는 같은 채널의 19번째 조각이 36.7초 밀렸습니다. 지연이 쌓이기만 하고 줄지 않으므로, speed가 1을 조금이라도 밑도는 상태로 방송이 길어지면 시청자의 지연도 끝없이 늘거나 플레이어가 목록 끝에서 멈춥니다. 수용량을 정할 때는 목표 서버에서, 실제 입력과 같은 사다리로, 수십 분 이상 지속 부하를 걸어 speed가 1 위에 머무는 최대 채널 수를 찾고 거기서 여유를 남겨야 합니다. 몇 분짜리 측정 한 번이나 다른 사람의 표는 출발점일 뿐입니다.
+
+## GPU 서버는 인코더 세션과 엔진 수가 먼저 막힙니다 {#11-스케줄러-4종-알고리즘-비교}
+
+CPU 서버는 speed 하나로 수용량을 재지만, GPU 서버에는 speed가 떨어지기 전에 걸리는 정해진 한도가 있습니다. NVENC는 GPU 칩 안의 전용 인코딩 엔진이라 GPU 개수가 아니라 엔진 수와 세대가 처리량을 정하고, GeForce 계열은 시스템 하나에 동시 인코딩 세션이 12개로 묶입니다. 화질 하나가 세션 하나이므로, 세 단계 사다리는 GeForce 서버에서 채널 4개(12 ÷ 3)가 한도입니다(계산값). T4와 A10은 모두 7세대 NVENC가 1개라 인코딩 엔진만 놓고 보면 같은 등급이고, L4는 8세대 엔진이 2개입니다(NVIDIA 지원 매트릭스, 2026-11-13 확인). 자세한 근거는 [NVENC 글](/posts/tech-blurting/nvenc-gpu-transcoding/)에 있습니다.
+
+스케줄러도 이 한도를 알아야 합니다. Kubernetes에서 NVIDIA 장치 플러그인은 GPU를 `nvidia.com/gpu`라는 개수 자원으로 알립니다([NVIDIA k8s-device-plugin](https://github.com/NVIDIA/k8s-device-plugin)). 스케줄러가 보는 것은 GPU 몇 장이지 NVENC 세션 몇 개가 아니므로, 채널 하나가 GPU 한 장을 통째로 잡게 하거나, 노드마다 「남은 세션 · 엔진 여유」를 따로 세어 배치 판단에 넣어야 합니다.
+
+## 빈 노드를 끄려면 채우는 배치를, 장애 반경을 줄이려면 흩는 배치를 고릅니다 {#12-bin-packing-vs-load-balancing--빈-노드-끄기}
+
+채널을 새로 띄울 노드를 고르는 방식은 두 방향입니다. 채우는 배치는 이미 많이 쓰인 노드에 먼저 넣습니다. Kubernetes 스케줄러의 `NodeResourcesFit` 플러그인에서 `MostAllocated` 점수 방식이 이것이고, 문서는 이 방식이 "가장 덜 쓰인 노드를 줄일 준비를 돕는다"고 설명합니다([Resource Bin Packing](https://kubernetes.io/docs/concepts/scheduling-eviction/resource-bin-packing/)). 확장 자원에도 가중치를 줄 수 있어 GPU 자원을 무겁게 셀 수도 있습니다. 흩는 배치는 채널을 여러 노드·영역에 고르게 나눕니다. Pod 토폴로지 분산 제약이 이 방향의 도구입니다([Pod Topology Spread Constraints](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/)).
+
+라이브 채널은 몇 시간씩 이어지는 긴 작업이라 이 선택의 대가가 분명합니다. 채우면 방송이 줄어드는 시간에 빈 노드를 끄기 쉽지만, 노드 하나가 죽을 때 한꺼번에 끊기는 채널이 많습니다. 흩으면 노드 하나의 장애가 끊는 채널 수는 줄지만 켜 둬야 할 노드가 늘어납니다. 방송 중인 채널을 다른 노드로 옮기면 인코더가 바뀌어 다음 절의 끊김 표시가 생기므로, 배치는 채널이 시작할 때 거의 결정됩니다.
+
+## 출력이 멈춘 인코더는 조각 생성 시각으로 잡습니다 {#22-ffmpeg-좀비-감지}
+
+프로세스가 살아 있다고 출력이 나오는 것은 아닙니다. 입력 연결이 걸려 있거나 출력 쓰기가 막히면 FFmpeg 프로세스는 남아 있어도 새 조각이 생기지 않습니다. 플레이어 쪽에서는 목록이 바뀌지 않는 것으로 보입니다. RFC 8216은 클라이언트가 목록을 다시 받았는데 바뀌지 않았으면 목표 길이의 절반을 기다린 뒤 다시 받으라고 정하므로([6.3.4절](https://www.rfc-editor.org/rfc/rfc8216#section-6.3.4)), 플레이어는 같은 목록을 계속 받으며 버퍼를 비워 갑니다.
+
+그래서 감시 기준은 프로세스 존재가 아니라 「가장 최근 조각이 언제 완성됐나」입니다. 2초 조각이면 새 조각은 약 2초마다 생겨야 하고, 마지막 조각 이후 목표 길이의 몇 배가 지나도록 새 조각이 없으면 그 인코더는 멈춘 것입니다. 위 측정처럼 speed가 1을 조금 밑도는 상태는 조각 간격이 2초보다 조금씩 길어지는 모습으로 나타나므로, 같은 지표로 「멈춤」과 「밀림」을 함께 볼 수 있습니다. `-progress`의 `out_time`도 출력이 실제로 나갈 때만 늘어나므로 보조 지표로 쓸 수 있습니다.
+
+## 입력이 다시 붙으면 목록에 끊김 표시가 들어갑니다 {#23-discontinuity-자동-처리}
+
+인코더를 다시 띄우면 출력 타임스탬프가 처음부터 다시 시작합니다. RFC 8216은 타임스탬프 순서가 바뀌는 조각 앞에 `EXT-X-DISCONTINUITY`를 반드시(MUST) 달고, 인코딩 순서가 바뀔 때도 달라고(SHOULD) 정합니다([4.3.2.3절](https://www.rfc-editor.org/rfc/rfc8216#section-4.3.2.3)). FFmpeg로 같은 목록에 이어 쓰는 실행을 두 번 하면 이 표시가 어떻게 들어가는지 볼 수 있습니다.
+
+```bash
+ffmpeg -f lavfi -i testsrc2=size=640x360:rate=30 -t 4 -c:v libx264 -preset veryfast -g 60 -sc_threshold 0 -f hls -hls_time 2 -hls_list_size 0 -hls_flags append_list+discont_start live.m3u8
 ```
 
----
+이 명령을 같은 폴더에서 두 번 실행하자, 두 번째 실행의 첫 조각 `live2.ts` 앞에 `#EXT-X-DISCONTINUITY`가 붙었고 그 조각의 첫 영상 타임스탬프는 첫 실행의 첫 조각과 같은 1.466667초로 돌아가 있었습니다. 첫 실행이 정상 종료하며 쓴 `EXT-X-ENDLIST`는 이어 쓰기에서 지워지고 목록 끝에 다시 붙었습니다. `discont_start` 플래그 때문에 첫 실행의 목록 맨 앞에도 끊김 표시가 두 줄 들어갔으므로, 라이브 목록에 쓸 때는 이 플래그의 출력도 함께 확인해야 합니다. 라이브에서 인코더가 재시작했는데 이 표시가 빠지면, 플레이어는 앞 조각과 같은 시간축으로 읽다가 시각이 뒤로 가는 조각을 만나게 됩니다. 시간 구간 경계를 HLS와 DASH가 어떻게 표시하는지는 [DASH 글](/posts/tech-blurting/dash-vs-hls/)에 있습니다.
 
-## 13. Tier Scheduling — 인기에 따른 GPU 차등
+반대로 송출이 잠깐 끊겼다 같은 세션으로 다시 붙는 경우까지 늘 끊김 표시를 달아야 하는 것은 아닙니다. PokeClip은 같은 세션 안에서는 다음 조각을 앞 조각 끝에 이어 시간축을 유지하고 끊김 표시를 빼는 쪽을 골랐고, 그 대가로 경계의 영상 겹침을 받아들였습니다([재접속 끊김 표시 글](/posts/0-to-1/pokeclip-reconnect-audio-gap/)). 표시를 다느냐는 타임스탬프를 이어 줄 수 있느냐로 정해집니다.
 
-![Tier 스케줄링 피라미드 — 인기 1%만 Premium A10](/images/tier-scheduling-pyramid.png)
+## 관리형 서비스는 출력마다 과금하고 이중 파이프라인을 둡니다
 
-{{< chart caption="설명용 가정 · 실측 근거 미확인: Tier 분배 (스트리머 수 vs 인프라 비용)" >}}
-{
-  "tooltip": { "trigger": "axis" },
-  "legend": { "data": ["스트리머 수 (%)", "인프라 비용 비중 (%)"], "top": 0 },
-  "grid": { "left": "10%", "right": "10%", "bottom": "12%", "top": "18%" },
-  "xAxis": { "type": "category", "data": ["Tier 1 (Top 1%)", "Tier 2 (Top 10%)", "Tier 3 (일반)"] },
-  "yAxis": { "type": "value", "name": "비중 (%)", "max": 100 },
-  "series": [
-    { "name": "스트리머 수 (%)", "type": "bar", "data": [1, 9, 90], "itemStyle": { "color": "#3b82f6" } },
-    { "name": "인프라 비용 비중 (%)", "type": "bar", "data": [40, 30, 30], "itemStyle": { "color": "#ef4444" } }
-  ]
-}
-{{< /chart >}}
+직접 운영하지 않는 길도 있습니다. AWS Elemental MediaLive의 가격 페이지는 실행 중인 입력·출력·부가 기능에 시간당 요금을 매기고, 채널의 출력 요금은 생성한 모든 출력의 합이며, 출력 하나의 요금은 코덱·비트레이트·해상도·프레임 레이트로 정해진다고 적습니다([MediaLive 가격](https://aws.amazon.com/medialive/pricing/)). 사다리 단계를 하나 늘리면 그만큼 출력 요금이 붙는 구조입니다. 같은 페이지는 표준 채널이 서로 다른 가용 영역에서 처리 파이프라인 두 개를 돌리고, 단일 파이프라인 채널 두 개를 따로 돌리는 것보다 싸다고 설명합니다. 직접 운영할 때 이중화를 하려면 위 「흩는 배치」와 입력 이중화를 따로 설계해야 하는 부분을 서비스가 묶어 파는 셈입니다.
 
-Top 1%가 시청자 80% 차지 → 인프라 비용 40% 정당화. 일반 90%는 budget 풀로 보내 비용 압축. **전체 비용 25% 절감.**
+규모가 아주 크면 범용 CPU·GPU 대신 전용 칩을 만들기도 합니다. YouTube는 2021년 4월 영상 트랜스코딩 전용 칩과 이를 조율하는 소프트웨어 VCU(Video (trans)Coding Unit)를 공개하며, 이전의 최적화한 시스템보다 연산 효율이 최대 20–33배 좋아졌다고 밝혔습니다([YouTube 블로그](https://blog.youtube/inside-youtube/new-era-video-infrastructure/), [ASPLOS 2021 논문](https://research.google/pubs/warehouse-scale-video-acceleration-co-design-and-deployment-in-the-wild/)). YouTube가 자기 시스템과 비교한 값이고 조건이 다르므로 다른 서비스의 수치로 옮길 수는 없습니다.
 
----
+## 수용량 숫자는 빌려 오지 말고 목표 서버에서 다시 잽니다 {#정리하면}
 
-## 14. 큐 시스템 — Redis Streams vs Kafka vs SRT
+- 채널 수의 기준은 출력마다의 speed와 조각 완성 시각입니다. CPU·GPU 사용률은 원인을 찾을 때 봅니다.
+- 같은 명령도 기계 상태에 따라 결과가 크게 달라졌습니다. 목표 서버에서 실제 입력·사다리로 오래 돌려 재고, 그 값에서 여유를 남깁니다.
+- 한 채널의 사다리는 한 프로세스에서 디코딩을 나눠 쓰고, 같은 키프레임 옵션으로 화질 사이 조각 경계를 맞춥니다.
+- GPU 서버는 GPU 장 수가 아니라 NVENC 엔진 수와 세션 한도로 계획합니다.
+- 인코더를 다시 띄우면 끊김 표시가 필요하고, 같은 세션에서 시간축을 이어 줄 수 있을 때만 뺄 수 있습니다.
 
-| 큐 | 처리량 | 운영 부담 | 지연 | 적합 규모 |
-|---|---|---|---|---|
-| **SRT (큐 없음)** | 채널당 자체 버퍼 | 0 | 120ms | 소규모 |
-| **Redis Streams** | ~10만 msg/s | 중 | <10ms | 중규모 |
-| **Kafka** | 100만+ msg/s | 큼 | <50ms | 대규모 |
+## 측정 조건
 
-```mermaid
-flowchart LR
-  ING[인제스트] -->|xadd<br/>maxlen=300| RS[Redis Stream<br/>stream:S_ID]
-  RS -->|xread block| TR[트랜스코딩 컨슈머]
-  RS -.->|maxlen 초과 시<br/>오래된 것 자동 삭제| GONE[(drop)]
-  TR -->|처리 느림| BP[백프레셔<br/>인제스트 속도 조절]
+- 수행: AI(Claude Code)가 2026년 11월 13일 02:34–02:45(KST)에 실행했습니다. 첫 회차는 N=1, 2, 3, 4, 5, 6, 8을 차례로, 둘째 회차는 그 직후 N=3, 4, 5, 6을 차례로 한 번씩 돌렸습니다.
+- 기종: MacBook Air(Mac17,3, 팬 없음), Apple M5 10코어(고성능 4 · 효율 6), 메모리 32GB, macOS 27.0.1. FFmpeg 9.0.2(Homebrew), x264 core 165 r3222.
+- 같은 기계에서 다른 세션의 작업(브라우저, 파일 감시, 다른 실험)이 함께 돌았습니다. 둘째 회차 시작 전과 끝에 FFmpeg가 아닌 프로세스의 CPU 사용률 합(`ps`의 %CPU 합)은 약 395%와 527%였습니다. 이 값에는 같은 시기에 다른 세션이 돌린 FFmpeg 실험이 빠져 있습니다. 첫 회차는 이 값을 기록하지 않았고, 시작 때 load average는 60.40이었습니다(바로 앞에 돈 preset 측정이 끝날 때는 125.12, 두 값 모두 이 측정의 x264 스레드를 포함할 수 있음). 온도와 클럭은 기록하지 않았습니다.
+- 채널 하나(N개를 동시에 띄움, 각 40초):
+
+```bash
+ffmpeg -nostdin -y -re -f lavfi -i testsrc2=size=1920x1080:rate=30 -t 40 -filter_complex "[0:v]split=3[a][b][c];[b]scale=1280:720[b2];[c]scale=854:480[c2]" -map "[a]" -map "[b2]" -map "[c2]" -c:v libx264 -preset veryfast -g 60 -sc_threshold 0 -b:v:0 6000k -b:v:1 3000k -b:v:2 1200k -f hls -hls_time 2 -hls_list_size 0 -var_stream_map "v:0 v:1 v:2" -hls_segment_filename "c1/v%v_%03d.ts" -progress c1/progress.txt "c1/v%v.m3u8"
 ```
 
-`maxlen=300` (6초 @ 50fps) — 라이브용 짧은 버퍼.
-
-```python
-# Redis Streams 푸시
-r.xadd(f'stream:{sid}', {'data': chunk, 'pts': pts}, maxlen=300)
-
-# Kafka 파티션 키 = stream_id → 순서 보장
-producer.produce('live-streams', key=sid.encode(), value=chunk)
-```
-
-```mermaid
-flowchart LR
-  P1[Producer 인제스트] -->|key=stream_A| K[(Kafka Topic<br/>partitions=100)]
-  P2[Producer 인제스트] -->|key=stream_B| K
-  K -->|partition 1| C1[Consumer 트랜스코더 1]
-  K -->|partition 2| C2[Consumer 트랜스코더 2]
-  K -->|partition N| CN[Consumer 트랜스코더 N]
-```
-
-같은 stream_id는 항상 같은 파티션 → 순서 보장.
-
----
-
-## 15. HPA 비대칭 스케일링
-
-| | 스케일 업 | 스케일 다운 |
-|---|---|---|
-| 안정화 윈도우 | 30초 | 600초 (10분) |
-| 변화율 | +50% / 60초 | -10% / 300초 |
-| 트리거 | GPU > 70% 또는 큐 지연 > 2s | GPU < 50% |
-
-**늘릴 땐 빨리, 줄일 땐 천천히** — 라이브 중인 방송 못 끔.
-
-{{< chart caption="설명용 가정 · 실측 근거 미확인: HPA 비대칭 스케일링 — 시간축 노드 수" >}}
-{
-  "tooltip": { "trigger": "axis" },
-  "grid": { "left": "10%", "right": "10%", "bottom": "12%", "top": "8%" },
-  "xAxis": { "type": "category", "data": ["t=0", "t=30s", "t=1m", "t=2m", "t=5m", "t=10m", "t=15m", "t=20m"] },
-  "yAxis": { "type": "value", "name": "노드 수" },
-  "series": [{
-    "type": "line",
-    "smooth": true,
-    "data": [10, 15, 22, 30, 35, 35, 33, 30],
-    "areaStyle": {},
-    "itemStyle": { "color": "#3b82f6" },
-    "lineStyle": { "width": 3 },
-    "markArea": {
-      "itemStyle": { "color": "rgba(239, 68, 68, 0.1)" },
-      "data": [[{ "xAxis": "t=0" }, { "xAxis": "t=2m" }]]
-    }
-  }]
-}
-{{< /chart >}}
-
-붉은 영역 = 폭증 대응 구간. 30초만에 50% 증가, 그러나 다운은 10분 걸쳐 천천히.
-
-```mermaid
-flowchart LR
-  M1[메트릭<br/>GPU > 70%] --> HPA
-  M2[메트릭<br/>큐 지연 > 2s] --> HPA
-  HPA{HPA<br/>판단} -->|업| UP[+50% / 60s<br/>윈도우 30s]
-  HPA -->|다운| DN[-10% / 300s<br/>윈도우 600s]
-  UP --> SCALE[Pod replica 조정]
-  DN --> SCALE
-```
-
----
-
-## 16. 예측 기반 스케일링 — 피크 5분 전 미리
-
-```mermaid
-flowchart LR
-  H[과거 데이터<br/>같은 요일/시간] --> PRED[부하 예측 모델]
-  T[최근 트렌드] --> PRED
-  E[예정된 인기 방송] --> PRED
-  PRED -->|5분 후 예측 부하| CMP{현재 capacity?}
-  CMP -->|부족| EARLY[미리 스케일 업]
-  CMP -->|충분| WAIT[유지]
-```
-
-{{< chart caption="설명용 가정 · 실측 근거 미확인: 저녁 피크 대응 — 예측형 vs 반응형 (시청자 영향 ms)" >}}
-{
-  "tooltip": { "trigger": "axis" },
-  "legend": { "data": ["반응형 (HPA만)", "예측형 + HPA"], "top": 0 },
-  "grid": { "left": "10%", "right": "10%", "bottom": "12%", "top": "18%" },
-  "xAxis": { "type": "category", "data": ["17:55", "18:00", "18:05", "18:10", "18:15", "18:20"] },
-  "yAxis": { "type": "value", "name": "Rebuffering 영향 (ms)", "max": 800 },
-  "series": [
-    { "name": "반응형 (HPA만)", "type": "line", "smooth": true, "data": [50, 700, 600, 200, 80, 50], "itemStyle": { "color": "#ef4444" }, "lineStyle": { "width": 3 } },
-    { "name": "예측형 + HPA", "type": "line", "smooth": true, "data": [60, 100, 80, 70, 60, 50], "itemStyle": { "color": "#10b981" }, "lineStyle": { "width": 3 } }
-  ]
-}
-{{< /chart >}}
-
-18:00 피크 직격 시 반응형은 700ms rebuffering, 예측형은 100ms 이하.
-
----
-
-## 17. 우선순위 QoS — 부하 폭증 시 누구부터
-
-| Priority | 대상 | 부하 폭증 시 |
-|---|---|---|
-| P1 | Top 1% | 무조건 처리 |
-| P2 | 광고/이벤트 진행 중 | 무조건 처리 |
-| P3 | Top 10% | 정상 처리 |
-| P4 | 일반 | 처리 |
-| P5 | 베타 테스터 | **거부/지연** |
-
-부하 95% 넘으면 P5부터 거부. 핵심 스트리머 보호.
-
----
-
-## 18. Stream Migration — 방송 중 노드 이동
-
-```mermaid
-sequenceDiagram
-  participant OLD as 노드 A (옛)
-  participant NEW as 노드 B (새)
-  participant PKG as 패키저
-  participant V as 시청자
-  
-  Note over OLD,NEW: 1. 두 노드 동시 인코딩 시작
-  OLD->>PKG: 출력 계속
-  NEW->>PKG: 출력 시작 (워밍업 1~2초)
-  Note over PKG: 2. 첫 GOP 경계 대기
-  PKG->>V: 옛 노드 출력 (계속)
-  Note over PKG: 3. GOP 경계 도달
-  PKG->>V: 새 노드 출력으로 전환
-  OLD->>OLD: 4. 종료
-  Note over V: 5~10초 끊김 후 정상
-```
-
-Spot 인스턴스 회수 시 미리 알람 받아 graceful drain.
-
----
-
-## 19. 월간 장애 빈도 — 실제 운영 데이터
-
-{{< chart caption="설명용 가정 · 실측 근거 미확인: 라이브 인프라 월간 장애 종류별 빈도" >}}
-{
-  "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
-  "grid": { "left": "30%", "right": "10%", "bottom": "12%", "top": "8%" },
-  "xAxis": { "type": "value", "name": "월간 건수" },
-  "yAxis": {
-    "type": "category",
-    "data": ["데이터센터 부분 정전", "CDN Origin Shield 장애", "Kafka 파티션 lag", "NVENC 세션 누수", "GPU 드라이버 hang", "SRT 패킷 손실 폭증", "스트리머 OBS 인코딩 변경"]
-  },
-  "series": [{
-    "type": "bar",
-    "data": [
-      { "value": 1, "itemStyle": { "color": "#94a3b8" } },
-      { "value": 1, "itemStyle": { "color": "#94a3b8" } },
-      { "value": 2, "itemStyle": { "color": "#3b82f6" } },
-      { "value": 4, "itemStyle": { "color": "#3b82f6" } },
-      { "value": 8, "itemStyle": { "color": "#f59e0b" } },
-      { "value": 15, "itemStyle": { "color": "#f59e0b" } },
-      { "value": 50, "itemStyle": { "color": "#ef4444" } }
-    ],
-    "label": { "show": true, "position": "right", "formatter": "{c}건" }
-  }]
-}
-{{< /chart>}}
-
-가장 흔한 게 **스트리머 측 변경**. 인프라 장애가 아니라서 자동 복구 불가 — 알림만.
-
----
-
-## 20. 장애 종류별 자동 복구 매핑
-
-| 장애 | 감지 신호 | 자동 복구 | MTTR |
-|---|---|---|---|
-| GPU 드라이버 hang | nvidia-smi 타임아웃 | 3단계 복구 시퀀스 | 30~60s |
-| FFmpeg 좀비 | 출력 mtime > 10s | 프로세스 kill + 재spawn | 5~15s |
-| NVENC 세션 누수 | 세션 수 증가 모니터링 | FFmpeg 재시작 | 10s |
-| SRT 패킷 손실 | 손실율 > 5% | SRT_LATENCY 증가 | 자동 |
-| Kafka lag | consumer lag > 임계 | 컨슈머 추가 | 1~5분 |
-| Region 장애 | 트랜스코딩 응답 90% 실패 | DNS 전환 또는 Active-Active | 5~10분 / 즉시 |
-| CDN 장애 | 에러율 > 5% / p99 > 1s | GSLB 가중치 0 | 30s |
-
----
-
-## 21. GPU Hang 3단계 자동 복구
-
-```mermaid
-flowchart TB
-  D[nvidia-smi 5초 타임아웃 감지] --> S1[1단계: FFmpeg 프로세스 강제 kill<br/>NVENC 세션 정리]
-  S1 --> CHK1{GPU 응답?}
-  CHK1 -->|YES| OK[정상 복귀<br/>80% 케이스]
-  CHK1 -->|NO| S2[2단계: nvidia-smi --gpu-reset<br/>드라이버 리셋]
-  S2 --> CHK2{GPU 응답?}
-  CHK2 -->|YES| OK2[정상 복귀<br/>95% 누적]
-  CHK2 -->|NO| S3[3단계: 노드 재시작<br/>또는 노드 교체]
-  S3 --> OK3[99% 누적 복구]
-```
-
-{{< chart caption="설명용 가정 · 실측 근거 미확인: GPU 복구 단계별 누적 성공률" >}}
-{
-  "tooltip": { "trigger": "axis" },
-  "grid": { "left": "10%", "right": "10%", "bottom": "12%", "top": "8%" },
-  "xAxis": { "type": "category", "data": ["1단계 (kill)", "2단계 (GPU reset)", "3단계 (reboot)"] },
-  "yAxis": { "type": "value", "name": "누적 성공률 (%)", "max": 100 },
-  "series": [{
-    "type": "bar",
-    "data": [
-      { "value": 80, "itemStyle": { "color": "#3b82f6" } },
-      { "value": 95, "itemStyle": { "color": "#10b981" } },
-      { "value": 99, "itemStyle": { "color": "#76b900" } }
-    ],
-    "label": { "show": true, "position": "top", "formatter": "{c}%" }
-  }]
-}
-{{< /chart >}}
-
----
-
-## 22. FFmpeg 좀비 감지
-
-```mermaid
-sequenceDiagram
-  participant W as Watchdog
-  participant FS as 파일시스템
-  participant F as FFmpeg
-  
-  loop 5초마다
-    W->>FS: stat $output/seg_*.m4s
-    FS-->>W: 최신 mtime
-    alt mtime < 10s
-      Note over W: 정상
-    else mtime >= 10s
-      W->>F: SIGKILL
-      W->>W: 새 FFmpeg spawn
-      Note over W: 5~15s 끊김
-    end
-  end
-```
-
-CPU는 살아있는데 출력 안 나오는 좀비 상태 잡는 유일한 방법.
-
----
-
-## 23. Discontinuity 자동 처리
-
-```mermaid
-flowchart LR
-  D[스트림 중단 감지<br/>PTS 점프 또는 재시작] --> N["새 init.mp4 생성<br/>init_v(N+1).mp4"]
-  N --> M["매니페스트 갱신<br/>#EXT-X-DISCONTINUITY<br/>#EXT-X-MAP:URI=init_v(N+1).mp4"]
-  M --> S[시퀀스 +100 점프<br/>안전 마진]
-  S --> P[플레이어 디코더 리셋<br/>~5초 끊김 후 정상]
-```
-
-코덱 설정 도중 바뀐 케이스도 같은 처리.
-
----
-
-## 24. Region Active-Active
-
-```mermaid
-flowchart LR
-  S[스트리머 OBS] -->|primary push| I1[서울 인제스트]
-  S -->|backup push| I2[도쿄 인제스트]
-  I1 --> T1[서울 트랜스코딩]
-  I2 --> T2[도쿄 트랜스코딩]
-  T1 --> SEL{출력 선택기}
-  T2 --> SEL
-  SEL -->|서울 정상| P[패키저<br/>서울 출력]
-  SEL -.->|서울 죽음| P2[패키저<br/>도쿄 즉시 전환]
-  P --> V[시청자]
-  P2 --> V
-```
-
-| | Active-Active | Passive Failover |
-|---|---|---|
-| 비용 | 2배 | 1배 |
-| 끊김 시간 | 0초 | 5~10분 (DNS TTL) |
-| 적용 대상 | Top 1% 스트리머 | 일반 |
-| 인제스트 송출 | OBS 두 번 송신 | 한 번만 |
-
-{{< chart caption="설명용 가정 · 실측 근거 미확인: Region 장애 시 끊김 시간 비교 (초)" >}}
-{
-  "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
-  "grid": { "left": "25%", "right": "10%", "bottom": "12%", "top": "8%" },
-  "xAxis": { "type": "value", "name": "끊김 (초)" },
-  "yAxis": {
-    "type": "category",
-    "data": ["Active-Active (Top 1%)", "Passive Failover (일반)"]
-  },
-  "series": [{
-    "type": "bar",
-    "data": [
-      { "value": 0, "itemStyle": { "color": "#10b981" } },
-      { "value": 480, "itemStyle": { "color": "#ef4444" } }
-    ],
-    "label": { "show": true, "position": "right", "formatter": "{c}s" }
-  }]
-}
-{{< /chart >}}
-
----
-
-## 25. Region Failover DNS 전환
-
-```mermaid
-flowchart LR
-  D[Region 헬스체크<br/>트랜스코딩 90% 실패] --> DEC{Active-Active?}
-  DEC -->|YES| AA[출력 선택기 즉시 전환<br/>0초 끊김]
-  DEC -->|NO| DNS[DNS 라우팅 변경<br/>서울 → 도쿄]
-  DNS --> NOT[활성 스트리머에게 알림<br/>reconnect URL]
-  NOT --> CDN[CDN 캐시 무효화]
-  CDN --> END[5~10분 끊김 후 정상]
-```
-
----
-
-## 26. CDN Failover GSLB 전환
-
-```mermaid
-sequenceDiagram
-  participant V as 시청자
-  participant B as 비콘 수집기
-  participant G as GSLB
-  participant A as Akamai
-  participant CF as CloudFront
-  
-  V->>B: 재생 에러 비콘
-  B->>G: 에러율 > 5% 보고
-  G->>G: Akamai 가중치 100 → 0
-  G->>G: CloudFront 가중치 0 → 100
-  V->>G: 다음 DNS 쿼리
-  G-->>V: CloudFront 엣지 IP
-  V->>CF: 매니페스트 요청
-  CF-->>V: 정상 응답
-```
-
-DNS TTL 30초로 짧게 → 빠른 전환.
-
----
-
-## 27. 알람 P0/P1/P2 분류
-
-| 레벨 | 대응 시간 | 예시 | 월 목표 빈도 |
-|---|---|---|---|
-| **P0** | 5분 이내 호출 | 전체 인제스트 장애 / GPU 95% / CDN 장애 | 5건 이하 |
-| **P1** | 1시간 이내 | Region 트랜스코딩 노드 일부 / VMAF 회귀 / Rebuffering 2%+ | 20건 이하 |
-| **P2** | 업무 시간 | 비용 예산 80% / 디스크 85% / 인증 지연 | 무제한 (대시보드) |
-
-{{< chart caption="설명용 가정 · 실측 근거 미확인: 알람 카테고리별 월 발생 빈도" >}}
-{
-  "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
-  "grid": { "left": "10%", "right": "10%", "bottom": "12%", "top": "8%" },
-  "xAxis": { "type": "category", "data": ["P0 (즉시)", "P1 (1시간)", "P2 (정보)"] },
-  "yAxis": { "type": "value", "name": "월 건수" },
-  "series": [{
-    "type": "bar",
-    "data": [
-      { "value": 4, "itemStyle": { "color": "#ef4444" } },
-      { "value": 18, "itemStyle": { "color": "#f59e0b" } },
-      { "value": 350, "itemStyle": { "color": "#94a3b8" } }
-    ],
-    "label": { "show": true, "position": "top", "formatter": "{c}건" }
-  }]
-}
-{{< /chart >}}
-
-P0 = 알람 피로 방지 핵심. 5건 초과면 룰 조정.
-
----
-
-## 28. Chaos Engineering — 일부러 죽이기
-
-| 기법 | 동작 | 검증하는 것 |
-|---|---|---|
-| Random Pod Kill | 무작위 K8s pod 종료 | HPA + Stream Migration |
-| Network Partition | iptables로 일시 차단 | Region Failover |
-| CPU Stress | 인위적 CPU 부하 | 스케줄러 회피 |
-| GPU Throttle | NVIDIA 클럭 제한 | 헬스체크 + 자동 복구 |
-| Latency Inject | 일시 패킷 지연 | SRT 재전송 + 버퍼 |
-
-```mermaid
-flowchart LR
-  C[Chaos Monkey<br/>0.1% 확률] -->|매분 무작위| K[K8s Pod kill]
-  C -->|0.01% 확률| N[Network partition 10s]
-  C -->|매시간| S[CPU stress 60s]
-  K --> R[자동 복구 시스템]
-  N --> R
-  S --> R
-  R --> V{복구 성공?}
-  V -->|YES| L[로그 기록]
-  V -->|NO| A[Postmortem 작성]
-```
-
-비프로덕션에서 매일 굴림. 운영 환경엔 약하게.
-
----
-
-## 29. Runbook as Code
-
-```python
-# runbooks/gpu_hang.py
-class GPUHangRunbook:
-    description = "GPU 드라이버 hang 자동 복구"
-    
-    def check_trigger(self, alert):
-        return alert.type == "gpu_unresponsive"
-    
-    def execute(self, alert):
-        node = alert.affected_node
-        if self.reset_gpu(node): return "RECOVERED"
-        if self.reboot_node(node): return "RECOVERED"
-        self.replace_node(node)
-        return "RECOVERED_REPLACEMENT"
-```
-
-```mermaid
-flowchart LR
-  A[알람 발생] --> M[알람 매칭]
-  M --> R[Runbook 검색]
-  R -->|발견| EXE[자동 실행]
-  R -.->|없음| H[사람 호출]
-  EXE --> CHK{복구?}
-  CHK -->|YES| L[로그 기록]
-  CHK -->|NO| H
-```
-
-**자동 복구가 우선, 사람 호출이 차선.** 문서 대신 코드.
-
----
-
-## 30. Postmortem 사이클
-
-```mermaid
-flowchart LR
-  IN[장애 발생] --> RES[복구]
-  RES --> WRITE[Postmortem 작성<br/>타임라인 + 근본 원인]
-  WRITE --> REV[팀 리뷰]
-  REV --> ACT[조치 항목<br/>코드 변경 / 알람 룰 / 자동화]
-  ACT --> RUNBOOK[Runbook 갱신]
-  RUNBOOK --> CODE[자동화 PR]
-  CODE --> IN2[다음 장애 자동 처리]
-```
-
-같은 장애 두 번 안 나게. 작성 의무 + 액션 트래킹.
-
----
-
-## 31. Pre-positioning — 인기 방송 캐시 워밍
-
-```mermaid
-flowchart LR
-  P[예측: 5분 후 시작 + 예상 시청 > 10k] --> SEG[예상 첫 N개 세그먼트 식별]
-  SEG --> EDGE[CDN 모든 엣지에<br/>가짜 요청 보내 캐시 채움]
-  EDGE --> READY[Thundering Herd 방지]
-  READY --> ORIGIN[Origin 부하 -90%]
-```
-
-방송 시작 직후 시청자 폭증 시 Origin 직격 막음.
-
----
-
-## 32. Reserved + On-Demand + Spot — 시간축 분배
-
-{{< chart caption="설명용 가정 · 실측 근거 미확인: 시간대별 인스턴스 분배 (Reserved / On-Demand / Spot)" >}}
-{
-  "tooltip": { "trigger": "axis" },
-  "legend": { "data": ["Reserved (80% 할인)", "On-Demand", "Spot (90% 할인)"], "top": 0 },
-  "grid": { "left": "10%", "right": "10%", "bottom": "12%", "top": "18%" },
-  "xAxis": { "type": "category", "data": ["3시", "8시", "12시", "14시", "18시", "20시", "22시", "1시"] },
-  "yAxis": { "type": "value", "name": "동시 채널" },
-  "series": [
-    { "name": "Reserved (80% 할인)", "type": "line", "stack": "total", "areaStyle": {}, "data": [50, 200, 200, 200, 200, 200, 200, 200], "itemStyle": { "color": "#3b82f6" } },
-    { "name": "On-Demand", "type": "line", "stack": "total", "areaStyle": {}, "data": [0, 0, 200, 100, 100, 300, 300, 100], "itemStyle": { "color": "#10b981" } },
-    { "name": "Spot (90% 할인)", "type": "line", "stack": "total", "areaStyle": {}, "data": [0, 0, 0, 0, 0, 500, 300, 100], "itemStyle": { "color": "#f59e0b" } }
-  ]
-}
-{{< /chart >}}
-
-| 인스턴스 | 할인 | 중단 위험 | 용도 |
-|---|---|---|---|
-| Reserved (1년) | 80% | 없음 | 상시 부하 |
-| On-Demand | 0% | 없음 | 평균 변동 |
-| Spot | 90% | 있음 | 피크 분 |
-
-**전체 비용 30~40% 절감.** Spot 회수 시 graceful drain.
-
----
-
-## 33. CDN 비용 절감 Waterfall
-
-{{< chart caption="설명용 가정 · 실측 근거 미확인: CDN 비용 — 절감 기법별 누적 효과" >}}
-{
-  "tooltip": { "trigger": "axis" },
-  "grid": { "left": "10%", "right": "10%", "bottom": "12%", "top": "8%" },
-  "xAxis": { "type": "category", "data": ["기본", "Multi-CDN 협상", "+Origin Shield", "+TTL 분리", "+Pre-positioning", "최종"] },
-  "yAxis": { "type": "value", "name": "월 비용 ($K)" },
-  "series": [
-    { "type": "bar", "stack": "Total", "data": [0, 45, 31.5, 25.2, 22.7, 0], "itemStyle": { "color": "rgba(0,0,0,0)" } },
-    { "type": "bar", "stack": "Total", "data": [45, 0, 0, 0, 0, 22.7], "label": { "show": true, "position": "top", "formatter": "${c}K" }, "itemStyle": { "color": "#3b82f6" } },
-    { "type": "bar", "stack": "Total", "data": [0, -13.5, -6.3, -2.5, -2.5, 0], "label": { "show": true, "position": "top", "formatter": "{c}K" }, "itemStyle": { "color": "#10b981" } }
-  ]
-}
-{{< /chart >}}
-
-$45K → $22.7K로 약 50% 절감. 누적 기법 효과.
-
----
-
-## 34. CDN 단가 협상별 비교
-
-| 등급 | GB 단가 | 월 트래픽 조건 |
-|---|---|---|
-| 소규모 약정 | $0.080 | < 10 TB |
-| CloudFront 표준 | $0.050 | 일반 |
-| 대량 협상 | $0.030 | > 1 PB |
-| Akamai 대형 고객 | $0.020 | > 10 PB + 다년 |
-
-협상력 = 트래픽 규모. Multi-CDN으로 경쟁시키면 추가 인하.
-
----
-
-## 35. 코덱 라이센스 비용
-
-{{< chart caption="설명용 가정 · 실측 근거 미확인: 100만 디바이스 기준 연간 코덱 라이센스 (USD)" >}}
-{
-  "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
-  "grid": { "left": "12%", "right": "10%", "bottom": "12%", "top": "8%" },
-  "xAxis": { "type": "category", "data": ["H.264", "H.265 (단순)", "H.265 (복잡)", "VP9", "AV1"] },
-  "yAxis": { "type": "value", "name": "연 라이센스 ($K, log)", "type": "log" },
-  "series": [{
-    "type": "bar",
-    "data": [
-      { "value": 250, "itemStyle": { "color": "#3b82f6" } },
-      { "value": 500, "itemStyle": { "color": "#f59e0b" } },
-      { "value": 1500, "itemStyle": { "color": "#ef4444" } },
-      { "value": 1, "itemStyle": { "color": "#10b981" } },
-      { "value": 1, "itemStyle": { "color": "#76b900" } }
-    ],
-    "label": { "show": true, "position": "top", "formatter": "${c}K" }
-  }]
-}
-{{< /chart >}}
-
-**AV1/VP9는 0** (AOMedia 오픈소스, Google). 라이브 플랫폼이 AV1 도입하는 큰 이유 중 하나.
-
----
-
-## 36. Per-Title + 카테고리별 절감 효과
-
-{{< chart caption="설명용 가정 · 실측 근거 미확인: 카테고리별 1080p60 비트레이트 (Kbps)" >}}
-{
-  "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
-  "grid": { "left": "20%", "right": "10%", "bottom": "12%", "top": "8%" },
-  "xAxis": { "type": "value", "name": "Kbps" },
-  "yAxis": {
-    "type": "category",
-    "data": ["발로란트", "그림 그리기", "저스트 채팅 (정적)"]
-  },
-  "series": [
-    { "name": "표준 사다리", "type": "bar", "data": [6000, 6000, 6000], "itemStyle": { "color": "#94a3b8" } },
-    { "name": "카테고리 절감 사다리", "type": "bar", "data": [8000, 4500, 3000], "itemStyle": { "color": "#10b981" }, "label": { "show": true, "position": "right", "formatter": "{c}k" } }
-  ]
-}
-{{< /chart >}}
-
-평균 30% 비트레이트 절감 → CDN + 트랜스코딩 동시 절감.
-
----
-
-## 37. 채널당 단가 분포
-
-{{< chart caption="설명용 가정 · 실측 근거 미확인: 채널당 시간당 단가 (USD)" >}}
-{
-  "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" } },
-  "grid": { "left": "25%", "right": "10%", "bottom": "12%", "top": "8%" },
-  "xAxis": { "type": "value", "name": "USD / 시간" },
-  "yAxis": {
-    "type": "category",
-    "data": ["VOD 시청", "720p30 축소 사다리", "1080p60 풀 사다리 + Per-Title"]
-  },
-  "series": [{
-    "type": "bar",
-    "data": [
-      { "value": 0.03, "itemStyle": { "color": "#10b981" } },
-      { "value": 0.05, "itemStyle": { "color": "#3b82f6" } },
-      { "value": 0.25, "itemStyle": { "color": "#ef4444" } }
-    ],
-    "label": { "show": true, "position": "right", "formatter": "${c}" }
-  }]
-}
-{{< /chart >}}
-
-이 단가가 매일 추적하는 핵심 지표. 갑자기 튀면 누가 잘못 설정한 것.
-
----
-
-## 38. A/B 테스트 — 가상의 비용·매출 비교 예시
-
-실제 수행한 A/B 테스트가 아니다. 아래 숫자는 계산 구조를 설명하려고 가정한 입력이며, 표본·분산·신뢰구간을 갖춘 결과가 아니다.
-
-| 지표 | A: 표준 (6000k) | B: 절감 (4500k) |
-|---|---|---|
-| 평균 시청 시간 | 38분 | 37분 (-3%) |
-| Rebuffering | 0.4% | 0.6% (+0.2%p) |
-| 채널당 비용 | $0.12/시간 | $0.09/시간 (-25%) |
-| 추정 매출 | $0.95 | $0.93 (-2%) |
-| **마진** | **$0.83** | **$0.84 (+1%)** |
-
-{{< chart caption="설명용 가정 · 실측 근거 미확인: A/B 테스트 결과 — 비용 vs 매출 vs 마진 (USD)" >}}
-{
-  "tooltip": { "trigger": "axis" },
-  "legend": { "data": ["A: 표준", "B: 절감"], "top": 0 },
-  "grid": { "left": "10%", "right": "10%", "bottom": "12%", "top": "18%" },
-  "xAxis": { "type": "category", "data": ["채널당 비용", "추정 매출", "마진"] },
-  "yAxis": { "type": "value", "name": "USD" },
-  "series": [
-    { "name": "A: 표준", "type": "bar", "data": [0.12, 0.95, 0.83], "itemStyle": { "color": "#3b82f6" }, "label": { "show": true, "position": "top", "formatter": "${c}" } },
-    { "name": "B: 절감", "type": "bar", "data": [0.09, 0.93, 0.84], "itemStyle": { "color": "#10b981" }, "label": { "show": true, "position": "top", "formatter": "${c}" } }
-  ]
-}
-{{< /chart >}}
-
-**마진 1% 우위 → B 도입.** 시청 시간 감소가 비용 절감보다 작을 때만 절감 정당.
-
-```mermaid
-flowchart TB
-  AB[A/B 2주 측정] --> D{시청시간 영향?}
-  D -->|증가| ADOPT[즉시 도입]
-  D -->|감소| DELTA{매출 감소 < 비용 절감?}
-  DELTA -->|YES| ADOPT
-  DELTA -->|NO| REJECT[적용 안 함]
-```
-
----
-
-## 39. 캐시 TTL 권장값
-
-| 자원 | TTL | 이유 |
-|---|---|---|
-| 세그먼트 (.m4s) | 24시간 | 한 번 생성 후 안 변함 |
-| 라이브 매니페스트 | 1~2초 | 6초마다 변함 |
-| VOD 매니페스트 | 30분 | 변할 일 거의 없음 |
-| init.mp4 | 24시간 | 코덱 설정 안 바뀌면 고정 |
-
----
-
-## 40. FinOps 3단계
-
-```mermaid
-flowchart LR
-  I[Inform<br/>비용 가시화] --> O[Optimize<br/>Reserved/Spot, 라이트사이징]
-  O --> P[Operate<br/>예산 알람, 변경 승인]
-  P --> I
-  
-  style I fill:#e0f2fe,color:#172c40
-  style O fill:#dcfce7,color:#172c40
-  style P fill:#fef3c7,color:#172c40
-```
-
-| 단계 | 활동 | KPI |
-|---|---|---|
-| Inform | 팀별/서비스별 비용 분배 | 채널당 단가 가시화 |
-| Optimize | 인스턴스 라이트사이징, Reserved/Spot | 월 비용 -20% |
-| Operate | 예산 자동 알람, 변경 승인 | 예산 초과 0건 |
-
----
-
-## 41. 비용 거버넌스 승인 흐름
-
-```mermaid
-flowchart TB
-  PR[설정 변경 PR] --> EST[자동 비용 영향 추정]
-  EST --> D{월 영향?}
-  D -->|< $1K| AUTO[엔지니어 자율]
-  D -->|$1K ~ $10K| LEAD[팀 리드 승인]
-  D -->|> $10K| DIR[디렉터 승인]
-  AUTO --> MERGE[Merge]
-  LEAD --> MERGE
-  DIR --> MERGE
-  MERGE --> TRACK[월 비용 추적]
-```
-
-설정 변경 PR마다 비용 영향 자동 첨부. 예산 책임 분산.
-
----
-
-## 정리하면
-
-라이브 트랜스코딩 인프라는 **7층 마이크로서비스 + 자동 복구 + 비용 최적화**의 종합 운영이다.
-
-1. **7층 분리**가 정석 — 자원 패턴 달라 각 인스턴스 타입 맞춤
-2. **방송 시작 시간** — 본문의 6.2초는 설명용 입력이며 측정값이 아니다
-3. **CDN 45% + 트랜스코딩 25%** = 비용 70% → 절감 우선순위
-4. **A10이 가성비 정점** — T4 대비 처리량 2배, 가격 1.9배
-5. **Bin Packing**으로 빈 노드 종료 → 30~40% 절감
-6. **Tier Scheduling** — Top 1%만 Premium GPU, 일반은 Budget
-7. **큐 선택**: SRT (소규모) / Redis Streams (중규모) / Kafka (대규모)
-8. **HPA 비대칭**: 업 30초, 다운 10분 — 라이브 방송 보호
-9. **예측 + HPA 결합**으로 피크 5분 전 미리 확장
-10. **우선순위 QoS** — 부하 폭증 시 P5부터 거부
-11. **Stream Migration**으로 GOP 경계에서 노드 이동 (5~10초 끊김)
-12. **장애 자동 복구 = Runbook as Code** — 사람 호출은 차선
-13. **GPU 3단계 복구**: kill → reset → reboot (99% 자동 복구)
-14. **FFmpeg 좀비 = 출력 mtime 헬스체크** — 유일한 방법
-15. **Region Active-Active** = Top 1%만 (0초 끊김), 일반은 Passive (5~10분)
-16. **Multi-CDN GSLB** — CDN 한 곳 장애 시 30초 내 가중치 전환
-17. **P0 알람 월 5건 이하** — 더 많으면 룰 조정
-18. **Chaos Engineering** + Postmortem 사이클로 같은 장애 반복 방지
-19. **Pre-positioning**으로 Thundering Herd 차단
-20. **Reserved 50% + On-Demand 30% + Spot 20%** = 비용 30~40% 절감
-21. **Origin Shield** — 요청 hit rate와 Origin 전송 바이트를 구분해 측정한다
-22. **카테고리별 사다리** = 30% 비트 절감 → CDN + 트랜스코딩 동시
-23. **AV1/VP9 라이센스 0** — H.264 대비 $250K/년 절감 (디바이스 보급 따라 점진)
-24. **A/B 테스트로 비용 절감의 매출 영향 검증** — 마진 기준 결정
-25. **TTL 분리**: 세그먼트 24h, 매니페스트 1~2s
-26. **FinOps 3단계** — Inform → Optimize → Operate
-27. **비용 거버넌스**: PR마다 영향 추정, $1K/$10K 단계별 승인
-
-이 글로 **레벨 4 (트랜스코딩과 인프라)** 정리 종료. 다음 글에선 **CDN 멀티 벤더 / Origin Shield / 글로벌 전송 깊이** 또는 **WebRTC 기반 인터랙티브 라이브**로 넘어간다.
-
----
-
-**참고**
-- [Kubernetes HPA 문서](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
-- [NVIDIA Device Plugin for Kubernetes](https://github.com/NVIDIA/k8s-device-plugin)
-- [AWS Spot Instance Best Practices](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/spot-best-practices.html)
-- [Netflix Chaos Engineering](https://netflixtechblog.com/the-netflix-simian-army-16e57fbab116)
-- [FinOps Foundation](https://www.finops.org/)
-- [Apache Kafka 공식 문서](https://kafka.apache.org/documentation/)
-- [Redis Streams 가이드](https://redis.io/docs/data-types/streams/)
+- speed: 각 프로세스 `progress.txt`의 마지막 `speed=` 값의 채널 평균(채널 사이 차이는 최대 0.023). 조각 지연: 채널 1의 1080p 조각 k 파일의 수정 시각 − 채널 폴더 생성 시각 − (2k + 2)초. 마지막 20번째 조각은 짧은 끝 조각이라 뺐습니다.
+- 끊김 표시: 같은 날 같은 기계에서 위 본문의 명령을 같은 폴더에서 두 번 실행하고 `live.m3u8`과 각 조각의 첫 영상 타임스탬프(`ffprobe -show_entries packet=pts_time`)를 확인했습니다.
+
+## 출처
+
+- [Twitch, Live Video Transmuxing/Transcoding: FFmpeg vs TwitchTranscoder, Part I](https://blog.twitch.tv/en/2017/10/10/live-video-transmuxing-transcoding-f-fmpeg-vs-twitch-transcoder-part-i-489c1c125f28/) (2017-10-10)
+- [nginx-rtmp-module 지시어 문서 — push · push_reconnect](https://github.com/arut/nginx-rtmp-module/wiki/Directives#push)
+- [RFC 8216: HTTP Live Streaming](https://www.rfc-editor.org/rfc/rfc8216) — 4.3.2.3 EXT-X-DISCONTINUITY, 6.3.4 목록 다시 받기
+- [NVIDIA, NVENC Application Note (Video Codec SDK 13.1)](https://docs.nvidia.com/video-technologies/video-codec-sdk/13.1/nvenc-application-note/index.html) · [Video Encode and Decode GPU Support Matrix](https://developer.nvidia.com/video-encode-and-decode-gpu-support-matrix-new) (2026-11-13 확인)
+- [NVIDIA k8s-device-plugin](https://github.com/NVIDIA/k8s-device-plugin)
+- [Kubernetes, Resource Bin Packing](https://kubernetes.io/docs/concepts/scheduling-eviction/resource-bin-packing/) · [Pod Topology Spread Constraints](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/)
+- [AWS Elemental MediaLive 가격](https://aws.amazon.com/medialive/pricing/) (2026-11-13 확인)
+- [YouTube, Reimagining video infrastructure to empower YouTube](https://blog.youtube/inside-youtube/new-era-video-infrastructure/) (2021-04-21) · [Google Research, Warehouse-Scale Video Acceleration: Co-design and Deployment in the Wild](https://research.google/pubs/warehouse-scale-video-acceleration-co-design-and-deployment-in-the-wild/) (ASPLOS 2021)
+- [FFmpeg 형식 문서 — hls 먹서](https://ffmpeg.org/ffmpeg-formats.html#hls-2)
+- PokeClip 기록: [MediaMTX 채택](/posts/0-to-1/pokeclip-mediamtx-build-or-adopt/) · [같은 세션 재접속의 끊김 표시](/posts/0-to-1/pokeclip-reconnect-audio-gap/)
+
+다음 편: [373MB/s에서 6Mbps로 — 조건을 명시하고 이해하는 H.264 압축](/posts/tech-blurting/h264-deep-dive/)

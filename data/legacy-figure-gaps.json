@@ -1,13 +1,9 @@
 {
   "0-to-1/pokeclip-v3-to-v4-cascade": 4,
   "tech-blurting/aac-and-friends": 4,
-  "tech-blurting/abr-ladder-design": 12,
   "tech-blurting/av1-vp9-deep-dive": 3,
   "tech-blurting/codec-decision-and-debugging": 8,
-  "tech-blurting/ffmpeg-deep-dive": 5,
   "tech-blurting/h264-deep-dive": 2,
   "tech-blurting/h265-hdr-deep-dive": 2,
-  "tech-blurting/live-transcoding-infrastructure": 38,
-  "tech-blurting/nvenc-gpu-transcoding": 9,
   "tech-blurting/opus-deep-dive": 4
 }

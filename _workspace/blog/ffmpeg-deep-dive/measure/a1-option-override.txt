@@ -1,0 +1,29 @@
+# A1 출력 하나에 -b:v 반복 vs -b:v:N (2026-11-13, AI 실행, FFmpeg 9.0.2, x264 core 165 r3222, Apple M5 macOS 27.0.1)
+
+## 반복(-b:v 3000k -b:v 1500k -b:v 600k): x264 머리말의 bitrate= 값
+bitrate=600
+bitrate=600
+bitrate=600
+경고 줄: 0개
+
+## 스트림 지정자(-b:v:0 3000k -b:v:1 1500k -b:v:2 600k)
+bitrate=3000
+bitrate=1500
+bitrate=600
+### rep
+v0 조각 합 1746332바이트, 20초 평균 699kbps
+v1 조각 합 1643120바이트, 20초 평균 657kbps
+v2 조각 합 1625072바이트, 20초 평균 650kbps
+#EXT-X-STREAM-INF:BANDWIDTH=801632,AVERAGE-BANDWIDTH=698532,RESOLUTION=1280x720,CODECS="avc1.64001f"
+#EXT-X-STREAM-INF:BANDWIDTH=734704,AVERAGE-BANDWIDTH=657247,RESOLUTION=960x540,CODECS="avc1.64001f"
+#EXT-X-STREAM-INF:BANDWIDTH=697856,AVERAGE-BANDWIDTH=650028,RESOLUTION=640x360,CODECS="avc1.64001e"
+### idx
+v0 조각 합 7794480바이트, 20초 평균 3118kbps
+v1 조각 합 3952888바이트, 20초 평균 1581kbps
+v2 조각 합 1625072바이트, 20초 평균 650kbps
+#EXT-X-STREAM-INF:BANDWIDTH=3264432,AVERAGE-BANDWIDTH=3117791,RESOLUTION=1280x720,CODECS="avc1.64001f"
+#EXT-X-STREAM-INF:BANDWIDTH=1724336,AVERAGE-BANDWIDTH=1581155,RESOLUTION=960x540,CODECS="avc1.64001f"
+#EXT-X-STREAM-INF:BANDWIDTH=697856,AVERAGE-BANDWIDTH=650028,RESOLUTION=640x360,CODECS="avc1.64001e"
+
+## 명령(반복판, 지정자판은 -b:v 셋을 -b:v:0 3000k -b:v:1 1500k -b:v:2 600k로)
+ffmpeg -f lavfi -i testsrc2=size=1280x720:rate=30 -t 20 -filter_complex "[0:v]split=3[a][b][c];[b]scale=960:540[b2];[c]scale=640:360[c2]" -map "[a]" -map "[b2]" -map "[c2]" -c:v libx264 -preset veryfast -g 60 -sc_threshold 0 -b:v 3000k -b:v 1500k -b:v 600k -f hls -hls_time 2 -hls_playlist_type vod -var_stream_map "v:0 v:1 v:2" -master_pl_name master.m3u8 rep/v%v.m3u8

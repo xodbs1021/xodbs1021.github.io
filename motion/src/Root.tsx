@@ -67,6 +67,12 @@ import { PLAYBACK_QUERY_GUARD_FRAMES, PlaybackQueryGuard } from "./scenes/pokecl
 import { VOLUME_FIRST_COPY_FRAMES, VolumeFirstCopy } from "./scenes/pokeclip-scratch-volume-ownership/VolumeFirstCopy";
 import { HLS_SESSION_AFTER_CUT_FRAMES, HlsSessionAfterCut } from "./scenes/pokeclip-dependency-upgrade-contracts/HlsSessionAfterCut";
 import { AUTH_QUEUE_SERIAL_FRAMES, AuthQueueSerial } from "./scenes/pokeclip-path-reconciler-design-history/AuthQueueSerial";
+import { OPTION_SCOPE_OVERRIDE_FRAMES, OptionScopeOverride } from "./scenes/ffmpeg-deep-dive/OptionScopeOverride";
+import { VBV_BUFFER_FRAMES, VbvBuffer } from "./scenes/x264-live-rate-control-gop/VbvBuffer";
+import { SHARED_SEGMENTS_FRAMES, SharedSegments } from "./scenes/ffmpeg-hls-dash-muxer/SharedSegments";
+import { CONVEX_HULL_CLIMB_FRAMES, ConvexHullClimb } from "./scenes/abr-ladder-design/ConvexHullClimb";
+import { GPU_MEMORY_PATH_FRAMES, GpuMemoryPath } from "./scenes/nvenc-gpu-transcoding/GpuMemoryPath";
+import { SPEED_BELOW_REALTIME_FRAMES, SpeedBelowRealtime } from "./scenes/live-transcoding-infrastructure/SpeedBelowRealtime";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
@@ -734,6 +740,66 @@ export const RemotionRoot: React.FC = () => (
       component={TemplateVsReload}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={TEMPLATE_VS_RELOAD_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="OptionScopeOverride" component={OptionScopeOverride} durationInFrames={OPTION_SCOPE_OVERRIDE_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="OptionScopeOverrideMobile"
+      component={OptionScopeOverride}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={OPTION_SCOPE_OVERRIDE_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="VbvBuffer" component={VbvBuffer} durationInFrames={VBV_BUFFER_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="VbvBufferMobile"
+      component={VbvBuffer}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={VBV_BUFFER_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="SharedSegments" component={SharedSegments} durationInFrames={SHARED_SEGMENTS_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="SharedSegmentsMobile"
+      component={SharedSegments}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={SHARED_SEGMENTS_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="ConvexHullClimb" component={ConvexHullClimb} durationInFrames={CONVEX_HULL_CLIMB_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="ConvexHullClimbMobile"
+      component={ConvexHullClimb}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={CONVEX_HULL_CLIMB_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="GpuMemoryPath" component={GpuMemoryPath} durationInFrames={GPU_MEMORY_PATH_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="GpuMemoryPathMobile"
+      component={GpuMemoryPath}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={GPU_MEMORY_PATH_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="SpeedBelowRealtime" component={SpeedBelowRealtime} durationInFrames={SPEED_BELOW_REALTIME_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="SpeedBelowRealtimeMobile"
+      component={SpeedBelowRealtime}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={SPEED_BELOW_REALTIME_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}

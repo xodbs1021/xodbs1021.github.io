@@ -1,0 +1,93 @@
+# C1·C2 두 출력 vs dash -hls_playlist (2026-11-13 02:48–02:50 KST, AI(Claude Code) 실행, MacBook Air M5, macOS 27.0.1, FFmpeg 9.0.2, x264 core 165 r3222)
+## 명령(작업 폴더 c2.sh)
+X="-c:v libx264 -preset veryfast -g 60 -sc_threshold 0 -b:v 3000k"
+/usr/bin/time -p ffmpeg -hide_banner -nostdin -y -f lavfi -t 20 -i testsrc2=size=1280x720:rate=30 \
+  $X -f hls -hls_time 2 -hls_playlist_type vod -hls_segment_type fmp4 -hls_segment_filename r1/hls/seg_%03d.m4s r1/hls/index.m3u8 \
+  $X -f dash -seg_duration 2 r1/dash/manifest.mpd > r1/log.txt 2>&1
+/usr/bin/time -p ffmpeg -hide_banner -nostdin -y -f lavfi -t 20 -i testsrc2=size=1280x720:rate=30 \
+  $X -f dash -seg_duration 2 -hls_playlist 1 r2/one/manifest.mpd > r2/log.txt 2>&1
+
+## libx264 인스턴스 수(로그의 서로 다른 [libx264 @ 주소])
+r1: 2
+r2: 1
+
+## CPU 시간(/usr/bin/time -p, user+sys 초), 3회
+r1 real 5.64 user 13.98 sys 0.80 
+r2 real 2.63 user 7.56 sys 0.39 
+r1_2 real 2.59 user 14.34 sys 0.63 
+r2_2 real 2.69 user 7.02 sys 0.41 
+r1_3 real 3.66 user 14.16 sys 0.72 
+r2_3 real 2.20 user 7.40 sys 0.34 
+
+## 파일과 바이트
+### r1/hls
+439 index.m3u8
+845 init.mp4
+786988 seg_000.m4s
+783598 seg_001.m4s
+711587 seg_002.m4s
+777666 seg_003.m4s
+706994 seg_004.m4s
+756340 seg_005.m4s
+718851 seg_006.m4s
+792154 seg_007.m4s
+734155 seg_008.m4s
+789530 seg_009.m4s
+### r1/dash
+786988 chunk-stream0-00001.m4s
+783598 chunk-stream0-00002.m4s
+711587 chunk-stream0-00003.m4s
+777666 chunk-stream0-00004.m4s
+706994 chunk-stream0-00005.m4s
+756340 chunk-stream0-00006.m4s
+718851 chunk-stream0-00007.m4s
+792154 chunk-stream0-00008.m4s
+734155 chunk-stream0-00009.m4s
+789530 chunk-stream0-00010.m4s
+833 init-stream0.m4s
+1233 manifest.mpd
+### r2/one
+786988 chunk-stream0-00001.m4s
+783598 chunk-stream0-00002.m4s
+711587 chunk-stream0-00003.m4s
+777666 chunk-stream0-00004.m4s
+706994 chunk-stream0-00005.m4s
+756340 chunk-stream0-00006.m4s
+718851 chunk-stream0-00007.m4s
+792154 chunk-stream0-00008.m4s
+734155 chunk-stream0-00009.m4s
+789530 chunk-stream0-00010.m4s
+833 init-stream0.m4s
+1233 manifest.mpd
+116 master.m3u8
+1082 media_0.m3u8
+
+r1/dash/chunk-stream0-00003.m4s 와 r2/one/chunk-stream0-00003.m4s: cmp 결과 동일
+
+## r2/one/master.m3u8
+#EXTM3U
+#EXT-X-VERSION:7
+#EXT-X-STREAM-INF:BANDWIDTH=3002676,RESOLUTION=1280x720,CODECS="avc1.64001f"
+media_0.m3u8
+
+## r2/one/media_0.m3u8 앞부분
+#EXTM3U
+#EXT-X-VERSION:6
+#EXT-X-TARGETDURATION:2
+#EXT-X-MEDIA-SEQUENCE:1
+#EXT-X-MAP:URI="init-stream0.m4s"
+#EXTINF:2.000000,
+#EXT-X-PROGRAM-DATE-TIME:2026-11-13T02:49:14.000+0900
+chunk-stream0-00001.m4s
+#EXTINF:2.000000,
+#EXT-X-PROGRAM-DATE-TIME:2026-11-13T02:49:16.000+0900
+chunk-stream0-00002.m4s
+#EXTINF:2.000000,
+#EXT-X-PROGRAM-DATE-TIME:2026-11-13T02:49:32.000+0900
+chunk-stream0-00010.m4s
+#EXT-X-ENDLIST
+## r2/one/manifest.mpd SegmentTemplate
+				<SegmentTemplate timescale="15360" initialization="init-stream$RepresentationID$.m4s" media="chunk-stream$RepresentationID$-$Number%05d$.m4s" startNumber="1">
+					<SegmentTimeline>
+						<S t="0" d="30720" r="9" />
+					</SegmentTimeline>
