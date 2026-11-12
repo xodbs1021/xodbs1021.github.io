@@ -139,4 +139,4 @@ RTMP를 다른 규약으로 바꿀지 고를 때 갈리는 질문은 「규약�
 - [Haivision, 「Haivision and Wowza Form SRT Alliance」 (2017-04)](https://www.haivision.com/about/press-releases/haivision-wowza-form-srt-alliance-support-new-open-source-low-latency-video-streaming-initiative/)
 - [VSF TR-06-1 RIST Simple Profile (2018-10-17)](https://static.vsf.tv/download/technical_recommendations/VSF_TR-06-1_2018_10_17.pdf)
 
-다음 편: [라이브 영상이 그냥 파일이라고? — HLS의 미친 발상](/posts/tech-blurting/hls-just-files/)
+다음 편: [HLS는 라이브 영상을 재생 목록과 조각 파일로 나눕니다](/posts/tech-blurting/hls-just-files/)

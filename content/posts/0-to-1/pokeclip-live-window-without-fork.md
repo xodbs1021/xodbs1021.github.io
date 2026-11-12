@@ -1,7 +1,7 @@
 ---
 title: "LL-HLS 라이브 창은 지연이 아니라 복귀 여유를 정했습니다"
 date: "2026-10-15T11:28:22+09:00"
-lastmod: "2026-11-12T02:10:00+09:00"
+lastmod: "2026-11-12T22:00:00+09:00"
 author: "김태윤"
 categories: ["0-to-1"]
 draft: false
@@ -31,6 +31,8 @@ PokeClip의 라이브 재생 목록 창을 6초로 줄이려던 2026년 8월 25�
 | 라이브 목록 창 | 목록에서 다시 받을 수 있는 과거 조각 범위 | 8월 14초 → 10월 28초 |
 | 시청 지연 | 라이브 끝에서 재생 위치까지 | PART-HOLD-BACK 1.25초(파트 0.5초의 2.5배) |
 | 녹화 조각 | 저장·편집용 파일 단위 | 4초 유지 |
+
+PART-HOLD-BACK의 2.5배는 MediaMTX가 쓰는 gohlslib이 파트 목표 길이에 곱하는 고정 계수이고([`muxer_stream.go` 468행](https://github.com/bluenviron/gohlslib/blob/v2.4.3/muxer_stream.go#L468)), 개정 초안 4.4.3.8의 하한(2배 이상, MUST)은 넘지만 권고(3배 이상, SHOULD)와 [애플 저작 규격](https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html) 14.3의 하한(3배 이상, MUST)에는 못 미칩니다.
 
 세 값을 나누자 6초 요구가 실제로 원한 것은 지연이었고, 지연은 창으로 줄지 않는다는 것이 보였습니다. 되감기도 따로 발행하는 목록이 맡기로 했으므로([라이브와 되감기 목록을 나눈 글](/posts/0-to-1/pokeclip-live-dvr-separation-handoff/)), 짧은 라이브 창 하나로 되감기를 채울 필요도 없었습니다.
 
