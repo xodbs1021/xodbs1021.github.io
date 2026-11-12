@@ -1,7 +1,7 @@
 ---
 title: "WHIP은 POST 한 번으로 WebRTC 송출 세션을 엽니다"
 date: 2026-06-20T10:12:18+09:00
-lastmod: "2026-11-12T15:32:05+09:00"
+lastmod: "2026-11-13T03:51:32+09:00"
 description: "WebRTC는 시그널링을 정하지 않아 송출기와 서버가 서로 맞지 않았습니다. WHIP(RFC 9725, 2025년 3월)은 SDP 제안을 HTTP POST로 보내고 201 응답의 SDP와 Location으로 세션을 엽니다. 그 뒤에도 ICE와 DTLS 왕복이 남는다는 점, 종료와 Trickle ICE, Enhanced RTMP 이후의 코덱 비교, 아직 초안인 WHEP, CDN 캐시를 못 쓰는 시청 비용, 날짜를 확인한 도입 현황을 RFC와 공식 문서로 정리했습니다."
 categories: ["tech-blurting"]
 tags: ["WHIP", "WHEP", "WebRTC", "RFC 9725", "OBS", "라이브 송출"]
@@ -160,4 +160,4 @@ Twitch · YouTube 같은 대형 플랫폼과 국내 라이브 플랫폼의 WHIP 
 - [bluenviron/mediamtx 「WebRTC clients」 문서](https://github.com/bluenviron/mediamtx/blob/main/docs/3-publish/03-webrtc.md) (2026-11-12 확인)
 - [FFmpeg `libavformat/whip.c` 커밋 기록](https://github.com/FFmpeg/FFmpeg/commits/master/libavformat/whip.c)
 
-다음 편: [373MB/s에서 6Mbps로 — 조건을 명시하고 이해하는 H.264 압축](/posts/tech-blurting/h264-deep-dive/)
+다음 편: [FFmpeg 옵션은 놓인 자리에 따라 걸리는 단계가 다릅니다](/posts/tech-blurting/ffmpeg-deep-dive/)

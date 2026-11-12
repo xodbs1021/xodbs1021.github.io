@@ -1,7 +1,7 @@
 ---
 title: "ABR 사다리는 해상도별 화질 곡선의 윗선에서 고릅니다"
 date: 2026-06-22T01:55:58+09:00
-lastmod: "2026-11-13T03:16:18+09:00"
+lastmod: "2026-11-13T03:51:32+09:00"
 description: "ABR 사다리는 같은 영상을 여러 해상도와 비트레이트로 준비한 목록입니다. 애플 HLS 저작 규격의 H.264 9단계 · HEVC 12단계 예시, bpp의 한계, 4:2:0 때문에 짝수인 해상도, Netflix 2015 per-title과 2018 shot-based 최적화를 원문으로 확인하고, Sintel 예고편 10초를 4개 해상도 × 7개 비트레이트로 인코딩해 VMAF 곡선의 윗선이 540p → 720p → 1080p로 넘어가는 지점을 직접 쟀습니다. 단계 비용은 픽셀률 합으로 계산했습니다."
 categories: ["tech-blurting"]
 tags: ["ABR", "HLS", "VMAF", "per-title", "FFmpeg", "x264"]
@@ -32,7 +32,7 @@ ABR(Adaptive Bitrate) 재생기는 받는 속도와 버퍼를 보고 조각마�
 | 1920×1080 | 6,000 | 원본과 같음 | 0.096 |
 | 1920×1080 | 7,800 | 원본과 같음 | 0.125 |
 
-같은 항목의 HEVC 표는 640×360 145kbps부터 3840×2160 16,800kbps까지 열두 단계이고, HDR 열을 따로 둡니다(예: 1080p 4,500 · 5,800kbps, HDR 5,400 · 7,000kbps). 1.32는 다변형 목록에서 처음 나오는 기본 변형을 평균 2,000kbps 변형으로 두라고 권합니다(SHOULD). 재생기는 처음에 대역을 모르므로 그 변형으로 시작합니다.
+같은 항목의 HEVC 표는 640×360 145kbps부터 3840×2160 16,800kbps까지 열두 단계이고, HDR 열을 따로 둡니다(예: 1080p 4,500 · 5,800kbps, HDR 5,400 · 7,000kbps). 1.32는 기본 영상 변형을 평균 2,000kbps 변형으로 두라고 권합니다(SHOULD). 여기서 기본은 호환되는 오디오를 가진 변형 묶음 안에서 다변형 목록에 처음 나오는 변형입니다. iOS용 수정 규칙은 이를 Wi-Fi 2,000kbps, 셀룰러 730kbps로 따로 둡니다(1.32a · 1.32b).
 
 이 표에는 해상도마다 두 단계가 있는 줄(432p · 720p · 1080p)이 있습니다. 해상도를 바꾸지 않고 비트레이트만 올리는 단계입니다. 그 비트레이트에서 한 단계 높은 해상도가 더 낫다면 이 단계는 낭비입니다. 그 판단은 영상을 실제로 인코딩해 봐야 할 수 있습니다.
 
@@ -76,7 +76,7 @@ Sintel 예고편 10초를 360p · 540p · 720p · 1080p로 줄이고 300kbps부�
 
 ## Netflix는 고정 사다리를 제목마다 다시 골랐습니다 {#7-per-title-encoding--netflix의-비용-혁명-2015}
 
-Netflix는 2010년 말 H.264 배포를 시작하며 카탈로그 전체에 쓰는 고정 사다리를 정했고, 맨 위 단계는 1080p 5,800kbps였습니다. 2015년 12월 글에서 이 고정 사다리의 문제를 두 방향으로 적습니다. 카메라 잡음이나 필름 결이 많은 장면은 5,800kbps에서도 블록이 보였고, 만화처럼 단순한 영상에는 5,800kbps가 지나치게 많았습니다. 복잡한 제목은 1080p를 5,800kbps보다 높은 「예컨대 7,500kbps」로 인코딩하는 편이 나을 수도 있다고 적었습니다([Netflix, 2015-12-14](https://netflixtechblog.com/per-title-encode-optimization-7e99442b62a2), [보관본](https://web.archive.org/web/20241231233219/https://netflixtechblog.com/per-title-encode-optimization-7e99442b62a2)).
+Netflix는 2010년 말 H.264 배포를 시작하며 카탈로그 전체에 쓰는 고정 사다리를 정했고, 맨 위 단계는 1080p 5,800kbps였습니다. 2015년 12월 글에서 이 고정 사다리의 문제를 두 방향으로 적습니다. 카메라 잡음이나 필름 결이 많은 장면은 5,800kbps에서도 블록이 보였고, 만화처럼 단순한 영상에는 5,800kbps가 지나치게 많았습니다. 복잡한 제목은 1080p를 5,800kbps보다 높은 「예컨대 7,500kbps」로 인코딩하는 편이 나을 수도 있다고 적었습니다([Netflix, 2015-12-14](https://netflixtechblog.com/per-title-encode-optimization-7e99442b62a2), [보관본](https://web.archive.org/web/20250709104450/https://netflixtechblog.com/per-title-encode-optimization-7e99442b62a2)).
 
 해법은 제목마다 앞 절의 곡선을 그리는 것이었습니다. 몇 가지 해상도에서 QP(양자화 매개변수)를 한 JND(사람이 겨우 구분하는 차이)씩 띄워 시험 인코딩하고, 비트레이트와 화질을 재 곡선을 보간한 뒤, 볼록 껍질에 가장 가까운 점을 골라 그 제목의 사다리로 씁니다. 글이 든 예는 두 편입니다. 단순한 애니메이션인 BoJack Horseman은 고정 사다리가 1,750kbps를 480p에 썼는데, 그 에피소드의 per-title 사다리는 1,540kbps부터 1080p를 보냈습니다. 평균 복잡도의 Orange Is the New Black은 맨 위 1080p가 4,640kbps로, 고정 사다리의 5,800kbps보다 20% 적었습니다. 이 글의 그림은 대부분 PSNR로 그렸고, VMAF로도 같은 분석을 할 수 있다고 덧붙였습니다.
 
@@ -128,10 +128,10 @@ FFmpeg 9.0.2로 실행하자 x264가 출력 파일에 적은 설정이 스트림
 
 ## 측정 조건
 
-- 수행: AI(Claude Code)가 2026년 11월 13일 02:50–03:10(KST)에 실행했습니다. 격자의 각 점은 1회 인코딩 · 1회 측정입니다.
+- 수행: AI(Claude Code)가 2026년 11월 13일 새벽에 실행했고, 결과 표 파일은 02:57:56(KST)에 기록됐습니다. 격자의 각 점은 1회 인코딩 · 1회 측정입니다.
 - 기종: MacBook Air(Apple M5, 고성능 4·효율 6코어, 32GB, 팬 없음), macOS 27.0.1. 같은 기계에서 다른 세션의 작업이 함께 돌았지만 VMAF와 파일 크기는 그 영향을 받지 않습니다.
 - 도구: FFmpeg 9.0.2(Homebrew), x264 core 165 r3222, libvmaf 3.2.1(모델 vmaf_v0.6.1).
-- 입력: [Sintel 예고편](https://durian.blender.org/sharing/) 1080p(Blender Foundation, CC BY 3.0) 20초 지점부터 10초를 FFV1로 풀어 둔 파일(1920×1080, 24fps, 240프레임). 원본이 H.264 약 2.1Mbps로 이미 압축된 영상이고 위아래 검은 띠가 있습니다.
+- 입력: [Sintel 예고편](https://durian.blender.org/sharing/) 1080p(© copyright Blender Foundation | durian.blender.org, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)) 20초 지점부터 10초를 FFV1로 풀어 둔 파일(1920×1080, 24fps, 240프레임). 원본이 H.264 약 2.1Mbps로 이미 압축된 영상이고 위아래 검은 띠가 있습니다.
   - `ffmpeg -ss 20 -i sintel_trailer-1080p.mp4 -t 10 -an -c:v ffv1 ref.mkv`
 - 인코딩: `ffmpeg -i ref.mkv -vf scale=<W>:<H>:flags=bicubic -c:v libx264 -preset medium -threads 4 -b:v <B>k -maxrate <B>k -bufsize <2B>k out.mp4` — W:H는 640:360 · 960:540 · 1280:720 · 1920:1080, B는 300 · 600 · 1000 · 1600 · 2500 · 4000 · 6000.
 - VMAF: `ffmpeg -i out.mp4 -i ref.mkv -lavfi "[0:v]scale=1920:1080:flags=bicubic,setpts=N/24/TB[d];[1:v]setpts=N/24/TB[r];[d][r]libvmaf=n_threads=4" -f null -`. 프레임 번호로 맞췄습니다(mkv의 밀리초 타임스탬프로 맞추면 프레임이 어긋났습니다). 표의 목표 kbps와 실제 평균은 5% 이내로 달랐고, 영상의 가로 위치는 실제 평균을 썼습니다. 교차점(약 700 · 1,200kbps)은 격자 두 점 사이를 비트레이트 기준 직선으로 보간한 값입니다.
@@ -141,9 +141,9 @@ FFmpeg 9.0.2로 실행하자 x264가 출력 파일에 적은 설정이 스트림
 
 - [Apple, HLS Authoring Specification for Apple Devices](https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html) (개정 2025-06-26) — 1.25 예시 사다리, 1.29, 1.32, 7.4, 8.22, 9.13, 9.14
 - [RFC 8216: HTTP Live Streaming](https://www.rfc-editor.org/rfc/rfc8216) — 4.3.4.2 BANDWIDTH · AVERAGE-BANDWIDTH
-- Netflix Technology Blog: [Per-Title Encode Optimization](https://netflixtechblog.com/per-title-encode-optimization-7e99442b62a2) (2015-12-14, Aaron 외) · [Dynamic Optimizer](https://netflixtechblog.com/dynamic-optimizer-a-perceptual-video-encoding-optimization-framework-e19f1e3a277f) (2018-03-05, Katsavounidis) · [Optimized shot-based encodes: Now Streaming!](https://netflixtechblog.com/optimized-shot-based-encodes-now-streaming-4b9464204830) (2018-03-09, Manohara 외). 원문 주소가 자동 접속을 막아 2024-12-31 web.archive.org 보관본으로 내용을 확인했습니다.
+- Netflix Technology Blog: [Per-Title Encode Optimization](https://netflixtechblog.com/per-title-encode-optimization-7e99442b62a2) (2015-12-14, Aaron 외) · [보관본](https://web.archive.org/web/20250709104450/https://netflixtechblog.com/per-title-encode-optimization-7e99442b62a2) · [Dynamic Optimizer](https://netflixtechblog.com/dynamic-optimizer-a-perceptual-video-encoding-optimization-framework-e19f1e3a277f) (2018-03-05, Katsavounidis) · [Optimized shot-based encodes: Now Streaming!](https://netflixtechblog.com/optimized-shot-based-encodes-now-streaming-4b9464204830) (2018-03-09, Manohara 외). 원문 주소가 자동 접속을 막아 web.archive.org 보관본(per-title은 2025-07-09 사본)으로 내용을 확인했습니다.
 - [Netflix, VMAF](https://github.com/Netflix/vmaf) — 화질 지표 구현(libvmaf)
 - [FFmpeg 필터 문서, scale](https://ffmpeg.org/ffmpeg-filters.html#scale-1) · [FFmpeg 형식 문서, hls](https://ffmpeg.org/ffmpeg-formats.html#hls-2)
-- [Blender Foundation, Sintel](https://durian.blender.org/sharing/) — 시험 영상(CC BY 3.0)
+- [Sintel](https://durian.blender.org/sharing/) — 시험 영상, © copyright Blender Foundation | durian.blender.org, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 
 다음 편: [NVENC는 CUDA 코어와 따로 도는 전용 인코딩 엔진입니다](/posts/tech-blurting/nvenc-gpu-transcoding/)

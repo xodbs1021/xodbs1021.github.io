@@ -1,7 +1,7 @@
 ---
 title: "NVENC는 CUDA 코어와 따로 도는 전용 인코딩 엔진입니다"
 date: 2026-06-22T02:22:28+09:00
-lastmod: "2026-11-13T03:16:18+09:00"
+lastmod: "2026-11-13T03:51:32+09:00"
 description: "NVIDIA GPU의 H.264·HEVC·AV1 인코딩은 CUDA 코어가 아니라 칩 안의 전용 블록 NVENC가 맡고, 그 수와 세대는 GPU마다 다릅니다. 지원 매트릭스로 T4·A10·L4·A100·H100의 NVENC 수와 세션 한도를, NVENC 앱 노트 13.1로 엔진당 1080p H.264 처리량을 확인하고, FFmpeg 9.0.2 소스로 x264와 다른 옵션 체계, 9.0에서 사라진 cbr_hq·-2pass·-vsync, GPU 메모리 안에서 끝나는 디코딩·스케일·인코딩 경로, lookahead와 B 프레임의 지연, AV1 인코딩의 등장 순서, 인코더 사용률 지표를 정리했습니다."
 categories: ["tech-blurting"]
 tags: ["NVENC", "NVIDIA", "FFmpeg", "GPU 트랜스코딩", "H.264", "AV1"]
@@ -22,7 +22,7 @@ NVIDIA의 [NVENC 앱 노트(Video Codec SDK 13.1)](https://docs.nvidia.com/video
 {"grid":{"left":8,"right":56,"top":36,"bottom":8,"containLabel":true},"legend":{"top":0,"data":["Turing","Ada"]},"xAxis":{"type":"value","name":"fps","min":0},"yAxis":{"type":"category","inverse":true,"data":["P1","P3","P5","P7"]},"series":[{"name":"Turing","type":"bar","itemStyle":{"color":"#7a8a9b"},"label":{"show":true,"position":"right","formatter":"{c}"},"data":[855,600,271,229]},{"name":"Ada","type":"bar","itemStyle":{"color":"#087f8b"},"label":{"show":true,"position":"right","formatter":"{c}"},"data":[910,652,291,247]}]}
 {{< /chart >}}
 
-P1에서 P7로 가면 엔진당 처리량이 Ada 기준 910에서 247프레임으로 약 3.7분의 1이 되고, 세대 차이는 같은 프리셋에서 6–9%입니다. 1080p30 출력 하나는 초당 30프레임이므로 P1의 910프레임은 계산상 출력 30개분입니다. 다만 앱 노트는 GeForce 계열 카드를 최고 영상 클럭으로 잰 값이고 다른 GPU는 클럭에 거의 비례해 달라진다고 적었습니다. 서버 한 대의 수용량은 실제 사다리와 입력으로 지속 부하를 걸어 재야 합니다([라이브 트랜스코딩 인프라 글](/posts/tech-blurting/live-transcoding-infrastructure/)).
+P1에서 P7로 가면 엔진당 처리량이 Ada 기준 910에서 247프레임으로 약 3.7분의 1이 되고, 세대 차이는 같은 프리셋에서 6–9%입니다. 1080p30 출력 하나는 초당 30프레임이므로 P1의 910프레임은 계산상 출력 30개분입니다. 다만 앱 노트의 값은 Turing 열을 RTX 8000, Ada 열을 RTX 4090으로 각각 최고 영상 클럭에서 잰 것이고 다른 GPU는 클럭에 거의 비례해 달라진다고 적었습니다. 서버 한 대의 수용량은 실제 사다리와 입력으로 지속 부하를 걸어 재야 합니다([라이브 트랜스코딩 인프라 글](/posts/tech-blurting/live-transcoding-infrastructure/)).
 
 ## A100·H100에는 NVENC가 없습니다 {#3-nvenc-세대--turing부터가-진짜}
 
@@ -33,11 +33,11 @@ NVIDIA의 [Video Encode and Decode GPU Support Matrix](https://developer.nvidia.
 | Tesla T4 | Turing | 7세대 | 1 | 2 | 아니오 | 제한 없음 |
 | NVIDIA A10 | Ampere | 7세대 | 1 | 2 | 아니오 | 제한 없음 |
 | NVIDIA L4 | Ada Lovelace | 8세대 | 2 | 4 | 예 | 제한 없음 |
-| NVIDIA A100 | Ampere | — | 0 | 5 | — | — |
-| NVIDIA H100 PCIe | Hopper | — | 0 | 7 | — | — |
+| NVIDIA A100 | Ampere | 7세대(엔진 0개) | 0 | 5 | — | — |
+| NVIDIA H100 PCIe | Hopper | N/A | 0 | 7 | — | — |
 | GeForce RTX 4080 16GB | Ada Lovelace | 8세대 | 2 | 1 | 예 | 12 |
 
-A100과 H100은 학습·추론용 계산 GPU라 NVDEC(디코딩 엔진)는 5개, 7개가 있지만 NVENC는 0개입니다. 이 GPU로 트랜스코딩하면 디코딩은 GPU에서 할 수 있어도 인코딩은 CPU나 다른 장치가 맡아야 합니다. 「GPU 서버니까 인코딩도 빠르다」는 가정은 모델 이름을 매트릭스에서 확인하기 전에는 세우지 않는 편이 안전합니다.
+A100과 H100은 학습·추론용 계산 GPU라 NVDEC(디코딩 엔진)는 5개, 7개가 있지만 NVENC는 0개입니다. 매트릭스의 A100 행은 엔진이 0개인데도 NVENC 세대 칸에 「7th Gen」을 적었고, H100 PCIe 행은 「N/A」입니다. 이 GPU로 트랜스코딩하면 디코딩은 GPU에서 할 수 있어도 인코딩은 CPU나 다른 장치가 맡아야 합니다. 「GPU 서버니까 인코딩도 빠르다」는 가정은 모델 이름을 매트릭스에서 확인하기 전에는 세우지 않는 편이 안전합니다.
 
 세대 이름도 아키텍처와 일대일이 아닙니다. Turing과 Ampere는 같은 7세대 NVENC를 쓰고, 같은 Turing이라도 GTX 1650·T1000 같은 일부 제품은 6세대입니다. Turing NVENC의 화질은 NVIDIA가 두 번 비교해 발표했습니다. 2018년 9월 [아키텍처 소개 글](https://developer.nvidia.com/blog/nvidia-turing-architecture-in-depth/)은 Twitch·YouTube에서 흔한 송출 설정에서 Turing 인코더가 x264의 fast 설정보다 화질이 높다고 했고, 2019년 2월 [T4 글](https://developer.nvidia.com/blog/turing-h264-video-encoding-speed-and-quality/)은 고화질 모드에서 libx264 medium(`-tune psnr`)과 같거나 약간 낫다고 했습니다. 두 글 모두 NVIDIA가 고른 조건이고, T4 글의 화질 지표는 PSNR뿐입니다(FFmpeg 4.0.2, libx264 스레드 4개 제한).
 
@@ -67,7 +67,7 @@ FFmpeg의 `libx264`와 `h264_nvenc`는 같은 H.264를 만들지만 옵션은 �
 
 NVENC의 설정 단위는 프리셋 하나가 아니라 「튜닝 정보 + 프리셋」 쌍입니다. [NVENC 프로그래밍 가이드](https://docs.nvidia.com/video-technologies/video-codec-sdk/13.0/nvenc-video-encoder-api-prog-guide/index.html)는 고화질·저지연·초저지연·무손실 네 가지 튜닝마다 P1(가장 빠름)부터 P7(가장 느림)까지 일곱 프리셋을 둡니다. 앱 노트의 성능 표가 「프리셋 · 율 제어 · 튜닝」 세 칸으로 줄을 나누는 것도 그래서입니다. 같은 P4라도 `-tune hq`와 `-tune ll`은 다른 설정입니다.
 
-용도별 기준도 가이드에 있습니다. 클라우드 게임·스트리밍·화상 회의는 대역폭에 여유가 있으면 저지연 + CBR, 대역폭이 빡빡하면 초저지연 + CBR을 권합니다. 저지연과 초저지연 튜닝에서 P1–P4를 고르면 분할 프레임 인코딩이 저절로 켜진다는 점도 적혀 있습니다. FFmpeg에서는 `-tune ll` 또는 `-tune ull`에 `-rc cbr`을 함께 줍니다. 초고화질 튜닝 `uhq`는 FFmpeg 9.0.2에서 `hevc_nvenc`·`av1_nvenc`에만 있고 `h264_nvenc`에는 없습니다.
+용도별 기준도 가이드에 있습니다. 클라우드 게임·스트리밍·화상 회의는 대역폭에 여유가 있으면 저지연 + CBR, 대역폭이 빡빡하면 초저지연 + CBR을 권합니다. 저지연과 초저지연 튜닝에서 P1–P4를 고르면 분할 프레임 인코딩이 저절로 켜진다고도 적혀 있는데, 조건이 붙습니다. 이 기능은 HEVC·AV1 전용이고, NVENC가 2개 이상인 GPU에서 프레임 높이가 HEVC는 2,112줄, AV1은 2,048줄 이상일 때만 켜집니다([프로그래밍 가이드 13.0 8.14절](https://docs.nvidia.com/video-technologies/video-codec-sdk/13.0/nvenc-video-encoder-api-prog-guide/index.html)). H.264에는 이 기능이 없습니다. FFmpeg에서는 `-tune ll` 또는 `-tune ull`에 `-rc cbr`을 함께 줍니다. 초고화질 튜닝 `uhq`는 FFmpeg 9.0.2에서 `hevc_nvenc`·`av1_nvenc`에만 있고 `h264_nvenc`에는 없습니다.
 
 ## FFmpeg 9.0에서 cbr_hq·2pass가 사라졌습니다 {#7-tune와-rc--라이브-모드-선택}
 
@@ -90,10 +90,10 @@ NVENC의 멀티패스는 파일 전체를 두 번 도는 x264의 2-pass와 다�
 [NVIDIA의 FFmpeg 안내(SDK 13.0)](https://docs.nvidia.com/video-technologies/video-codec-sdk/13.0/ffmpeg-with-nvidia-gpu/index.html)는 이 두 옵션이 "프레임을 GPU 메모리에 둔다"고 설명하고, 스케일도 GPU 필터로 하면 "시스템 메모리와 영상 메모리 사이 전송이 사라진다"고 적습니다. 안내의 1:1 스케일 예제를 FFmpeg 9.0.2에 맞추면 다음과 같습니다.
 
 ```bash
-ffmpeg -fps_mode passthrough -hwaccel cuda -hwaccel_output_format cuda -i input.mp4 -vf scale_cuda=1280:720 -c:a copy -c:v h264_nvenc -b:v 5M output.mp4
+ffmpeg -hwaccel cuda -hwaccel_output_format cuda -i input.mp4 -vf scale_cuda=1280:720 -fps_mode passthrough -c:a copy -c:v h264_nvenc -b:v 5M output.mp4
 ```
 
-안내의 원래 명령은 `-vsync 0`으로 시작하는데, FFmpeg 9.0에서 `-vsync`가 지워져([927ffd0930](https://github.com/FFmpeg/FFmpeg/commit/927ffd0930fa3f7a948d4ed30c67bd518f9549ce)) 그대로 실행하면 "Unrecognized option 'vsync'" 오류로 멈춥니다. 같은 뜻은 `-fps_mode passthrough`입니다. 이 맥의 FFmpeg 9.0.2로 오류 문구와 `-fps_mode`가 받아들여지는 것까지는 확인했지만, NVIDIA GPU가 없어 위 명령 전체는 실행하지 못했습니다. 예전 글에 흔하던 `-pix_fmt yuv420p`도 NVIDIA 안내의 GPU 경로 명령에는 없습니다. 출력 형식은 디코더가 정한 CUDA 표면을 그대로 넘기는 것이 이 경로의 전제입니다. 한 입력으로 여러 화질을 만들 때 디코딩을 한 번만 하는 방법은 [FFmpeg 글의 split 절](/posts/tech-blurting/ffmpeg-deep-dive/#9--filter_complex--멀티-입력출력)과 같고, 각 갈래의 스케일만 `scale_cuda`로 바꿉니다.
+안내의 원래 명령은 `-vsync 0`으로 시작하는데, FFmpeg 9.0에서 `-vsync`가 지워져([927ffd0930](https://github.com/FFmpeg/FFmpeg/commit/927ffd0930fa3f7a948d4ed30c67bd518f9549ce)) 그대로 실행하면 "Unrecognized option 'vsync'" 오류로 멈춥니다. 같은 뜻은 `-fps_mode passthrough`입니다. 다만 전역 옵션이던 `-vsync`와 달리 `-fps_mode`는 출력 옵션이라 `-i` 뒤, 출력 파일 앞에 둡니다. `-i` 앞에 두면 "cannot be applied to input url" 오류로 멈춥니다. 이 맥의 FFmpeg 9.0.2에서 위 명령이 옵션 해석을 모두 지나 `h264_nvenc` 인코더가 없다는 단계에서 멈추는 것까지는 확인했지만, NVIDIA GPU가 없어 끝까지 실행하지는 못했습니다. 예전 글에 흔하던 `-pix_fmt yuv420p`도 NVIDIA 안내의 GPU 경로 명령에는 없습니다. 출력 형식은 디코더가 정한 CUDA 표면을 그대로 넘기는 것이 이 경로의 전제입니다. 한 입력으로 여러 화질을 만들 때 디코딩을 한 번만 하는 방법은 [FFmpeg 글의 split 절](/posts/tech-blurting/ffmpeg-deep-dive/#9--filter_complex--멀티-입력출력)과 같고, 각 갈래의 스케일만 `scale_cuda`로 바꿉니다.
 
 ## lookahead와 B 프레임은 프레임 수만큼 지연을 더합니다 {#10-지연-vs-화질--옵션-조합의-트레이드오프}
 
@@ -103,7 +103,7 @@ B 프레임은 뒤 프레임을 참조하므로, 인코더는 B 프레임 다음
 
 ## AV1 인코딩은 Ada·L4부터이고 Intel Arc가 먼저였습니다 {#11-nvenc-h265--av1--차세대-코덱-실시간}
 
-매트릭스에서 AV1 인코딩이 「예」인 NVIDIA 제품은 8세대 NVENC(Ada)부터입니다. 위 표의 T4·A10은 「아니오」, L4와 RTX 4080은 「예」입니다. NVIDIA의 첫 AV1 인코더를 단 RTX 4090은 [2022년 10월 12일](https://www.nvidia.com/en-us/geforce/news/geforce-rtx-4090-out-now/) 나왔습니다. 그보다 앞선 [2022년 6월 14일](https://download.intel.com/newsroom/archive/2025/de-de-2022-06-14-intel-arc-a380-graphics-available-in-china.pdf) Intel은 데스크톱 Arc A380을 중국에서 내놓으며 Xe 미디어 엔진의 하드웨어 AV1 인코딩을 「industry-first」라고 소개했습니다. 같은 Intel이라도 13세대 코어(Raptor Lake) 내장 그래픽은 AV1을 디코딩만 하고 인코딩하지 않습니다. Intel 미디어 드라이버의 코덱 표에서 Raptor Lake가 속한 TGLx 열은 AV1이 「D」, Arc의 DG2 열은 「D/E」입니다([intel/media-driver](https://github.com/intel/media-driver/blob/master/README.md)).
+매트릭스에서 AV1 인코딩이 「예」인 NVIDIA 제품은 8세대 NVENC(Ada)부터입니다. 위 표의 T4·A10은 「아니오」, L4와 RTX 4080은 「예」입니다. NVIDIA의 첫 AV1 인코더를 단 RTX 4090은 [2022년 10월 12일](https://www.nvidia.com/en-us/geforce/news/geforce-rtx-4090-out-now/) 나왔습니다. 그보다 앞선 [2022년 6월 14일](https://download.intel.com/newsroom/archive/2025/de-de-2022-06-14-intel-arc-a380-graphics-available-in-china.pdf) Intel은 데스크톱 Arc A380의 중국 출시를 발표하며 Xe 미디어 엔진의 하드웨어 AV1 인코딩을 「industry-first」라고 소개했습니다. 같은 Intel이라도 13세대 코어(Raptor Lake) 내장 그래픽은 AV1을 디코딩만 하고 인코딩하지 않습니다. Intel 미디어 드라이버의 코덱 표에서 Raptor Lake가 속한 TGLx 열은 AV1이 「D」, Arc의 DG2 열은 「D/E」입니다([intel/media-driver](https://github.com/intel/media-driver/blob/master/README.md)).
 
 AV1을 인코딩할 수 있어도 시청 플랫폼이 받는지는 따로 확인해야 합니다. Twitch는 [2024년 1월 8일](https://blog.twitch.tv/en/2024/01/08/introducing-the-enhanced-broadcasting-beta/) 송출자의 GPU 인코더로 여러 화질을 만들어 보내는 Enhanced Broadcasting을 비공개 베타로 열면서, AV1은 RTX 40 시리즈로 앞으로 가져올 일이라고 적었습니다. 맥에서 하드웨어 인코딩을 맡는 VideoToolbox 인코더(`h264_videotoolbox`·`hevc_videotoolbox`)는 macOS용 FFmpeg 빌드에만 있습니다. 이 글을 쓴 Apple M5 맥의 FFmpeg 9.0.2 인코더 목록에도 VideoToolbox는 H.264·HEVC·ProRes뿐이었습니다.
 
@@ -116,7 +116,8 @@ AV1을 인코딩할 수 있어도 시청 플랫폼이 받는지는 따로 확인
 ## 측정 조건
 
 - 수행: AI(Claude Code)가 2026년 11월 13일 Apple M5 MacBook Air(macOS 27.0.1)의 FFmpeg 9.0.2(Homebrew)로 실행했습니다. NVIDIA GPU가 없어 NVENC 명령은 실행하지 않았습니다.
-- `-vsync` 제거 확인: `ffmpeg -vsync 0 -f lavfi -i testsrc2 -t 1 -f null -` → "Unrecognized option 'vsync'." / `ffmpeg -f lavfi -i testsrc2 -t 1 -fps_mode passthrough -f null -` → 정상 종료.
+- `-vsync` 제거 확인: `ffmpeg -vsync 0 -f lavfi -i testsrc2 -t 1 -f null -` → "Unrecognized option 'vsync'." / `ffmpeg -f lavfi -i testsrc2 -t 1 -fps_mode passthrough -f null -` → 정상 종료 / `ffmpeg -fps_mode passthrough -i input.mp4 -c:v libx264 -f null -` → "cannot be applied to input url" 오류.
+- 본문 GPU 경로 명령: 글의 명령 그대로(`ffmpeg -hwaccel cuda -hwaccel_output_format cuda -i input.mp4 -vf scale_cuda=1280:720 -fps_mode passthrough -c:a copy -c:v h264_nvenc -b:v 5M output.mp4`, 입력은 testsrc2로 만든 2초 mp4) → 옵션 해석은 통과하고 "Unknown encoder 'h264_nvenc'"에서 멈춤(이 빌드에 NVENC 없음). 같은 배치에서 `scale_cuda`·`h264_nvenc`만 `scale`·`libx264`로 바꾸면 종료 코드 0.
 - 쓰이지 않은 옵션 확인: `ffmpeg -f lavfi -i testsrc2 -t 1 -c:v h264_videotoolbox -crf 23 -f null -` → "Codec AVOption crf (Constant Rate Factor value) has not been used for any stream." 경고 뒤 종료 코드 0.
 - 인코더 목록: `ffmpeg -encoders`의 VideoToolbox 항목은 `h264_videotoolbox`·`hevc_videotoolbox`·`prores_videotoolbox`.
 - NVENC 옵션은 FFmpeg 태그 n9.0.2의 `libavcodec/nvenc_h264.c`·`nvenc_hevc.c`·`nvenc_av1.c`·`nvenc.c` 원문으로 확인했습니다.

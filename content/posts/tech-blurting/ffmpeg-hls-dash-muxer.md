@@ -16,7 +16,7 @@ HLS와 DASH를 함께 내려고 ffmpeg 명령에 `-f hls` 출력과 `-f dash` �
 
 `-hls_time`을 주지 않으면 hls 먹서는 조각을 2초 목표로 자릅니다. 소스의 기본값은 2,000,000마이크로초이고([`hlsenc.c` 3133행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavformat/hlsenc.c#L3133)), 형식 문서도 기본값을 2로 적습니다([형식 문서 hls](https://ffmpeg.org/ffmpeg-formats.html#hls-2)). 키프레임이 2초마다 있는 10초 입력을 옵션 없이 넣자 조각 다섯 개가 모두 `#EXTINF:2.000000`이었습니다. 목록에 남기는 조각 수(`-hls_list_size`)의 기본값은 5입니다.
 
-이 값은 목표일 뿐입니다. 먹서는 영상 패킷 가운데 키프레임 표시가 붙은 것에서만 조각을 나눕니다([`hlsenc.c` 2490–2491행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavformat/hlsenc.c#L2490-L2491)). 그래서 조각 길이는 인코더의 키프레임 간격에 묶이고, 키프레임 간격을 고정하는 옵션은 [x264 글](/posts/tech-blurting/x264-live-rate-control-gop/)에서 다룹니다. 애플 저작 규격은 목표 길이로 6초를 권하므로(7.5) 2초는 지연을 줄이는 쪽으로 기운 기본값입니다([HLS 저작 규격](https://developer.apple.com/documentation/http-live-streaming/hls-authoring-specification-for-apple-devices)).
+이 값은 목표일 뿐입니다. 먹서는 영상 패킷 가운데 키프레임 표시가 붙은 것에서만 조각을 나눕니다([`hlsenc.c` 2490–2491행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavformat/hlsenc.c#L2490-L2491)). 그래서 조각 길이는 인코더의 키프레임 간격에 묶이고, 키프레임 간격을 고정하는 옵션은 [x264 글](/posts/tech-blurting/x264-live-rate-control-gop/)에서 다룹니다. 애플 저작 규격은 목표 길이로 6초를 권합니다(7.5, [HLS 저작 규격](https://developer.apple.com/documentation/http-live-streaming/hls-authoring-specification-for-apple-devices)).
 
 `-hls_init_time`은 목록이 처음 찰 때까지의 조각 길이입니다([`hlsenc.c` 2961행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavformat/hlsenc.c#L2961)). 키프레임 1초 간격 입력에 `-hls_init_time 1 -hls_time 4`를 주자 처음 조각 여섯 개가 1초, 이어서 3초 하나, 그 뒤가 4초였습니다. 첫 조각을 짧게 해 재생을 일찍 시작하게 하려는 옵션입니다.
 
@@ -66,7 +66,7 @@ ffmpeg의 출력 옵션은 출력마다 따로 걸리므로, 출력이 둘이면
 
 두 출력 쪽의 DASH 조각과 한 출력 쪽의 조각은 바이트 단위로 같았습니다. 같은 설정의 인코더가 같은 프레임을 두 번 압축했을 뿐입니다. 인코딩을 한 번만 하고 포장만 둘로 나누려면 출력을 둘로 두지 말고, 한 먹서가 두 목록을 쓰게 하거나 인코딩한 결과를 패키저에 넘겨야 합니다. 미디어를 한 벌로 맞춰도 인코딩은 줄지 않고 포장과 저장이 줄어든다는 점은 [CMAF 글](/posts/tech-blurting/cmaf-deep-dive/#2-cmaf-도입-효과--실제-절감-수치)에 있습니다.
 
-패키저에 넘길 때 MP4를 파이프로 보내는 방식은 동작하지 않습니다. `ffmpeg … -f mp4 -`는 「muxer does not support non seekable output」을 내고 헤더를 쓰지 못했습니다. MP4 먹서는 끝에서 앞으로 돌아가 `moov`를 고쳐 써야 하기 때문입니다. Shaka Packager 문서도 FFmpeg에서 넘길 때 MPEG-TS를 UDP나 이름 있는 파이프로 보내는 예를 듭니다([Shaka Packager v3.9.3 FFmpeg 파이프 문서](https://github.com/shaka-project/shaka-packager/blob/v3.9.3/docs/source/tutorials/ffmpeg_piping.rst)).
+패키저에 파이프로 넘길 때는 MP4 종류를 가려야 합니다. 조각이 아닌 MP4는 파이프로 보낼 수 없습니다. `ffmpeg … -f mp4 -`는 「muxer does not support non seekable output」을 내고 헤더를 쓰지 못했습니다. MP4 먹서가 다 쓴 뒤 앞으로 돌아가 `mdat` 상자의 크기 칸을 고쳐 써야 하기 때문입니다([movenc.c 9000–9010행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavformat/movenc.c#L9000-L9010)). 같은 먹서도 `-movflags frag_keyframe+empty_moov`로 조각 MP4를 만들면 파이프로 나갑니다. 소스에도 「조각으로 쓰면 되돌아갈 수 없는 출력도 괜찮다」는 주석이 있습니다([movenc.c 8241–8247행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavformat/movenc.c#L8241-L8247)). Shaka Packager 문서는 FFmpeg에서 넘길 때 MPEG-TS를 UDP나 이름 있는 파이프로 보내는 예를 듭니다([Shaka Packager v3.9.3 FFmpeg 파이프 문서](https://github.com/shaka-project/shaka-packager/blob/v3.9.3/docs/source/tutorials/ffmpeg_piping.rst)).
 
 ## dash 먹서 -hls_playlist는 조각 한 벌을 두 목록이 가리킵니다
 
@@ -121,7 +121,7 @@ FFmpeg 9.0.2의 hls · dash 먹서와 목록 작성 코드에는 LL-HLS의 부�
 - `independent_segments`: 같은 입력 20초를 `-g 300`, `-hls_time 2 -hls_flags independent_segments`로 썼습니다. 열린 GOP 시험의 원본은 `ffmpeg -f lavfi -t 12 -i testsrc2=size=640x360:rate=30 -c:v libx264 -preset veryfast -g 60 -keyint_min 60 -sc_threshold 0 -x264-params open-gop=1 og/src.mkv`이고, `ffmpeg -i og/src.mkv -c copy -f hls -hls_time 2 -hls_playlist_type vod -hls_flags independent_segments -hls_segment_filename og/seg_%03d.ts og/index.m3u8`로 잘랐습니다. 조각의 NAL 종류는 패킷 바이트를, 혼자 디코딩되는지는 `ffmpeg -i og/seg_001.ts -f framecrc -`로 확인했습니다.
 - `hls_allow_cache`: 4초 입력에 `-hls_allow_cache 1`을 주고 목록 머리를 읽었습니다. TS 조각이면 판 3 목록에, `-hls_segment_type fmp4`를 더하면 `#EXT-X-VERSION:7` 바로 아래에 `#EXT-X-ALLOW-CACHE:YES`가 들어갔습니다.
 - `hls_init_time`: `ffmpeg -f lavfi -t 30 -i testsrc2=size=640x360:rate=30 -c:v libx264 -preset veryfast -g 30 -sc_threshold 0 -f hls -hls_init_time 1 -hls_time 4 -hls_segment_filename it/seg_%03d.ts it/index.m3u8`, 조각 길이는 `ffprobe`의 `format=duration`입니다.
-- MP4 파이프: `ffmpeg -f lavfi -t 2 -i testsrc2=size=640x360:rate=30 -c:v libx264 -f mp4 - > /dev/null`
+- MP4 파이프: `ffmpeg -f lavfi -t 2 -i testsrc2=size=640x360:rate=30 -c:v libx264 -f mp4 - > /dev/null` → 「muxer does not support non seekable output」, 종료 코드 234. 조각 MP4: `ffmpeg -f lavfi -t 2 -i testsrc2=size=640x360:rate=30 -c:v libx264 -movflags frag_keyframe+empty_moov -f mp4 - > out.mp4` → 종료 코드 0.
 
 ## 출처
 

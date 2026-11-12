@@ -1,7 +1,7 @@
 ---
 title: "라이브 트랜스코딩 서버는 실시간 배속으로 수용량을 잽니다"
 date: 2026-06-22T15:38:47+09:00
-lastmod: "2026-11-13T03:16:18+09:00"
+lastmod: "2026-11-13T03:51:32+09:00"
 description: "라이브 트랜스코더 한 대에 넣을 채널 수는 CPU 사용률이 아니라 각 출력이 실시간 속도(speed 1.0)를 지키는지로 정합니다. 1080p30 입력을 세 화질로 인코딩하는 FFmpeg를 팬 없는 맥북에서 1개부터 8개까지 동시에 돌려 speed와 조각 지연을 쟀고, 같은 개수에서도 회차마다 결과가 크게 흔들린 것을 그대로 적었습니다. 수신·인코딩·포장을 나누는 이유, 디코딩을 한 번만 하는 사다리, GPU 서버의 세션·엔진 한도, 채우는 배치와 흩는 배치, 멈춘 인코더 감지, 재시작 뒤의 끊김 표시, 관리형 서비스의 과금 단위를 공식 문서로 정리했습니다."
 categories: ["tech-blurting"]
 tags: ["라이브 트랜스코딩", "FFmpeg", "x264", "HLS", "NVENC", "Kubernetes"]
@@ -30,7 +30,7 @@ flowchart TB
 
 ## 한 프로세스가 사다리 전체를 내면 디코딩과 스케일을 한 번만 합니다 {#6-트랜스코딩-클러스터--a10이-가성비-정점}
 
-화질마다 FFmpeg를 따로 띄우면 같은 입력을 화질 수만큼 디코딩합니다. Twitch는 2017년 글에서 FFmpeg 인스턴스 N개로 N개 화질을 만들면 "디코더 N개, 스케일러 N개, 인코더 N개"가 생긴다고 쓰고, 똑같은 디코더 N−1개는 없애야 한다는 점을 자체 트랜스코더(TwitchTranscoder)를 만든 이유 가운데 하나로 들었습니다([Twitch, FFmpeg vs TwitchTranscoder Part I](https://blog.twitch.tv/en/2017/10/10/live-video-transmuxing-transcoding-f-fmpeg-vs-twitch-transcoder-part-i-489c1c125f28/)). 같은 글은 HLS가 화질 사이의 조각 경계를 IDR 프레임에서 맞추라고 요구하는데, 서로 독립인 인코더는 그 정렬을 보장하지 못한다는 점도 짚습니다.
+화질마다 FFmpeg를 따로 띄우면 같은 입력을 화질 수만큼 디코딩합니다. Twitch는 2017년 글에서 FFmpeg 인스턴스 N개로 N개 화질을 만들면 "디코더 N개, 스케일러 N개, 인코더 N개"가 생긴다고 쓰고, 똑같은 디코더 N−1개는 없애야 한다는 점을 자체 트랜스코더(TwitchTranscoder)를 만든 이유 가운데 하나로 들었습니다([Twitch, FFmpeg vs TwitchTranscoder Part I](https://blog.twitch.tv/en/2017/10/10/live-video-transmuxing-transcoding-f-fmpeg-vs-twitch-transcoder-part-i-489c1c125f28/)). 같은 글은 HLS가 화질 사이의 조각 경계를 IDR 프레임에서 맞추라고 요구하는데, 원본을 재포장한 변형과 다시 인코딩한 변형은 IDR이 맞는다는 보장이 없다는 점도 짚습니다.
 
 FFmpeg 하나로도 디코딩을 한 번으로 줄일 수 있습니다. `split` 필터로 디코딩한 프레임을 갈래마다 나눠 스케일하고, 갈래마다 인코더를 붙입니다. 아래 「측정 조건」의 채널 명령이 그 형태이고, CPU 시간 차이는 [FFmpeg 글의 split 절](/posts/tech-blurting/ffmpeg-deep-dive/#9--filter_complex--멀티-입력출력)에 있습니다. 세 인코더에 같은 `-g 60 -sc_threshold 0`을 주면 같은 프레임에서 키프레임을 만듭니다. 이 측정의 1080p·720p·480p 출력은 20조각씩, 모두 `EXTINF:2.000000`이었고, 6번째 조각의 키프레임은 세 화질 모두 11.466667초 위치에 있었습니다.
 
@@ -44,7 +44,7 @@ FFmpeg `-progress`의 `speed`는 처리한 미디어 시간을 흐른 벽시계 
 {"grid":{"left":8,"right":24,"top":40,"bottom":8,"containLabel":true},"legend":{"top":0,"data":["첫 회차","둘째 회차"]},"xAxis":{"type":"category","name":"동시 채널 수","data":["1","2","3","4","5","6","8"]},"yAxis":{"type":"value","name":"speed","min":0.4,"max":1.1,"interval":0.1},"series":[{"name":"첫 회차","type":"line","symbolSize":10,"itemStyle":{"color":"#087f8b"},"lineStyle":{"color":"#087f8b","width":3},"label":{"show":true,"position":"top","formatter":"{c}"},"markLine":{"symbol":"none","silent":true,"lineStyle":{"color":"#172c40","type":"dashed","width":2},"label":{"show":false},"data":[{"yAxis":1}]},"data":[1.01,1.01,1.01,0.9,0.99,0.75,0.52]},{"name":"둘째 회차","type":"line","symbolSize":10,"itemStyle":{"color":"#7a8a9b"},"lineStyle":{"color":"#7a8a9b","width":3},"label":{"show":true,"position":"bottom","formatter":"{c}"},"data":[null,null,0.98,0.7,0.52,0.63,null]}]}
 {{< /chart >}}
 
-첫 회차만 보면 3개까지는 실시간을 지키고 4개부터 무너졌지만, 5개(0.99)가 4개(0.90)보다 나았고 둘째 회차에서는 4개가 0.70, 5개가 0.52까지 떨어졌습니다. 같은 기계, 같은 명령인데 몇 분 사이에 결과가 이만큼 다릅니다. 이 맥북은 팬이 없어 부하가 길어지면 클럭을 낮출 수 있고, 측정하는 동안 다른 세션의 프로세스가 CPU 4–5코어 분량을 쓰고 있었습니다. 온도와 클럭은 기록하지 않았으므로 어느 쪽이 얼마나 기여했는지는 모릅니다.
+첫 회차만 보면 3개까지는 실시간을 지키고 4개부터 무너졌지만, 5개(0.99)가 4개(0.90)보다 나았고 둘째 회차에서는 4개가 0.70, 5개가 0.52까지 떨어졌습니다. 같은 기계, 같은 명령인데 몇 분 사이에 결과가 이만큼 다릅니다. 이 맥북은 팬이 없어 부하가 길어지면 클럭을 낮출 수 있습니다. 둘째 회차 앞뒤에 잰 FFmpeg 밖 프로세스만 해도 CPU 4–5코어 분량을 쓰고 있었고, 같은 시기에 돌던 다른 FFmpeg 실험은 이 값에 들어 있지 않습니다. 첫 회차는 이 부하를 기록하지 않았습니다. 온도와 클럭도 기록하지 않았으므로 어느 쪽이 얼마나 기여했는지는 모릅니다.
 
 speed가 1을 밑돌 때 시청자에게 보이는 것은 조각이 늦게 나오는 일입니다. [[fig-speed-below-realtime]]은 첫 회차의 3개 실행과 6개 실행에서 채널 하나의 1080p 조각이 실제로 완성된 시각을 실시간 기준 시각(흐린 눈금) 위에 찍은 것입니다.
 
@@ -100,7 +100,7 @@ ffmpeg -f lavfi -i testsrc2=size=640x360:rate=30 -t 4 -c:v libx264 -preset veryf
 
 - 수행: AI(Claude Code)가 2026년 11월 13일 02:34–02:45(KST)에 실행했습니다. 첫 회차는 N=1, 2, 3, 4, 5, 6, 8을 차례로, 둘째 회차는 그 직후 N=3, 4, 5, 6을 차례로 한 번씩 돌렸습니다.
 - 기종: MacBook Air(Mac17,3, 팬 없음), Apple M5 10코어(고성능 4 · 효율 6), 메모리 32GB, macOS 27.0.1. FFmpeg 9.0.2(Homebrew), x264 core 165 r3222.
-- 같은 기계에서 다른 세션의 작업(브라우저, 파일 감시, 다른 실험)이 함께 돌았습니다. 둘째 회차 시작 전과 끝에 FFmpeg가 아닌 프로세스의 CPU 사용률 합(`ps`의 %CPU 합)은 약 395%와 527%였습니다. 온도와 클럭은 기록하지 않았습니다.
+- 같은 기계에서 다른 세션의 작업(브라우저, 파일 감시, 다른 실험)이 함께 돌았습니다. 둘째 회차 시작 전과 끝에 FFmpeg가 아닌 프로세스의 CPU 사용률 합(`ps`의 %CPU 합)은 약 395%와 527%였습니다. 이 값에는 같은 시기에 다른 세션이 돌린 FFmpeg 실험이 빠져 있습니다. 첫 회차는 이 값을 기록하지 않았고, 시작 때 load average는 60.40이었습니다(바로 앞에 돈 preset 측정이 끝날 때는 125.12, 두 값 모두 이 측정의 x264 스레드를 포함할 수 있음). 온도와 클럭은 기록하지 않았습니다.
 - 채널 하나(N개를 동시에 띄움, 각 40초):
 
 ```bash

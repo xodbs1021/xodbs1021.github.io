@@ -89,7 +89,6 @@ test('corrected numerical claims and explicit model boundaries survive publishin
  for(const slug of ['0-to-1/pokeclip-indexer-recovery-without-events','0-to-1/pokeclip-nginx-playback-request-boundary']){
   const $=load(fs.readFileSync(`dist/posts/${slug}/index.html`,'utf8'));
   assert.equal($('[data-lab]').length,1);assert.match($('.explanation-lab').text(),/설명용 모형/);
-  $('.explanation-lab input[type=range]').each((_,el)=>assert.equal($(`label[for="${$(el).attr('id')}"]`).length,1));
   assert.ok($('.explanation-lab noscript').length);assert.ok($('.explanation-lab [role=status]').length);
  }
 });

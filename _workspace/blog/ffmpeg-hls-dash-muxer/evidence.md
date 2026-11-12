@@ -29,3 +29,5 @@
 
 ## 옛 ffmpeg-deep-dive에서 이 글로 옮기며 바로잡은 것
 hls_time을 「GOP 정렬」로만 설명하던 것(기본값 2초 · 키프레임 분할로), independent_segments가 키프레임을 보장한다는 서술(태그만), EXT-X-ALLOW-CACHE 사용 권장(프로토콜 7에서 삭제), event 「자연 전환」(list_size 0 강제 · 정상 종료 시에만 ENDLIST), var_stream_map 예시의 -b:v 반복(마지막 값만), 「Netflix 다국어」 근거 없음(삭제), WebVTT 마스터 참조(미확인 — 삭제), CMAF 공유 「비용 절반」(두 출력이면 인코딩 두 번), -hls_init_time을 LL-HLS로 설명(첫 조각 길이), FFmpeg LL-HLS 「한계」(파트 없음), ffmpeg -f mp4 - | packager 'in=-'(mp4는 non-seekable 출력 불가).
+| 조각이 아닌 MP4는 파이프 불가(mdat 크기 되쓰기), frag_keyframe+empty_moov 조각 MP4는 파이프 가능 | FFmpeg 9.0.2 실측(종료 코드 234 / 0), movenc.c n9.0.2 8241–8247·9000–9010 | 실측·소스 |
+리뷰 반영(2026-11-13): MP4 파이프 문장을 「조각이 아닌 MP4만 불가, 조각 MP4는 가능」으로, 원인을 moov가 아니라 mdat 크기 칸 되쓰기로 정정. hls_time 2초 기본값 해석 문장 삭제.

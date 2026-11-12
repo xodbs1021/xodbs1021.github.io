@@ -1,4 +1,4 @@
-# E1 해상도 × 비트레이트 격자의 VMAF (2026-11-13 02:50–03:10 KST, AI(Claude Code) 실행)
+# E1 해상도 × 비트레이트 격자의 VMAF (2026-11-13 새벽, 결과 표 기록 02:57:56 KST, AI(Claude Code) 실행)
 기종: MacBook Air(Apple M5, 고성능 4·효율 6코어, 32GB, 팬 없음), macOS 27.0.1, FFmpeg 9.0.2, x264 core 165 r3222, libvmaf 3.2.1(vmaf_v0.6.1)
 입력 ref.mkv: Sintel 예고편 1080p(Blender Foundation, CC BY 3.0) 20초부터 10초, FFV1 무손실, 1920x1080 24fps 240프레임. 원본이 H.264 약 2.1Mbps로 이미 압축된 영상, 위아래 검은 띠, 한 장면 묶음 10초.
 인코딩: ffmpeg -i ref.mkv -vf scale=W:H:flags=bicubic -c:v libx264 -preset medium -threads 4 -b:v Bk -maxrate Bk -bufsize 2Bk e_H_B.mp4
