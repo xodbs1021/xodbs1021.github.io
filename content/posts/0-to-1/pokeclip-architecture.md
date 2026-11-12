@@ -1,7 +1,7 @@
 ---
 title: "치지직 하이라이트 자동 추출 파이프라인 설계기 - PokeClip"
 date: 2026-06-13T00:52:51+09:00
-lastmod: "2026-11-11T06:13:36+09:00"
+lastmod: "2026-11-12T15:27:39+09:00"
 categories: ["0-to-1"]
 draft: false
 ---
@@ -41,7 +41,7 @@ draft: false
 
 처음엔 [obs-multi-rtmp](https://github.com/sorayuki/obs-multi-rtmp) 오픈소스 플러그인을 포크해서 한쪽은 RTMP, 한쪽은 SRT로 보내도록 수정하려 했다. 근데 OBS가 이미 네이티브로 멀티 출력을 지원한다는 걸 알게 됐다. 플러그인 수정 없이 OBS 설정에서 바로 SRT 출력 추가가 가능했다. 외부 의존 없이 더 안정적이라 그 방향으로 바꿨다.
 
-SRT+MPEG-TS를 선택한 이유는 멀티 오디오 트랙 때문이다. MPEG-TS는 PID 구조로 하나의 스트림에 여러 트랙을 독립적으로 담을 수 있고, SRT는 그걸 안정적으로 전송한다. 프로토콜 선택 과정은 [이전 글](/posts/tech-blurting/rtmp-mpeg-ts-srt/)에 따로 정리해뒀다.
+SRT+MPEG-TS를 선택한 이유는 멀티 오디오 트랙 때문이다. MPEG-TS는 PID 구조로 하나의 스트림에 여러 트랙을 독립적으로 담을 수 있고, SRT는 그걸 안정적으로 전송한다. MPEG-TS가 PID로 오디오 트랙을 나누는 구조는 [이 글](/posts/tech-blurting/rtmp-mpeg-ts-srt/)에 따로 정리했다.
 
 ---
 
