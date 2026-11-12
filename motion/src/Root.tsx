@@ -3,6 +3,11 @@ import { RETRANSMIT_WINDOW_FRAMES, RetransmitWindow } from "./scenes/srt-broadca
 import { WHIP_ROUND_TRIPS_FRAMES, WhipRoundTrips } from "./scenes/whip-whep-modern-ingest/WhipRoundTrips";
 import { ICE_CANDIDATE_PAIRS_FRAMES, IceCandidatePairs } from "./scenes/webrtc-deep-dive/IceCandidatePairs";
 import { PID_DEMUX_FRAMES, PidDemux } from "./scenes/rtmp-mpeg-ts-srt/PidDemux";
+import { PLAYLIST_SLIDE_FRAMES, PlaylistSlide } from "./scenes/hls-just-files/PlaylistSlide";
+import { HOLD_BACK_START_FRAMES, HoldBackStart } from "./scenes/hls-deep-dive/HoldBackStart";
+import { BLOCKING_PART_FLOW_FRAMES, BlockingPartFlow } from "./scenes/ll-hls-deep-dive/BlockingPartFlow";
+import { CHUNKED_SEGMENT_FRAMES, ChunkedSegment } from "./scenes/cmaf-deep-dive/ChunkedSegment";
+import { TEMPLATE_VS_RELOAD_FRAMES, TemplateVsReload } from "./scenes/dash-vs-hls/TemplateVsReload";
 import { CONNECTION_TOKEN_LIFETIME_FRAMES, ConnectionTokenLifetime } from "./scenes/pokeclip-shared-db-auth-iam-tls/ConnectionTokenLifetime";
 import { TOKEN_TO_VERIFIED_DB_FRAMES, TokenToVerifiedDb } from "./scenes/pokeclip-shared-db-auth-iam-tls/TokenToVerifiedDb";
 import { Composition } from "remotion";
@@ -679,6 +684,56 @@ export const RemotionRoot: React.FC = () => (
       component={PidDemux}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={PID_DEMUX_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="PlaylistSlide" component={PlaylistSlide} durationInFrames={PLAYLIST_SLIDE_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="PlaylistSlideMobile"
+      component={PlaylistSlide}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={PLAYLIST_SLIDE_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="HoldBackStart" component={HoldBackStart} durationInFrames={HOLD_BACK_START_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="HoldBackStartMobile"
+      component={HoldBackStart}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={HOLD_BACK_START_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="BlockingPartFlow" component={BlockingPartFlow} durationInFrames={BLOCKING_PART_FLOW_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="BlockingPartFlowMobile"
+      component={BlockingPartFlow}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={BLOCKING_PART_FLOW_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="ChunkedSegment" component={ChunkedSegment} durationInFrames={CHUNKED_SEGMENT_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="ChunkedSegmentMobile"
+      component={ChunkedSegment}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={CHUNKED_SEGMENT_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="TemplateVsReload" component={TemplateVsReload} durationInFrames={TEMPLATE_VS_RELOAD_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="TemplateVsReloadMobile"
+      component={TemplateVsReload}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={TEMPLATE_VS_RELOAD_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}

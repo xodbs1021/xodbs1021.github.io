@@ -1,0 +1,67 @@
+[styp] size=8+16
+[moof] size=8+160
+  [mfhd] size=12+4
+    sequence number = 1
+  [traf] size=8+136
+    [tfhd] size=12+20, flags=2003a
+      track ID = 1
+      sample description index = 1
+      default sample duration = 512
+      default sample size = 21065
+      default sample flags = 1010000
+    [tfdt] size=12+8, version=1
+      base media decode time = 0
+    [trun] size=12+72, flags=205
+      sample count = 15
+      data offset = 176
+      first sample flags = 2000000
+[mdat] size=8+191479
+[moof] size=8+156
+  [mfhd] size=12+4
+    sequence number = 2
+  [traf] size=8+132
+    [tfhd] size=12+20, flags=2003a
+      track ID = 1
+      sample description index = 1
+      default sample duration = 512
+      default sample size = 12161
+      default sample flags = 1010000
+    [tfdt] size=12+8, version=1
+      base media decode time = 7680
+    [trun] size=12+68, flags=201
+      sample count = 15
+      data offset = 172
+[mdat] size=8+184744
+[moof] size=8+160
+  [mfhd] size=12+4
+    sequence number = 3
+  [traf] size=8+136
+    [tfhd] size=12+20, flags=2003a
+      track ID = 1
+      sample description index = 1
+      default sample duration = 512
+      default sample size = 25507
+      default sample flags = 1010000
+    [tfdt] size=12+8, version=1
+      base media decode time = 15360
+    [trun] size=12+72, flags=205
+      sample count = 15
+      data offset = 176
+      first sample flags = 2000000
+[mdat] size=8+198043
+[moof] size=8+156
+  [mfhd] size=12+4
+    sequence number = 4
+  [traf] size=8+132
+    [tfhd] size=12+20, flags=2003a
+      track ID = 1
+      sample description index = 1
+      default sample duration = 512
+      default sample size = 12069
+      default sample flags = 1010000
+    [tfdt] size=12+8, version=1
+      base media decode time = 23040
+    [trun] size=12+68, flags=201
+      sample count = 15
+      data offset = 172
+[mdat] size=8+189506

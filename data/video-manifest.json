@@ -77,6 +77,32 @@
       "poster": "/images/clip-edit-recipe-render-boundary-recipe-rerender-mobile-poster.jpg"
     }
   },
+  "cmaf-deep-dive-chunked-segment": {
+    "scene": "ChunkedSegment",
+    "alt": "왼쪽 seg-1.m4s 상자에 styp 아래로 moof와 mdat로 된 청크가 tfdt 0, 7680, 15360, 23040 순서로 하나씩 차오르고, 청크가 완성될 때마다 오른쪽 LL-HLS 목록에 EXT-X-PART DURATION=0.5 줄이 하나씩 붙는다. 네 번째 청크가 끝나면 목록에 EXTINF 2.000과 seg-1.m4s 줄이 붙는다",
+    "sha256": "ceb0f4bf86765b07977d750aa5b921a03efda07de1d69fbe6c0c8a7bb2646498",
+    "bytes": 289293,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/cmaf-deep-dive-chunked-segment-poster.jpg",
+    "mobile": {
+      "sha256": "3df3863fe4500a488c6ab6af06cc9c682992209c49517d8ef2cf9d93b27fc09f",
+      "bytes": 330353,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/cmaf-deep-dive-chunked-segment-mobile-poster.jpg"
+    }
+  },
   "coverage-gate-that-fails-when-tests-disappear-coverage-gate-runs": {
     "scene": "CoverageGateRuns",
     "alt": "「① 정상 실행」 「② 테스트 파일 하나 제외」 「③ 임시 커밋 제거 후 재실행」 세 칸이 차례로 켜진다. 칸마다 작은 네모 9개가 청록으로 채워지며 「9개 패키지 테스트 ok」가 뜨고, 점선 「80%」 기준선 위로 index 막대가 오른다. 첫째와 셋째 막대는 「index 81.8%」까지 올라 「게이트 통과」가 뜨고, 둘째 막대는 빨간색으로 「index 52.3%」에서 멈춰 기준선 아래에 머물며 「게이트 실패」가 뜨는 장면",
@@ -103,6 +129,32 @@
       "poster": "/images/coverage-gate-that-fails-when-tests-disappear-coverage-gate-runs-mobile-poster.jpg"
     }
   },
+  "dash-vs-hls-template-vs-reload": {
+    "scene": "TemplateVsReload",
+    "alt": "위쪽에 12번, 13번, 14번 조각 칸이 있고 13번과 14번이 차례로 완성된다. 왼쪽 HLS 칸에는 조각마다 목록 다시 받기와 GET seg 요청이 차례로 쌓여 네트워크 요청이 4번이 되고, 오른쪽 DASH 칸에는 시계 t=26초에서 13번, t=28초에서 14번을 계산하는 점선 칸과 GET 요청만 쌓여 네트워크 요청이 2번이 된다",
+    "sha256": "778fb57a0cb67159bfb4ae04330c9baddbc5a49674daa45e7a1f48e87bf83e7b",
+    "bytes": 231381,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/dash-vs-hls-template-vs-reload-poster.jpg",
+    "mobile": {
+      "sha256": "2bc2ac70b3e32bbbae80019f460f87a1c418137c6aa8d0b230e2631a843b493f",
+      "bytes": 209144,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/dash-vs-hls-template-vs-reload-mobile-poster.jpg"
+    }
+  },
   "harness-session-isolation-worktree-root-session-state-split": {
     "scene": "SessionStateSplit",
     "alt": "위에 「세션 A · 워크트리 A」와 「세션 B · 워크트리 B」 상자가 있다. 두 세션에서 점이 하나씩 선을 따라 내려와 아래 「공유 상태 폴더 하나」에 나란히 앉고, 세션 A가 빨개지며 「B의 표식 때문에 종료 차단」이 뜬다. 이어 공유 폴더가 청록 「A의 상태」와 「B의 상태」 두 폴더로 갈라지고, 점이 각자 바로 아래 자기 폴더로 내려가며 「A의 표식만 읽음」과 맨 아래 회색 「전: 공유 폴더 하나 → A가 B의 표식 때문에 종료 차단」이 뜨는 장면",
@@ -127,6 +179,84 @@
       "audio": 0,
       "faststart": true,
       "poster": "/images/harness-session-isolation-worktree-root-session-state-split-mobile-poster.jpg"
+    }
+  },
+  "hls-deep-dive-hold-back-start": {
+    "scene": "HoldBackStart",
+    "alt": "6초 조각 칸이 시간축에 늘어서 있고 목록 끝 표시가 마지막 완성 조각 뒤에 있다. 재생점은 목록 끝에서 18초 뒤인 시작 위치에 서고, 그 구간에 목표 길이 6초 × 3 = 18초 띠가 붙는다. 오른쪽의 만드는 중인 조각이 다 차면 목록 끝이 한 칸 뛰고, 재생점과 지금 시각 사이에 시청 지연 표시가 따라간다. 아래에 목록이 바뀌었으면 6초 뒤, 그대로면 3초 뒤 다시 받는다는 이름표가 있다",
+    "sha256": "e93960fea3bbd0ae0fab96b88bb47e9cc1b96adecca38959fb10f2a40596381e",
+    "bytes": 253337,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/hls-deep-dive-hold-back-start-poster.jpg",
+    "mobile": {
+      "sha256": "c0362976729e19310ce98587d3aa1a0d513cc244cd8f576995d3b60ff2ff3432",
+      "bytes": 239216,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/hls-deep-dive-hold-back-start-mobile-poster.jpg"
+    }
+  },
+  "hls-just-files-playlist-slide": {
+    "scene": "PlaylistSlide",
+    "alt": "라이브 미디어 목록 화면에서 EXT-X-MEDIA-SEQUENCE가 100이고 seg100부터 seg105까지 EXTINF 줄 여섯 개가 있다. 끝에 seg106 줄이 붙자 맨 앞 seg100 줄이 지워지며 번호가 101로 오르고, 한 번 더 seg107이 붙고 seg101이 빠져 102가 된 뒤 마지막 줄에 EXT-X-ENDLIST가 붙는다",
+    "sha256": "ff484da779d79c5786e898579d62b4cdf8f3bddffadcfeb548900693242bc96e",
+    "bytes": 318471,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/hls-just-files-playlist-slide-poster.jpg",
+    "mobile": {
+      "sha256": "3843860847eb7963fe95f481381ee0028a105abd349b71b6b665dbc677a7f9ac",
+      "bytes": 343797,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/hls-just-files-playlist-slide-mobile-poster.jpg"
+    }
+  },
+  "ll-hls-deep-dive-blocking-part-flow": {
+    "scene": "BlockingPartFlow",
+    "alt": "위쪽에 seg42의 파트 0과 1이 완성돼 있고 파트 2가 차는 중이다. 플레이어가 서버로 _HLS_msn=42와 _HLS_part=2 목록 요청, 그리고 PRELOAD-HINT로 알게 된 파트 2 요청을 보내면 서버 옆에 보류가 뜬다. 파트 2가 완성되는 순간 서버가 목록과 파트 2를 함께 돌려주고, 플레이어는 곧바로 파트 3에 대해 같은 두 요청을 보내 다시 보류된다",
+    "sha256": "4446606d19a44fac9d319b446478fc0c5d0f9b086e8fef0b38b1a30d8e81797c",
+    "bytes": 162106,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/ll-hls-deep-dive-blocking-part-flow-poster.jpg",
+    "mobile": {
+      "sha256": "e0fdf973475f68f40b56ea83f8e9c25cd062c040d781f6d9674c26e028521e83",
+      "bytes": 112437,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/ll-hls-deep-dive-blocking-part-flow-mobile-poster.jpg"
     }
   },
   "media-ci-path-filter-required-check-tradeoff-protection-first-order": {

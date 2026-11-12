@@ -492,5 +492,45 @@
     "posterFrame": 320,
     "alt": "영상 0x100과 오디오 0x101–0x106에서 나온 패킷 칸이 MPEG-TS 한 흐름 관 하나에 섞여 지나가고, 먼저 지난 PAT · PMT 칸이 PID와 트랙의 대응을 적은 표 상자로 들어간 뒤 나머지 칸이 PID에 맞는 7개 줄로 갈라져 쌓이며 영상 줄이 가장 길어지고 오디오6 줄 끝에 0x106만 꺼냄이 뜬다",
     "mobile": true
+  },
+  {
+    "id": "PlaylistSlide",
+    "post": "hls-just-files",
+    "kind": "video",
+    "posterFrame": 320,
+    "alt": "라이브 미디어 목록 화면에서 EXT-X-MEDIA-SEQUENCE가 100이고 seg100부터 seg105까지 EXTINF 줄 여섯 개가 있다. 끝에 seg106 줄이 붙자 맨 앞 seg100 줄이 지워지며 번호가 101로 오르고, 한 번 더 seg107이 붙고 seg101이 빠져 102가 된 뒤 마지막 줄에 EXT-X-ENDLIST가 붙는다",
+    "mobile": true
+  },
+  {
+    "id": "HoldBackStart",
+    "post": "hls-deep-dive",
+    "kind": "video",
+    "posterFrame": 320,
+    "alt": "6초 조각 칸이 시간축에 늘어서 있고 목록 끝 표시가 마지막 완성 조각 뒤에 있다. 재생점은 목록 끝에서 18초 뒤인 시작 위치에 서고, 그 구간에 목표 길이 6초 × 3 = 18초 띠가 붙는다. 오른쪽의 만드는 중인 조각이 다 차면 목록 끝이 한 칸 뛰고, 재생점과 지금 시각 사이에 시청 지연 표시가 따라간다. 아래에 목록이 바뀌었으면 6초 뒤, 그대로면 3초 뒤 다시 받는다는 이름표가 있다",
+    "mobile": true
+  },
+  {
+    "id": "BlockingPartFlow",
+    "post": "ll-hls-deep-dive",
+    "kind": "video",
+    "posterFrame": 320,
+    "alt": "위쪽에 seg42의 파트 0과 1이 완성돼 있고 파트 2가 차는 중이다. 플레이어가 서버로 _HLS_msn=42와 _HLS_part=2 목록 요청, 그리고 PRELOAD-HINT로 알게 된 파트 2 요청을 보내면 서버 옆에 보류가 뜬다. 파트 2가 완성되는 순간 서버가 목록과 파트 2를 함께 돌려주고, 플레이어는 곧바로 파트 3에 대해 같은 두 요청을 보내 다시 보류된다",
+    "mobile": true
+  },
+  {
+    "id": "ChunkedSegment",
+    "post": "cmaf-deep-dive",
+    "kind": "video",
+    "posterFrame": 320,
+    "alt": "왼쪽 seg-1.m4s 상자에 styp 아래로 moof와 mdat로 된 청크가 tfdt 0, 7680, 15360, 23040 순서로 하나씩 차오르고, 청크가 완성될 때마다 오른쪽 LL-HLS 목록에 EXT-X-PART DURATION=0.5 줄이 하나씩 붙는다. 네 번째 청크가 끝나면 목록에 EXTINF 2.000과 seg-1.m4s 줄이 붙는다",
+    "mobile": true
+  },
+  {
+    "id": "TemplateVsReload",
+    "post": "dash-vs-hls",
+    "kind": "video",
+    "posterFrame": 320,
+    "alt": "위쪽에 12번, 13번, 14번 조각 칸이 있고 13번과 14번이 차례로 완성된다. 왼쪽 HLS 칸에는 조각마다 목록 다시 받기와 GET seg 요청이 차례로 쌓여 네트워크 요청이 4번이 되고, 오른쪽 DASH 칸에는 시계 t=26초에서 13번, t=28초에서 14번을 계산하는 점선 칸과 GET 요청만 쌓여 네트워크 요청이 2번이 된다",
+    "mobile": true
   }
 ]

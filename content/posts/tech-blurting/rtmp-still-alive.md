@@ -1,7 +1,7 @@
 ---
 title: "Flash 없이도 방송 송출 주소가 rtmp로 시작하는 이유"
 date: 2026-06-20T03:09:07+09:00
-lastmod: "2026-11-12T15:32:05+09:00"
+lastmod: "2026-11-12T22:56:00+09:00"
 description: "Flash Player는 2020년 말 지원이 끝났지만 OBS 내장 서비스 84개 가운데 81개가 rtmp·rtmps 주소로 송출합니다. RTMP가 Flash 부속 규약에서 송출 입구가 된 경위, 핸드셰이크·connect·publish 순서, 청크 인터리빙, 트랙 번호가 없던 옛 사양과 Enhanced RTMP, OBS가 프레임을 버리는 기준, SRT·RIST·WHIP과 견줄 때 볼 것을 공식 사양과 OBS 소스로 확인했습니다."
 categories: ["tech-blurting"]
 tags: ["RTMP", "Enhanced RTMP", "OBS", "SRT", "WHIP", "라이브 송출"]
@@ -139,4 +139,4 @@ RTMP를 다른 규약으로 바꿀지 고를 때 갈리는 질문은 「규약�
 - [Haivision, 「Haivision and Wowza Form SRT Alliance」 (2017-04)](https://www.haivision.com/about/press-releases/haivision-wowza-form-srt-alliance-support-new-open-source-low-latency-video-streaming-initiative/)
 - [VSF TR-06-1 RIST Simple Profile (2018-10-17)](https://static.vsf.tv/download/technical_recommendations/VSF_TR-06-1_2018_10_17.pdf)
 
-다음 편: [라이브 영상이 그냥 파일이라고? — HLS의 미친 발상](/posts/tech-blurting/hls-just-files/)
+다음 편: [HLS는 라이브 영상을 재생 목록과 조각 파일로 나눕니다](/posts/tech-blurting/hls-just-files/)
