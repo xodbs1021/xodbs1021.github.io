@@ -1,0 +1,40 @@
+# 인코더를 다시 띄워 같은 목록에 이어 쓸 때의 끊김 표시 (2026-11-13, AI(Claude Code) 실행, FFmpeg 9.0.2, macOS 27.0.1)
+아래 명령을 같은 폴더에서 두 번 실행(두 번째가 재시작한 인코더 역할)
+ffmpeg -f lavfi -i testsrc2=size=640x360:rate=30 -t 4 -c:v libx264 -preset veryfast -g 60 -sc_threshold 0 -f hls -hls_time 2 -hls_list_size 0 -hls_flags append_list+discont_start live.m3u8
+
+## 결과 live.m3u8
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:2
+#EXT-X-MEDIA-SEQUENCE:0
+#EXT-X-DISCONTINUITY
+#EXT-X-DISCONTINUITY
+#EXTINF:2.000000,
+live0.ts
+#EXTINF:2.000000,
+live1.ts
+#EXT-X-DISCONTINUITY
+#EXTINF:2.000000,
+live2.ts
+#EXTINF:2.000000,
+live3.ts
+#EXT-X-ENDLIST
+
+## 조각 첫 영상 pts(초)
+live0.ts 1.466667,
+live1.ts 3.466667,
+live2.ts 1.466667,
+live3.ts 3.466667,
+
+## 첫 실행만 한 목록(새 폴더에서 같은 명령 한 번)
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:2
+#EXT-X-MEDIA-SEQUENCE:0
+#EXT-X-DISCONTINUITY
+#EXT-X-DISCONTINUITY
+#EXTINF:2.000000,
+live0.ts
+#EXTINF:2.000000,
+live1.ts
+#EXT-X-ENDLIST

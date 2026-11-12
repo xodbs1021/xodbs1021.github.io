@@ -1,0 +1,28 @@
+# F 동시 채널 수 대 speed (2026-11-13 02:34–02:45 KST, AI(Claude Code) 실행)
+기종: MacBook Air(Mac17,3, 팬 없음), Apple M5 10코어(고성능 4·효율 6), 32GB, macOS 27.0.1, FFmpeg 9.0.2(Homebrew), x264 core 165 r3222
+같은 기계에 다른 세션 작업(브라우저·파일 감시·다른 실험)이 돌았음: 2회차 시작 전 ffmpeg 아닌 프로세스 CPU 합 약 395%, 끝 527%(ps %CPU 합). 1회차 → 2회차로 갈수록 같은 N에서 speed가 떨어짐(팬 없는 기종의 지속 부하 + 다른 작업).
+
+채널 하나(N개를 동시에 띄움, 각 40초):
+one(){ # $1=run dir
+  mkdir -p $1
+  ffmpeg -hide_banner -loglevel error -nostdin -y -re -f lavfi -i testsrc2=size=1920x1080:rate=30 -t $DUR \
+    -filter_complex "[0:v]split=3[a][b][c];[b]scale=1280:720[b2];[c]scale=854:480[c2]" \
+    -map "[a]" -map "[b2]" -map "[c2]" -c:v libx264 -preset veryfast -g 60 -sc_threshold 0 \
+    -b:v:0 6000k -b:v:1 3000k -b:v:2 1200k -f hls -hls_time 2 -hls_list_size 0 \
+    -var_stream_map "v:0 v:1 v:2" -hls_segment_filename "$1/v%v_%03d.ts" -progress $1/progress.txt "$1/v%v.m3u8"
+}
+
+판정: 각 프로세스 -progress 마지막 speed, 조각 지연 = v0 조각 k 파일의 수정 시각 - 시작 - (2k+2)초(-re라 조각 k가 가장 빨리 끝날 수 있는 시각 기준), seg18 = 마지막 온전한 조각
+
+N=1 wall=39.6s final_speed min=1.010 mean=1.010 max=1.010 seg_late_max=0.52s seg18_late_mean=0.52s
+N=2 wall=39.7s final_speed min=1.010 mean=1.010 max=1.010 seg_late_max=0.52s seg18_late_mean=0.51s
+N=3 wall=39.8s final_speed min=1.010 mean=1.010 max=1.010 seg_late_max=0.58s seg18_late_mean=0.54s
+N=4 wall=44.8s final_speed min=0.893 mean=0.897 max=0.906 seg_late_max=6.84s seg18_late_mean=5.48s
+N=5 wall=40.8s final_speed min=0.982 mean=0.989 max=1.000 seg_late_max=3.22s seg18_late_mean=1.32s
+N=6 wall=53.4s final_speed min=0.749 mean=0.752 max=0.757 seg_late_max=14.37s seg18_late_mean=13.60s
+N=8 wall=77.6s final_speed min=0.516 mean=0.517 max=0.520 seg_late_max=38.30s seg18_late_mean=37.51s
+--- 2회차(1회차 직후 이어서)
+N=3 wall=41.0s final_speed min=0.976 mean=0.977 max=0.978 seg_late_max=2.02s seg18_late_mean=1.83s
+N=4 wall=57.4s final_speed min=0.698 mean=0.701 max=0.707 seg_late_max=18.43s seg18_late_mean=17.75s
+N=5 wall=77.7s final_speed min=0.515 mean=0.517 max=0.520 seg_late_max=38.56s seg18_late_mean=37.36s
+N=6 wall=64.8s final_speed min=0.618 mean=0.626 max=0.641 seg_late_max=26.11s seg18_late_mean=24.40s
