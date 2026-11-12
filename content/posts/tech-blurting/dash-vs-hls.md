@@ -1,366 +1,173 @@
 ---
-title: "DASH가 기술적으로 더 좋은데 왜 HLS가 이겼나"
+title: "DASH는 목록 대신 MPD 규칙으로 조각 주소를 계산합니다"
 date: 2026-06-20T04:17:40+09:00
+lastmod: "2026-11-12T22:00:00+09:00"
+description: "HLS 플레이어는 조각 주소가 적힌 목록을 계속 다시 받고, DASH 플레이어는 MPD의 SegmentTemplate 규칙과 시계로 조각 번호를 계산할 수 있습니다. MPEG의 제안 요청(2010-04)부터 ISO/IEC 23009-1 1판(2012-04)과 6판(2026-07)까지의 연혁, Period · AdaptationSet · Representation 계층과 HLS 태그의 대응, 광고 구간을 적는 Period와 DATERANGE, ContentProtection과 EXT-X-KEY, 기기별 기본 재생기와 저지연 모드를 규격 · 공식 문서로 비교했습니다."
 categories: ["tech-blurting"]
+tags: ["DASH", "MPD", "HLS", "SegmentTemplate", "DRM", "Media3"]
 draft: false
 ---
 
-기술 표준의 역사에서 자주 보이는 패턴이 있다. **기술적으로 더 우수한 게 시장에서 진다.**
+HLS 플레이어는 라이브 내내 조각 주소가 적힌 목록을 다시 받아야 다음 조각을 알 수 있습니다. DASH(Dynamic Adaptive Streaming over HTTP)의 MPD(Media Presentation Description)는 조각 주소를 하나씩 적지 않고 `SegmentTemplate`이라는 규칙으로 적을 수 있어, 플레이어가 시계와 그 규칙으로 다음 조각 번호를 계산합니다. DASH는 MPEG가 2010년 4월 HTTP 스트리밍 제안을 요청해 만든 국제 표준으로, ISO/IEC 23009-1 1판이 2012년 4월에 나왔고 지금은 2026년 7월의 6판입니다. 어느 쪽을 낼지는 표현력보다 대상 기기의 기본 재생기와 DRM이 정합니다. Apple 기기의 기본 재생기는 HLS를 받고, Android의 Media3는 둘 다 받습니다.
 
-영상 스트리밍이 정확히 그렇다. DASH는 ISO/IEC가 정식 국제 표준으로 만든 프로토콜이다. 코덱이 자유롭고, 광고 비즈니스에 유리하고, DRM 통합이 깔끔하다. HLS보다 모든 면에서 진보적이다.
+## DASH는 HTTP 적응 스트리밍을 ISO 표준으로 맞추려고 나왔습니다 {#1-dash의-출신--isoiec의-apple-견제}
 
-근데 2024년 시장 점유율을 보면 HLS 60%, DASH 32%. HLS가 두 배.
+2010년 무렵 HTTP로 화질을 바꿔 가며 보내는 방식은 회사마다 달랐습니다. Apple의 HLS는 개인 제출 인터넷 드래프트였고, 3GPP는 2010년 3월 Release 9에서 자체 적응 HTTP 스트리밍(AHS)을 마쳤습니다. MPEG(ISO/IEC JTC 1/SC 29/WG 11)은 2010년 4월 드레스덴 회의에서 「HTTP Streaming of MPEG Media」 제안 요청(N11338)을 냈습니다. Qualcomm의 Thomas Stockhammer는 이 경위를 W3C 워크숍 논문에 정리했습니다([Stockhammer, 2010](https://www.w3.org/2010/11/web-and-tv/papers/webtv2_submission_64.pdf)).
 
-[지난 글](../hls-just-files/)에서 HLS의 발상을 봤다면, 이번 글은 **DASH의 정체와 두 표준이 공존하는 산업의 현실**을 정리한 노트다. DASH가 어떻게 만들어졌고, 뭐가 다르고, 왜 더 좋은데도 못 이겼는지, 그리고 결국 어떻게 수렴하는지.
+| 날짜 | 일 | 근거 |
+|---|---|---|
+| 2010-04 | MPEG 제안 요청 N11338 | Stockhammer 논문 참고문헌 |
+| 2011-11 | 각국 표준 기관 투표로 ISO/IEC 23009-1 승인, 2011년 12월 98차 MPEG 회의에서 발표 | [98차 MPEG 회의 보고](https://multimediacommunication.blogspot.com/2011/12/mpeg-news-report-from-98th-meeting.html) |
+| 2011 | Qualcomm · Netflix · Microsoft · Akamai · Ericsson · Samsung이 DASH-IF 시작, 2012년 정식 출범 | [SVTA 발표문](https://www.svta.org/2024/07/23/dash-if-becomes-part-of-the-svta/) |
+| 2012-04-03 | ISO/IEC 23009-1:2012(1판) 발행 | [IEC 웹스토어 판 기록](https://webstore.iec.ch/en/publication/114980) |
+| 2024-07-23 | DASH-IF가 SVTA(Streaming Video Technology Alliance)의 작업 그룹으로 합류 | SVTA 발표문 |
+| 2026-07-14 | ISO/IEC 23009-1:2026(6판) 발행 | IEC 웹스토어 |
 
----
+HLS 쪽은 2017년 RFC 8216(Informational)이 됐고, 개정 초안 22판이 RFC 편집자에게 넘어가 있습니다([HLS 기본 글](/posts/tech-blurting/hls-just-files/)). 한쪽은 ISO/IEC 국제 표준, 다른 쪽은 IETF 개인 제출 RFC라는 차이가 있지만, 둘 다 HTTP로 조각을 받는 같은 구조입니다.
 
-## 1. DASH의 출신 — ISO/IEC의 Apple 견제
+## MPD는 Period · AdaptationSet · Representation으로 나뉩니다 {#2-mpd의-계층-구조--xml로-모든-걸-표현}
 
-2009년 HLS가 나오고 1년 만에 모바일 영상 표준이 됐다. iPhone이 폭발적으로 팔리면서.
+MPD는 XML 문서이고 세 층으로 나뉩니다. Period는 시간 구간(본편, 광고), AdaptationSet은 서로 바꿔 쓸 수 있는 트랙 묶음(영상, 한국어 오디오), Representation은 그 묶음 안의 개별 판(1080p, 720p)입니다. [[fig-mpd-layers]]에서 조각 주소 규칙이 어디에 붙는지 보십시오.
 
-이 상황이 모든 비-Apple 진영을 불편하게 만들었다.
-
-```
-[2010년 영상 스트리밍 시장]
-시청자 측:
-- iOS: HLS (강제)
-- Android: 표준 없음 (각자 다른 방식)
-- 데스크탑: Flash + RTMP
-- 스마트TV: 제각각
-
-→ 콘텐츠 제공자는 같은 영상을 여러 방식으로 만들어야 함
-```
-
-Apple은 HLS 스펙을 IETF에 RFC로 제출했다. 그래도 인식은 **"Apple이 만든 것"**. Apple이 마음대로 바꿀 수 있는 표준.
-
-여기에 산업계가 대안을 만들기로 했다.
-
-![DASH vs HLS 출신](/images/dash-vs-hls-origin.png)
-
-영상 코덱 표준을 만드는 **MPEG (Moving Picture Experts Group)** 가 주도. Microsoft, Netflix, Samsung, Sony, Adobe, Google, Qualcomm 등 30개 이상 기업이 참여. 2011년 작업 시작, 2012년 11월 **MPEG-DASH** 발표.
-
-**DASH = Dynamic Adaptive Streaming over HTTP**
-
-이름 자체가 HLS와 거의 같은 컨셉을 선언한다.
-- Dynamic: 라이브든 VOD든
-- Adaptive: 화질 자동 조절 (ABR)
-- HTTP: 일반 HTTP 위에서 동작
-
-HLS도 다 하는 건데 왜 따로 만들었나?
-
-1. **코덱 독립적** — HLS는 사실상 H.264 + AAC + MPEG-TS 컨테이너에 묶여 있었음. DASH는 어떤 코덱, 어떤 컨테이너든 OK
-2. **정확한 ISO 표준** — 한 회사 소유가 아닌 ISO/IEC 23009-1
-3. **더 풍부한 메타데이터** — MPD가 M3U8보다 표현력이 좋음
-
-기술적으로 깔끔한 답이었다.
-
----
-
-## 2. MPD의 계층 구조 — XML로 모든 걸 표현
-
-DASH의 매니페스트는 `.mpd` (Media Presentation Description). XML 기반.
-
-![MPD 계층 구조](/images/mpd-hierarchy.png)
-
-M3U8이 평면적이라면 MPD는 계층적이다.
-
-```
-MPD
-└── Period (시간 구간 - "본방송", "광고", "본방송")
-    └── AdaptationSet (트랙 그룹 - 비디오, 한국어 오디오, 영어 오디오)
-        └── Representation (개별 트랙 - 1080p, 720p, 480p)
-            └── Segment (실제 데이터 조각)
+```mermaid {#fig-mpd-layers kind="개념도" caption="MPD의 계층. Period가 시간 구간을, AdaptationSet이 바꿔 쓸 수 있는 트랙 묶음을, Representation이 화질별 판을 나타내고, SegmentTemplate이 init과 조각 주소를 만드는 규칙을 담습니다. ISO/IEC 23009-1의 MPD 구조를 줄여 그렸습니다." source="https://dashif.org/Guidelines-TimingModel/"}
+flowchart TB
+  accTitle: MPD 계층 구조
+  accDescr: MPD 아래 Period가 있고, Period 아래 영상 AdaptationSet과 한국어 오디오 AdaptationSet이 있다. 영상 AdaptationSet 아래 1080p와 720p Representation이 있고, Representation 아래 SegmentTemplate이 init과 조각 번호 규칙을 담는다.
+  M["MPD<br/>type=dynamic"] --> P["Period"]
+  P --> V["AdaptationSet<br/>영상"]
+  P --> A["AdaptationSet<br/>오디오 ko"]
+  V --> R["Representation<br/>1080p · 720p"]
+  R --> T["Segment<br/>Template<br/>init · $Number$"]
 ```
 
-실제 MPD 예시:
+아래는 [CMAF 글](/posts/tech-blurting/cmaf-deep-dive/)의 실측에서 FFmpeg 9.0.2가 쓴 MPD를 줄인 것입니다(그 실측은 녹화 파일이라 `type="static"`입니다).
 
 ```xml
-<MPD type="dynamic"
-     minimumUpdatePeriod="PT2S"
-     timeShiftBufferDepth="PT5M"
-     availabilityStartTime="2026-06-20T10:00:00Z">
-  <Period>
-    <AdaptationSet mimeType="video/mp4">
-      <Representation id="1080p" bandwidth="6000000" width="1920" height="1080">
-        <SegmentTemplate
-          media="1080p/seg_$Number$.m4s"
-          initialization="1080p/init.mp4"
-          startNumber="1"
-          duration="6000"
-          timescale="1000"/>
+<MPD type="static" mediaPresentationDuration="PT4.0S" maxSegmentDuration="PT2.0S"
+     profiles="urn:mpeg:dash:profile:isoff-live:2011">
+  <Period id="0" start="PT0.0S">
+    <AdaptationSet contentType="video" segmentAlignment="true" startWithSAP="1">
+      <Representation id="0" mimeType="video/mp4" codecs="avc1.64001f"
+                      bandwidth="3106960" width="1280" height="720">
+        <SegmentTemplate timescale="1000000" duration="2000000"
+                         availabilityTimeOffset="1.500"
+                         initialization="init.mp4" media="seg-$Number$.m4s" startNumber="1"/>
       </Representation>
-      <Representation id="720p" bandwidth="3000000" width="1280" height="720">
-        <SegmentTemplate ... />
-      </Representation>
-    </AdaptationSet>
-    
-    <AdaptationSet mimeType="audio/mp4" lang="ko">
-      <Representation id="ko_aac_128k" bandwidth="128000"/>
-    </AdaptationSet>
-    
-    <AdaptationSet mimeType="audio/mp4" lang="en">
-      <Representation id="en_aac_128k" bandwidth="128000"/>
     </AdaptationSet>
   </Period>
 </MPD>
 ```
 
-### MPD vs M3U8 — 표현력 vs 단순함
+### HLS 목록과 MPD 요소는 이렇게 대응합니다 {#mpd-vs-m3u8--표현력-vs-단순함}
 
-| 항목 | M3U8 (HLS) | MPD (DASH) |
-|------|-----------|------------|
-| 포맷 | 텍스트 (라인 기반) | XML |
-| 크기 | ~5 KB | ~50 KB |
-| 파싱 | 수십 줄 코드 | 수백 줄 코드 |
-| 표현력 | 제한적 | 풍부 |
-| 구조 | 평면적 | 계층적 |
+| 하는 일 | HLS | DASH MPD |
+|---|---|---|
+| 전체 목차 | 다변형 재생 목록 | `MPD` |
+| 화질별 판 | `EXT-X-STREAM-INF` + 미디어 목록 | `Representation` |
+| 언어별 오디오 · 자막 묶음 | `EXT-X-MEDIA`의 `GROUP-ID` | `AdaptationSet`(`lang`) |
+| 조각 주소 | 미디어 목록에 하나씩 나열 | `SegmentTemplate` 규칙, `SegmentTimeline`, `SegmentList` |
+| 초기화 파일 | `EXT-X-MAP` | `Initialization` · `@initialization` |
+| 최대 조각 길이 | `EXT-X-TARGETDURATION` | `@maxSegmentDuration` |
+| 끝났음 | `EXT-X-ENDLIST` | `type="static"` |
+| 시간 구간 경계 | `EXT-X-DISCONTINUITY` · `EXT-X-DATERANGE` | `Period` · `EventStream` |
+| 암호화 | `EXT-X-KEY` | `ContentProtection` |
 
-이게 DASH의 양날의 검이다. 표현력은 좋은데 복잡하다.
+이 표는 두 규격의 요소를 하는 일로 짝지은 것이고, 일대일로 바꿔 쓸 수 있다는 뜻은 아닙니다. 예를 들어 HLS의 조각 목록은 조각마다 길이가 달라도 그대로 적지만, `SegmentTemplate@duration`은 모든 조각이 같은 길이라고 가정합니다.
 
-### SegmentTemplate — DASH의 핵심 효율
+## SegmentTemplate은 시각에서 조각 번호를 계산하게 합니다 {#segmenttemplate--dash의-핵심-효율}
 
-DASH가 라이브에서 강한 진짜 이유.
+라이브 MPD(`type="dynamic"`)는 `availabilityStartTime`으로 MPD 시간축의 0점을 벽시계에 묶습니다. `SegmentTemplate@duration`으로 조각 길이가 일정하다고 적으면, 플레이어는 지금 시각과 그 길이로 받을 수 있는 마지막 조각 번호를 셉니다. DASH-IF 타이밍 지침은 조각의 끝 시각이 「지금 + availabilityTimeOffset」 안에 들면 받을 수 있다고 설명하고(13.3절), 이렇게 스스로 늘어나는 조각 목록에서는 MPD를 다시 받지 않고도 새 조각 주소를 얻을 수 있다고 적습니다(13.6.2절).
+
+```js
+// SegmentTemplate@duration(단순 주소)에서 받을 수 있는 마지막 조각 번호 — 설명용 계산
+const segSec = duration / timescale;                       // 2초
+const now = (Date.now() - Date.parse(availabilityStartTime)) / 1000 - periodStart;
+const lastIndex = Math.floor((now + availabilityTimeOffset) / segSec) - 1;
+const url = media.replace('$Number$', String(startNumber + lastIndex));
+```
+
+아래 영상에서 HLS 플레이어가 목록을 다시 받아야 다음 조각 이름을 아는 동안, DASH 플레이어는 시계만 보고 다음 번호를 계산하는 차이를 보십시오.
+
+{{< motion scene="TemplateVsReload" id="fig-template-vs-reload" kind="개념도" caption="같은 2초 조각을 받는 두 플레이어. HLS 플레이어는 목록을 다시 받아 새 조각 줄을 확인한 뒤 그 조각을 요청하고, DASH 플레이어는 MPD의 SegmentTemplate 규칙과 시계로 조각 번호를 계산해 바로 요청합니다. 요청 시점과 번호는 설명용입니다." >}}
+
+그렇다고 DASH가 MPD를 한 번만 받는 것은 아닙니다. `minimumUpdatePeriod`가 있으면 받은 MPD는 그 시간 동안만 유효하므로 플레이어가 MPD를 다시 받고, 조각 길이가 일정하지 않으면 `SegmentTimeline`으로 조각마다 시각을 적어 MPD를 갱신해야 합니다. 시계 계산은 클라이언트와 서버 시각이 맞아야 정확하므로, DASH-IF 지침은 라이브 MPD에 시각 동기 방법(`UTCTiming`)을 하나 이상 두라고 정합니다(SHALL).
+
+## 광고 구간은 Period와 DATERANGE로 표시합니다 {#3-dash의-진짜-강점--period-기반-광고-삽입}
+
+DASH는 본편과 광고를 서로 다른 Period로 나눠 MPD에 적을 수 있습니다. Period마다 AdaptationSet과 주소 규칙을 따로 두므로, 광고 Period만 시청자별로 다르게 만들고 본편 조각은 모든 시청자가 같은 주소로 받게 할 수 있습니다. Media3 ExoPlayer는 여러 Period 재생을 지원하지만, 서버가 지시하는 xlink 광고 삽입은 지원하지 않습니다([Media3 DASH 문서](https://developer.android.com/media/media3/exoplayer/dash)).
+
+HLS는 같은 일을 목록 태그로 합니다. 광고 경계에는 `EXT-X-DISCONTINUITY`를 달고, SCTE-35 신호는 `EXT-X-DATERANGE`의 `SCTE35-OUT` · `SCTE35-IN` 속성에 담습니다([RFC 8216 4.3.2.7.1](https://www.rfc-editor.org/rfc/rfc8216#section-4.3.2.7.1)). 흔히 보이는 `EXT-X-CUE-OUT` · `EXT-X-CUE-IN`은 RFC에 없는 태그입니다. 개정 초안 부록 D는 `CLASS="com.apple.hls.interstitial"`인 `EXT-X-DATERANGE`에 `X-ASSET-URI`나 `X-ASSET-LIST`로 광고 자산을 가리키는 Interstitials를 정합니다. 본편 목록은 그대로 두고 플레이어가 그 시점에 다른 자산을 재생하는 방식입니다.
+
+## DRM 신호는 ContentProtection과 EXT-X-KEY로 다르게 적습니다 {#4-dash의-또-다른-강점--cenc-통합-drm}
+
+DASH는 `ContentProtection` 요소를 여러 개 둡니다. 하나는 공통 암호화 방식을 알리고(`urn:mpeg:dash:mp4protection:2011`, `value="cenc"` 또는 `"cbcs"`), 나머지는 DRM 시스템마다 시스템 ID로 구분합니다. 시스템 ID는 DASH-IF가 [식별자 목록](https://dashif.org/identifiers/content_protection/)으로 관리합니다.
 
 ```xml
-<SegmentTemplate
-  media="seg_$Number$.m4s"
-  startNumber="1"
-  duration="6000"
-  timescale="1000"/>
+<ContentProtection schemeIdUri="urn:mpeg:dash:mp4protection:2011" value="cbcs"
+                   cenc:default_KID="…"/>
+<!-- Widevine -->
+<ContentProtection schemeIdUri="urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed"/>
+<!-- PlayReady -->
+<ContentProtection schemeIdUri="urn:uuid:9a04f079-9840-4286-ab92-e65be0885f95"/>
 ```
 
-세그먼트 URL을 일일이 나열하지 않고 **패턴**으로 표현. `$Number$`가 1, 2, 3, ...으로 치환.
+HLS는 미디어 목록의 `EXT-X-KEY`로 적습니다. FairPlay Streaming이면 방식은 `SAMPLE-AES`, 키 형식은 `com.apple.streamingkeydelivery`여야 하고(애플 저작 규격 13.2 · 13.3), 키 주소는 보통 `skd://`로 시작합니다.
 
-플레이어는 시간만 보고 다음 세그먼트 URL을 직접 계산.
+「CENC가 없으면 DRM마다 세 번 인코딩한다」는 설명은 틀립니다. 암호화는 인코딩한 결과를 다시 잠그는 일이라 다시 인코딩하지 않습니다. 실제 갈림은 암호화 방식입니다. FairPlay는 `cbcs`만 받고 Android TV의 PlayReady SL2000은 `cenc`만 받으므로, 둘을 함께 지원하려면 같은 인코딩을 두 방식으로 암호화해 두 벌을 둡니다. 대상이 모두 `cbcs`를 받으면 한 벌로 됩니다([CMAF 글](/posts/tech-blurting/cmaf-deep-dive/)).
 
-```javascript
-const elapsed = (Date.now() - availabilityStartTime) / 1000;
-const segmentNumber = Math.floor(elapsed / 6);
-const nextUrl = `seg_${segmentNumber + 1}.m4s`;
-```
-
-HLS처럼 매니페스트 폴링 안 해도 됨. 이게 DASH의 라이브 지연이 HLS보다 짧았던 이유.
-
----
-
-## 3. DASH의 진짜 강점 — Period 기반 광고 삽입
-
-DASH의 비즈니스 가치가 여기서 나온다.
-
-![DASH Period 광고 삽입](/images/dash-period-ad-insertion.png)
-
-한 영상 안에 여러 Period를 두고, **각 Period의 BaseURL을 사용자별로 다르게** 줄 수 있다.
-
-```xml
-<MPD>
-  <Period id="content_part1" duration="PT15M">
-    <BaseURL>https://cdn.example.com/content/</BaseURL>
-    <AdaptationSet>...</AdaptationSet>
-  </Period>
-  
-  <Period id="ad_personalized_user12345" duration="PT30S">
-    <BaseURL>https://ad-server.example.com/user12345/</BaseURL>
-    <AdaptationSet>...</AdaptationSet>
-  </Period>
-  
-  <Period id="content_part2" duration="PT15M">
-    <BaseURL>https://cdn.example.com/content/</BaseURL>
-    <AdaptationSet>...</AdaptationSet>
-  </Period>
-</MPD>
-```
+## 어느 기기가 무엇을 재생하는지가 선택을 정합니다 {#6-그래서-왜-hls가-이겼나}
 
-```
-시청자 A: user12345 광고 (자동차)
-시청자 B: user67890 광고 (게임)
-시청자 C: user11111 광고 (배달앱)
-```
+| 재생기 | HLS | DASH | 근거 |
+|---|---|---|---|
+| Apple AVPlayer(iOS · tvOS · macOS 앱) | 재생 | 문서의 재생 대상에 없음 | [AVPlayer 문서](https://developer.apple.com/documentation/avfoundation/avplayer) |
+| Safari 내장(`<video src>`) | 재생 | 없음 | [Apple HLS 개요](https://developer.apple.com/documentation/http-live-streaming) |
+| iOS 17.1 이상 Safari의 JavaScript 재생기 | hls.js 1.5.0+ | dash.js 4.7.3+ | ManagedMediaSource 지원([hls.js](https://github.com/video-dev/hls.js/releases/tag/v1.5.0), [dash.js](https://github.com/Dash-Industry-Forum/dash.js/releases/tag/v4.7.3)) |
+| Android Media3 ExoPlayer | HLS 모듈 | DASH 모듈(fMP4 · WebM · Matroska) | [Media3 HLS](https://developer.android.com/media/media3/exoplayer/hls) · [DASH](https://developer.android.com/media/media3/exoplayer/dash) 문서 |
+| MSE가 있는 브라우저 | hls.js | dash.js | 각 저장소 |
+| Shaka Player | 재생 | 재생 | [Shaka Player README](https://github.com/shaka-project/shaka-player) |
 
-본 콘텐츠는 공유 (CDN 캐시 효율), 광고만 개인화. 이게 **Server-Side Ad Insertion (SSAI)**.
+ExoPlayer는 지금 AndroidX Media3 라이브러리의 재생기입니다. 브라우저에서는 JavaScript 재생기가 MSE(Media Source Extensions)로 둘 다 재생할 수 있으므로, 실제로 선택을 가르는 곳은 앱의 기본 재생기와 TV · 셋톱 같은 기기입니다.
 
-HLS도 가능하지만 `EXT-X-DISCONTINUITY` 태그 + 플레이리스트 동적 조작이 필요해 복잡. DASH는 구조 자체가 광고에 친화적.
+### Apple 기기 기본 재생기는 HLS를 받습니다 {#이유-1-ios-강제}
 
-**YouTube가 DASH를 강하게 미는 이유**가 이거다. 광고 비즈니스 모델에 직접 유리.
+AVPlayer 문서는 이 재생기가 로컬 · 원격 파일 미디어와 「HTTP Live Streaming으로 제공되는 오디오 · 비디오 미디어」를 재생한다고 적고, DASH는 적지 않습니다. Apple 기기용 앱이 기본 재생기를 쓰거나 Safari 내장 재생을 쓰려면 HLS를 내야 합니다. iOS 17.1 이상에서는 ManagedMediaSource 덕분에 Safari에서 dash.js도 돌 수 있지만, 그 경우 재생 품질과 DRM(FairPlay는 HLS의 `SAMPLE-AES` 방식)은 따로 확인해야 합니다.
 
----
+## 두 형식 모두 저지연 모드가 따로 있습니다
 
-## 4. DASH의 또 다른 강점 — CENC 통합 DRM
+일반 HLS와 일반 DASH는 모두 조각이 다 만들어진 뒤에 받습니다. 저지연은 각자 다른 방식으로 풉니다.
 
-OTT에서 결정적인 차이.
+| 방식 | 핵심 | 확인한 지원 |
+|---|---|---|
+| LL-HLS | 부분 조각(파트), 보류 목록 요청, PRELOAD-HINT | hls.js 1.0.0+, [LL-HLS 글](/posts/tech-blurting/ll-hls-deep-dive/) |
+| LL-DASH | CMAF 청크를 만들면서 chunked 전송, `availabilityTimeOffset`로 일찍 요청 | Media3의 「초저지연 CMAF 라이브 재생」, FFmpeg `-ldash`, Shaka Packager |
 
-```xml
-<ContentProtection
-  schemeIdUri="urn:mpeg:dash:mp4protection:2011"
-  value="cenc"
-  cenc:default_KID="abc-123-..."/>
+LL-HLS는 파트를 다 만든 뒤 한 번에 보내고(개정 초안 6.2.6절), LL-DASH는 만들어지는 청크를 흘려보냅니다. 두 방식 모두 CMAF 청크를 바탕으로 쓸 수 있지만, 서버와 CDN에 요구하는 동작이 다릅니다.
 
-<ContentProtection
-  schemeIdUri="urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed"
-  value="Widevine">
-  <cenc:pssh>...</cenc:pssh>
-</ContentProtection>
+## CMAF로 미디어를 맞추면 매니페스트 두 벌만 남습니다 {#7-그래서-둘이-수렴-중--cmaf의-미래}
 
-<ContentProtection
-  schemeIdUri="urn:uuid:9a04f079-9840-4286-ab92-e65be0885f95"
-  value="PlayReady">
-  <cenc:pssh>...</cenc:pssh>
-</ContentProtection>
-```
+HLS가 fMP4를 받게 되면서, CMAF 조각 한 벌을 HLS 목록과 DASH MPD가 함께 가리킬 수 있습니다. 포장과 저장, CDN 캐시가 한 벌로 줄고 매니페스트만 두 벌 남습니다. 조건은 코덱, 암호화 방식(`cbcs`), 조각 시각 연속성이 두 쪽에서 맞는 것입니다. 자세한 조건은 [CMAF 글](/posts/tech-blurting/cmaf-deep-dive/)에 있습니다.
 
-**CENC (Common Encryption)**: 한 번 암호화한 콘텐츠를 여러 DRM 시스템이 공유.
+## HLS만 낼지 DASH도 낼지는 재생 기기와 DRM이 정합니다 {#8-그럼-우리는-뭘-써야-하나}
 
-```
-[CENC 없이 = HLS 방식]
-Widevine용으로 한 번 암호화 → Chrome용
-PlayReady용으로 한 번 더 → Edge용
-FairPlay용으로 또 → Safari용
-→ 같은 영상 3번 인코딩, 저장 3배
+- **대상에 Apple 기기 기본 재생기나 Safari 내장 재생이 있다** — HLS가 필요합니다.
+- **대상이 브라우저와 Android뿐이다** — hls.js와 Media3로 HLS 하나만 내도 됩니다. DASH만 내도 됩니다.
+- **DRM 대상에 `cenc`만 받는 기기가 있다** — 암호화 파일이 두 벌이 됩니다. 매니페스트를 하나로 줄여도 이 비용은 남습니다.
+- **광고를 본편 사이에 넣는다** — DASH는 Period, HLS는 DATERANGE와 Interstitials를 지원하는 재생기인지 확인합니다.
 
-[CENC = DASH 방식]
-콘텐츠를 한 번 암호화
-Widevine 라이센스 서버: 같은 키 제공
-PlayReady 라이센스 서버: 같은 키 제공
-FairPlay 라이센스 서버: 같은 키 제공
-→ 인코딩/저장 1배
-```
+「DASH가 기술적으로 더 좋은데 HLS가 이겼다」는 설명보다, 내 서비스가 닿아야 하는 재생기 목록을 먼저 적어 보는 편이 결정을 빨리 끝냅니다. 그 목록이 둘 다 받으면 CMAF로 미디어를 한 벌로 맞추고, 매니페스트는 대상 재생기가 요구하는 만큼만 내십시오.
 
-넷플릭스, 디즈니플러스 같은 글로벌 OTT는 DASH를 거의 필수로 쓴다. 멀티 DRM 비용 차이가 크니까.
+## 출처
 
----
+- [ISO/IEC 23009-1:2026 DASH](https://webstore.iec.ch/en/publication/114980) (6판, 2026-07-14, 판 기록에 1판 2012-04-03)
+- [Thomas Stockhammer, 「Dynamic Adaptive Streaming over HTTP – Design Principles and Standards」](https://www.w3.org/2010/11/web-and-tv/papers/webtv2_submission_64.pdf) (W3C Web and TV 워크숍, 2010) — 3GPP AHS, MPEG N11338(2010-04)
+- [Christian Timmerer, 「MPEG news: a report from the 98th meeting」](https://multimediacommunication.blogspot.com/2011/12/mpeg-news-report-from-98th-meeting.html) (2011-12-08)
+- [SVTA, 「DASH Industry Forum (DASH-IF) Becomes Part of the SVTA」](https://www.svta.org/2024/07/23/dash-if-becomes-part-of-the-svta/) (2024-07-23)
+- [DASH-IF, Timing Model 지침](https://dashif.org/Guidelines-TimingModel/) — 13.3 가용 창, 13.6.2 MPD 갱신 사이의 새 조각
+- [DASH-IF, Content Protection 식별자 목록](https://dashif.org/identifiers/content_protection/)
+- [RFC 8216](https://www.rfc-editor.org/rfc/rfc8216) — 4.3.2.7.1 SCTE-35와 DATERANGE · [draft-pantos-hls-rfc8216bis-22](https://www.ietf.org/archive/id/draft-pantos-hls-rfc8216bis-22.txt) — 6.2.6, 부록 D Interstitials
+- [Apple, HLS Authoring Specification for Apple Devices](https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html) — 13.2 · 13.3
+- [Apple, AVPlayer](https://developer.apple.com/documentation/avfoundation/avplayer) · [Apple, HTTP Live Streaming 개요](https://developer.apple.com/documentation/http-live-streaming)
+- [Android Developers, Media3 ExoPlayer DASH](https://developer.android.com/media/media3/exoplayer/dash) · [HLS](https://developer.android.com/media/media3/exoplayer/hls)
+- [hls.js 1.5.0 릴리스](https://github.com/video-dev/hls.js/releases/tag/v1.5.0) · [dash.js 4.7.3 릴리스](https://github.com/Dash-Industry-Forum/dash.js/releases/tag/v4.7.3) (2023-12-08, Managed Media Source 지원) · [Shaka Player](https://github.com/shaka-project/shaka-player)
 
-## 5. 기술 비교표 — 한눈에
-
-| 항목 | HLS | DASH |
-|------|-----|------|
-| 발표 | 2009 Apple | 2012 ISO/IEC |
-| 매니페스트 | M3U8 (~5 KB) | MPD (~50 KB) |
-| 컨테이너 | TS, fMP4 | fMP4, WebM, TS |
-| 코덱 자유도 | 제한적 | 자유 |
-| iOS 네이티브 | ✅ | ❌ |
-| Android 네이티브 | ⭕ 제한적 | ✅ ExoPlayer |
-| 브라우저 네이티브 | Safari만 | 없음 |
-| 광고 삽입 | DISCONTINUITY | Period 분리 (우수) |
-| DRM | FairPlay 따로 | CENC 통합 |
-| 라이브 지연 | 18~25초 (LL-HLS 2~5초) | 6~15초 |
-
-거의 모든 항목에서 DASH가 더 진보적이다.
-
-근데 HLS가 60% 점유.
-
----
-
-## 6. 그래서 왜 HLS가 이겼나
-
-세 가지 이유.
-
-### 이유 1: iOS 강제
-
-iPhone 시청자는 DASH를 못 본다. iOS Safari가 DASH 네이티브 지원 안 함. JavaScript로 dash.js 돌릴 수는 있지만 **배터리 효율이 떨어진다**.
-
-iOS가 글로벌 모바일 시청 시간의 30~50%. 이걸 포기할 수 있는 서비스가 거의 없다.
-
-**"iOS도 지원해야지" → HLS 필수. 그럼 굳이 DASH도 따로 만들 필요가 있나?** 작은 서비스는 HLS만으로 끝.
-
-### 이유 2: 단순함
-
-M3U8은 메모장으로 열어볼 수 있다.
-
-```
-#EXTM3U
-#EXTINF:6.000,
-seg100.ts
-```
-
-MPD는 XML 파서가 필요하다. 250줄짜리 매니페스트를 디버깅하는 일이 정말 괴롭다.
-
-개발자가 처음 라이브 인프라 만들 때 HLS부터 잡는다. 도구도 다 HLS 위주(FFmpeg, OBS, hls.js).
-
-### 이유 3: ingest 표준이 HLS와 더 가까움
-
-스트리머는 RTMP나 SRT로 송출 → 플랫폼이 트랜스코딩 → 시청자에게 HLS로 배포. 이 흐름에서 DASH로 가려면 추가 전환 단계.
-
-라이브 플랫폼이 HLS를 기본으로 가는 자연스러운 이유.
-
-### 결론: 기술 우수성보다 호환성과 생태계
-
-DASH가 더 진보적이지만, 도입 비용이 크다. HLS는 "그냥 되는" 선택. 작은 서비스부터 큰 플랫폼까지 같은 이유로 HLS를 선택.
-
-이게 **VHS vs 베타맥스**, **QWERTY vs 드보락**과 같은 패턴이다. 기술적 우수성이 시장을 결정하지 않는다.
-
----
-
-## 7. 그래서 둘이 수렴 중 — CMAF의 미래
-
-산업이 두 표준을 영원히 유지할 수는 없다. 저장/CDN 비용이 두 배.
-
-해결책이 **CMAF (Common Media Application Format)** — [지난 시리즈에서 깊이 다룬 그거](../../) — fMP4 기반 공통 컨테이너.
-
-![HLS와 DASH의 시장 점유율과 CMAF 수렴](/images/hls-dash-cmaf-convergence.png)
-
-```
-[전통적 운영]
-HLS용: seg1.ts, seg2.ts, ... (별도 인코딩)
-DASH용: seg1.m4s, seg2.m4s, ... (별도 인코딩)
-→ 저장 비용 2배
-
-[CMAF 시대]
-공통: seg1.cmaf, seg2.cmaf, ...
-HLS의 m3u8가 이걸 참조
-DASH의 MPD도 이걸 참조
-→ 저장 비용 1배
-```
-
-iOS 시청자는 m3u8 받고, Android 시청자는 MPD 받지만, **둘이 다운로드하는 실제 미디어 파일은 똑같다**.
-
-이러면 HLS와 DASH의 컨테이너 차이가 사라진다. 매니페스트 포맷만 다를 뿐. 결국 산업은 한 미디어 파일 + 두 매니페스트로 수렴 중.
-
----
-
-## 8. 그럼 우리는 뭘 써야 하나
-
-상황별 선택 가이드.
-
-**HLS만 쓰면 되는 경우**:
-- 한국 라이브 방송 (시청자 단일 시장)
-- 단순 콘텐츠 배포
-- iOS 비중 높음
-- 개발 리소스 적음
-
-→ 치지직, SOOP 같은 한국 라이브 플랫폼은 HLS만으로 충분.
-
-**DASH도 같이 쓰는 경우**:
-- 글로벌 OTT 서비스
-- 광고 비즈니스 (SSAI 활용)
-- 멀티 DRM 필수 (Widevine + PlayReady + FairPlay)
-- 다양한 디바이스 (스마트TV, 게임 콘솔)
-
-→ 넷플릭스, 디즈니플러스, YouTube는 DASH + HLS 병행.
-
-**플레이어 선택**:
-- HLS만: `hls.js`
-- DASH만: `dash.js`
-- 둘 다 + 자체 확장: `Shaka Player` (Google, YouTube가 씀)
-
----
-
-## 정리하면
-
-DASH의 이야기는 결국 **기술 표준화의 정치학**이다.
-
-1. **출신** — 2012년 ISO/IEC + 30개 기업이 Apple 견제용으로 만든 정식 국제 표준
-2. **구조** — XML 기반 MPD, Period > AdaptationSet > Representation 계층, SegmentTemplate으로 URL 패턴화
-3. **장점** — 코덱 자유, Period 기반 SSAI 광고, CENC 통합 DRM
-4. **단점** — 매니페스트 크기 10배, XML 파싱 복잡, 도구 생태계 약함
-5. **시장 결과** — HLS 60% vs DASH 32%. iOS 강제 + 단순함 + ingest 호환성이 결정
-6. **미래** — CMAF로 같은 미디어 파일 공유, 매니페스트만 다른 구조로 수렴 중
-
-다음 글에선 HLS의 본질적 한계 — **18~25초 라이브 지연을 어떻게 2초로 줄였나** — LL-HLS의 chunked CMAF 기법을 본다.
-
----
-
-**참고**
-- [DASH 표준 (ISO/IEC 23009-1)](https://www.iso.org/standard/79329.html)
-- [DASH-IF (DASH Industry Forum)](https://dashif.org/)
-- [dash.js GitHub](https://github.com/Dash-Industry-Forum/dash.js)
-- [Shaka Player](https://shaka-player-demo.appspot.com/)
+다음 편: [WebRTC는 NAT 뒤 두 브라우저를 ICE 후보로 잇습니다](/posts/tech-blurting/webrtc-deep-dive/)
