@@ -1,0 +1,36 @@
+ffmpeg -hide_banner -y -f lavfi -i testsrc2=size=1920x1080:rate=60 -t 1 -c:v libx264 -preset veryfast -level 4.1 -profile:v high -pix_fmt yuv420p -g 120 -sc_threshold 0 -f mpegts h264_lvl41_60.ts
+Input #0, lavfi, from 'testsrc2=size=1920x1080:rate=60':
+  Duration: N/A, start: 0.000000, bitrate: N/A
+  Stream #0:0: Video: wrapped_avframe, yuv420p, 1920x1080 [SAR 1:1 DAR 16:9], 60 fps, 60 tbr, 60 tbn
+Stream mapping:
+  Stream #0:0 -> #0:0 (wrapped_avframe (native) -> h264 (libx264))
+Press [q] to stop, [?] for help
+[libx264 @ 0x7967400a80] using SAR=1/1
+[libx264 @ 0x7967400a80] MB rate (489600) > level limit (245760)
+[libx264 @ 0x7967400a80] using cpu capabilities: ARMv8 NEON DotProd I8MM
+[libx264 @ 0x7967400a80] profile High, level 4.1, 4:2:0, 8-bit
+Output #0, mpegts, to 'h264_lvl41_60.ts':
+  Metadata:
+    encoder         : Lavf63.1.102
+  Stream #0:0: Video: h264, yuv420p(tv, progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 60 fps, 90k tbn
+    Metadata:
+      encoder         : Lavc63.1.102 libx264
+    Side data:
+      CPB properties: bitrate max/min/avg: 0/0/0 buffer size: 0 vbv_delay: N/A
+[out#0/mpegts @ 0x7967024480] video:851KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 3.459713%
+frame=   60 fps=0.0 q=-1.0 Lsize=     880KiB time=00:00:00.96 bitrate=7460.4kbits/s speed=2.25x elapsed=0:00:00.42    
+[libx264 @ 0x7967400a80] frame I:1     Avg QP:12.71  size: 33906
+[libx264 @ 0x7967400a80] frame P:15    Avg QP:20.45  size: 20571
+[libx264 @ 0x7967400a80] frame B:44    Avg QP:30.15  size: 12019
+[libx264 @ 0x7967400a80] consecutive B-frames:  1.7%  0.0%  5.0% 93.3%
+[libx264 @ 0x7967400a80] mb I  I16..4: 90.6%  2.6%  6.8%
+[libx264 @ 0x7967400a80] mb P  I16..4:  4.3%  0.9%  0.5%  P16..4:  3.4%  2.5%  1.4%  0.0%  0.0%    skip:86.9%
+[libx264 @ 0x7967400a80] mb B  I16..4:  0.2%  0.0%  0.0%  B16..8:  4.0%  2.5%  0.3%  direct: 2.5%  skip:90.4%  L0:31.8% L1:42.4% BI:25.7%
+[libx264 @ 0x7967400a80] 8x8 transform intra:9.3% inter:9.1%
+[libx264 @ 0x7967400a80] coded y,uvDC,uvAC intra: 12.8% 20.3% 19.0% inter: 2.6% 5.5% 4.9%
+[libx264 @ 0x7967400a80] i16 v,h,dc,p: 91%  7%  2%  0%
+[libx264 @ 0x7967400a80] i8 v,h,dc,ddl,ddr,vr,hd,vl,hu: 11% 26% 42%  7%  3%  1%  2%  5%  2%
+[libx264 @ 0x7967400a80] i4 v,h,dc,ddl,ddr,vr,hd,vl,hu: 35% 26% 23%  4%  3%  2%  3%  3%  2%
+[libx264 @ 0x7967400a80] i8c dc,h,v,p: 81%  9% 10%  0%
+[libx264 @ 0x7967400a80] Weighted P-Frames: Y:0.0% UV:0.0%
+[libx264 @ 0x7967400a80] kb/s:6970.52

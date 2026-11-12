@@ -1,348 +1,307 @@
 ---
-title: "373MB/s에서 6Mbps로 — 조건을 명시하고 이해하는 H.264 압축"
+title: "H.264는 이미 디코딩한 화면으로 다음 블록을 예측합니다"
 date: 2026-06-20T10:38:55+09:00
+lastmod: "2026-11-13T06:55:39+09:00"
+description: "1080p60 원본 373.248MB/s를 6Mbps로 줄이는 차이는 예측과 양자화에서 나옵니다. H.264의 I · P · B 슬라이스와 디코딩 순서, 매크로블록 8,160개, 정수 변환과 QP, CABAC, 프로파일 · 레벨 표(1080p60은 레벨 4.2)와 avc1 코덱 문자열, NAL 단위와 SPS · PPS, TS와 MP4의 NAL 구분 방식을 규격 · 소스로 확인하고, FFmpeg 9.0.2 · x264로 레벨 자동 선언과 NAL 순서, 1-pass와 2-pass의 VMAF 평균 · 하위 1% · 2초 최대 비트레이트를 직접 쟀습니다."
 categories: ["tech-blurting"]
-lastmod: 2026-10-29T09:00:00+09:00
+tags: ["H.264", "AVC", "x264", "VMAF", "코덱", "FFmpeg"]
 draft: false
 ---
 
-> **2026-10-29 정정** — raw 단위·압축 비율·매크로블록 올림·GOP 계산을 수정했습니다. 근거 없는 고정 화질·성능 수치는 철회하고 계산 예시와 측정이 필요한 항목을 구분했습니다.
+1080p 60fps 영상을 RGB 8비트 세 채널, 패딩 없이 그대로 보내면 1920 × 1080 × 3 × 60 = 373,248,000바이트, 곧 초당 373.248MB입니다(10진 단위, 1시간이면 약 1.344TB). 라이브 송출에 흔한 6Mbps는 초당 0.75MB이므로 두 데이터율의 비는 497.664배입니다. 원본을 영상 압축의 출발점인 8비트 YUV 4:2:0으로 잡아도 186.624MB/s라 약 249배를 줄여야 합니다. 이 차이는 두 단계에서 나옵니다. 인코더는 이미 디코딩한 화면에서 비슷한 블록을 찾아 차이만 남기고(예측), 그 차이에서 눈에 덜 띄는 부분을 버립니다(양자화). 실제로 Sintel 예고편 10초(1080p 24fps)를 x264 medium · CRF 28로 인코딩하자 평균 1,799kbps에 VMAF 93.4가 나왔습니다. 같은 영상의 4:2:0 원본 데이터율(약 597Mbps)의 약 332분의 1입니다(아래 「측정 조건」).
 
+## H.264는 ITU-T와 ISO/IEC가 2003년에 함께 낸 규격입니다 {#1-h264의-정체--두-표준-단체가-공동으로-만든-결과}
 
-1080p 60fps를 **RGB 8비트 × 3채널, 패딩 없는 raw 영상**으로 계산하면 1920 × 1080 × 3 × 60 = **373,248,000바이트/초**, 즉 **373.248MB/s**다. 1시간은 약 1.344TB다. 여기서 MB·TB는 10진 단위다.
+H.264는 ITU-T 권고 H.264이자 ISO/IEC 14496-10 AVC(Advanced Video Coding)입니다. 두 단체가 만든 공동 팀(JVT)이 같은 본문을 두 이름으로 냈습니다. [ITU-T 권고 목록](https://www.itu.int/rec/T-REC-H.264)에서 첫 판은 2003년 5월(05/2003)이고, 지금 효력이 있는 판은 2026년 6월(06/2026)에 나온 열여섯 번째 판입니다. 그사이 프로파일과 확장이 더해졌지만 처음 정한 부호화 구조는 그대로입니다. 특허 라이선스는 지금도 [Via LA의 AVC/H.264 프로그램](https://www.via-la.com/licensing-programs/avc-h-264/)이 운영합니다.
 
-비교할 인코딩 비트레이트를 **6Mbps로 가정**하면 6,000,000 ÷ 8 = **750,000바이트/초 = 0.75MB/s**. 두 데이터율의 비는 **497.664배, 약 498배**다. 오디오와 컨테이너 오버헤드는 제외했다.
+## 줄이는 중복은 공간·시간·통계 세 가지입니다 {#2-압축의-3가지-원리--어디서-데이터를-줄이나}
 
-이 값은 두 표현의 데이터율 비교다. H.264가 모든 영상을 같은 화질로 498배 압축한다는 뜻이 아니다. raw를 8비트 YUV 4:2:0으로 잡으면 186.624MB/s라 비교 비율도 약 249배로 바뀐다. 손실 압축 결과는 장면과 인코더 설정으로 따로 평가해야 한다.
+영상에는 같은 정보가 여러 번 들어 있습니다. H.264는 그 중복을 세 가지 도구로 줄입니다.
 
-{{< chart caption="계산 예시: 1080p60 raw 표현과 가정한 6Mbps 출력의 데이터율 (실측 아님)" >}}
-{"tooltip":{"trigger":"axis"},"grid":{"left":"18%","right":"8%","bottom":"15%"},"xAxis":{"type":"category","data":["RGB 24bit raw","YUV 4:2:0 8bit raw","6Mbps 출력 가정"]},"yAxis":{"type":"value","name":"MB/s"},"series":[{"type":"bar","data":[373.248,186.624,0.75],"label":{"show":true,"position":"top"},"itemStyle":{"color":"#087f8b"}}]}
+| 중복 | 어디에 있나 | H.264 도구 |
+|---|---|---|
+| 공간 | 한 화면 안에서 이웃 화소끼리 비슷함 | 화면 내 예측(intra), 변환 |
+| 시간 | 이어지는 화면끼리 비슷함 | 화면 간 예측(inter)과 모션 벡터 |
+| 통계 | 같은 값이 자주 나옴 | 엔트로피 부호화(CAVLC · CABAC) |
+
+이 가운데 화질을 잃는 단계는 예측 뒤에 남은 차이를 줄이는 양자화 하나입니다.
+
+## P·B 슬라이스는 이미 디코딩한 화면에서 블록을 가져옵니다 {#3-ipb-프레임--h264의-압축-핵심}
+
+H.264는 화면을 슬라이스로 나누고 슬라이스마다 종류를 둡니다. I 슬라이스는 같은 화면 안의 이웃 블록만으로 예측하고, P 슬라이스는 참조 화면 하나에서, B 슬라이스는 참조 목록 둘에서 블록을 가져올 수 있습니다. 「I 프레임」 · 「P 프레임」은 화면의 슬라이스가 모두 그 종류일 때 부르는 이름입니다.
+
+B는 표시 순서로 뒤에 오는 화면도 참조할 수 있습니다. 그래서 그 뒤 화면이 먼저 디코딩돼 있어야 합니다. 아래 영상에서 위 줄이 표시 순서, 아래 줄이 디코딩 순서입니다. P가 I만 참조해 먼저 나오고, 그다음에야 I와 P를 함께 참조하는 B 두 장이 나옵니다.
+
+{{< motion scene="DecodeOrder" id="fig-decode-order" kind="개념도" caption="표시 순서 I B B P를 디코딩할 때는 P가 I를 참조해 먼저 디코딩되고, 그 뒤에 I와 P를 함께 참조하는 B 두 장이 디코딩됩니다. 화살표는 참조 방향입니다." >}}
+
+x264로 B 프레임 3장을 허용해 9프레임을 인코딩하자 출력 파일의 패킷도 이 순서였습니다. I 다음 패킷은 표시 순서로 다섯 번째 화면인 P였고, 그 뒤에 B 세 장이 표시 순서대로 왔습니다. 디코딩 시각(dts)이 표시 시각(pts)보다 한 화면 앞서도록 첫 dts는 음수(−512, 1/12,288초 단위)로 적혀 있었습니다. 디코더는 B를 내보내기 전에 P를 받아 둬야 하므로 B 프레임 수만큼 지연이 생깁니다. 라이브용 `-tune zerolatency`가 B 프레임을 끄는 이유입니다([x264 글](/posts/tech-blurting/x264-live-rate-control-gop/#zerolatency는-b-프레임lookaheadmbtree를-끕니다)).
+
+인코더가 참조로 쓰는 화면도 원본이 아니라 자기가 디코딩해 본 화면입니다. 디코더는 원본을 모르므로, 인코더가 원본으로 예측하면 둘이 쓰는 참조가 달라져 오차가 프레임마다 쌓입니다. 인코더 안에 디코더가 하나 들어 있는 이유이고, 아래 파이프라인 절의 도식이 그 고리입니다.
+
+### 모션 벡터는 가져올 블록의 위치를 가리킵니다 {#motion-vector--pb-프레임의-작동-원리}
+
+P 블록은 「참조 화면의 어느 자리에서 블록을 가져와라」를 모션 벡터로 적고, 가져온 블록과 실제 블록의 차이(잔차)만 따로 보냅니다. 모션 벡터는 휘도 기준 1/4 화소 단위라 화소 사이 위치를 가리킬 수도 있고, 그 자리 값은 보간 필터로 만듭니다([FFmpeg h264qpel.c](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/h264qpel.c)). 블록은 16×16 하나로 옮기기도 하고 16×8 · 8×16 · 8×8과 그보다 작은 조각으로 나눠 따로 옮기기도 합니다. 빠른 움직임 · 질감 · 잡음이 많은 장면은 맞는 블록을 찾기 어려워 잔차가 커지고, 같은 해상도라도 비트레이트가 더 듭니다.
+
+### IDR만 앞 화면과의 참조를 끊습니다 {#gop-크기의-트레이드오프}
+
+I 슬라이스로만 된 화면이 나와도, 그 뒤 화면이 I보다 앞선 화면을 참조하는 것은 막혀 있지 않습니다. 참조를 확실히 끊는 화면은 IDR(Instantaneous Decoding Refresh)입니다. IDR이 오면 디코더는 참조 버퍼를 비우고, 뒤 화면은 IDR 이전 화면을 참조하지 않습니다. 그래서 중간에 들어온 시청자나 HLS 조각 하나만 받은 플레이어는 IDR에서 디코딩을 시작할 수 있습니다. 비트스트림에서는 NAL 종류 번호로 갈립니다. IDR 슬라이스는 5, 나머지 슬라이스는 I여도 1입니다.
+
+IDR 사이 간격(GOP 길이)이 짧으면 진입점과 오류 복구 지점이 늘지만, IDR은 화면 간 예측을 못 쓰므로 같은 비트레이트에서 나머지 화면에 쓸 비트가 줄어듭니다. 60fps에서 2초 간격은 120프레임입니다. x264에서 간격을 고정하는 옵션과 애플 HLS 규격의 2초 권장은 [x264 글](/posts/tech-blurting/x264-live-rate-control-gop/#키프레임은--g와--sc_threshold-0이-고정합니다)에, PokeClip 시험 방송이 키프레임을 2초로 맞춘 방식은 [OBS 인코더 공유 글](/posts/0-to-1/pokeclip-obs-shared-encoder-srt/)에 있습니다.
+
+## 예측하고 남은 차이를 변환하고 양자화에서 버립니다 {#4-h264-인코딩-5단계-파이프라인}
+
+인코더 한 바퀴는 다섯 단계입니다. 화면을 블록으로 나누고, 블록마다 예측하고, 남은 차이를 변환하고, 계수를 양자화하고, 엔트로피 부호화합니다. 도식에서 오른쪽 아래 고리가 인코더 안의 디코더입니다. 양자화한 계수를 다시 풀어 화면을 복원하고, 그 복원 화면을 다음 예측의 참조로 씁니다.
+
+```mermaid {#fig-encoder-loop kind="개념도" caption="H.264 인코더의 복원 고리. 양자화한 계수는 엔트로피 부호화로 나가는 동시에 역양자화 · 역변환을 거쳐 예측에 더해지고, 그 복원 화면이 참조 버퍼에 들어가 다음 블록의 예측에 쓰입니다. 디코더가 만드는 화면과 같은 화면을 참조로 쓰기 위한 구조입니다." source="ITU-T H.264 부호화 구조를 옮긴 개념도"}
+flowchart TB
+  accTitle: H.264 인코더의 복원 고리
+  accDescr: 원본 블록에서 예측을 빼 잔차를 만들고 변환과 양자화를 거쳐 엔트로피 부호화로 내보낸다. 양자화 결과는 역양자화와 역변환을 거쳐 예측과 더해져 참조 버퍼에 들어가고, 참조 버퍼가 다음 예측에 쓰인다.
+  A[원본 블록] --> B[잔차 = 원본 − 예측]
+  B --> C[정수 변환]
+  C --> D[양자화]
+  D --> E[엔트로피 부호화]
+  E --> F[비트스트림]
+  D --> G[역양자화 · 역변환]
+  G --> H[복원 = 잔차 + 예측]
+  H --> I[참조 버퍼]
+  I --> J[예측]
+  J --> B
+  J --> H
+```
+
+인코더와 디코더가 양자화 손실까지 같은 복원 화면을 참조로 쓰므로 오차가 화면마다 불어나지 않습니다.
+
+### 화면은 16×16 매크로블록 8,160개로 나뉩니다 {#stage-1-macroblock-분할}
+
+H.264의 기본 단위는 휘도 16×16 화소(4:2:0이면 색차 8×8 두 개를 함께) 매크로블록입니다. 1920×1080을 덮으려면 가로 1920 ÷ 16 = 120개, 세로 1080 ÷ 16 = 67.5개를 올려 68개가 필요합니다. 합계 120 × 68 = 8,160개이고, 부호화 높이는 68 × 16 = 1,088줄이 됩니다. x264 출력의 SPS에도 그대로 적혀 있었습니다. 가로 매크로블록 수 − 1이 119, 세로가 67이고, 아래쪽 자르기 값(frame_crop_bottom_offset) 4가 4:2:0에서 두 줄 단위라 8줄을 잘라 1,080줄로 보여 줍니다. 2-pass 첫 패스 통계 파일에도 첫 화면은 화면 내 예측 매크로블록 8,160개(`imb:8160`)였습니다.
+
+### 예측이 맞을수록 남는 차이가 작아집니다 {#stage-2-prediction--압축의-진짜-비밀}
+
+예측은 매크로블록마다 고릅니다. 화면 내 예측은 이미 부호화한 왼쪽 · 위쪽 이웃 화소를 이어 붙여 블록을 만듭니다. 휘도 4×4 블록에는 세로 · 가로 · DC(평균) · 대각선 등 아홉 방향이 있습니다([FFmpeg h264pred.h 38–46행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/h264pred.h#L38-L46)). 화면 간 예측은 앞 절의 모션 벡터로 참조 화면에서 블록을 가져옵니다. 인코더는 후보마다 「잔차를 보내는 비용 + 모드 · 벡터를 적는 비용」을 견줘 하나를 고릅니다.
+
+```text
+설명용 값(휘도 2×2 일부)
+실제 블록      예측 블록      잔차
+[123 124]  −  [122 123]  =  [+1 +1]
+[125 126]     [124 125]     [+1 +1]
+```
+
+### 정수 변환은 차이를 저주파로 모읍니다 {#stage-3-integer-dct--주파수-변환}
+
+잔차는 4×4(High 프로파일부터는 8×8도) 블록 단위로 주파수 성분으로 바꿉니다. H.264는 DCT(이산 코사인 변환)를 정수만으로 근사한 변환을 씁니다. 실수 연산이 없으므로 인코더와 디코더가 비트 단위까지 같은 결과를 냅니다. 4×4 순변환의 핵심 행렬은 다음과 같고, 블록 X에 대해 Cf · X · Cfᵀ를 계산합니다.
+
+```text
+Cf = [ 1  1  1  1 ]
+     [ 2  1 −1 −2 ]
+     [ 1 −1 −1  1 ]
+     [ 1 −2  2 −1 ]
+```
+
+잔차가 모두 +1인 4×4 블록을 넣으면 왼쪽 위 DC 계수 하나만 16이고 나머지 15개는 0입니다. 정규 직교 DCT로 계산하면 DC가 4인데, H.264는 그 차이(행마다 다른 크기 보정)를 변환에서 곱하지 않고 양자화 배율에 합쳐 둡니다. 실제 잔차는 이렇게 평평하지 않지만, 이웃끼리 비슷한 값이면 에너지가 왼쪽 위 저주파 계수에 몰리고 오른쪽 아래 고주파 계수는 작아집니다.
+
+### QP가 6 오르면 양자화 간격이 두 배가 됩니다 {#stage-4-quantization--손실-압축의-본질}
+
+양자화는 변환 계수를 일정 간격으로 나눠 반올림하는 단계입니다. 간격이 넓을수록 작은 계수가 0이 되고 비트가 줄며, 잃은 값은 되돌릴 수 없습니다. H.264는 간격을 QP(양자화 파라미터, 8비트에서 0–51)로 정하고, QP가 6 오를 때마다 간격이 두 배가 됩니다. FFmpeg의 H.264 디코더도 역양자화 배율을 「QP를 6으로 나눈 몫」만큼 왼쪽으로 밀어(2의 거듭제곱을 곱해) 만듭니다([h264_ps.c 639–644행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/h264_ps.c#L639-L644), [h264data.c의 quant_div6 표](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/h264data.c#L182)). 같은 몫 안의 나머지 0–5는 배율 표의 여섯 값이 촘촘히 채웁니다.
+
+```text
+설명용 균일 양자화(간격 10, 반올림)
+계수 40 → 4 → 복원 40
+계수  8 → 1 → 복원 10
+계수  3 → 0 → 복원  0
+```
+
+위 예시는 원리만 보인 것이고 특정 QP의 값이 아닙니다. x264의 CRF도 화면마다 QP를 정하는 방식일 뿐이어서, 같은 CRF가 영상마다 같은 화질이나 같은 비트레이트를 뜻하지 않습니다. 이 글의 Sintel 10초에서 CRF 28은 VMAF 93.4였지만, 다른 영상에서는 다른 값이 나옵니다.
+
+### CABAC은 Main 프로파일부터 씁니다 {#stage-5-entropy-coding--무손실-압축-마무리}
+
+양자화한 계수와 모드 · 모션 벡터는 마지막에 무손실로 압축합니다. H.264에는 두 방식이 있습니다. CAVLC(문맥 적응 가변 길이 부호)는 표를 보고 짧은 부호를 붙이고, CABAC(문맥 적응 이진 산술 부호)는 먼저 나온 값으로 확률을 계속 고쳐 가며 산술 부호화합니다. CABAC이 더 많이 줄이는 대신 한 비트씩 차례로 풀어야 해서 디코딩 계산이 무겁습니다. Baseline 프로파일은 CABAC을 쓸 수 없고, x264도 Baseline을 고르면 CABAC을 끕니다([x264 common/base.c 788–795행](https://code.videolan.org/videolan/x264/-/blob/b35605ace3ddf7c1a5d67a2eb553f034aef41d55/common/base.c#L788-795)). High로 만든 이 글의 출력은 PPS의 `entropy_coding_mode_flag`가 1, 곧 CABAC이었습니다.
+
+## 프로파일은 도구를, 레벨은 처리량 상한을 정합니다 {#5-profile과-level--h264의-두-축}
+
+디코더가 스트림을 풀 수 있는지는 두 값으로 갈립니다. 프로파일은 어떤 도구(B 슬라이스, CABAC, 8×8 변환 등)를 쓸 수 있는지를 정하고, 레벨은 화면 크기와 초당 처리량, 참조 버퍼, 비트레이트의 상한을 정합니다. 둘은 SPS의 `profile_idc`와 `level_idc`로 스트림 앞에 적힙니다.
+
+### 프로파일마다 쓸 수 있는 도구가 다릅니다 {#profile--기능-집합}
+
+x264가 프로파일에 맞춰 끄는 도구로 차이를 보면 다음과 같습니다([x264 common/base.c 761–812행](https://code.videolan.org/videolan/x264/-/blob/b35605ace3ddf7c1a5d67a2eb553f034aef41d55/common/base.c#L761-812)).
+
+| 프로파일 | profile_idc | 위 단계에 더해 쓸 수 있는 도구 |
+|---|---|---|
+| Baseline | 66 | I · P 슬라이스, CAVLC |
+| Main | 77 | B 슬라이스, CABAC, 인터레이스, 가중 예측 |
+| High | 100 | 8×8 변환, 양자화 스케일링 행렬, 흑백(4:0:0) |
+| High 10 | 110 | 9–10비트 표본 |
+
+High 10은 10비트 프로파일이지 HDR 프로파일이 아닙니다. HDR 여부는 프로파일이 아니라 색 · 전달 특성 표시가 정하고, 그 표시는 [H.265 글](/posts/tech-blurting/h265-hdr-deep-dive/)에서 다룹니다. 애플 [HLS 저작 규격](https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html)(개정 2025-06-26) 1.4는 H.264에 Main · Baseline보다 High를 쓰라고 권합니다(SHOULD).
+
+### 1080p60은 초당 매크로블록 489,600개라 레벨 4.2가 필요합니다 {#level--처리-부담-상한}
+
+레벨은 규격 표 A-1의 여러 상한을 한꺼번에 만족해야 합니다. 1080p60이면 화면당 매크로블록 8,160개 × 60 = 초당 489,600개입니다. 레벨 4.1의 초당 상한(MaxMBPS)은 245,760개라 넘고, 4.2는 522,240개라 들어갑니다. 4.2의 화면 크기 상한(MaxFS) 8,704개도 8,160개를 덮습니다. 아래 표는 FFmpeg가 규격 표 A-1 · A-2를 옮겨 둔 값입니다.
+
+| 레벨 | MaxMBPS(초당 MB) | MaxFS(화면당 MB) | MaxDpbMbs | High 최대 비트레이트(VCL) |
+|---|---|---|---|---|
+| 4.0 | 245,760 | 8,192 | 32,768 | 25,000kbps |
+| 4.1 | 245,760 | 8,192 | 32,768 | 62,500kbps |
+| 4.2 | 522,240 | 8,704 | 34,816 | 62,500kbps |
+| 5.0 | 589,824 | 22,080 | 110,400 | 168,750kbps |
+| 5.1 | 983,040 | 36,864 | 184,320 | 300,000kbps |
+
+표 출처는 [FFmpeg n9.0.2 libavcodec/h264_levels.c](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/h264_levels.c#L23-L64)입니다. 마지막 열은 표의 MaxBR(기준 프로파일 값, 1,000비트/초 단위)에 High의 배율 1.25를 곱한 값입니다(4.2는 50,000 × 1.25 = 62,500kbps). 참조 버퍼 상한 MaxDpbMbs 34,816을 화면당 8,160으로 나누면 4.27이므로, 레벨 4.2의 1080p는 참조 화면을 4장까지 둘 수 있습니다.
+
+x264에 레벨을 주지 않으면 이 표로 스스로 고릅니다. 1080p60은 레벨 4.2, 같은 크기의 30fps는 4.0으로 선언했고, 둘 다 SPS의 참조 화면 수(max_num_ref_frames)는 4였습니다. `-level 4.1`을 억지로 주자 x264는 `MB rate (489600) > level limit (245760)` 경고를 남기고도 SPS에는 41을 그대로 적었습니다. 레벨 선언은 디코더에게 하는 약속이고, 인코더가 그 약속을 강제하지는 않습니다. 애플 규격은 1.3a에서 호환성을 위해 일부 H.264 변형을 High 4.1 이하로 두라고 권하고(SHOULD), 1.3b에서 모든 변형을 High 5.2 이하로 제한합니다(MUST, macOS는 5.0, tvOS는 5.1). 1080p60 변형은 4.2라 허용 범위 안이지만, 권고를 따르려면 같은 사다리에 4.1 이하 변형도 함께 둡니다. PokeClip 시험 방송의 1080p30은 4.0 안에 들어갑니다.
+
+### avc1.640028은 High 프로파일 레벨 4.0입니다 {#코덱-문자열--avc1640028-해부}
+
+HLS 다변형 목록의 `CODECS`나 브라우저의 `MediaSource.isTypeSupported('video/mp4; codecs="avc1.640028"')`에 쓰는 코덱 문자열은 SPS의 세 바이트를 16진수로 적은 것입니다. [RFC 6381](https://www.rfc-editor.org/rfc/rfc6381#section-3.3) 3.3절이 순서를 profile_idc, 제약 플래그 바이트, level_idc로 정합니다.
+
+```text
+avc1.640028
+     64 → profile_idc 100 = High
+       00 → constraint_set 플래그 모두 0
+         28 → level_idc 40 = 레벨 4.0 (4.2라면 42 = 0x2a)
+```
+
+FFmpeg hls 먹서가 쓴 목록에서도 1080p60 x264 출력은 `CODECS="avc1.64002a"`, 1080p30은 `avc1.640028`이었습니다. 레벨 4.2 스트림을 `avc1.640028`로 적으면 플레이어는 4.0 디코더로 충분하다고 보고 고를 수 있습니다. 목록의 문자열은 실제 SPS와 맞춰야 합니다.
+
+## 비트스트림은 NAL 단위이고 SPS·PPS가 먼저 와야 합니다 {#6-nal-unit--비트스트림의-단위}
+
+H.264 비트스트림은 NAL(Network Abstraction Layer) 단위의 연속입니다. 화면 데이터(슬라이스)와 설정(SPS · PPS), 부가 정보(SEI)가 각각 NAL 하나가 되고, 그릇(TS · MP4 · RTP)은 NAL을 나눠 담기만 합니다.
+
+### NAL 머리 1바이트에 참조 중요도와 종류가 들어 있습니다 {#nal-unit-헤더-1바이트}
+
+NAL 첫 바이트는 세 칸입니다. `forbidden_zero_bit`(1비트, 항상 0), `nal_ref_idc`(2비트, 0이면 참조로 쓰지 않음), `nal_unit_type`(5비트)입니다. FFmpeg의 `trace_headers`로 x264 출력을 풀자 SPS · PPS · IDR은 `nal_ref_idc`가 3, AUD와 SEI는 0이었습니다. 0인 NAL은 버려도 다른 화면의 디코딩에 영향이 없다는 표시입니다.
+
+### 종류 번호 5는 IDR, 7과 8은 SPS와 PPS입니다 {#주요-nal-unit-type}
+
+| 종류 | 이름 | 내용 |
+|---|---|---|
+| 1 | IDR이 아닌 슬라이스 | P · B 슬라이스, IDR이 아닌 I 슬라이스 |
+| 5 | IDR 슬라이스 | 참조를 끊는 화면의 슬라이스 |
+| 6 | SEI | 부가 정보(인코더 설정 문자열, HDR 메타데이터 등) |
+| 7 | SPS | 시퀀스 설정 |
+| 8 | PPS | 화면 설정 |
+| 9 | AUD | 화면 하나(액세스 단위)의 시작 표시 |
+| 12 | 필러 데이터 | CBR을 맞추는 빈 비트([x264 글](/posts/tech-blurting/x264-live-rate-control-gop/#-minrate만으로는-필러가-들어가지-않습니다)) |
+
+번호는 [FFmpeg h264.h 35–46행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/h264.h#L35-L46)의 목록과 같습니다.
+
+### x264 출력은 첫 화면 앞에 SPS·PPS를 붙입니다 {#sps--pps--디코더의-설정값}
+
+SPS(Sequence Parameter Set)에는 프로파일 · 레벨, 매크로블록 단위 화면 크기와 자르기 값, 참조 화면 수, 비트 깊이가 들어 있습니다. PPS(Picture Parameter Set)에는 엔트로피 부호화 방식(CAVLC · CABAC)과 QP 초깃값처럼 화면마다 바뀔 수 있는 설정이 들어 있습니다. 슬라이스는 PPS 번호를, PPS는 SPS 번호를 가리키므로 디코더는 둘을 먼저 받아야 첫 슬라이스를 풀 수 있습니다.
+
+1080p60 1초를 MPEG-TS로 인코딩한 파일에서 첫 패킷은 AUD(9) → SPS(7) → PPS(8) → SEI(6) → IDR(5) 순서였고, 다음 패킷부터는 AUD(9) → 슬라이스(1)만 있었습니다. 중간에 들어온 시청자가 디코딩을 시작하려면 다음 IDR과 그 앞의 SPS · PPS를 받아야 하므로, TS로 내보내는 쪽은 키프레임마다 SPS · PPS를 반복해 넣습니다.
+
+### TS는 시작 코드, MP4는 길이 머리로 NAL을 나눕니다 {#annex-b-vs-avcc--두-가지-포맷}
+
+같은 NAL을 그릇에 담는 방식이 둘입니다. 규격 부록 B의 바이트 스트림(Annex B)은 NAL 앞에 시작 코드 `00 00 01`(또는 `00 00 00 01`)을 둬서 경계를 표시합니다. MPEG-TS가 이 방식이라 SPS · PPS도 화면 사이에 NAL로 섞여 옵니다. MP4 · fMP4는 NAL 앞에 길이(보통 4바이트)를 적고, SPS · PPS는 표본 설명(avcC 상자)에 따로 둡니다. 코덱 문자열의 `avc1`이 이 형태를 뜻하고, 애플 규격 1.10이 SPS · PPS를 표본 안에 두는 `avc3`보다 `avc1`을 권하는 것도 이 차이입니다.
+
+HLS의 TS 조각을 브라우저 MSE(Media Source Extensions)로 재생하려면 fMP4로 바꿔야 합니다. hls.js는 TS에서 꺼낸 NAL마다 앞에 4바이트 길이를 붙여 mdat에 씁니다([mp4-remuxer.ts 742–750행](https://github.com/video-dev/hls.js/blob/127c6adee512843abf85748d82767bdf1a3c8e5c/src/remux/mp4-remuxer.ts#L742-L750)). 시작 코드를 그대로 남긴 채 MP4에 넣으면 디코더는 시작 코드 바이트를 길이로 읽고 깨집니다.
+
+## 송출 명령에서는 레벨 선언과 키프레임 간격을 함께 맞춥니다 {#7-인코더-옵션--실전-튜닝}
+
+프로파일 · 레벨과 키프레임 간격은 스트림을 받는 쪽과의 계약입니다. preset · tune · VBV처럼 인코더 안의 압축을 정하는 옵션은 [x264 글](/posts/tech-blurting/x264-live-rate-control-gop/)에서 실측했습니다. 아래 명령에서는 이 글에서 다룬 값이 들어가는 자리만 봅니다.
+
+### 1080p60 송출은 -level 4.2와 -r 60 -g 120을 함께 줍니다 {#라이브-인코딩-표준-명령}
+
+```bash
+ffmpeg -i input.mp4 \
+  -c:v libx264 -preset veryfast -tune zerolatency \
+  -profile:v high -level 4.2 -pix_fmt yuv420p \
+  -b:v 6000k -maxrate 6000k -bufsize 6000k \
+  -r 60 -g 120 -sc_threshold 0 \
+  -c:a aac -b:a 160k \
+  -f flv rtmp://<수신 서버>/<앱>/<스트림 키>
+```
+
+- `-profile:v high -level 4.2`: SPS에 High · 4.2를 적습니다. 4.2는 위 표대로 1080p60이 들어가는 가장 낮은 레벨입니다. 30fps라면 x264가 고르는 4.0으로 충분합니다.
+- `-pix_fmt yuv420p`: 8비트 4:2:0입니다. 입력이 4:2:2나 10비트면 출력이 High 4:2:2 · High 10 프로파일이 돼 재생기가 거부할 수 있습니다.
+- `-r 60 -g 120 -sc_threshold 0`: 60fps 출력에서 키프레임 간격을 최대 120프레임(2초)으로 두고, 장면 전환 키프레임을 꺼 2초 위치에 고정합니다.
+- `-tune zerolatency`: B 프레임을 꺼 표시 순서와 디코딩 순서를 같게 만듭니다. x264의 tune에는 이 밖에 film · animation · grain · stillimage · psnr · ssim · fastdecode가 있습니다([x264.h 713행](https://code.videolan.org/videolan/x264/-/blob/b35605ace3ddf7c1a5d67a2eb553f034aef41d55/x264.h#L713)).
+
+`-maxrate`와 `-bufsize`가 순간 비트를 얼마나 묶는지, 같은 값의 `-minrate`가 libx264에 전달되지 않는 문제는 [x264 글의 VBV 절](/posts/tech-blurting/x264-live-rate-control-gop/#maxrate와-bufsize가-vbv-상한을-정합니다)에서 잰 결과를 보십시오. 서버 한 대에서 이 인코딩을 몇 채널 돌릴 수 있는지는 [라이브 트랜스코딩 서버 글](/posts/tech-blurting/live-transcoding-infrastructure/), GPU 인코더는 [NVENC 글](/posts/tech-blurting/nvenc-gpu-transcoding/)에 있습니다.
+
+## VMAF 점수는 모델·해상도·프레임 정렬을 함께 적어야 비교됩니다 {#8-화질-평가--psnr-vs-ssim-vs-vmaf}
+
+화질 지표는 원본과 인코딩 결과를 화면마다 견줍니다. PSNR은 화소 오차의 평균 제곱을 데시벨로 바꾼 값이고, SSIM은 밝기 · 대비 · 구조가 얼마나 같은지를 봅니다. VMAF(Video Multimethod Assessment Fusion)는 Netflix가 여러 화질 특징을 사람의 평가 점수에 맞춰 학습시킨 모델이라, 점수는 학습한 시청 조건을 전제로 합니다. 그래서 VMAF 숫자는 네 가지를 함께 적어야 다른 숫자와 비교할 수 있습니다.
+
+1. **모델과 판.** 기본 모델 vmaf_v0.6.1은 1080p HDTV를 화면 높이의 세 배(3H) 거리에서 보는 조건으로 학습했습니다. 4K 모델(vmaf_4k_v0.6.1)은 4K TV를 1.5H에서 보는 조건이고, 휴대폰 모델은 같은 영상에 더 높은 점수를 줍니다([VMAF 모델 문서](https://github.com/Netflix/vmaf/blob/a6ed0f18285cab504b779bbccb0bbaddc3bf44c2/resource/doc/models_v0.md)).
+2. **해상도.** 720p 결과는 원본 해상도(1080p)로 키운 뒤 1080p 원본과 비교합니다. 720p끼리 비교한 점수는 더 먼 거리에서 본 화질을 예측하는 셈이라 높게 나오고, 1080p 점수와 견줄 수 없습니다([VMAF FAQ](https://github.com/Netflix/vmaf/blob/a6ed0f18285cab504b779bbccb0bbaddc3bf44c2/resource/doc/faq.md)).
+3. **프레임 정렬.** FFmpeg 필터는 프레임 번호가 아니라 타임스탬프로 두 입력을 맞춥니다([VMAF FFmpeg 문서](https://github.com/Netflix/vmaf/blob/a6ed0f18285cab504b779bbccb0bbaddc3bf44c2/resource/doc/ffmpeg.md)). 시작 시각이나 시간 단위가 다르면 다른 화면끼리 비교해 점수가 크게 떨어집니다. 아래 측정은 두 입력 모두 `setpts=N/24/TB`로 프레임 번호에 맞췄습니다. mkv의 밀리초 타임스탬프를 그대로 쓰면 프레임이 어긋났습니다.
+4. **평균과 하위 백분위.** 기본 출력은 화면별 점수의 산술 평균입니다. VMAF FAQ도 사람의 판단은 가장 나쁜 화면 쪽으로 기운다고 적고, 백분위 같은 다른 집계를 함께 제공합니다. 이 글의 1-pass 결과는 평균이 90.94였지만 화면별 점수의 하위 1%는 78.86으로 12점 낮았습니다. 평균만 보면 잠깐 깨지는 장면을 놓칩니다.
+
+해상도별 VMAF 곡선으로 사다리를 고른 결과는 [ABR 사다리 글](/posts/tech-blurting/abr-ladder-design/#6-convex-hull--사다리에서-쓸데없는-점-제거), preset별 VMAF는 [x264 글](/posts/tech-blurting/x264-live-rate-control-gop/#preset은-같은-crf에서-cpu-시간과-파일-크기를-맞바꿉니다)에 있습니다.
+
+## 2-pass는 첫 패스 통계로 평균 비트레이트를 나눠 씁니다 {#9-two-pass-인코딩--화질-짜내기}
+
+1-pass 평균 비트레이트(ABR) 인코딩은 앞으로 올 장면을 모른 채 목표에 맞춰 나갑니다. 2-pass는 첫 패스에서 화면마다 복잡도를 통계 파일에 적고, 둘째 패스에서 그 통계로 전체 비트를 화면마다 나눕니다. 복잡도에 정비례해 나누지는 않습니다. x264는 복잡도 차이를 qcomp(기본 0.6, [base.c 423행](https://code.videolan.org/videolan/x264/-/blob/b35605ace3ddf7c1a5d67a2eb553f034aef41d55/common/base.c#L423))로 눌러, 복잡한 장면에 비트를 더 주되 QP도 함께 올립니다. 첫 패스는 통계만 얻으면 되므로 빠른 설정으로 돕니다. FFmpeg의 `fastfirstpass` 옵션은 기본으로 켜져 있고([libx264.c 1254–1255행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/libx264.c#L1254-L1255)), x264는 첫 패스에서 참조를 1장으로, 움직임 탐색을 다이아몬드로, 부화소 정밀도를 2단계 이하로 낮춥니다([x264 common/base.c 717–729행](https://code.videolan.org/videolan/x264/-/blob/b35605ace3ddf7c1a5d67a2eb553f034aef41d55/common/base.c#L717-729)). 이번 첫 패스의 통계 파일 머리에도 `ref=1 me=dia subme=2 trellis=0 8x8dct=0`이 적혀 있었습니다.
+
+같은 Sintel 10초를 x264 medium으로 목표 1,500kbps에 두고 1-pass와 2-pass를 비교했습니다. 1-pass는 실제 평균이 목표를 넘었으므로, 목표를 낮춘 1-pass와 목표를 올린 2-pass를 더해 실제 비트레이트가 비슷한 쌍끼리도 견줬습니다.
+
+| 방식 | 목표 | 실제 평균 | VMAF 평균 | 하위 1% | 2초 구간 최대 | CPU 시간 |
+|---|---|---|---|---|---|---|
+| 1-pass ABR | 1,400k | 1,536kbps | 89.93 | 75.99 | 2,899kbps | 31.4초 |
+| 2-pass | 1,500k | 1,530kbps | 90.30 | 75.50 | 2,016kbps | 43.2초(16.2 + 26.9) |
+| 1-pass ABR | 1,500k | 1,640kbps | 90.94 | 78.86 | 3,094kbps | 32.8초 |
+| 2-pass | 1,625k | 1,652kbps | 91.48 | 77.57 | 2,169kbps | 42.9초(16.2 + 26.7) |
+| CRF 29(참고) | 없음 | 1,626kbps | 91.94 | 79.41 | 2,155kbps | 32.6초 |
+
+2-pass는 목표를 2% 안으로 맞췄고(1,530 · 1,652kbps), 1-pass는 두 번 모두 목표보다 약 10% 많이 썼습니다. 실제 평균이 비슷한 쌍끼리 보면 2-pass의 VMAF 평균은 0.37 · 0.54점 높았지만 하위 1%는 0.49 · 1.29점 낮았습니다. 두드러진 차이는 2초 구간 최대 비트레이트였습니다. 2-pass가 2,899 → 2,016kbps, 3,094 → 2,169kbps로 약 30% 낮았습니다. CPU 시간은 첫 패스(약 16초)만큼 늘어 1.3–1.4배였습니다. 같은 비트레이트 근처의 CRF 29는 평균과 하위 1% 모두 2-pass보다 높았습니다. 2-pass는 CRF보다 화질을 더 짜내는 방식이 아니라, 정한 평균 비트레이트나 파일 크기에 정확히 맞추는 방식입니다.
+
+1초씩 나눠 보면 비트가 간 곳이 다릅니다. 실제 평균이 약 1,530kbps로 같은 두 결과에서 2–3초 구간(움직임이 큰 장면)을 1-pass는 3,523kbps로 크게 썼고, 2-pass는 1,889kbps만 썼습니다.
+
+{{< chart id="fig-twopass-per-second" kind="실측" caption="실제 평균이 약 1,530kbps로 같은 1-pass ABR(목표 1,400k)과 2-pass(목표 1,500k)의 1초 구간별 비트레이트. 1-pass는 2–3초 구간에 3,523kbps를 몰아 쓰고 첫 1초와 7–9초 구간에는 덜 썼습니다. 2-pass는 둘 다 300kbps대로 아낀 1–2초 구간을 빼면 1,054–2,035kbps 안에서 고르게 나눴습니다. Sintel 예고편 10초, x264 medium, 1회." source="아래 「측정 조건」" height="320px" >}}
+{
+  "grid": {"left": 8, "right": 24, "top": 40, "bottom": 28, "containLabel": true},
+  "xAxis": {"type": "category", "name": "초", "data": ["0–1", "1–2", "2–3", "3–4", "4–5", "5–6", "6–7", "7–8", "8–9", "9–10"]},
+  "yAxis": {"type": "value", "name": "kbps", "nameTextStyle": {"align": "left"}, "min": 0, "max": 4000, "interval": 1000},
+  "series": [
+    {"name": "1-pass", "type": "line", "symbol": "circle", "symbolSize": 6, "itemStyle": {"color": "#7a8a9b"}, "lineStyle": {"color": "#7a8a9b", "type": "dashed"},
+     "data": [1207, 382, {"value": 3523, "label": {"show": true, "position": "right", "formatter": "1-pass", "color": "#172c40"}}, 2229, 1391, 1459, 1470, 1119, 959, 1616]},
+    {"name": "2-pass", "type": "line", "symbol": "circle", "symbolSize": 6, "itemStyle": {"color": "#087f8b"}, "lineStyle": {"color": "#087f8b", "width": 3},
+     "data": [1740, 307, 1889, 2035, 1656, {"value": 1751, "label": {"show": true, "position": "top", "formatter": "2-pass", "color": "#172c40", "fontWeight": "bold"}}, 1707, 1465, 1054, 1695]}
+  ]
+}
 {{< /chart >}}
 
-[지난 글](../whip-whep-modern-ingest/)에서 스트리밍 프로토콜(RTMP/HLS/WebRTC/WHIP)을 정리했다면, 이번 글은 **그 안에 흐르는 영상 데이터가 어떻게 만들어지는지** 정리한 노트다. I/P/B 프레임, 매크로블록, 양자화, CABAC, NAL Unit, 그리고 OBS 인코딩 옵션의 진짜 의미.
-
----
-
-## 1. H.264의 정체 — 두 표준 단체가 공동으로 만든 결과
-
-H.264는 ITU-T와 ISO/IEC가 공동으로 표준화한 영상 부호화 규격이다. AVC, ISO/IEC 14496-10이라는 이름으로도 부른다. 첫 권고는 2003년에 나왔다. 라이브·녹화 환경에서 널리 쓰이지만, 이 글에는 시장 점유율을 산출할 자료가 없다.
-
-## 2. 압축의 3가지 원리 — 어디서 데이터를 줄이나
-
-H.264는 영상의 **중복성**을 세 가지 방식으로 활용한다.
-
-| 종류 | 원리 | 예시 |
-|---|---|---|
-| **공간적 중복** | 한 프레임 안에서 인접 픽셀이 비슷함 | 하늘은 거의 같은 파란색 |
-| **시간적 중복** | 연속 프레임이 거의 같음 | 정적인 배경 |
-| **통계적 중복** | 자주 나오는 값에 짧은 코드 부여 | 0이 많이 나옴 → 0에 1비트 |
-
-각 중복을 다른 기법으로 압축. **공간 → Intra Prediction**, **시간 → Inter Prediction + Motion Vector**, **통계 → CABAC/CAVLC**.
-
----
-
-## 3. I/P/B 프레임 — H.264의 압축 핵심
-
-![I/P/B 프레임 + 모션 벡터](/images/h264-frame-types-motion.png)
-
-*그림은 예측 관계를 설명하는 도식이다. 프레임별 바이트 수와 비율은 고정값이 아니다.*
-
-| 구분 | 사용하는 예측 | 읽을 때 주의할 점 |
-|---|---|---|
-| I | 같은 영상 안의 공간 예측 | raw 이미지 저장과 다르다 |
-| P | 참조 영상 목록을 이용한 예측 | 이전에 복호한 참조 영상이 필요하다 |
-| B | 두 참조 목록을 이용한 예측 | 표시 순서와 복호 순서가 다를 수 있다 |
-
-실제 문법은 슬라이스 단위다. I/P/B를 프레임 전체의 성격으로 부르는 것은 설명을 단순화한 표현이다. **I 영상과 IDR은 같은 말이 아니다.** IDR은 뒤의 영상이 IDR 이전 영상을 참조하지 않도록 하는 경계다. 중간 진입과 독립 재생을 설명할 때 이 차이가 중요하다.
-
-### Motion Vector — P/B 프레임의 작동 원리
-
-P-frame이 이전 프레임의 모든 픽셀을 다시 저장하지 않는 비밀.
-
-```
-[P-frame의 표현]
-"이전 프레임 (10, 20) 위치의 16x16 블록을 가져와서
- (0, -5)만큼 이동시켜라 + 작은 차분"
-
-→ 모션 벡터 (Δx=0, Δy=-5) + residual data (작음)
-```
-
-장면이 정적이면 모션 벡터 거의 0. 액션 장면이면 큰 값. 같은 해상도라도 움직임·질감·노이즈에 따라 필요한 비트레이트가 달라지는 이유다. 차이를 고정된 배수로 말할 수는 없다.
-
-### GOP 크기의 트레이드오프
-
-키프레임을 자주 넣으면 중간 진입과 탐색을 위한 경계가 늘지만, 같은 비트레이트에서 압축 효율이 나빠질 수 있다. 긴 GOP는 그 반대의 비용을 가진다. 정확한 탐색은 필요한 앞선 참조부터 복호하는 방식으로도 가능하다.
-
-HLS에 **6초 GOP가 강제되는 것은 아니다**. 세그먼트 목표 길이, 키프레임 간격, 독립 세그먼트 조건을 함께 맞춘다. 60fps 출력에서 2초 간격은 120프레임이다. [HLS 규격](https://www.rfc-editor.org/rfc/rfc8216.html)의 독립 세그먼트 조건과 플레이어의 요구를 확인해야 한다.
-
-## 4. H.264 인코딩 5단계 파이프라인
-
-I/P/B 프레임을 만드는 실제 과정.
-
-![H.264 인코딩 5단계 파이프라인](/images/h264-encoding-pipeline.png)
-
-```mermaid
-flowchart LR
-  A[원본 프레임<br/>1920x1080<br/>~6MB raw] --> B[Macroblock<br/>16×16 분할]
-  B --> C{Prediction}
-  C -->|Intra| D1[같은 프레임<br/>인접 블록 예측]
-  C -->|Inter| D2[이전 프레임<br/>+ Motion Vector]
-  D1 --> E[Residual<br/>작아질 수 있음]
-  D2 --> E
-  E --> F[Integer DCT<br/>주파수 변환]
-  F --> G[Quantization<br/>나눗셈 → 손실 발생]
-  G --> H[Entropy Coding<br/>CABAC/CAVLC]
-  H --> I[압축 비트스트림<br/>크기는 설정·장면에 따라 다름]
-```
-
-### Stage 1: Macroblock 분할
-
-프로그레시브 1920 × 1080 영상을 16 × 16 단위로 덮으려면 다음과 같이 올림한다.
-
-```text
-가로: ceil(1920 / 16) = 120
-세로: ceil(1080 / 16) = 68
-합계: 120 × 68 = 8,160 매크로블록
-부호화 높이 1,088에서 표시 영역 1,080으로 크롭
-```
-
-예측과 변환에는 더 작은 분할도 쓰인다. 모든 연산이 16 × 16 한 단위로만 이루어진다는 뜻은 아니다.
-
-### Stage 2: Prediction — 압축의 진짜 비밀
-
-각 매크로블록에 대해 **이미 처리된 부분**(같은 프레임의 인접 블록 OR 이전 프레임의 비슷한 블록)으로 예측.
-
-```
-실제 블록    예측 블록    차분(residual)
-[123 124   ]   [122 123   ]   [+1 +1   ]
-[125 126   ]   [124 125   ]   [+1 +1   ]
-...            ...            ...
-```
-
-예측이 잘 맞을수록 차분이 작아진다. 복잡한 장면에서는 큰 잔차가 남을 수 있다.
-
-### Stage 3: Integer DCT — 주파수 변환
-
-차분을 **주파수 도메인**으로 변환. DCT 비슷한 정수 변환(Integer DCT). 영상의 큰 패턴은 저주파, 디테일은 고주파.
-
-```
-공간 도메인          주파수 도메인
-[+1 +1 +1 +1]       [+4  0  0  0]  ← 저주파에 집중
-[+1 +1 +1 +1]   →   [ 0  0  0  0]
-[+1 +1 +1 +1]       [ 0  0  0  0]
-[+1 +1 +1 +1]       [ 0  0  0  0]
-```
-
-이 예시는 일정한 잔차가 저주파에 집중되는 경우다. 모든 입력의 변환 계수가 이렇게 나오는 것은 아니다.
-
-### Stage 4: Quantization — 손실 압축의 본질
-
-변환 계수를 더 거친 단계로 표현하면 정보를 잃는 대신 0과 작은 계수가 많아질 수 있다.
-
-```text
-설명용 균일 양자화: 단계 크기를 10으로 가정하고 최근접 반올림
-40 / 10 → 4 → 복원 40
- 8 / 10 → 1 → 복원 10
- 3 / 10 → 0 → 복원  0
-```
-
-**위 나눗셈은 H.264의 QP=10을 뜻하지 않는다.** 실제 양자화에는 스케일링과 반올림 규칙이 있고, QP와 단계 크기는 선형 관계가 아니다. QP 6 증가에 단계 크기가 대략 2배가 되는 관계를 사용한다.
-
-QP별 압축 배수나 “모바일 화질”이 정해져 있지도 않다. x264의 CRF는 일정 비트레이트를 지정하는 모드가 아니라 품질 목표에 따라 양자화를 조절하는 방식이며, 같은 CRF라도 결과는 콘텐츠에 따라 달라진다.
-
-### Stage 5: Entropy Coding — 무손실 압축 마무리
-
-양자화 뒤의 문법 요소를 엔트로피 부호화한다. CAVLC와 CABAC은 압축 효율과 연산량이 다르며, 사용할 수 있는 방식은 프로파일의 제약을 받는다. CABAC을 켜면 항상 10% 줄어든다는 보장은 없다. 실제 입력과 인코더 설정으로 비교해야 한다.
-
-## 5. Profile과 Level — H.264의 두 축
-
-각자 다른 걸 제한.
-
-### Profile — 기능 집합
-
-| Profile | 기능 | 호환성 | 사용처 |
-|---|---|---|---|
-| **Baseline** | 기본 (I/P만) | 최고 (피처폰) | 옛 모바일 |
-| **Main** | + B-frame, CABAC | 좋음 | 일반 라이브 |
-| **High** | + 8x8 transform, 가변 양자화 | 약간 제한적 | VOD, 고화질 |
-| **High 10** | + 10-bit | 제한적 | HDR |
-
-High Profile은 흔한 선택이지만 보편적인 호환성 보장은 아니다. 대상 기기의 프로파일·레벨·비트 심도 지원을 확인한다.
-
-### Level — 처리 부담 상한
-
-레벨은 단일한 “최대 해상도” 표가 아니다. 영상당 매크로블록 수, 초당 처리량, 디코딩 버퍼, 비트레이트 등에 상한을 둔다. 비트레이트 한도는 프로파일에도 영향을 받는다.
-
-1080p60을 다룰 때 Level 4.2를 검토할 수 있지만, 레벨을 선언했다고 인코더 출력이나 모든 디코더가 그 조건을 만족하는 것은 아니다. 실제 스트림과 대상 기기를 확인해야 한다.
-
-### 코덱 문자열 — `avc1.640028` 해부
-
-브라우저에서 `MediaSource.isTypeSupported('video/mp4; codecs="avc1.640028"')` 같은 거 봤을 거다.
-
-```
-avc1.640028
-└─┬─┘ │ │ │
-   │  │ │ └── 28 = Level 4.0 (decimal 40, 16진수 28)
-   │  │ └──── 00 = Constraint flags
-   │  └────── 64 = Profile (decimal 100 = High Profile)
-   └──────── avc1 = H.264 (AVC)
-
-→ "H.264 High Profile Level 4.0"
-```
-
-매니페스트(M3U8/MPD)에 박혀있어서 플레이어가 미리 디코딩 가능 여부 판단.
-
----
-
-## 6. NAL Unit — 비트스트림의 단위
-
-압축된 H.264 데이터는 **NAL Unit (Network Abstraction Layer Unit)** 의 연속.
-
-### NAL Unit 헤더 (1바이트)
-
-```
- 7 6 5 4 3 2 1 0
-┌─┬─┬─┬─┬─┬─┬─┬─┐
-│F│NRI│  Type   │
-└─┴─┴─┴─┴─┴─┴─┴─┘
-F   = Forbidden (0 강제)
-NRI = Reference Idc (참조 중요도)
-Type = NAL Unit 종류 (5비트)
-```
-
-### 주요 NAL Unit Type
-
-| Type | 이름 | 의미 |
-|---|---|---|
-| 1 | Non-IDR Slice | IDR이 아닌 부호화 슬라이스; I 슬라이스도 가능 |
-| 5 | IDR Slice | 참조 관계를 끊는 IDR 영상의 슬라이스 |
-| 6 | SEI | 보조 정보 (HDR 메타데이터 등) |
-| 7 | **SPS** | Sequence Parameter Set |
-| 8 | **PPS** | Picture Parameter Set |
-| 9 | AUD | Access Unit Delimiter |
-
-### SPS / PPS — 디코더의 설정값
-
-```
-SPS (Sequence Parameter Set):
-- 해상도, fps, bit depth, profile, level
-- 초기화에 필요하며 스트림 안에서 반복되거나 갱신될 수 있음
-
-PPS (Picture Parameter Set):
-- 엔트로피 코딩 모드 (CABAC/CAVLC), 양자화 초기값
-- 영상 전체 또는 일부에 적용
-```
-
-디코더는 해당 슬라이스가 참조하는 SPS/PPS를 먼저 알아야 한다. 이 정보는 비트스트림 안에서 오거나 MP4 초기화 정보처럼 별도로 전달될 수 있다. 중간 진입에는 필요한 설정과 복호 가능한 진입점이 모두 필요하다.
-
-### Annex B vs AVCC — 두 가지 포맷
-
-같은 NAL Unit을 두 가지 방식으로 표현.
-
-```
-[Annex B - MPEG-TS 등의 바이트 스트림 표현]
-00 00 00 01 [NAL Unit 1] 00 00 00 01 [NAL Unit 2] ...
-└──┬──┘                  └──┬──┘
-Start Code               Start Code
-
-[AVCC - MP4, fMP4에서 사용]
-[Length (설정된 길이)] [NAL Unit 1] [Length (설정된 길이)] [NAL Unit 2] ...
-```
-
-HLS의 .ts는 Annex B, fMP4는 AVCC. **hls.js의 transmuxing이 이 변환을 한다**.
-
----
-
-## 7. 인코더 옵션 — 실전 튜닝
-
-### x264 preset — 속도 vs 화질
-
-preset은 인코더가 사용할 탐색과 압축 도구의 조합이다. 느린 preset이 더 많은 계산으로 압축 효율을 개선할 수 있지만, 동일 CRF의 파일 크기나 VMAF가 일정한 비율로 변하는 것은 아니다.
-
-기존의 preset별 VMAF·속도 그래프는 원본 영상과 실행 조건이 없어 철회했다. 이 글의 그래프는 앞부분의 raw 데이터율 계산으로 교체했다. 라이브에서는 입력 해상도·fps를 지속적으로 처리할 수 있는지 측정하고, 그 안에서 품질과 비용을 비교한다.
-
-### Tune — 콘텐츠별 최적화
-
-| Tune | 용도 |
-|---|---|
-| `film` | 영화 (필름 노이즈 유지) |
-| `animation` | 애니메이션 (큰 단색 영역) |
-| `grain` | 필름 그레인 보존 |
-| `stillimage` | 슬라이드쇼 |
-| `psnr` / `ssim` | 측정값 최적화 |
-| **`zerolatency`** | **라이브 (B-frame 비활성, lookahead 0)** |
-
-`zerolatency`는 재정렬과 선행 탐색 대기를 줄이는 선택이다. 압축 효율의 비용이 있어 모든 라이브에 강제하지 않는다. 줄어드는 시간도 fps와 기존 설정에 따라 다르다.
-
-### 비트레이트 제어 모드
-
-```bash
-# CRF — 품질 목표 기반, 비트레이트는 콘텐츠에 따라 가변
-ffmpeg -c:v libx264 -crf 23 ...
-# CRF 숫자를 보편적인 화질 등급으로 해석하지 않는다
-
-# 비트레이트/VBV 제약 예시 — 이 옵션만으로 모든 순간의 전송량이 일정해지지는 않음
-ffmpeg -c:v libx264 -b:v 6000k -minrate 6000k -maxrate 6000k -bufsize 12000k ...
-# muxer·padding·측정 구간까지 포함해 실제 전송률을 확인한다
-
-# VBR (Variable Bit Rate) — 평균 일정, 순간 가변
-ffmpeg -c:v libx264 -b:v 6000k -maxrate 12000k -bufsize 24000k ...
-# VOD에서 가끔
-```
-
-### 라이브 인코딩 구성 예시
-
-```bash
-ffmpeg -i input \
-  -c:v libx264 \
-  -preset veryfast \
-  -tune zerolatency \
-  -profile:v high \
-  -level 4.2 \
-  -pix_fmt yuv420p \
-  -b:v 6000k -minrate 6000k -maxrate 6000k -bufsize 12000k \
-  -r 60 -g 120 -keyint_min 120 \
-  -sc_threshold 0 \
-  -f flv rtmp://...
-```
-
-위 명령은 1080p 입력을 60fps로 출력한다는 구성 예시이며, 실행 벤치마크가 아니다.
-
-각 옵션의 의미:
-- `preset veryfast`: 실시간 인코딩
-- `tune zerolatency`: B-frame 끔, 지연 최소화
-- `profile:v high -level 4.2`: 출력의 프로파일과 레벨 선언; 입력 크기와 실제 제약 확인 필요
-- `pix_fmt yuv420p`: 8비트 4:2:0 출력; 대상 플레이어의 지원은 별도 확인
-- `r 60 -g 120`: 60fps 출력에서 최대 120프레임, 즉 2초 GOP
-- `sc_threshold 0`: scene change에 의한 자동 키프레임 비활성 (GOP 일정 유지)
-
----
-
-## 8. 화질 평가 — PSNR vs SSIM vs VMAF
-
-PSNR은 픽셀 오차, SSIM은 구조적 유사성, VMAF는 여러 특징을 결합한 학습 모델로 품질을 평가한다. 서로 다른 관점을 제공하므로 하나의 점수로 모든 화질을 판정하지 않는다.
-
-**PSNR 40dB나 VMAF 90이 무손실을 보장하지 않는다.** 해상도, 스케일링, 정렬, VMAF 모델과 버전, 시청 환경을 함께 기록해야 한다. 원본과 테스트 영상의 대응이 잘못되면 비교 자체가 무의미해진다. 육안 검토도 함께 한다.
-
-## 9. Two-pass 인코딩 — 화질 짜내기
-
-입력을 먼저 분석할 수 있는 파일 인코딩에서는 1차 통계로 2차 비트 배분을 계획할 수 있다. 다음은 목표 평균 비트레이트를 쓰는 x264 예시다.
-
-```bash
-ffmpeg -i input.mp4 -an -c:v libx264 -b:v 6000k -pass 1 -f null /dev/null
-ffmpeg -i input.mp4 -c:v libx264 -b:v 6000k -pass 2 output.mp4
-```
-
-VMAF가 고정적으로 2~3점 상승하거나 실행 시간이 정확히 두 배가 되는 것은 아니다. CRF와 2-pass 평균 비트레이트 제어도 서로 구분한다. 아직 도착하지 않은 미래 입력 전체를 미리 분석하는 방식은 라이브에 그대로 적용할 수 없다.
-
-## 정리하면
-
-핵심은 **표현 조건, 예측 관계, 양자화, 실제 출력 검증**을 구분하는 것이다. raw 데이터율은 계산할 수 있지만 압축 후 화질과 속도는 측정해야 한다. 60fps에서 2초 GOP는 120프레임이며, I 영상과 IDR은 다르다. `avc1.640028`은 High Level 4.0이고 Level 4.2라면 끝이 `2a`다.
-
-다음 [H.265 글](../h265-hdr-deep-dive/)에서는 압축 도구와 호환성, 라이선스 검토를 구분한다.
-
-**참고**
-- [ITU-T H.264](https://www.itu.int/rec/T-REC-H.264)
-- [FFmpeg libx264 옵션](https://ffmpeg.org/ffmpeg-codecs.html#libx264_002c-libx264rgb)
-- [x264](https://www.videolan.org/developers/x264.html)
-- [Netflix VMAF](https://github.com/Netflix/vmaf)
+그 구간의 VMAF 평균은 1-pass 94.2, 2-pass 81.0이었고, 2-pass의 하위 1%가 낮았던 이유도 여기에 있습니다. 대신 2-pass는 1-pass가 아낀 첫 1초(VMAF 83.4 → 88.9)와 7–8초 구간에 비트를 더 썼습니다. 순간 비트를 평평하게 만든 것은 망에는 좋지만, 가장 어려운 장면의 화질과 맞바꾼 결과입니다. 영상 1개 · 1회 측정이라 1점 안팎의 차이는 다른 영상에서 뒤집힐 수 있습니다.
+
+2-pass는 입력 전체를 먼저 읽어야 하므로 라이브에는 그대로 쓸 수 없습니다. 라이브 인코더가 미리 볼 수 있는 것은 lookahead 몇 프레임뿐이고, 그것도 지연이 됩니다([x264 글](/posts/tech-blurting/x264-live-rate-control-gop/#zerolatency는-b-프레임lookaheadmbtree를-끕니다)). 2-pass가 쓸모 있는 곳은 파일 크기나 평균 비트레이트를 정확히 맞춰야 하는 VOD 인코딩입니다.
+
+## I 프레임과 IDR, CRF와 화질 등급을 같은 것으로 보면 틀립니다 {#정리하면}
+
+- I 프레임은 참조를 끊지 않습니다. 중간 진입과 HLS 조각 시작에는 IDR(NAL 종류 5)이 필요합니다.
+- CRF 숫자는 화질 등급이 아닙니다. 같은 CRF라도 영상마다 비트레이트와 VMAF가 다릅니다.
+- 레벨 선언은 인코더가 지켜 주지 않습니다. x264는 1080p60에 4.1을 적으라면 경고만 남기고 적습니다. 1080p60은 4.2이고, 코덱 문자열로는 `avc1.64002a`입니다.
+- VMAF 평균 하나로 화질을 말하면 하위 프레임이 숨습니다. 모델 · 해상도 · 정렬 방식과 하위 백분위를 함께 적어야 다른 사람의 숫자와 견줄 수 있습니다.
+
+인코딩 결과가 이상하면 먼저 `ffmpeg -i <파일> -c copy -bsf:v trace_headers -f null -`로 SPS의 profile_idc · level_idc와 NAL 순서를 보십시오. 목록에 적은 코덱 문자열과 실제 스트림이 어긋나는 문제는 대부분 여기서 드러납니다.
+
+## 측정 조건
+
+- 수행: AI(Claude Code)가 2026년 11월 13일에 실행했습니다. 헤더 · 레벨 · NAL 확인은 06:34–06:35(KST), 1-pass · 2-pass(목표 1,500k)는 06:34:44–06:35:57, 목표를 바꾼 1-pass 1,400k · 2-pass 1,625k는 06:52–06:54, CRF 29는 06:37에 돌렸습니다. 모두 1회입니다.
+- 기종: MacBook Air(Mac17,3, Apple M5, 고성능 4 · 효율 6코어, 32GB, 팬 없음), macOS 27.0.1.
+- 부하: 같은 기계에서 다른 세션의 작업(브라우저, 다른 인코딩 · 렌더 실험)이 함께 돌았습니다. 10초마다 기록한 1분 load average는 측정 시작 때 26.3, 1,500k 비교 때 26–53, 1,400k · 1,625k 비교 때 216–221이었습니다(이 측정의 인코더 스레드 포함). 그래서 벽시계 시간은 쓰지 않고 CPU 시간(user + sys, 자식 프로세스 rusage)으로 비교했습니다. 같은 목표의 2-pass를 load 50과 217에서 돌린 CPU 시간은 43.2초와 42.9초로 비슷했지만, 성능 · 효율 코어가 섞인 칩이라 CPU 시간도 부하의 영향을 완전히 피하지는 못합니다.
+- 도구: FFmpeg 9.0.2(Homebrew 9.0.2_1), x264 core 165 r3222, libvmaf 3.2.1(모델 vmaf_v0.6.1).
+- 입력: [Sintel 예고편](https://durian.blender.org/sharing/) 1080p(© copyright Blender Foundation | durian.blender.org, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)), `https://download.blender.org/durian/trailer/sintel_trailer-1080p.mp4`(sha256 `34bbd52a4b89fdf63c8ace50b268da26653a59508288100cd3c23de276db7931`, H.264 약 2.1Mbps)의 20초 지점부터 10초를 FFV1로 풀어 둔 파일(1920×1080, 24fps, 240프레임). 원본 자체가 이미 한 번 압축된 영상이고, 위아래에 검은 띠가 있어 `cropdetect` 기준 실제 화면은 대부분 1920×818입니다.
+  - `ffmpeg -ss 20 -i sintel_trailer-1080p.mp4 -t 10 -an -c:v ffv1 ref.mkv`
+- 1-pass: `ffmpeg -i ref.mkv -an -c:v libx264 -preset medium -b:v <1400k|1500k> abr1.mp4`
+- 2-pass: `ffmpeg -i ref.mkv -an -c:v libx264 -preset medium -b:v <1500k|1625k> -pass 1 -passlogfile tp -f null -` 뒤 `ffmpeg -i ref.mkv -an -c:v libx264 -preset medium -b:v <같은 값> -pass 2 -passlogfile tp twopass.mp4`. 첫 패스 설정은 통계 파일(`tp-0.log`) 첫 줄에서 읽었습니다.
+- CRF: `ffmpeg -i ref.mkv -an -c:v libx264 -preset medium -crf <28|29> out.mp4`
+- VMAF: `ffmpeg -i out.mp4 -i ref.mkv -lavfi "[0:v]setpts=N/24/TB[d];[1:v]setpts=N/24/TB[r];[d][r]libvmaf=model=version=vmaf_v0.6.1:n_threads=8:log_fmt=json:log_path=v.json" -f null -`. 평균은 libvmaf의 평균, 하위 1%는 화면별 점수 240개를 정렬해 아래에서 세 번째 값(1백분위, 가장 가까운 순위)입니다.
+- 비트레이트: `ffprobe -v error -select_streams v -show_entries packet=pts_time,size -of csv=p=0 out.mp4`의 영상 패킷 크기 합(컨테이너 제외). 2초 구간 최대는 표시 순서로 48프레임씩 한 프레임씩 밀며 잰 최댓값, 1초 구간 값은 표시 시각의 정수 초로 나눈 합입니다.
+- 레벨 · NAL: `ffmpeg -f lavfi -i testsrc2=size=1920x1080:rate=<60|30> -t 1 -c:v libx264 -preset <veryfast|medium> [-level <4.1|4.2>] -profile:v high -pix_fmt yuv420p -g <120|60> -sc_threshold 0 -f mpegts out.ts` 뒤 `ffmpeg -i out.ts -c copy -bsf:v trace_headers -f null -`. 코덱 문자열은 같은 입력 2초를 `-f hls -hls_segment_type fmp4 -hls_time 1 -master_pl_name master.m3u8`로 내보낸 다변형 목록에서 읽었습니다.
+- 디코딩 순서: `ffmpeg -i ref.mkv -frames:v 9 -an -c:v libx264 -preset medium -bf 3 -b-pyramid none dec.mp4` 뒤 `ffprobe -v error -select_streams v -show_entries packet=pts,dts,flags -of csv=p=0 dec.mp4`.
+
+## 출처
+
+- [ITU-T H.264 권고 목록](https://www.itu.int/rec/T-REC-H.264) — 판 이력(05/2003 첫 판, 06/2026 현재 판)
+- [Via LA, AVC/H.264 라이선스 프로그램](https://www.via-la.com/licensing-programs/avc-h-264/)
+- FFmpeg n9.0.2 소스: [h264_levels.c](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/h264_levels.c#L23-L64) — 레벨 표 A-1 · A-2 · [h264_ps.c](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/h264_ps.c#L639-L644) · [h264data.c](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/h264data.c#L182) — 역양자화 · [h264.h](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/h264.h#L35-L46) — NAL 종류 · [h264pred.h](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/h264pred.h#L38-L46) — 화면 내 예측 모드 · [h264qpel.c](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/h264qpel.c) — 1/4 화소 보간 · [libx264.c](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/libx264.c#L1254-L1255) — fastfirstpass
+- x264 r3222 소스: [common/base.c](https://code.videolan.org/videolan/x264/-/blob/b35605ace3ddf7c1a5d67a2eb553f034aef41d55/common/base.c#L717-812) — 첫 패스 설정 · 프로파일 제약 · [x264.h](https://code.videolan.org/videolan/x264/-/blob/b35605ace3ddf7c1a5d67a2eb553f034aef41d55/x264.h#L713) — tune 목록
+- [RFC 6381](https://www.rfc-editor.org/rfc/rfc6381#section-3.3) — 3.3 avc1 코덱 문자열
+- [Apple, HLS Authoring Specification for Apple Devices](https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html) (개정 2025-06-26) — 1.3a · 1.3b · 1.4 · 1.10
+- [hls.js mp4-remuxer.ts](https://github.com/video-dev/hls.js/blob/127c6adee512843abf85748d82767bdf1a3c8e5c/src/remux/mp4-remuxer.ts#L742-L750) — NAL 길이 머리 쓰기
+- Netflix VMAF 문서: [모델](https://github.com/Netflix/vmaf/blob/a6ed0f18285cab504b779bbccb0bbaddc3bf44c2/resource/doc/models_v0.md) · [FAQ](https://github.com/Netflix/vmaf/blob/a6ed0f18285cab504b779bbccb0bbaddc3bf44c2/resource/doc/faq.md) · [FFmpeg에서 쓰기](https://github.com/Netflix/vmaf/blob/a6ed0f18285cab504b779bbccb0bbaddc3bf44c2/resource/doc/ffmpeg.md)
+- [Sintel](https://durian.blender.org/sharing/) — 시험 영상, © copyright Blender Foundation | durian.blender.org, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+- PokeClip 기록: [OBS 인코더 공유와 GOP 2초](/posts/0-to-1/pokeclip-obs-shared-encoder-srt/)
+
+다음 편: [H.265의 HDR은 PQ와 HLG 두 전달 곡선으로 나뉩니다](/posts/tech-blurting/h265-hdr-deep-dive/)
