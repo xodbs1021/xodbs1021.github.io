@@ -1,7 +1,6 @@
 export const labForSlug = {
   '0-to-1/pokeclip-indexer-recovery-without-events':'recovery',
   '0-to-1/pokeclip-nginx-playback-request-boundary':'authorization',
-  'tech-blurting/live-transcoding-infrastructure':'latency',
   'projects/multicloud-migration-design':['compatibility','cutover']
 };
 // A post may carry one model (string) or several (array) in reading order.
@@ -28,11 +27,6 @@ export function playbackDecision(kind,accessAllowed) {
   if(!scenario)throw new Error('Unknown teaching case');
   const allowed=Boolean(accessAllowed&&scenario.allowed);
   return {allowed,upstream:allowed?1:0,reason:!accessAllowed?'앞단 접근 제어에서 거절했습니다. 대상 대조 단계로 진행하지 않습니다.':scenario.reason};
-}
-export function latencyBudget(segment,bufferSegments,encodeMs,networkMs) {
-  if(![segment,bufferSegments,encodeMs,networkMs].every(Number.isFinite)||segment<=0||bufferSegments<0||encodeMs<0||networkMs<0)throw new Error('Invalid model inputs');
-  const parts=[{name:'인코딩',seconds:encodeMs/1000},{name:'전송',seconds:networkMs/1000},{name:'세그먼트 대기',seconds:segment/2},{name:'버퍼',seconds:segment*bufferSegments}];
-  return {parts,total:parts.reduce((n,p)=>n+p.seconds,0)};
 }
 
 export const compatibilityCategories = [

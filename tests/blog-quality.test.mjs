@@ -5,7 +5,7 @@ import {load} from 'cheerio';
 import sharp from 'sharp';
 import {posts,slugify,renderBody} from '../src/lib/posts.mjs';
 import {readingPaths,readingContext} from '../src/lib/reading-paths.mjs';
-import {reconcile,playbackCases,playbackDecision,latencyBudget,labForSlug,labsForSlug,compatibilityCategories,compatibilityCategory,cutoverStages,cutoverStage} from '../src/lib/explanation-models.mjs';
+import {reconcile,playbackCases,playbackDecision,labForSlug,labsForSlug,compatibilityCategories,compatibilityCategory,cutoverStages,cutoverStage} from '../src/lib/explanation-models.mjs';
 
 test('missed events converge without duplicates, but missing bytes are not restored',()=>{
  const disk=[1,2,3,4,5,6,7];
@@ -20,12 +20,6 @@ test('access permission never overrides a mismatched or malformed playback targe
    assert.equal(playbackDecision(kind,true).upstream,kind==='match'?1:0);
  }
  assert.throws(()=>playbackDecision('unknown',true));
-});
-test('latency budget follows stated units and assumptions at endpoints',()=>{
- assert.equal(latencyBudget(2,2,300,200).total,5.5);
- assert.equal(latencyBudget(6,4,1000,1000).total,29);
- assert.equal(latencyBudget(1,0,0,0).total,.5);
- assert.throws(()=>latencyBudget(-1,0,0,0));
 });
 test('curated reading sequences have valid, unique destinations and correct neighbors',()=>{
  for(const route of readingPaths){
@@ -92,7 +86,7 @@ test('corrected numerical claims and explicit model boundaries survive publishin
  assert.ok(!h264.title.includes('10만'));assert.match(h264.raw,/497\.664/);assert.match(h264.raw,/8,160/);assert.match(h264.raw,/-r 60 -g 120/);
  assert.equal(1920*1080*3*60/750000,497.664);
  assert.equal(6e6*14400/8/1e9*50000,540000);
- for(const slug of ['0-to-1/pokeclip-indexer-recovery-without-events','0-to-1/pokeclip-nginx-playback-request-boundary','tech-blurting/live-transcoding-infrastructure']){
+ for(const slug of ['0-to-1/pokeclip-indexer-recovery-without-events','0-to-1/pokeclip-nginx-playback-request-boundary']){
   const $=load(fs.readFileSync(`dist/posts/${slug}/index.html`,'utf8'));
   assert.equal($('[data-lab]').length,1);assert.match($('.explanation-lab').text(),/설명용 모형/);
   $('.explanation-lab input[type=range]').each((_,el)=>assert.equal($(`label[for="${$(el).attr('id')}"]`).length,1));
@@ -110,13 +104,13 @@ test('raw SVG stays in the SVG namespace across blank lines',()=>{
 });
 
 test('a post can carry several explanation models, each a known mode',()=>{
- const known=new Set(['recovery','authorization','latency','compatibility','cutover']);
+ const known=new Set(['recovery','authorization','compatibility','cutover']);
  for(const slug of Object.keys(labForSlug)){
   const modes=labsForSlug(slug);
   assert.ok(modes.length>=1);assert.equal(new Set(modes).size,modes.length);
   for(const mode of modes)assert.ok(known.has(mode),`${slug}: ${mode}`);
  }
- assert.deepEqual(labsForSlug('tech-blurting/live-transcoding-infrastructure'),['latency']);
+ assert.deepEqual(labsForSlug('tech-blurting/live-transcoding-infrastructure'),[]);
  assert.deepEqual(labsForSlug('tech-blurting/hls-just-files'),[]);
  assert.deepEqual(labsForSlug('projects/multicloud-migration-design'),['compatibility','cutover']);
  assert.deepEqual(labsForSlug('no/such-post'),[]);

@@ -384,16 +384,10 @@ try {
         if(!await lab.locator('[data-result]').textContent().then(t=>t.includes('대상 DB 하나')))fail(scope,'next button did not reach the final stage');
         if(!await lab.locator('[data-action=next]').isDisabled())fail(scope,'next stays enabled on the final stage');
         await capture('done');
-      }else{
-        for(const input of await lab.locator('input[type=range]').all()){
-          await input.focus();await page.keyboard.press('End');
-        }
-        await capture('maximum');
       }
       await lab.locator('[data-action=reset]').focus();await page.keyboard.press('Enter');
       await capture('reset');
       if(mode==='authorization'&&!await lab.locator('[data-stage=upstream]').textContent().then(t=>t==='1회'))fail(scope,'keyboard reset failed');
-      if(mode==='latency'&&!await lab.locator('[data-result]').textContent().then(t=>t.includes('5.50초')))fail(scope,'keyboard reset failed');
       if(mode==='recovery'&&!await lab.locator('[data-result]').textContent().then(t=>t.includes('DB 4개 / 디스크 8개')))fail(scope,'keyboard reset failed');
       if(mode==='compatibility'&&await lab.getAttribute('data-selected')!=='0')fail(scope,'keyboard reset failed');
       if(mode==='cutover'&&!await lab.locator('[data-result]').textContent().then(t=>t.includes('원본 DB 하나')))fail(scope,'keyboard reset failed');
