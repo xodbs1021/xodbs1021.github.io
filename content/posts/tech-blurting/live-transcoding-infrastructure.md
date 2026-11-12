@@ -1,7 +1,7 @@
 ---
 title: "라이브 트랜스코딩 서버는 실시간 배속으로 수용량을 잽니다"
 date: 2026-06-22T15:38:47+09:00
-lastmod: "2026-11-13T03:51:32+09:00"
+lastmod: "2026-11-13T06:49:32+09:00"
 description: "라이브 트랜스코더 한 대에 넣을 채널 수는 CPU 사용률이 아니라 각 출력이 실시간 속도(speed 1.0)를 지키는지로 정합니다. 1080p30 입력을 세 화질로 인코딩하는 FFmpeg를 팬 없는 맥북에서 1개부터 8개까지 동시에 돌려 speed와 조각 지연을 쟀고, 같은 개수에서도 회차마다 결과가 크게 흔들린 것을 그대로 적었습니다. 수신·인코딩·포장을 나누는 이유, 디코딩을 한 번만 하는 사다리, GPU 서버의 세션·엔진 한도, 채우는 배치와 흩는 배치, 멈춘 인코더 감지, 재시작 뒤의 끊김 표시, 관리형 서비스의 과금 단위를 공식 문서로 정리했습니다."
 categories: ["tech-blurting"]
 tags: ["라이브 트랜스코딩", "FFmpeg", "x264", "HLS", "NVENC", "Kubernetes"]
@@ -123,4 +123,4 @@ ffmpeg -nostdin -y -re -f lavfi -i testsrc2=size=1920x1080:rate=30 -t 40 -filter
 - [FFmpeg 형식 문서 — hls 먹서](https://ffmpeg.org/ffmpeg-formats.html#hls-2)
 - PokeClip 기록: [MediaMTX 채택](/posts/0-to-1/pokeclip-mediamtx-build-or-adopt/) · [같은 세션 재접속의 끊김 표시](/posts/0-to-1/pokeclip-reconnect-audio-gap/)
 
-다음 편: [373MB/s에서 6Mbps로 — 조건을 명시하고 이해하는 H.264 압축](/posts/tech-blurting/h264-deep-dive/)
+다음 편: [H.264는 이미 디코딩한 화면으로 다음 블록을 예측합니다](/posts/tech-blurting/h264-deep-dive/)
