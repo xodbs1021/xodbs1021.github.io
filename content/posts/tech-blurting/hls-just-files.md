@@ -1,415 +1,157 @@
 ---
-title: "라이브 영상이 그냥 파일이라고? — HLS의 미친 발상"
+title: "HLS는 라이브 영상을 재생 목록과 조각 파일로 나눕니다"
 date: 2026-06-20T04:06:03+09:00
+lastmod: "2026-11-12T22:00:00+09:00"
+description: "HLS는 영상을 몇 초짜리 조각 파일로 자르고, 그 목록을 텍스트 재생 목록으로 알려 줍니다. 플레이어는 둘 다 HTTP GET으로 받습니다. 다변형 목록과 미디어 목록의 관계, 라이브 목록이 밀리는 규칙(목표 길이 3배 · 애플 6조각), EXTINF와 목표 길이의 반올림 규칙, TS · fMP4 · 묶음 오디오 조각, IDR 시작 규칙, 브라우저 재생 경로와 hls.js의 TS → fMP4 변환, 조각 404 처리를 RFC 8216 · 개정 초안 22판 · 애플 저작 규격으로 확인했습니다."
 categories: ["tech-blurting"]
+tags: ["HLS", "M3U8", "RFC 8216", "hls.js", "MSE", "라이브 스트리밍"]
 draft: false
 ---
 
-2009년 Apple이 한 결정이 라이브 스트리밍의 모든 걸 바꿨다.
+라이브 영상을 보내던 규약은 서버와 플레이어가 연결을 계속 유지하는 방식이 많아, 평범한 웹 서버와 CDN(Content Delivery Network)의 캐시를 그대로 쓰기 어려웠습니다. Apple의 Roger Pantos가 2009년 5월 1일 인터넷 드래프트로 낸 HLS(HTTP Live Streaming)는 영상을 몇 초짜리 조각 파일로 자르고, 그 조각의 목록을 텍스트 재생 목록으로 알려 줍니다. 플레이어는 목록과 조각을 모두 HTTP GET으로 받습니다. 라이브에서는 서버가 목록 끝에 새 조각을 붙이고 앞 조각을 빼며, 방송이 끝나면 `#EXT-X-ENDLIST`를 붙입니다. 이 규칙은 2017년 RFC 8216(Informational)으로 정리됐고, 프로토콜 버전 13을 담은 개정 초안 22판(2026-05-01)이 지금 RFC 편집자에게 넘어가 있습니다.
 
-당시 RTMP를 비롯한 모든 스트리밍 프로토콜은 **지속 연결**을 전제로 했다. 서버가 클라이언트 상태를 관리하고, 연결이 끊기면 복잡한 재연결 절차. 라이브 영상은 본질적으로 "흐르는" 것이라고 모두가 믿었다.
+## HTTP 파일만으로 라이브를 보내려고 영상을 몇 초씩 잘랐습니다 {#1-apple의-미친-발상--그냥-http로-작은-파일들-다운받자}
 
-Apple은 정반대로 갔다. **"라이브 영상도 그냥 파일이다."**
+첫 판인 [draft-pantos-http-live-streaming-00](https://www.ietf.org/archive/id/draft-pantos-http-live-streaming-00.txt)(2009-05-01)은 스스로를 「끝이 정해지지 않은 멀티미디어 흐름을 HTTP로 보내는 규약」이라고 소개하고, 파일 형식과 서버 · 클라이언트가 할 일을 정합니다. 핵심은 연결이 아니라 파일입니다. 서버는 인코더가 만든 영상을 몇 초 단위 조각으로 잘라 웹 서버에 올리고, 어떤 조각이 있는지를 목록 파일에 적습니다. 플레이어는 목록을 받아 조각을 차례로 요청합니다.
 
-[지난 글](../rtmp-still-alive/)에서 RTMP가 왜 안 죽는지 봤다면, 이번 글은 **시청자 측 표준을 사실상 독점한 HLS**의 내부를 정리한 노트다. M3U8 플레이리스트, .ts 파일 안의 MPEG-TS 패킷, PTS/DTS 이중 타임스탬프, 그리고 브라우저가 HLS를 어떻게 재생하는지까지.
+파일이므로 HTTP가 이미 가진 장치를 그대로 씁니다. Apple의 [HLS 개요 문서](https://developer.apple.com/documentation/http-live-streaming)는 HLS가 평범한 웹 서버와 CDN으로 콘텐츠를 배포한다고 적습니다. 같은 조각을 받는 시청자가 많으면 CDN 가장자리 서버가 한 번 받아 둔 사본을 나눠 줄 수 있습니다.
 
----
+목록 파일의 형식은 MP3 재생 목록으로 쓰이던 M3U에서 왔습니다. [RFC 8216 4절](https://www.rfc-editor.org/rfc/rfc8216#section-4)은 재생 목록 형식이 M3U에서 파생됐고 `EXTM3U`와 `EXTINF` 두 태그를 물려받았다고 적습니다. 목록 파일은 UTF-8로 쓰고, 주소가 `.m3u8`이나 `.m3u`로 끝나거나 HTTP Content-Type이 `application/vnd.apple.mpegurl`이어야 합니다.
 
-## 1. Apple의 미친 발상 — "그냥 HTTP로 작은 파일들 다운받자"
+## 다변형 재생 목록이 화질별 미디어 재생 목록을 가리킵니다 {#3-m3u8-두-가지-종류--master와-media}
 
-2009년 iPhone OS 3.0 출시 시점. Apple이 안고 있던 두 가지 문제.
+재생 목록은 두 층입니다. 위층의 다변형 재생 목록(Multivariant Playlist)은 같은 영상을 화질별로 만든 변형(variant)과 오디오 · 자막 묶음을 나열합니다. RFC 8216은 이것을 「Master Playlist」라고 불렀고, 개정 초안은 이름을 바꿨습니다([개정 초안 4.4.6절](https://www.ietf.org/archive/id/draft-pantos-hls-rfc8216bis-22.txt)). 아래층의 미디어 재생 목록(Media Playlist)이 실제 조각 주소를 나열합니다. [[fig-hls-layers]]에서 플레이어가 위에서 아래로 내려가는 순서를 보십시오.
 
-```
-[2009년 모바일 영상 환경]
-- iPhone 3G/3GS 막 보급
-- 모바일 네트워크: 3G (1~3 Mbps, 매우 불안정)
-- 기존 영상 표준: RTMP (Flash 기반)
-- 그런데 Apple은 iOS에서 Flash를 안 씀
-```
-
-**1. Flash 없이 영상 재생**
-HTML5 video 태그가 있긴 했지만 단순 다운로드 방식. 라이브 불가능.
-
-**2. 불안정한 모바일 네트워크**
-3G가 자주 끊긴다. 지하철 들어가면 신호 없어진다. RTMP는 끊기면 처음부터 다시.
-
-Apple의 해법은 단순했다.
-
-![RTMP vs HLS 패러다임](/images/rtmp-vs-hls-paradigm.png)
-
-기존 프로토콜이 복잡한 이유는 **연결을 유지**하기 때문이었다. 서버가 클라이언트 상태를 알아야 하고, 끊기면 재연결 절차 필요. 서버 비용 비싸다.
-
-HLS의 아이디어: **영상을 작은 파일들로 잘라서 HTTP로 하나씩 요청**.
-
-```
-서버 ────HTTP GET────▶ 클라이언트 (6초 파일)
-        (응답 후 끊김)
-서버 ────HTTP GET────▶ 클라이언트 (다음 6초 파일)
-        (응답 후 끊김)
-...
+```mermaid {#fig-hls-layers kind="개념도" caption="HLS 재생 목록의 두 층. 다변형 재생 목록이 화질별 미디어 재생 목록과 오디오 묶음을 가리키고, 미디어 재생 목록이 조각 주소를 나열합니다. 플레이어는 위에서 아래로 내려가며 변형 하나를 고르고 그 목록의 조각을 받습니다. RFC 8216 4절과 개정 초안 22판 4.4.6절을 줄여 그렸습니다." source="https://www.rfc-editor.org/rfc/rfc8216#section-4"}
+flowchart TB
+  accTitle: HLS 다변형 목록에서 조각까지
+  accDescr: 다변형 재생 목록이 화질별 미디어 재생 목록(1080p, 720p)과 오디오 묶음을 가리킨다. 720p 미디어 재생 목록은 seg100부터 seg105까지 조각 주소를 나열한다.
+  M["다변형 재생 목록<br/>master.m3u8"] --> L["미디어 목록<br/>1080p · 720p"]
+  M --> A["오디오 묶음<br/>EXT-X-MEDIA"]
+  L --> S["720p 조각<br/>seg100 … seg105"]
 ```
 
-서버는 그냥 정적 파일 호스팅 서버면 된다.
+다변형 목록의 `EXT-X-STREAM-INF`는 변형마다 최대 비트레이트(`BANDWIDTH`), 해상도, 코덱을 적고 다음 줄에 그 미디어 목록 주소를 둡니다.
 
-### 이 단순한 발상이 동시에 해결한 것들
-
-1. **CDN 자연스럽게 활용** — HTTP 정적 파일이니 모든 CDN이 그대로 캐시. RTMP는 못 했던 게 공짜로 됨
-2. **방화벽 통과** — 80/443 포트 사용. RTMP의 1935 차단 문제 없음
-3. **화질 자동 전환 (ABR)** — 다음 파일부터 다른 화질로 요청 가능
-4. **라이브와 VOD 동일 구조** — 라이브는 파일이 계속 추가, VOD는 끝이 정해진 것
-5. **끊김 복구** — HTTP 재요청만 하면 됨. 복잡한 재연결 프로토콜 불필요
-
-이게 HLS가 **모바일 시대의 표준이 된 진짜 이유**다. 기술이 좋아서가 아니라 발상이 단순했기 때문에.
-
----
-
-## 2. HLS의 두 가지 파일 — .m3u8과 .ts
-
-HLS는 두 종류 파일로 구성된다.
-
-- **`.m3u8` (Playlist)**: 목차. 어떤 세그먼트가 있는지 나열. 텍스트 파일
-- **`.ts` (Transport Stream)**: 실제 영상 데이터. 6초 분량. 바이너리
-
-### M3U8의 출신은 영상이 아닌 음악
-
-M3U는 1990년대 후반 WinAMP 같은 MP3 플레이어가 쓰던 재생 목록 포맷이었다. Apple이 이걸 영상 스트리밍에 가져다 썼다. M3U + UTF-8 = M3U8.
-
-이래서 M3U8 파일이 그냥 텍스트다. 메모장으로 열어볼 수 있다.
-
----
-
-## 3. M3U8 두 가지 종류 — Master와 Media
-
-플레이리스트는 두 단계로 나뉜다.
-
-![M3U8 플레이리스트 구조](/images/m3u8-playlist-structure.png)
-
-**Master Playlist (master.m3u8)**: ABR ladder 목차. 각 화질의 sub playlist 위치 나열.
-
-```
+```m3u8
 #EXTM3U
-#EXT-X-VERSION:3
-#EXT-X-STREAM-INF:BANDWIDTH=6500000,RESOLUTION=1920x1080
-1080p/playlist.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=3200000,RESOLUTION=1280x720
-720p/playlist.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=1700000,RESOLUTION=854x480
-480p/playlist.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=6500000,RESOLUTION=1920x1080,CODECS="avc1.640028,mp4a.40.2"
+1080p/index.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=3200000,RESOLUTION=1280x720,CODECS="avc1.64001f,mp4a.40.2"
+720p/index.m3u8
 ```
 
-**Media Playlist (1080p/playlist.m3u8)**: 실제 세그먼트 목록.
+플레이어는 다변형 목록을 받아 지금 망에 맞는 변형을 고르고, 그 미디어 목록을 받은 뒤 조각을 요청합니다. 화질을 바꿀 때는 다른 변형의 미디어 목록으로 옮겨 갑니다.
 
-```
-#EXTM3U
-#EXT-X-VERSION:3
-#EXT-X-TARGETDURATION:6
-#EXT-X-MEDIA-SEQUENCE:100
-#EXTINF:6.000,
-seg100.ts
-#EXTINF:6.000,
-seg101.ts
-#EXTINF:6.000,
-seg102.ts
-```
+## 라이브 목록은 앞이 빠지고 뒤가 붙으며, 끝나면 ENDLIST가 붙습니다 {#라이브-vs-vod--끝이-있냐-없냐}
 
-플레이어는:
-1. master.m3u8 받음
-2. 현재 대역폭 측정 → 적합한 화질 선택
-3. 해당 화질의 Media Playlist 받음
-4. 세그먼트 받기 시작
+미디어 목록 머리의 `EXT-X-MEDIA-SEQUENCE`는 목록 첫 조각의 번호입니다. [RFC 8216 6.2.1절](https://www.rfc-editor.org/rfc/rfc8216#section-6.2.1)은 서버가 미디어 목록을 바꿀 수 있는 방법을 넷으로 한정합니다. 끝에 줄을 붙이기, 앞에서부터 순서대로 조각을 빼기, `EXT-X-MEDIA-SEQUENCE`를 올리기, `EXT-X-ENDLIST`를 붙이기입니다. 아래 영상에서 맨 위 조각이 빠질 때 번호가 100에서 101로 오르고, 아래에 새 `EXTINF` 줄이 붙는 순서를 보십시오.
 
-### 라이브 vs VOD — 끝이 있냐 없냐
+{{< motion scene="PlaylistSlide" id="fig-playlist-slide" kind="개념도" caption="라이브 미디어 목록이 갱신되는 모습. 새 조각 줄이 끝에 붙으면 맨 앞 조각이 빠지고 EXT-X-MEDIA-SEQUENCE가 1씩 오릅니다. 목록에는 늘 조각 6개가 남고, 방송이 끝나면 EXT-X-ENDLIST가 붙어 더는 바뀌지 않습니다. RFC 8216 6.2.1–6.2.2절과 애플 저작 규격 8.11을 따라 그린 설명용 그림입니다." >}}
 
-VOD 플레이리스트엔 `#EXT-X-ENDLIST` 태그가 박혀있다. "끝났음" 신호. 플레이어는 자유롭게 시킹 가능.
+앞에서 몇 개를 남겨야 하는지는 「최근 3~5개」 같은 관습이 아니라 규격이 정합니다.
 
-라이브엔 ENDLIST가 없다. 대신 **Sliding Window**.
+| 규칙 | 내용 | 근거 |
+|---|---|---|
+| 목록 길이 하한 | `EXT-X-ENDLIST`가 없는 목록에서 조각을 빼서 목록 길이가 목표 길이의 3배보다 짧아지면 안 됨(MUST NOT) | [RFC 8216 6.2.2](https://www.rfc-editor.org/rfc/rfc8216#section-6.2.2) |
+| 애플 기기 조각 수 | 라이브 목록에 조각 6개 이상(MUST) | [애플 HLS 저작 규격](https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html) 8.11 |
+| 애플 기기 목록 길이 | 라이브 목록에 15분 이상(SHOULD) | 같은 규격 8.12 |
 
-```
-[12:00:00]                 [12:00:06]
-seg100, seg101, seg102  →  seg101, seg102, seg103
-                                              ↑ 새로 추가
-                                              ↑ seg100 사라짐
-```
+PokeClip의 라이브 목록은 4초 조각 7개, 28초 창으로 정했습니다. 창 길이가 시청 지연이 아니라 멈췄다 돌아온 시청자가 목록에서 자기 자리를 다시 찾을 수 있는지를 정했다는 실측은 [라이브 창 글](/posts/0-to-1/pokeclip-live-window-without-fork/)에 있습니다.
 
-플레이어가 매 6초마다 `playlist.m3u8`을 다시 받는 **polling** 방식.
+목록이 끝나면 서버는 `#EXT-X-ENDLIST`를 붙입니다. 그 뒤로 조각이 추가되지 않으므로 플레이어는 목록을 다시 받지 않아도 됩니다. 처음부터 끝이 정해진 VOD는 `EXT-X-PLAYLIST-TYPE:VOD`로 목록이 바뀌지 않는다고 알리고, 앞 조각을 빼지 않고 붙이기만 하는 목록은 `EVENT`로 알립니다(6.2.1절, 애플 규격 8.6 · 8.8). 같은 주소에 끝 표시를 단 뒤 다시 조각을 붙이면 플레이어마다 다르게 읽는 문제는 [세션 주소 글](/posts/0-to-1/pokeclip-session-url-and-endlist/)에 있습니다.
 
-### EXTINF의 정확한 의미
+## EXTINF는 조각의 길이이고 목표 길이는 반올림한 상한입니다 {#extinf의-정확한-의미}
 
-```
-#EXTINF:6.000,
-seg100.ts
-```
+`#EXTINF:5.967,`은 바로 다음 줄 조각의 길이(초)입니다. `#EXT-X-TARGETDURATION:6`은 이 목록의 목표 길이로, 조각 길이의 상한입니다. 목표 길이에는 세 규칙이 걸립니다.
 
-`6.000`은 이 세그먼트의 **실제 지속 시간** (초). `#EXT-X-TARGETDURATION:6`은 모든 세그먼트의 **최대** 지속 시간.
+| 규칙 | 내용 | 근거 |
+|---|---|---|
+| 반올림 상한 | 각 조각의 EXTINF를 정수로 반올림한 값이 목표 길이 이하(MUST) | [RFC 8216 4.3.3.1](https://www.rfc-editor.org/rfc/rfc8216#section-4.3.3.1) |
+| 바꾸지 않음 | 미디어 목록의 목표 길이 값은 바뀌면 안 됨(MUST NOT) | [RFC 8216 6.2.1](https://www.rfc-editor.org/rfc/rfc8216#section-6.2.1) |
+| 0.5초 초과 금지 | 애플 기기에서는 조각이 목표 길이를 0.5초 넘게 넘으면 안 됨(MUST NOT) | [애플 저작 규격](https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html) 7.7 |
 
-세그먼트는 정확히 6초가 아닐 수도 있다. 키프레임 위치에서 잘리니까. 5.8초, 6.2초 같은 값이 흔하다.
+조각이 정확히 6초가 되지 않는 이유는 조각을 키프레임에서 자르기 때문입니다. FFmpeg의 HLS 묶개 문서도 `hls_time`이 지난 뒤 다음 키프레임에서 조각을 자른다고 적습니다([FFmpeg 형식 문서](https://ffmpeg.org/ffmpeg-formats.html#hls-2)). 송출의 키프레임 간격이 흔들리면 조각 하나가 길어질 수 있습니다. PokeClip에서는 7.66초 조각 하나가 반올림 8로 목표 길이 6을 넘었습니다. 목표 길이를 바꿀 수 없어 목록이 둘로 갈렸고, 다시보기가 마지막 7.5분만 덮었습니다([회차 다시보기 글](/posts/projects/pokeclip-round-vod/)).
 
----
+## 조각 파일은 TS · fMP4 · 묶음 오디오 가운데 하나입니다 {#2-hls의-두-가지-파일--m3u8과-ts}
 
-## 4. .ts 파일 내부 — MPEG-TS의 188바이트 우주
+조각 형식은 [RFC 8216 3절](https://www.rfc-editor.org/rfc/rfc8216#section-3)이 정한 것만 씁니다. 영상은 MPEG-2 TS나 fMP4(fragmented MP4)이고, 오디오만 담는 묶음 오디오(Packed Audio)와 자막용 WebVTT가 있습니다.
 
-`.ts` 파일을 hexdump로 열어보면 첫 바이트가 항상 `0x47`이다. 그리고 정확히 **188바이트마다 또 `0x47`이 나온다**.
+| 형식 | 디코더 초기화 정보 | 조건 |
+|---|---|---|
+| MPEG-2 TS | PAT와 PMT. 조각 안에 두거나 `EXT-X-MAP`으로 따로 둠 | 처음 두 패킷이 PAT · PMT여야 함(SHOULD, 3.2절) |
+| fMP4 | `ftyp` · `moov`를 담은 init 파일을 `EXT-X-MAP`으로 가리킴 | 조각마다 `EXT-X-MAP` 적용(3.3절), 프로토콜 버전 6 이상(7절) |
+| 묶음 오디오 | 없음. 조각 머리의 ID3 PRIV 태그에 첫 표본 시각을 둠 | AAC(ADTS) · MP3 · AC-3 · E-AC-3(3.4절) |
 
-![MPEG-TS 패킷 구조](/images/mpegts-packet-structure.png)
+「TS 조각의 첫 패킷은 언제나 PAT」라는 설명은 규격보다 강합니다. RFC 8216은 TS 조각이 PAT와 PMT를 담거나 `EXT-X-MAP`으로 따로 주라고 요구하고, `EXT-X-MAP`이 없는 조각의 처음 두 패킷이 PAT와 PMT이기를 권고(SHOULD)합니다. TS 패킷과 PID의 내부 구조는 [MPEG-TS 글](/posts/tech-blurting/rtmp-mpeg-ts-srt/)에 있습니다.
 
-```
-.ts 파일 = 188바이트 패킷의 연속
-패킷 = 4바이트 헤더 + 184바이트 페이로드
-첫 바이트 sync byte 0x47 → 패킷 시작 표시
-```
+애플 기기에서 HEVC와 AV1 영상은 fMP4로만 내야 합니다(저작 규격 1.5 · 1.39). fMP4 조각과 DASH 조각을 같은 파일로 맞추는 방법은 [CMAF 글](/posts/tech-blurting/cmaf-deep-dive/)에 있습니다.
 
-방송 표준이라서 손상에 강하다. 한 패킷이 망가져도 다음 sync byte 찾으면 됨.
+## 조각은 IDR 프레임으로 시작해야 혼자 디코딩됩니다 {#idr-frame이-세그먼트-시작에-있어야-하는-이유}
 
-### PAT / PMT / PES — 3단 계층
+P 프레임과 B 프레임은 다른 프레임을 참조해 그립니다. 조각을 처음 받은 플레이어가 그 조각만으로 디코딩을 시작하려면, 참조 없이 그릴 수 있고 이전 참조를 모두 끊는 IDR(Instantaneous Decoding Refresh) 프레임이 앞에 있어야 합니다.
 
-`.ts` 안에 영상/오디오만 있는 게 아니다. **목차도 같이** 있다.
+규격마다 강도가 다릅니다. RFC 8216 3절은 H.264를 담은 조각이 IDR을 포함하기를 권고(SHOULD)하고, 첫 IDR 앞 프레임은 받기만 하고 버려질 수 있다고 적습니다. 애플 저작 규격 7.4는 영상 조각이 IDR로 시작해야 한다(MUST)고 정합니다. 그래서 인코더의 키프레임 간격이 조각 길이를 정합니다. 2초 조각을 원하면 2초 이하 간격으로 키프레임을 넣어야 하고, 화질별 변형의 키프레임 위치도 맞춰야 조각 경계에서 화질을 바꿀 수 있습니다.
 
-**PAT (Program Association Table)**: 첫 번째 패킷. PID=0. "이 스트림에 프로그램이 몇 개 있고, 각 프로그램의 PMT가 어디 있는지" 표시.
+## 브라우저는 내장 재생기나 MSE로 HLS를 재생합니다 {#6-브라우저는-hls를-어떻게-재생하나--hlsjs와-mse}
 
-**PMT (Program Map Table)**: 각 프로그램의 트랙 정보. "비디오는 PID=256, 오디오는 PID=257" 같은 매핑.
+Safari는 `<video>`에 `.m3u8` 주소를 넣으면 내장 재생기로 HLS를 재생합니다. 다른 브라우저에서는 JavaScript가 목록과 조각을 받아 MSE(Media Source Extensions)의 `SourceBuffer`에 넣습니다. MSE가 받는 형식은 브라우저가 정합니다. W3C의 [MSE 바이트 스트림 형식 레지스트리](https://www.w3.org/TR/mse-byte-stream-format-registry/)에는 ISO BMFF(`video/mp4`)와 함께 MPEG-2 TS(`video/mp2t`)도 올라 있으므로, 「MSE는 fMP4만 받는다」는 말은 규격으로는 맞지 않습니다.
 
-**PES (Packetized Elementary Stream)**: 실제 영상/오디오 데이터. H.264 NAL units이 여기 들어감.
+| 환경 | 재생 경로 | 근거 |
+|---|---|---|
+| Safari(macOS · iOS) | `<video src="….m3u8">` 내장 재생 | [Apple HLS 개요](https://developer.apple.com/documentation/http-live-streaming) |
+| iOS 17.1 이상 Safari | 내장 재생, 또는 MSE 대신 ManagedMediaSource 위의 hls.js(1.5.0부터) | [hls.js 1.5.0 릴리스](https://github.com/video-dev/hls.js/releases/tag/v1.5.0) |
+| MSE가 있는 그 밖의 브라우저 | hls.js 같은 라이브러리가 MSE에 넣음 | [hls.js README](https://github.com/video-dev/hls.js#readme) |
 
-```
-[패킷 흐름]
-PAT (PID=0) → "프로그램 1의 PMT는 PID=4096에 있어"
-PMT (PID=4096) → "비디오=PID=256, 오디오=PID=257"
-PES Video (PID=256) → 실제 H.264 데이터
-PES Audio (PID=257) → 실제 AAC 데이터
-PES Video (PID=256) → ...
+Chrome도 내장 HLS 재생을 들이고 있습니다. Chromium 소스에는 HLS 목록 해석기와 디먹서를 넣는 빌드 옵션 `enable_hls_demuxer`가 있고([`media_options.gni`](https://chromium.googlesource.com/chromium/src/+/main/media/media_options.gni)), hls.js README는 Chrome 147이 `canPlayType`에 지원한다고 답하지만 일부 자료를 내장으로 재생하지 못할 수 있다고 적습니다. 그래서 hls.js는 `Hls.isSupported()`를 먼저 확인하는 순서를 권합니다.
+
+```js
+// hls.js README 기본 설정 발췌
+if (Hls.isSupported()) {
+  const hls = new Hls();
+  hls.loadSource(videoSrc);
+  hls.attachMedia(video);
+} else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+  video.src = videoSrc; // 내장 HLS
+}
 ```
 
-PID로 트랙을 구분하니 **멀티 오디오 트랙이 자연스럽게 가능**하다. RTMP가 못한 것.
+### hls.js는 TS를 fMP4로 바꿔 MSE에 넣습니다 {#hlsjs의-핵심--transmuxing}
 
-### IDR Frame이 세그먼트 시작에 있어야 하는 이유
+hls.js README는 fMP4(CMAF 포함) 조각은 다시 묶지 않고 MSE로 넘기고, MPEG-2 TS와 묶음 오디오(AAC · MP3 · AC-3) 조각은 fMP4로 바꿔(transmux) 넣는다고 적습니다. 바꾸는 일은 가능하면 Web Worker에서 비동기로 합니다. 압축된 영상 · 오디오 데이터는 그대로 두고 담는 그릇만 바꾸므로 다시 인코딩하지 않습니다. 브라우저가 `video/mp2t`를 받을 수 있더라도 한 경로로 맞추면 브라우저마다 다른 TS 지원에 기대지 않아도 됩니다.
 
-세그먼트 파일을 처음 받는 순간 디코딩이 시작될 수 있어야 한다. P-frame은 "이전 프레임 + 차이"라서 혼자 못 그린다.
+### 조각 404는 위치에 따라 건너뛰거나 재시도합니다 {#recovery--에러-복구}
 
-→ **세그먼트의 첫 프레임은 반드시 IDR (Instantaneous Decoder Refresh) 키프레임**.
+「세 번 재시도한 뒤 다음 조각으로 건너뛴다」는 설명은 hls.js의 실제 동작과 다릅니다. hls.js 1.7.3 소스를 따라가 보면, 다른 화질로 바꿀 수 없는 스트림에서 조각 404는 그 조각이 목록 어디에 있느냐에 따라 갈립니다([되감기 404 글](/posts/projects/rewind-missing-segment/)).
 
-```
-[정상]
-seg100.ts: [IDR] [P] [P] [P] [P] ...   ← 시작 가능
+| 404가 난 조각 | hls.js 1.7.3 동작 | 시청자가 보는 것 |
+|---|---|---|
+| 라이브 목록 가운데 | 틈(gap)으로 표시하고 다음 조각으로 넘어감, 재시도 없음 | 몇 초가 말없이 빠짐 |
+| 라이브 목록 마지막, 또는 끝난 목록의 조각 | 같은 조각을 1 · 2 · 4 · 8 · 8 · 8초 간격으로 6번 더 요청한 뒤 치명 오류 | 멈춘 뒤 오류 |
 
-[비정상]
-seg100.ts: [P] [P] [P] [P] ...          ← 디코딩 불가
-```
+화질이 여럿이면 다른 화질로 바꾸는 갈래가 먼저입니다. 앱이 치명 오류를 받아 다시 시작하면 같은 6번이 처음부터 다시 돕니다.
 
-이래서 FFmpeg `-hls_time 6` 옵션이 정확히 6초마다 못 자르고 키프레임 위치까지 기다리는 거다.
+## HLS의 창 · 첫 패킷 · 404 처리는 흔히 틀리게 알려져 있습니다 {#정리하면}
 
----
+- **「라이브 목록에는 최근 3~5개 조각을 둔다」** — RFC 8216은 목록 길이를 목표 길이 3배 아래로 줄이지 말라고 하고, 애플 기기는 6조각 이상을 요구합니다.
+- **「TS 조각의 첫 패킷은 언제나 PAT」** — 권고(SHOULD)이고, `EXT-X-MAP`으로 따로 줄 수도 있습니다.
+- **「조각 길이는 목표 길이 이하」** — 반올림한 값이 목표 길이 이하면 됩니다. 애플 기기는 여기에 0.5초 초과 금지를 더합니다.
+- **「MSE는 fMP4만 받는다」** — 형식 레지스트리에는 MPEG-2 TS도 있습니다. hls.js가 TS를 fMP4로 바꾸는 것은 구현의 선택입니다.
+- **「조각 404는 몇 번 재시도하고 건너뛴다」** — hls.js 1.7.3에서는 목록 가운데 조각은 재시도 없이 건너뛰고, 마지막 조각은 6번 재시도한 뒤 멈춥니다.
 
-## 5. PTS vs DTS — 시간이 두 종류인 이유
+목록이 이상해 보이면 조각 수보다 목표 길이, 반올림한 EXTINF, 목록 전체 길이를 먼저 확인하십시오. 재생 중 몇 초가 사라졌는데 오류가 없다면 404가 난 조각이 목록 가운데에 있었는지부터 보십시오.
 
-영상에 타임스탬프가 **두 개** 박혀있다. PTS와 DTS.
+## 출처
 
-![PTS vs DTS와 B-frame](/images/pts-vs-dts-bframe.png)
+- [RFC 8216: HTTP Live Streaming](https://www.rfc-editor.org/rfc/rfc8216) (2017-08, Informational) — 3절 조각 형식, 4절 M3U 파생 · UTF-8, 4.3.3.1 목표 길이, 6.2.1–6.2.2 목록 변경 · 길이 하한, 7절 버전
+- [draft-pantos-hls-rfc8216bis-22: HTTP Live Streaming 2nd Edition](https://www.ietf.org/archive/id/draft-pantos-hls-rfc8216bis-22.txt) (2026-05-01, 프로토콜 버전 13) · [datatracker 상태](https://datatracker.ietf.org/doc/draft-pantos-hls-rfc8216bis/)(Independent Submission, 「Sent to the RFC Editor」, 2026-11-12 확인)
+- [draft-pantos-http-live-streaming-00](https://www.ietf.org/archive/id/draft-pantos-http-live-streaming-00.txt) (2009-05-01)
+- [Apple, HLS Authoring Specification for Apple Devices](https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html) (개정 2025-06-26) — 1.5 · 1.39 · 7.4 · 7.7 · 8.6 · 8.8 · 8.11 · 8.12
+- [Apple, HTTP Live Streaming 개요](https://developer.apple.com/documentation/http-live-streaming)
+- [W3C, Media Source Extensions Byte Stream Format Registry](https://www.w3.org/TR/mse-byte-stream-format-registry/)
+- [hls.js README](https://github.com/video-dev/hls.js#readme) · [hls.js 1.5.0 릴리스 노트](https://github.com/video-dev/hls.js/releases/tag/v1.5.0) (2024-01-09)
+- [Chromium `media/media_options.gni`](https://chromium.googlesource.com/chromium/src/+/main/media/media_options.gni) — `enable_hls_demuxer` (2026-11-12 확인)
+- [FFmpeg 형식 문서 — hls 묶개](https://ffmpeg.org/ffmpeg-formats.html#hls-2)
+- PokeClip 기록: [라이브 창](/posts/0-to-1/pokeclip-live-window-without-fork/) · [세션 주소와 ENDLIST](/posts/0-to-1/pokeclip-session-url-and-endlist/) · [회차 다시보기](/posts/projects/pokeclip-round-vod/) · [되감기 404](/posts/projects/rewind-missing-segment/)
 
-- **PTS (Presentation Timestamp)**: 화면에 보여줄 시각
-- **DTS (Decoding Timestamp)**: 디코더에 넘길 시각
-
-B-frame이 없으면 둘은 같다. 있으면 다르다.
-
-```
-[디스플레이 순서 (PTS)]
-I(0ms) → B(33ms) → B(66ms) → P(100ms)
-
-[디코딩 순서 (DTS)]
-I(0ms) → P(33ms) → B(66ms) → B(100ms)
-```
-
-B-frame은 **과거 I-frame과 미래 P-frame을 모두 참조**한다. 그래서 P-frame이 먼저 디코딩돼야 한다. 보여주는 순서랑 다름.
-
-플레이어 입장에서:
-- DTS 순서로 디코더에 넘김
-- PTS 순서로 화면에 표시
-
-라이브 zerolatency에서 B-frame을 끄는 이유 — 디코딩-표시 시간 차이가 지연이 되니까.
-
-### 영상-오디오 동기화의 기준
-
-영상과 오디오가 한 .ts 안에 있어도 따로 패킷에 들어간다. 두 PTS를 맞춰서 동기화.
-
-```
-영상 PTS = 1.000초
-오디오 PTS = 1.020초
-→ 플레이어가 오디오를 20ms 일찍 재생하거나 영상을 20ms 늦게
-```
-
-OBS의 "마이크 오프셋 -50ms" 같은 옵션이 이 PTS 조정의 후처리 버전.
-
----
-
-## 6. 브라우저는 HLS를 어떻게 재생하나 — hls.js와 MSE
-
-여기서 헷갈리는 사실: **Chrome, Firefox, Edge는 HLS를 네이티브로 재생 못 한다.**
-
-```
-[네이티브 HLS 지원]
-✅ Safari (iOS, macOS)
-✅ Apple TV
-❌ Chrome
-❌ Firefox  
-❌ Edge
-❌ 안드로이드 브라우저
-```
-
-그럼 우리는 Chrome에서 어떻게 HLS를 보고 있나? **hls.js**가 자바스크립트로 변환해서 보여준다.
-
-![hls.js와 MSE 파이프라인](/images/hls-js-mse-pipeline.png)
-
-### MSE — Media Source Extensions
-
-핵심은 브라우저의 **MSE** API다. JavaScript에서 `SourceBuffer`에 미디어 데이터를 직접 넣을 수 있다.
-
-```javascript
-const mediaSource = new MediaSource();
-video.src = URL.createObjectURL(mediaSource);
-
-mediaSource.addEventListener('sourceopen', () => {
-  const sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.640028"');
-  sourceBuffer.appendBuffer(mp4Data);
-});
-```
-
-MSE는 **fMP4만 받는다**. MPEG-TS는 못 받는다.
-
-### hls.js의 핵심 — transmuxing
-
-hls.js가 하는 일:
-1. `.m3u8` 받기
-2. `.ts` 파일 받기
-3. **MPEG-TS → fMP4 transmuxing** (디코딩 없이 컨테이너만 변환)
-4. fMP4를 MSE의 SourceBuffer에 넣기
-5. video 태그가 자동 재생
-
-```
-.ts (MPEG-TS) → hls.js → fMP4 (메모리) → MSE → <video>
-```
-
-핵심은 **transmuxing**. 압축된 H.264 NAL units을 그대로 두고 컨테이너만 바꿈. 디코딩 안 함. 그래서 빠름.
-
-### ABR Controller — 화질 자동 선택
-
-hls.js 안에 ABR 알고리즘이 있다.
-
-```
-[측정]
-- 직전 세그먼트 다운로드 속도 (대역폭 추정)
-- 현재 버퍼 길이 (여유 추정)
-
-[결정]
-- 대역폭 + 안전 마진 < 현재 화질 비트레이트 → 다운그레이드
-- 버퍼 충분 + 대역폭 여유 → 업그레이드
-- 잦은 전환 방지 (히스테리시스)
-```
-
-이 알고리즘이 잘 만들어진 게 hls.js의 가치다. 직접 만들면 화질이 자주 바뀌어서 시청자가 신경 쓰임.
-
-### Recovery — 에러 복구
-
-세그먼트 다운로드 실패 시:
-
-```javascript
-hls.on(Hls.Events.ERROR, (event, data) => {
-  if (data.fatal) {
-    switch (data.type) {
-      case Hls.ErrorTypes.NETWORK_ERROR:
-        hls.startLoad();
-        break;
-      case Hls.ErrorTypes.MEDIA_ERROR:
-        hls.recoverMediaError();
-        break;
-    }
-  }
-});
-```
-
-3번 정도 재시도 → 안 되면 다음 세그먼트 건너뛰고 진행. 라이브에서 멈춰버리는 것보단 한 세그먼트 스킵이 나음.
-
----
-
-## 7. 라이브 HLS 운영의 현실
-
-HLS가 단순해 보이지만, 라이브 운영은 까다롭다.
-
-### Origin 서버의 역할
-
-```
-인코더 → Origin Server → CDN → 시청자
-         ↑
-         세그먼트 생성/저장
-         매니페스트 갱신
-```
-
-Origin이 하는 일:
-1. 트랜스코더로부터 세그먼트 받기
-2. 디스크에 저장 (또는 Redis 같은 메모리 캐시)
-3. `.m3u8` 매니페스트 동적 갱신
-4. CDN에 푸시 또는 CDN이 풀
-
-### Signed URL — 무단 사용 차단
-
-영상 URL이 유출되면 누구나 볼 수 있다. CDN 비용 폭증.
-
-```
-원본: /live/seg100.ts
-서명: /live/seg100.ts?token=abc...&expires=1700000060
-```
-
-CDN이 토큰 서명과 만료를 검증. 만료 60초로 짧게 잡으면 유출돼도 곧 못 씀.
-
-라이브에서는 토큰 만료 처리가 까다롭다. 시청자가 30분째 보고 있는데 토큰이 만료되면 끊긴다. 플레이어가 주기적으로 새 토큰 받는 메커니즘 필요.
-
-### Beacon으로 시청자 측 측정
-
-플레이어가 자기 상태를 서버에 보고:
-- Startup time
-- Rebuffering 발생
-- ABR 화질 전환
-- 시청 종료 (실수로 닫음 vs 끝까지 봄)
-
-이 데이터가 모이면 Prometheus → Grafana 대시보드로 QoE 모니터링.
-
----
-
-## 8. HLS의 본질적 한계 — 지연
-
-HLS가 산업 표준이 됐지만 한 가지는 못 이긴다. **지연**.
-
-```
-[일반 HLS 지연 구조]
-인코딩: 0~6초 (세그먼트 만들기 대기)
-전송: ~1초
-플레이어 버퍼: 12~18초 (3개 세그먼트)
-─────────────────────
-총 지연: 18~25초
-```
-
-채팅과 영상 동기화가 안 된다. "지금 죽었어!" 채팅이 영상보다 18초 빠르다. 게임 스포일러가 채팅으로 먼저 샌다.
-
-해결책이 **LL-HLS** (다음 시리즈). Chunked CMAF로 1~3초 지연 달성.
-
----
-
-## 정리하면
-
-HLS는 기술의 승리가 아니라 **발상의 승리**다.
-
-1. **출신** — 2009년 Apple, "라이브 영상도 그냥 파일이다"
-2. **구조** — .m3u8 (텍스트 목차) + .ts (바이너리 영상), Master + Media 두 단계
-3. **MPEG-TS** — 188바이트 패킷 + PAT/PMT/PES 3단 계층, 첫 패킷이 항상 PAT
-4. **타임스탬프** — PTS (표시) + DTS (디코딩), B-frame 때문에 둘이 다름
-5. **브라우저 재생** — Chrome은 네이티브 미지원, hls.js가 transmuxing + MSE로 처리
-6. **운영** — Origin + CDN + Signed URL + Beacon으로 QoE 측정
-7. **한계** — 18~25초 지연, LL-HLS가 해결책
-
-다음 글에선 HLS의 라이벌 — **DASH**를 본다. 산업이 왜 두 표준을 같이 유지하는지.
-
----
-
-**참고**
-- [HLS 표준 (RFC 8216)](https://datatracker.ietf.org/doc/html/rfc8216)
-- [Apple HLS Authoring Specification](https://developer.apple.com/documentation/http-live-streaming/hls-authoring-specification-for-apple-devices)
-- [hls.js GitHub](https://github.com/video-dev/hls.js)
-- [MPEG-TS (ISO/IEC 13818-1)](https://www.iso.org/standard/74427.html)
+다음 편: [일반 HLS는 라이브 끝에서 목표 길이 세 배 뒤부터 재생합니다](/posts/tech-blurting/hls-deep-dive/)
