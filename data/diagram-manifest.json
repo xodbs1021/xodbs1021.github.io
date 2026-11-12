@@ -119,15 +119,6 @@
       "bytes": 19462
     }
   },
-  "3fb574fb1056c36a": {
-    "source": "content/posts/tech-blurting/h264-deep-dive.md",
-    "wide": {
-      "file": "3fb574fb1056c36a-wide.svg",
-      "width": 432,
-      "height": 632,
-      "bytes": 23929
-    }
-  },
   "4187c5e2b25d2254": {
     "source": "content/posts/0-to-1/stream-id-contract-compatible-migration.md",
     "wide": {
@@ -303,6 +294,15 @@
       "width": 392,
       "height": 490,
       "bytes": 18429
+    }
+  },
+  "7aed4a8002e3e5e5": {
+    "source": "content/posts/tech-blurting/h264-deep-dive.md",
+    "wide": {
+      "file": "7aed4a8002e3e5e5-wide.svg",
+      "width": 432,
+      "height": 714,
+      "bytes": 25087
     }
   },
   "80f1c7018c20790e": {
