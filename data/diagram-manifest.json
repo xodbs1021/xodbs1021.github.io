@@ -107,6 +107,15 @@
       "bytes": 19562
     }
   },
+  "267970177e233596": {
+    "source": "content/posts/tech-blurting/hls-just-files.md",
+    "wide": {
+      "file": "267970177e233596-wide.svg",
+      "width": 392,
+      "height": 272,
+      "bytes": 15985
+    }
+  },
   "2c797b3098ea69a8": {
     "source": "content/posts/tech-blurting/h265-hdr-deep-dive.md",
     "wide": {
@@ -231,6 +240,15 @@
       "width": 392,
       "height": 631,
       "bytes": 19895
+    }
+  },
+  "4868a2b18917f075": {
+    "source": "content/posts/tech-blurting/dash-vs-hls.md",
+    "wide": {
+      "file": "4868a2b18917f075-wide.svg",
+      "width": 392,
+      "height": 469,
+      "bytes": 17899
     }
   },
   "4a61b431f94d8e2b": {
@@ -566,21 +584,6 @@
       "bytes": 21252
     }
   },
-  "865e7c79c921c8be": {
-    "source": "content/posts/tech-blurting/cmaf-deep-dive.md",
-    "wide": {
-      "file": "865e7c79c921c8be-wide.svg",
-      "width": 1706,
-      "height": 178,
-      "bytes": 23245
-    },
-    "narrow": {
-      "file": "865e7c79c921c8be-narrow.svg",
-      "width": 392,
-      "height": 963,
-      "bytes": 23273
-    }
-  },
   "86baf8be3873b411": {
     "source": "content/posts/0-to-1/shakedown-bounded-ai-image-generation.md",
     "wide": {
@@ -761,21 +764,6 @@
       "bytes": 44980
     }
   },
-  "b0c137e3208b3c4d": {
-    "source": "content/posts/tech-blurting/cmaf-deep-dive.md",
-    "wide": {
-      "file": "b0c137e3208b3c4d-wide.svg",
-      "width": 1098,
-      "height": 197,
-      "bytes": 19017
-    },
-    "narrow": {
-      "file": "b0c137e3208b3c4d-narrow.svg",
-      "width": 392,
-      "height": 684,
-      "bytes": 18922
-    }
-  },
   "b444c2613e32344b": {
     "source": "content/posts/0-to-1/pokeclip-session-url-and-endlist.md",
     "wide": {
@@ -792,6 +780,15 @@
       "width": 392,
       "height": 564,
       "bytes": 20928
+    }
+  },
+  "bb3dde56e2c9d01b": {
+    "source": "content/posts/tech-blurting/cmaf-deep-dive.md",
+    "wide": {
+      "file": "bb3dde56e2c9d01b-wide.svg",
+      "width": 392,
+      "height": 469,
+      "bytes": 18104
     }
   },
   "bb86789c059d560c": {
@@ -816,24 +813,6 @@
       "width": 417,
       "height": 511,
       "bytes": 20874
-    }
-  },
-  "c1159dd16ef82875": {
-    "source": "content/posts/tech-blurting/cmaf-deep-dive.md",
-    "wide": {
-      "file": "c1159dd16ef82875-wide.svg",
-      "width": 763,
-      "height": 519,
-      "bytes": 27129
-    }
-  },
-  "c1d47d78cc254729": {
-    "source": "content/posts/tech-blurting/cmaf-deep-dive.md",
-    "wide": {
-      "file": "c1d47d78cc254729-wide.svg",
-      "width": 704,
-      "height": 649,
-      "bytes": 27200
     }
   },
   "c37c03575db72d43": {
@@ -896,6 +875,15 @@
       "bytes": 21752
     }
   },
+  "dcb864a5a4959d04": {
+    "source": "content/posts/tech-blurting/hls-deep-dive.md",
+    "wide": {
+      "file": "dcb864a5a4959d04-wide.svg",
+      "width": 420,
+      "height": 422,
+      "bytes": 26744
+    }
+  },
   "e15178edd37d55ae": {
     "source": "content/posts/0-to-1/pokeclip-six-track-input-contract.md",
     "wide": {
@@ -903,15 +891,6 @@
       "width": 417,
       "height": 255,
       "bytes": 19006
-    }
-  },
-  "e3c79ac5c0e8907f": {
-    "source": "content/posts/tech-blurting/cmaf-deep-dive.md",
-    "wide": {
-      "file": "e3c79ac5c0e8907f-wide.svg",
-      "width": 900,
-      "height": 440,
-      "bytes": 24953
     }
   },
   "e4758cf5a68e113a": {
@@ -936,6 +915,15 @@
       "width": 184,
       "height": 862,
       "bytes": 22748
+    }
+  },
+  "e6f5c3907eb423e7": {
+    "source": "content/posts/tech-blurting/ll-hls-deep-dive.md",
+    "wide": {
+      "file": "e6f5c3907eb423e7-wide.svg",
+      "width": 420,
+      "height": 422,
+      "bytes": 26816
     }
   },
   "e7795fa8c3334af2": {
@@ -1029,15 +1017,6 @@
       "width": 392,
       "height": 302,
       "bytes": 17069
-    }
-  },
-  "fdc7e37322cf0959": {
-    "source": "content/posts/tech-blurting/cmaf-deep-dive.md",
-    "wide": {
-      "file": "fdc7e37322cf0959-wide.svg",
-      "width": 804,
-      "height": 377,
-      "bytes": 23539
     }
   }
 }

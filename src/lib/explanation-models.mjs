@@ -1,7 +1,6 @@
 export const labForSlug = {
   '0-to-1/pokeclip-indexer-recovery-without-events':'recovery',
   '0-to-1/pokeclip-nginx-playback-request-boundary':'authorization',
-  'tech-blurting/hls-just-files':'latency',
   'tech-blurting/live-transcoding-infrastructure':'latency',
   'projects/multicloud-migration-design':['compatibility','cutover']
 };

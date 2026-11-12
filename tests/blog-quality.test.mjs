@@ -92,7 +92,7 @@ test('corrected numerical claims and explicit model boundaries survive publishin
  assert.ok(!h264.title.includes('10만'));assert.match(h264.raw,/497\.664/);assert.match(h264.raw,/8,160/);assert.match(h264.raw,/-r 60 -g 120/);
  assert.equal(1920*1080*3*60/750000,497.664);
  assert.equal(6e6*14400/8/1e9*50000,540000);
- for(const slug of ['0-to-1/pokeclip-indexer-recovery-without-events','0-to-1/pokeclip-nginx-playback-request-boundary','tech-blurting/hls-just-files']){
+ for(const slug of ['0-to-1/pokeclip-indexer-recovery-without-events','0-to-1/pokeclip-nginx-playback-request-boundary','tech-blurting/live-transcoding-infrastructure']){
   const $=load(fs.readFileSync(`dist/posts/${slug}/index.html`,'utf8'));
   assert.equal($('[data-lab]').length,1);assert.match($('.explanation-lab').text(),/설명용 모형/);
   $('.explanation-lab input[type=range]').each((_,el)=>assert.equal($(`label[for="${$(el).attr('id')}"]`).length,1));
@@ -116,7 +116,8 @@ test('a post can carry several explanation models, each a known mode',()=>{
   assert.ok(modes.length>=1);assert.equal(new Set(modes).size,modes.length);
   for(const mode of modes)assert.ok(known.has(mode),`${slug}: ${mode}`);
  }
- assert.deepEqual(labsForSlug('tech-blurting/hls-just-files'),['latency']);
+ assert.deepEqual(labsForSlug('tech-blurting/live-transcoding-infrastructure'),['latency']);
+ assert.deepEqual(labsForSlug('tech-blurting/hls-just-files'),[]);
  assert.deepEqual(labsForSlug('projects/multicloud-migration-design'),['compatibility','cutover']);
  assert.deepEqual(labsForSlug('no/such-post'),[]);
 });
