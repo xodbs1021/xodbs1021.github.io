@@ -1,0 +1,42 @@
+{
+ "started": "2026-11-13T06:34:29+0900",
+ "finished": "2026-11-13T06:52:12+0900",
+ "compare_choice": {
+  "x264_medium": 28,
+  "x265_medium": 28,
+  "svt_8": 39,
+  "svt_4": 41
+ },
+ "svt_presets_crf35": {
+  "4": "svt_4_crf35",
+  "6": "svt_6_crf35",
+  "8": "svt_8_crf35",
+  "10": "svt_10_crf35"
+ },
+ "svt_default_log": [
+  "Svt[info]: -------------------------------------------",
+  "Svt[info]: SVT [version]:\tSVT-AV1 Encoder Lib v4.2.0",
+  "Svt[info]: SVT [build]  :\tApple LLVM 21.0.0 (clang-2100.3.34.2)\t 64 bit",
+  "Svt[info]: LIB Build date: Jul 13 2026 18:06:33",
+  "Svt[info]: -------------------------------------------",
+  "Svt[info]: Level of Parallelism: 4",
+  "Svt[info]: Number of PPCS 59",
+  "Svt[info]: [asm level on system : up to neon_i8mm]",
+  "Svt[info]: [asm level selected : up to neon_i8mm]",
+  "Svt[info]: -------------------------------------------",
+  "Svt[info]: SVT [config]: main profile\ttier (auto)\tlevel (auto)",
+  "Svt[info]: SVT [config]: width / height / fps numerator / fps denominator \t\t: 1920 / 1080 / 24 / 1",
+  "Svt[info]: SVT [config]: bit-depth / color format \t\t\t\t\t: 8 / YUV420",
+  "Svt[info]: SVT [config]: preset / tune / pred struct \t\t\t\t\t: 8 / PSNR / random access",
+  "Svt[info]: SVT [config]: gop size / mini-gop size / key-frame type \t\t\t: 161 / 16 / key frame",
+  "Svt[info]: SVT [config]: BRC mode / rate factor \t\t\t\t\t: CRF / 35.00 ",
+  "Svt[info]: SVT [config]: AQ mode / Variance Boost \t\t\t\t\t: 2 / 0",
+  "Svt[info]: SVT [config]: sharpness / luminance-based QP bias \t\t\t\t: 0 / 0",
+  "Svt[info]: SVT [config]: QP scale compress strength \t\t\t\t\t: 0",
+  "Svt[info]: -------------------------------------------"
+ ],
+ "hls_av1_30": {
+  "cmd": "ffmpeg -hide_banner -y -f lavfi -i testsrc2=size=1920x1080:rate=60 -t 2 -c:v libsvtav1 -preset 12 -r 30 -pix_fmt yuv420p -f hls -hls_segment_type fmp4 -hls_time 1 -hls_list_size 0 -master_pl_name master.m3u8 hls_av1_30/v.m3u8",
+  "master": "#EXTM3U\n#EXT-X-VERSION:7\n#EXT-X-STREAM-INF:BANDWIDTH=5958207,AVERAGE-BANDWIDTH=5958207,RESOLUTION=1920x1080,CODECS=\"av01.0.08M.08\"\nv.m3u8\n\n"
+ }
+}

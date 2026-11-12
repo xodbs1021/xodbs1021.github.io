@@ -1,0 +1,34 @@
+06:34:29 start; uptime 6:34  up 44 days,  3:57, 8 users, load averages: 26.28 21.32 36.26
+06:34:29 == h264 headers / level
+06:34:39 == decode order
+06:34:40 == hevc tags / hdr
+06:34:44 == h264 1-pass ABR vs 2-pass
+06:35:57 == same VMAF target compare
+06:41:53 encode svt_8_crf35
+06:42:11   svt_8_crf35: cpu=28.38s kbps=1572.8 vmaf=94.94 p1=79.82
+06:42:11 encode svt_8_crf48
+06:42:29   svt_8_crf48: cpu=29.97s kbps=686.5 vmaf=87.29 p1=65.63
+06:42:29 encode svt_8_crf41
+06:42:51   svt_8_crf41: cpu=29.02s kbps=1054.1 vmaf=92.13 p1=74.19
+06:42:51 encode svt_8_crf38
+06:43:14   svt_8_crf38: cpu=28.75s kbps=1285.4 vmaf=93.62 p1=77.42
+06:43:14 encode svt_8_crf39
+06:43:34   svt_8_crf39: cpu=28.28s kbps=1201.3 vmaf=93.07 p1=77.01
+06:43:34 encode svt_8_crf40
+06:43:55   svt_8_crf40: cpu=29.41s kbps=1128.7 vmaf=92.75 p1=75.41
+06:43:55   svt 8 -> crf 39
+06:43:55 encode svt_4_crf41
+06:44:50   svt_4_crf41: cpu=93.15s kbps=866.5 vmaf=93.19 p1=75.44
+06:44:50 encode svt_4_crf44
+06:46:09   svt_4_crf44: cpu=97.49s kbps=724.2 vmaf=91.62 p1=70.66
+06:46:09 encode svt_4_crf42
+06:48:21   svt_4_crf42: cpu=98.78s kbps=817.8 vmaf=92.67 p1=74.02
+06:48:21   svt 4 -> crf 41
+06:48:21 == svt presets at crf 35
+06:48:21 encode svt_4_crf35
+06:50:36   svt_4_crf35: cpu=89.0s kbps=1261.9 vmaf=95.68 p1=81.34
+06:50:36 encode svt_6_crf35
+06:51:31   svt_6_crf35: cpu=55.17s kbps=1370.2 vmaf=95.52 p1=81.04
+06:51:31 encode svt_10_crf35
+06:52:10   svt_10_crf35: cpu=17.26s kbps=1625.8 vmaf=93.43 p1=78.48
+06:52:13 end; uptime 6:52  up 44 days,  4:14, 8 users, load averages: 219.66 156.94 108.93
