@@ -1,0 +1,19 @@
+# B4 bufsize 두 값의 순간 비트레이트와 HLS BANDWIDTH (2026-11-13, AI(Claude Code) 실행, FFmpeg 9.0.2, x264 core 165 r3222)
+입력: Sintel 예고편 10초 무손실 발췌(ref.mkv, 1920x1080 24fps 240프레임)
+ffmpeg -i ref.mkv -c:v libx264 -preset veryfast -tune zerolatency -threads 4 -b:v 3000k -maxrate 3000k -bufsize 750k -g 48 -sc_threshold 0 -f mpegts vbv_750.ts
+ffmpeg -i ref.mkv -c:v libx264 -preset veryfast -tune zerolatency -threads 4 -b:v 3000k -maxrate 3000k -bufsize 6000k -g 48 -sc_threshold 0 -f mpegts vbv_6000.ts
+프레임 크기: ffprobe -v error -select_streams v -show_entries packet=pts_time,size,flags -of csv=p=0 vbv_X.ts (영상 ES 바이트)
+
+bufsize 750k : 평균 2,745kbps, 1초 창 최대 3,489kbps, 0.25초 창 최대 4,816kbps, 최대 프레임 37,801바이트, 2초 구간(키프레임 정렬) 2153/3022/2833/2923/2793kbps
+bufsize 6000k: 평균 3,109kbps, 1초 창 최대 5,483kbps, 0.25초 창 최대 5,719kbps, 최대 프레임 56,277바이트, 2초 구간 2145/4543/3012/2877/2967kbps
+VBV 상한(계산): 길이 T초 구간의 비트 ≤ maxrate×T + bufsize → 2초 구간 최대 750k: 3,375kbps, 6000k: 6,000kbps
+VBV 버퍼 수위 계산(초기 0.9, 프레임마다 maxrate/24 채우고 프레임 크기만큼 비움): 최저 750k 15.2%, 6000k 39.7%
+0.25초(6프레임) 창 kbps 계열(영상 장면 데이터):
+750k : 2614 2192 2436 2414 2363 2179 1039 1988 4316 2971 3226 2962 2408 2774 2599 2919 3163 2834 2508 2750 2618 2764 3028 2999 3055 3151 3464 2764 3202 3264 2079 2402 41 3030 4299 3190 2682 2155 2636 4312
+6000k: 3093 2242 2483 2267 2113 2114 1019 1827 5481 5276 5605 5572 3579 3858 3416 3555 3929 2987 2762 2754 2662 2814 3137 3047 3047 3094 3401 2851 3214 3232 2020 2155 40 2208 3686 3995 4098 2358 2744 4607
+
+HLS 목록(-f hls -hls_time 2 -hls_list_size 0 -master_pl_name master.m3u8 v.m3u8):
+6000k, -re로 실시간 입력: 실행 중 master BANDWIDTH=3300000(=-b:v 3000k + 10%, hlsenc.c 1490–1494), 끝난 뒤 다시 쓴 master BANDWIDTH=4670672, AVERAGE-BANDWIDTH=3202617 → 측정 피크가 실행 중 선언값의 141.5%
+750k: 끝난 뒤 BANDWIDTH=3099744, AVERAGE-BANDWIDTH=2827519 → 실행 중 선언값 3,300,000의 93.9%
+조각 바이트(TS): 6000k 557232/1167668/774560/741660/762152, 750k 553848/774936/731132/755196/719288
+750k를 -re로 다시(실행 중 master 확인): 실행 중 BANDWIDTH=3300000, 끝난 뒤 BANDWIDTH=3112528, AVERAGE-BANDWIDTH=2826918 → 94.3% (글에는 이 값)

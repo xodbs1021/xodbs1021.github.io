@@ -1,0 +1,8 @@
+# B3 키프레임 위치 (2026-11-13, AI 실행, FFmpeg 9.0.2, x264 core 165 r3222)
+입력 cuts.mkv: testsrc2 1.3초 + mandelbrot 1.3초 + smptehdbars 3.4초 이어 붙임(장면 전환 1.3·2.6초), 1280x720 30fps 6초
+ffmpeg -f lavfi -i "testsrc2=size=1280x720:rate=30:d=1.3" -f lavfi -i "mandelbrot=size=1280x720:rate=30,trim=duration=1.3" -f lavfi -i "smptehdbars=size=1280x720:rate=30:d=3.4" -filter_complex "[0:v][1:v][2:v]concat=n=3:v=1[v]" -map "[v]" -c:v ffv1 cuts.mkv
+ffmpeg -i cuts.mkv -c:v libx264 -preset veryfast -g 60 default.mp4                    -> 키프레임 0, 1.3, 2.6, 4.6초
+ffmpeg -i cuts.mkv -c:v libx264 -preset veryfast -g 60 -keyint_min 60 kmin.mp4        -> 키프레임 0, 1.3, 2.6, 4.6초
+ffmpeg -i cuts.mkv -c:v libx264 -preset veryfast -g 60 -sc_threshold 0 sc0.mp4        -> 키프레임 0, 2.0, 4.0초
+키프레임: ffprobe -v error -select_streams v -show_entries packet=pts_time,flags -of csv=p=0 X.mp4 (flags에 K)
+x264 encoder/encoder.c: i_keyint_min = x264_clip3(i_keyint_min, 1, i_keyint_max/2+1) — -g 60이면 keyint_min은 31로 깎임

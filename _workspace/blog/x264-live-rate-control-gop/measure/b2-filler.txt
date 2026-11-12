@@ -1,0 +1,9 @@
+# B2 -minrate만 vs nal-hrd=cbr 필러 NAL (2026-11-13, AI 실행, FFmpeg 9.0.2, x264 core 165 r3222)
+ffmpeg -f lavfi -i color=c=gray:size=1280x720:rate=30 -t 10 -c:v libx264 -preset veryfast -b:v 3000k -maxrate 3000k -bufsize 3000k -minrate 3000k -f mpegts minrate.ts
+  -> 99,264바이트, 평균 79kbps, 필러 NAL(type 12) 0개
+ffmpeg -f lavfi -i color=c=gray:size=1280x720:rate=30 -t 10 -c:v libx264 -preset veryfast -b:v 3000k -maxrate 3000k -bufsize 3000k -minrate 3000k -x264-params nal-hrd=cbr -f mpegts nalhrd.ts
+  -> 3,894,608바이트, 평균 3,115kbps, 필러 NAL 297개(300프레임)
+필러 수: ffmpeg -i X.ts -c copy -bsf:v trace_headers -f null - 2>&1 | grep -c "nal_unit_type .* = 12$"
+
+-minrate 유무 비교(-threads 4, 나머지 같음): 두 출력 md5 3e3ec239196b69774053dc6b23b41da6, 99,264바이트로 바이트까지 같음
+FFmpeg 9.0.2 libavcodec/libx264.c에 rc_min_rate를 읽는 줄 0개(grep -c min_rate = 0). nal-hrd 개인 옵션 1546–1550행(「requires vbv-bufsize; cbr not allowed in .mp4」)

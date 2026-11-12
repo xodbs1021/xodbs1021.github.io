@@ -1,0 +1,28 @@
+# B1 preset 10종 (2026-11-13 02:27–02:33 KST, AI 실행, Apple M5 4P+6E 32GB, macOS 27.0.1, FFmpeg 9.0.2, x264 core 165 r3222, libvmaf 3.2.1 vmaf_v0.6.1)
+입력 ref.mkv: Sintel 예고편 1080p(Blender Foundation, CC BY 3.0, sha256 34bbd52a…7931) 20초부터 10초, 1920x1080 24fps 240프레임, FFV1로 무손실 저장. 원본 자체가 H.264 2.1Mbps라 이미 한 번 압축된 영상, 위아래 검은 띠 있음.
+명령: ffmpeg -i ref.mkv -c:v libx264 -preset P -crf 23 enc_P.mp4  (/usr/bin/time -p, cpu=user+sys 초)
+VMAF: ffmpeg -i enc_P.mp4 -i ref.mkv -lavfi "[0:v]setpts=N/24/TB[d];[1:v]setpts=N/24/TB[r];[d][r]libvmaf=n_threads=8" -f null -  (프레임 번호로 맞춤 — mkv 밀리초 타임스탬프 반올림 때문에 PTS 기준 정렬은 프레임이 어긋남)
+다른 세션 작업이 함께 돌았음: 시작 load 15.96, 끝 load 125.12 — 벽시계 시간은 참고용
+
+ultrafast real=0.84 cpu=6.83 bytes=9326848 kbps=7461
+superfast real=2.02 cpu=14.49 bytes=5915378 kbps=4732
+veryfast real=2.91 cpu=17.97 bytes=3537987 kbps=2830
+faster real=4.55 cpu=24.81 bytes=3925974 kbps=3141
+fast real=6.19 cpu=31.14 bytes=4012324 kbps=3210
+medium real=7.70 cpu=35.32 bytes=3802492 kbps=3042
+slow real=13.69 cpu=46.29 bytes=3702891 kbps=2962
+slower real=17.97 cpu=80.13 bytes=3683179 kbps=2947
+veryslow real=33.56 cpu=174.2 bytes=3423518 kbps=2739
+placebo real=184.53 cpu=955.99 bytes=3521748 kbps=2817
+
+VMAF(프레임 번호 정렬):
+ultrafast 98.14
+superfast 97.68
+veryfast 95.8
+faster 97.28
+fast 97.6
+medium 97.7
+slow 97.68
+slower 97.96
+veryslow 97.86
+placebo 97.97
