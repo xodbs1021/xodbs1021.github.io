@@ -121,7 +121,7 @@ const M_CELL = { w: 120, h: 80 } as const;
 const M_ENTRY: Pt = [M_PIPE.x0 + 8 + M_CELL.w / 2, M_PIPE.y];
 const M_EXIT: Pt = [M_PIPE.x1 - 8 - M_CELL.w / 2, M_PIPE.y];
 const M_BUS_X = 1030;
-const M_LANE_X0 = 180;
+const M_LANE_X0 = 205;
 const M_SLOT0 = M_BUS_X - 52;
 const M_SLOT_PITCH = 50;
 /** 이름표 아래 가운데(영상 · 오디오). */
@@ -152,7 +152,7 @@ const MOBILE: Layout = {
   cell: M_CELL,
   laneCell: { w: 44, h: 56 },
   rows: M_ROWS,
-  laneLabelX: 60,
+  laneLabelX: 40,
   slotX: (slot) => M_SLOT0 - slot * M_SLOT_PITCH,
   sinkPath: (track, x) => [M_EXIT, [M_BUS_X, M_PIPE.y], [M_BUS_X, M_ROWS[track]], [x, M_ROWS[track]]],
   fan: [
@@ -161,7 +161,7 @@ const MOBILE: Layout = {
   ],
   head: { x: 660, y: 598 },
   box: { x: 60, y: 548, w: 560, pad: 18, line: 60 },
-  take: { x: M_LANE_X0, y: M_ROWS[6] - 37 },
+  take: { x: M_LANE_X0 + 10, y: M_ROWS[6] - 37 },
 };
 
 const LAYOUTS = { desktop: DESKTOP, mobile: MOBILE } as const;
@@ -383,7 +383,7 @@ export const PidDemux: React.FC<Props> = ({ layout = "desktop" }) => {
               color={FILL[TRACK_TONE[track]]}
               opacity={lanes}
             >
-              {pidTail(track)}
+              {`0x${pidTail(track)}`}
             </Label>
           ))}
 
