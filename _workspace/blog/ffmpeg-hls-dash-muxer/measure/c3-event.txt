@@ -1,0 +1,23 @@
+# C3 event 목록 (2026-11-13, AI 실행, FFmpeg 9.0.2)
+ffmpeg -re -f lavfi -t 10 -i testsrc2=size=640x360:rate=30 -c:v libx264 -preset veryfast -g 60 -sc_threshold 0 -f hls -hls_playlist_type event -hls_segment_filename ev/seg_%03d.ts ev/index.m3u8
+## 6.5초 시점 목록: 조각 3개, ENDLIST 없음 / 끝난 뒤: 조각 5개 + ENDLIST
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:2
+#EXT-X-MEDIA-SEQUENCE:0
+#EXT-X-PLAYLIST-TYPE:EVENT
+#EXTINF:2.000000,
+seg_000.ts
+#EXTINF:2.000000,
+seg_001.ts
+#EXTINF:2.000000,
+seg_002.ts
+#EXTINF:2.000000,
+seg_003.ts
+#EXTINF:2.000000,
+seg_004.ts
+#EXT-X-ENDLIST
+
+event + -hls_list_size 3 (20초, -re 없음): 목록 항목 10개, ENDLIST 1개
+SIGKILL(7초 뒤 kill -9): 항목 3, ENDLIST 0
+SIGINT(7초 뒤 kill -INT): 항목 4, ENDLIST 1

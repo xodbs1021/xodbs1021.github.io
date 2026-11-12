@@ -1,0 +1,51 @@
+# C4 hls_time 기본값·independent_segments·hls_allow_cache·hls_init_time (2026-11-13, AI 실행, FFmpeg 9.0.2)
+## hls_time 생략, -g 60(2초), 10초: EXTINF
+#EXTINF:2.000000,
+#EXTINF:2.000000,
+#EXTINF:2.000000,
+#EXTINF:2.000000,
+#EXTINF:2.000000,
+## -g 300(10초 GOP) -hls_time 2 -hls_flags independent_segments, 20초
+#EXTM3U
+#EXT-X-VERSION:6
+#EXT-X-TARGETDURATION:10
+#EXT-X-MEDIA-SEQUENCE:0
+#EXT-X-PLAYLIST-TYPE:VOD
+#EXT-X-INDEPENDENT-SEGMENTS
+#EXTINF:10.000000,
+seg_000.ts
+#EXTINF:10.000000,
+seg_001.ts
+#EXT-X-ENDLIST
+## open GOP 원본을 -c copy로: 원본 ffmpeg -f lavfi -t 12 -i testsrc2=size=640x360:rate=30 -c:v libx264 -preset veryfast -g 60 -keyint_min 60 -sc_threshold 0 -x264-params open-gop=1 og/src.mkv
+ffmpeg -i og/src.mkv -c copy -f hls -hls_time 2 -hls_playlist_type vod -hls_flags independent_segments -hls_segment_filename og/seg_%03d.ts og/index.m3u8
+#EXTM3U
+#EXT-X-VERSION:6
+#EXT-X-TARGETDURATION:2
+#EXT-X-MEDIA-SEQUENCE:0
+#EXT-X-PLAYLIST-TYPE:VOD
+#EXT-X-INDEPENDENT-SEGMENTS
+#EXTINF:2.000000,
+seg_000.ts
+#EXTINF:2.000000,
+seg_001.ts
+#EXTINF:2.000000,
+seg_002.ts
+#EXTINF:2.000000,
+seg_003.ts
+#EXTINF:2.000000,
+seg_004.ts
+#EXTINF:1.980000,
+seg_005.ts
+#EXT-X-ENDLIST
+seg_000 NAL: AUD SEI SPS PPS IDR(5) …, seg_001 첫 패킷: AUD(9) SEI(6, payload 6=recovery point) 슬라이스 type 1(비IDR), SPS·PPS 없음 → 혼자 디코딩 0프레임('non-existing PPS 0 referenced')
+## -hls_allow_cache 1: 목록 머리
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-ALLOW-CACHE:YES
+#EXT-X-TARGETDURATION:2
+## -hls_init_time 1 -hls_time 4 -g 30, 30초, 목록 크기 기본 5: 조각 길이
+1.000000 1.000000 1.000000 1.000000 1.000000 1.000000 3.000000 4.000000 4.000000 4.000000 4.000000 4.000000 1.000000 
+## mp4를 표준 출력으로
+ffmpeg -f lavfi -t 2 -i testsrc2=size=640x360:rate=30 -c:v libx264 -f mp4 - > /dev/null
+[mp4 @ …] muxer does not support non seekable output / Could not write header (incorrect codec parameters ?): Invalid argument
