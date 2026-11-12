@@ -74,7 +74,7 @@ nginx는 MediaMTX와 같은 네트워크 네임스페이스를 씁니다([`compo
 | MediaMTX 관리 API(9997) | 전달 설정이 없음 |
 | SRT 송출 | NLB에서 MediaMTX로 바로 감, nginx를 지나지 않음 |
 
-관리 API에는 송출 끊기(kick), 설정 변경, 녹화 삭제가 있습니다. 사이드카만 비밀번호를 갖고 있지만, nginx가 이 포트로 넘기면 그 비밀번호 하나에 기대는 표면이 내부 ALB 쪽으로 열립니다. 그래서 렌더된 설정에 관리 API 포트 번호가 한 번도 나오지 않게 했습니다([22–25행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/nginx/nginx.conf.tmpl#L22-L25)). 제어면 상류 주소는 코드 기본값이 빈 값이고, 비어 있으면 허용 접두사도 404로 닫힙니다([`prod/media/variables.tf` 64–68행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/prod/media/variables.tf#L64-L68)). 운영 상자는 11월 3일 되감기를 켜면서 이 값을 사이드카 제어면 주소로 채웠습니다.
+관리 API에는 송출 끊기(kick), 설정 변경, 녹화 삭제가 있습니다. 사이드카만 비밀번호를 갖고 있지만, nginx가 이 포트로 넘기면 그 비밀번호 하나에 기대는 표면이 내부 ALB 쪽으로 열립니다. 그래서 렌더된 설정에 관리 API 포트 번호가 한 번도 나오지 않게 했습니다([22–25행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/nginx/nginx.conf.tmpl#L22-L25)). 제어면 상류 주소는 코드 기본값이 빈 값이고, 비어 있으면 허용 접두사도 404로 닫힙니다([`prod/media/variables.tf` 64–68행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/prod/media/variables.tf#L64-L68)). 11월 3일 운영 상자에서 되감기를 켜면서 이 값을 사이드카 제어면 주소로 채우기로 제가 정했습니다.
 
 ## 403에 더해 상류에 닿은 요청이 0건인지 셌습니다 {#성공-응답뿐-아니라-상류에-가지-않았는지도-확인했습니다}
 
