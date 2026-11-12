@@ -10,8 +10,5 @@
   "tech-blurting/h265-hdr-deep-dive": 2,
   "tech-blurting/live-transcoding-infrastructure": 38,
   "tech-blurting/nvenc-gpu-transcoding": 9,
-  "tech-blurting/opus-deep-dive": 4,
-  "tech-blurting/srt-broadcaster-protocol": 3,
-  "tech-blurting/webrtc-deep-dive": 2,
-  "tech-blurting/whip-whep-modern-ingest": 2
+  "tech-blurting/opus-deep-dive": 4
 }

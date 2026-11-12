@@ -1287,6 +1287,58 @@
       "poster": "/images/rewind-missing-segment-rewind-fallout-mobile-poster.jpg"
     }
   },
+  "rtmp-mpeg-ts-srt-pid-demux": {
+    "scene": "PidDemux",
+    "alt": "영상 0x100과 오디오 0x101–0x106에서 나온 패킷 칸이 MPEG-TS 한 흐름 관 하나에 섞여 지나가고, 먼저 지난 PAT · PMT 칸이 PID와 트랙의 대응을 적은 표 상자로 들어간 뒤 나머지 칸이 PID에 맞는 7개 줄로 갈라져 쌓이며 영상 줄이 가장 길어지고 오디오6 줄 끝에 0x106만 꺼냄이 뜬다",
+    "sha256": "2a06d08dea698ee9b23487e65fde0dd8505644019342d749c708e4d121997cdf",
+    "bytes": 349290,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/rtmp-mpeg-ts-srt-pid-demux-poster.jpg",
+    "mobile": {
+      "sha256": "6527634e297315d56e98f55f99a4eeba3d8c64f2a14f28d85d7669a3b60ff230",
+      "bytes": 385956,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/rtmp-mpeg-ts-srt-pid-demux-mobile-poster.jpg"
+    }
+  },
+  "rtmp-still-alive-chunk-interleave": {
+    "scene": "ChunkInterleave",
+    "alt": "OBS에서 서버로 가는 연결 두 줄 가운데 위 줄은 영상 메시지 막대 하나가 관을 지나는 동안 오디오와 제어가 기다렸다가 영상 뒤에야 도착하고, 아래 줄은 같은 영상이 청크 V1–V6으로 쪼개져 V2 뒤에 오디오, V4 뒤에 제어가 끼어들어 먼저 도착하며 청크 여섯 개는 서버에서 영상 메시지 하나로 합쳐진다",
+    "sha256": "0786c4e388c1438f1fddf69c47af2394fafa22689321a742549bd59e93c67638",
+    "bytes": 372395,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/rtmp-still-alive-chunk-interleave-poster.jpg",
+    "mobile": {
+      "sha256": "d42165d6196fdf4502366f342863a5d55e99d200bb9195ed07bd474b667e5c25",
+      "bytes": 363123,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/rtmp-still-alive-chunk-interleave-mobile-poster.jpg"
+    }
+  },
   "shakedown-bounded-ai-image-generation-generation-and-plan-gates": {
     "scene": "GenerationAndPlanGates",
     "alt": "왼쪽 「이미지 생성」 열에 기존 Dockerfile · 지원 스택 규칙 · Claude 1회 · 형식 · 금지 요소 검사 · 별도 사본에서 빌드 상자가 위에서 아래로 있다. 점이 내려가며 기존 Dockerfile은 「없음」, 규칙은 「규칙 밖」으로 회색이 되고, Claude 1회에 「3.679초」, 검사에 「통과」, 빌드에 「HTTP 200」이 강조색으로 뜬다. 오른쪽 「규모 선택」 열에서 「150 RPS · 높은 가용성 · 급증 가능」이 「최소 등급 large」로 이어진 뒤, small 선택은 위험색 「HTTP 400」에서 멈추고 large 선택은 강조색 「200 · 저장」으로 끝나는 장면",
@@ -1443,6 +1495,32 @@
       "poster": "/images/shakedown-reboot-recovery-and-deletion-reboot-twice-tombstone-mobile-poster.jpg"
     }
   },
+  "srt-broadcaster-protocol-retransmit-window": {
+    "scene": "RetransmitWindow",
+    "alt": "받는 쪽 버퍼 칸 1–6이 두 줄로 놓이고 두 줄 모두 비어 있는 3번 칸에서 송신 쪽으로 NAK 3이 나간 뒤 재전송 3이 되돌아온다. 내보낼 시각을 뜻하는 세로선이 칸을 왼쪽부터 지나는 동안 위 줄은 재전송이 먼저 와 3번을 메우고 1–6을 모두 내보내고, 아래 줄은 선이 3번에 닿을 때까지 재전송이 오지 않아 3번을 건너뛴 채 4번부터 내보내며 뒤늦게 온 3은 버려진다",
+    "sha256": "e3afa19704c531652bb4d34642f586a2f4db47ec1c59dd5594ffa9e3511771b9",
+    "bytes": 290180,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/srt-broadcaster-protocol-retransmit-window-poster.jpg",
+    "mobile": {
+      "sha256": "452f0b2c8ca605eafc9331390aa072faa6c1cea768e4b1b18d9bdcbc20e00ad9",
+      "bytes": 244328,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/srt-broadcaster-protocol-retransmit-window-mobile-poster.jpg"
+    }
+  },
   "stream-id-contract-compatible-migration-deploy-order": {
     "scene": "DeployOrder",
     "alt": "두 줄의 배포 순서. 위 줄은 소비자가 먼저 ingestStreamId로 조각을 찾게 배포되고 생산자가 새 streamId를 내 조각 조회가 정상으로 끝난다. 아래 줄은 생산자가 먼저 새 streamId를 내고 옛 소비자가 경로 칸에 세션 id를 넣어 조회해 0행으로 끝나는 장면",
@@ -1467,6 +1545,58 @@
       "audio": 0,
       "faststart": true,
       "poster": "/images/stream-id-contract-compatible-migration-deploy-order-mobile-poster.jpg"
+    }
+  },
+  "webrtc-deep-dive-ice-candidate-pairs": {
+    "scene": "IceCandidatePairs",
+    "alt": "피어 A와 피어 B 아래로 host · srflx · relay 후보 칸이 차례로 생기고, 같은 종류끼리 이은 세 쌍 가운데 host 쌍은 서로 다른 망이라 실패하고 srflx · relay 쌍은 통한다. 이어 srflx 쌍이 굵어지며 선택 · 미디어 이름표와 함께 패킷이 A에서 B로 흐르고 relay 쌍은 회색 예비로 남는다",
+    "sha256": "fced9a6b220dd7ac1427d74c851020a6ba03320f4c6fb8d37bfce2e58288daa8",
+    "bytes": 255524,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/webrtc-deep-dive-ice-candidate-pairs-poster.jpg",
+    "mobile": {
+      "sha256": "1f63fb3fa347d606acb898aa28e143748b2675a24e56593762d80f8e0186f69c",
+      "bytes": 168432,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/webrtc-deep-dive-ice-candidate-pairs-mobile-poster.jpg"
+    }
+  },
+  "whip-whep-modern-ingest-whip-round-trips": {
+    "scene": "WhipRoundTrips",
+    "alt": "송출기와 WHIP 서버 두 세로선 사이로 POST · SDP 제안과 201 Created · SDP 응답이 오가 왕복 1, STUN 연결 확인과 응답이 오가 왕복 2, DTLS 핸드셰이크 두 쌍이 오가 왕복 4가 된 뒤에야 미디어 시작이 붙고 굵은 RTP 미디어 화살표가 송출기에서 서버로 흐른다",
+    "sha256": "00039828efab1e09da0c6556067664280d5305adb35b61c0474472d64e19fb8f",
+    "bytes": 264884,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/whip-whep-modern-ingest-whip-round-trips-poster.jpg",
+    "mobile": {
+      "sha256": "4b8b4c9fae8e84747d95709a63d67b2c79c2493803ee6c1f333a120e3586ccb1",
+      "bytes": 225526,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/whip-whep-modern-ingest-whip-round-trips-mobile-poster.jpg"
     }
   }
 }

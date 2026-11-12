@@ -1,3 +1,8 @@
+import { CHUNK_INTERLEAVE_FRAMES, ChunkInterleave } from "./scenes/rtmp-still-alive/ChunkInterleave";
+import { RETRANSMIT_WINDOW_FRAMES, RetransmitWindow } from "./scenes/srt-broadcaster-protocol/RetransmitWindow";
+import { WHIP_ROUND_TRIPS_FRAMES, WhipRoundTrips } from "./scenes/whip-whep-modern-ingest/WhipRoundTrips";
+import { ICE_CANDIDATE_PAIRS_FRAMES, IceCandidatePairs } from "./scenes/webrtc-deep-dive/IceCandidatePairs";
+import { PID_DEMUX_FRAMES, PidDemux } from "./scenes/rtmp-mpeg-ts-srt/PidDemux";
 import { CONNECTION_TOKEN_LIFETIME_FRAMES, ConnectionTokenLifetime } from "./scenes/pokeclip-shared-db-auth-iam-tls/ConnectionTokenLifetime";
 import { TOKEN_TO_VERIFIED_DB_FRAMES, TokenToVerifiedDb } from "./scenes/pokeclip-shared-db-auth-iam-tls/TokenToVerifiedDb";
 import { Composition } from "remotion";
@@ -624,6 +629,56 @@ export const RemotionRoot: React.FC = () => (
       component={AuthQueueSerial}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={AUTH_QUEUE_SERIAL_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="ChunkInterleave" component={ChunkInterleave} durationInFrames={CHUNK_INTERLEAVE_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="ChunkInterleaveMobile"
+      component={ChunkInterleave}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={CHUNK_INTERLEAVE_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="RetransmitWindow" component={RetransmitWindow} durationInFrames={RETRANSMIT_WINDOW_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="RetransmitWindowMobile"
+      component={RetransmitWindow}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={RETRANSMIT_WINDOW_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="WhipRoundTrips" component={WhipRoundTrips} durationInFrames={WHIP_ROUND_TRIPS_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="WhipRoundTripsMobile"
+      component={WhipRoundTrips}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={WHIP_ROUND_TRIPS_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="IceCandidatePairs" component={IceCandidatePairs} durationInFrames={ICE_CANDIDATE_PAIRS_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="IceCandidatePairsMobile"
+      component={IceCandidatePairs}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={ICE_CANDIDATE_PAIRS_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="PidDemux" component={PidDemux} durationInFrames={PID_DEMUX_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="PidDemuxMobile"
+      component={PidDemux}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={PID_DEMUX_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}
