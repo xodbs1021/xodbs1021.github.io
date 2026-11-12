@@ -1,7 +1,7 @@
 ---
 title: "WebRTC는 NAT 뒤 두 브라우저를 ICE 후보로 잇습니다"
 date: 2026-06-20T10:04:12+09:00
-lastmod: "2026-11-12T14:14:56+09:00"
+lastmod: "2026-11-12T15:32:05+09:00"
 description: "공유기(NAT) 뒤의 두 브라우저는 서로의 주소를 모릅니다. WebRTC는 W3C API(2021년 1월 Recommendation)와 IETF 프로토콜 묶음(RFC 8825 등)으로, ICE가 host·srflx·relay 후보를 모아 연결되는 쌍을 고르게 했습니다. STUN과 TURN의 역할, SDP 제안·응답, 메시와 SFU의 연결 수, Simulcast와 SVC, 대규모 시청에서 CDN 캐시를 못 쓰는 비용을 RFC와 W3C 문서로 확인했습니다."
 categories: ["tech-blurting"]
 tags: ["WebRTC", "ICE", "STUN", "TURN", "SDP", "SFU"]
@@ -22,7 +22,7 @@ WebRTC 이전에는 브라우저에서 카메라를 켜고 상대와 영상을 �
 | 미디어 전송(RTP) | [RFC 8834](https://www.rfc-editor.org/rfc/rfc8834.html) | 2021-01 |
 | 연결 수립(ICE) | [RFC 8445](https://www.rfc-editor.org/rfc/rfc8445.html) | 2018-07 |
 
-예전 글의 「2017년 W3C 표준화」는 첫 CR을 표준 완성으로 읽은 것입니다. 2017년부터 2021년 사이 API는 여러 차례 후보 권고안으로 다시 나왔습니다.
+2017년은 첫 후보 권고안이 나온 해이고, 2017년부터 2021년 사이 API는 여러 차례 후보 권고안으로 다시 나온 뒤 권고안이 됐습니다.
 
 ## 세 API가 장치·연결·데이터를 맡습니다 {#2-세-가지-핵심-api}
 
@@ -130,15 +130,15 @@ SFU가 시청자마다 다른 화질을 주려면 보내는 쪽이 여러 화질
 | 문서 | [RFC 8853](https://www.rfc-editor.org/rfc/rfc8853.html)(SDP의 rid로 인코딩 구분) | [W3C webrtc-svc](https://www.w3.org/TR/webrtc-svc/)의 `scalabilityMode`(Working Draft, 2026-09-14) |
 | 코덱 | 코덱 제약이 적음 | VP9 · AV1은 공간 · 시간 층 모두, VP8 · H.264 · H.265는 시간 층만 |
 
-`scalabilityMode`의 이름은 `L(공간 층 수)T(시간 층 수)`입니다. `L1T3`은 해상도 하나에 프레임률 층 셋, `L3T3`은 해상도 층 셋(2:1 비율)과 시간 층 셋입니다. Simulcast는 인코더가 같은 화면을 여러 번 인코딩하므로 보내는 쪽 연산과 업로드가 늘어납니다. SVC는 인코딩이 하나지만 공간 층을 쓰려면 VP9나 AV1이 필요합니다. 예전 글의 「Zoom은 Simulcast, Google Meet은 AV1 SVC」는 확인할 공식 문서를 찾지 못해 지웠습니다.
+`scalabilityMode`의 이름은 `L(공간 층 수)T(시간 층 수)`입니다. `L1T3`은 해상도 하나에 프레임률 층 셋, `L3T3`은 해상도 층 셋(2:1 비율)과 시간 층 셋입니다. Simulcast는 인코더가 같은 화면을 여러 번 인코딩하므로 보내는 쪽 연산과 업로드가 늘어납니다. SVC는 인코딩이 하나지만 공간 층을 쓰려면 VP9나 AV1이 필요합니다.
 
 ## 대규모 시청에서는 CDN 캐시를 못 쓰는 것이 비용이 됩니다 {#8-webrtc를-라이브-방송에-쓰려면}
 
-WebRTC를 라이브 방송에 쓰는 표준은 방향별로 하나씩입니다. 송출자가 서버로 보내는 WHIP은 2025년 3월 [RFC 9725](https://www.rfc-editor.org/rfc/rfc9725.html)가 됐고, 서버가 시청자에게 보내는 WHEP은 2026년 10월 기준 아직 드래프트입니다([WHIP 글](/posts/tech-blurting/whip-whep-modern-ingest/)). 예전 글은 WHIP 방향을 「시청자 → 서버」로 잘못 적었습니다.
+WebRTC를 라이브 방송에 쓰는 표준은 방향별로 하나씩입니다. 송출자가 서버로 보내는 WHIP은 2025년 3월 [RFC 9725](https://www.rfc-editor.org/rfc/rfc9725.html)가 됐고, 서버가 시청자에게 보내는 WHEP은 2026년 10월 기준 아직 드래프트입니다([WHIP 글](/posts/tech-blurting/whip-whep-modern-ingest/)).
 
-시청 쪽 비용 구조는 HLS와 다릅니다. HLS 조각은 같은 파일을 CDN이 여러 시청자에게 그대로 줄 수 있지만, WebRTC는 시청자마다 ICE 경로와 DTLS 세션이 따로 있고 SRTP 키도 세션마다 달라 공유할 사본이 없습니다. 시청자가 늘면 SFU의 세션 수와 전송량이 함께 늘어나므로, 많은 시청자를 받으려면 SFU를 여러 지역에 두고 서로 잇는 구조가 필요합니다. 그 비용이 HLS의 몇 배인지는 구조와 요금에 따라 달라, 예전 글의 「100배」 같은 배수와 출처 없는 지연 비교 차트는 지웠습니다.
+시청 쪽에서는 시청자마다 DTLS · SRTP 세션이 따로 있어 HLS 조각처럼 CDN이 한 사본을 여러 시청자에게 줄 수 없고, 시청자가 늘면 SFU의 세션 수와 전송량이 함께 늘어납니다. 비용 구조는 [WHIP 글의 시청 비용 절](/posts/tech-blurting/whip-whep-modern-ingest/#5-whep의-진짜-한계--시청자-확장)에 있습니다.
 
-## WebRTC를 쓸 때 갈리는 판단과 흔한 오해
+## P2P라도 WebRTC에는 시그널링 · TURN · SFU 서버가 필요합니다
 
 - **「P2P라서 서버가 필요 없다」** — 시그널링 서버는 늘 필요하고, NAT 바깥 주소를 알려면 STUN, 직접 경로가 막히면 TURN이 필요합니다. 여럿이면 SFU도 필요합니다.
 - **「STUN이 미디어를 중계한다」** — STUN은 주소만 알려 줍니다. 중계는 TURN입니다. TURN 대역은 운영 비용에 바로 잡힙니다.
