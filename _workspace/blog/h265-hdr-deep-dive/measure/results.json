@@ -1,0 +1,415 @@
+{
+ "started": "2026-11-13T06:34:29+0900",
+ "h264_headers": {
+  "auto60_veryfast": {
+   "cmd": "ffmpeg -hide_banner -y -f lavfi -i testsrc2=size=1920x1080:rate=60 -t 1 -c:v libx264 -preset veryfast -profile:v high -pix_fmt yuv420p -g 120 -sc_threshold 0 -f mpegts h264_auto60_veryfast.ts",
+   "level_idc": [
+    "42"
+   ],
+   "profile_idc": [
+    "100"
+   ],
+   "max_num_ref_frames": [
+    "4"
+   ],
+   "first_nals": [
+    "7",
+    "8",
+    "9",
+    "7",
+    "8",
+    "6",
+    "5",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9"
+   ],
+   "warnings": [
+    "[libx264 @ 0x75fac24a80] profile High, level 4.2, 4:2:0, 8-bit"
+   ]
+  },
+  "auto60_medium": {
+   "cmd": "ffmpeg -hide_banner -y -f lavfi -i testsrc2=size=1920x1080:rate=60 -t 1 -c:v libx264 -preset medium -profile:v high -pix_fmt yuv420p -g 120 -sc_threshold 0 -f mpegts h264_auto60_medium.ts",
+   "level_idc": [
+    "42"
+   ],
+   "profile_idc": [
+    "100"
+   ],
+   "max_num_ref_frames": [
+    "4"
+   ],
+   "first_nals": [
+    "7",
+    "8",
+    "9",
+    "7",
+    "8",
+    "6",
+    "5",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9"
+   ],
+   "warnings": [
+    "[libx264 @ 0x776d028a80] profile High, level 4.2, 4:2:0, 8-bit"
+   ]
+  },
+  "auto30_medium": {
+   "cmd": "ffmpeg -hide_banner -y -f lavfi -i testsrc2=size=1920x1080:rate=30 -t 1 -c:v libx264 -preset medium -profile:v high -pix_fmt yuv420p -g 60 -sc_threshold 0 -f mpegts h264_auto30_medium.ts",
+   "level_idc": [
+    "40"
+   ],
+   "profile_idc": [
+    "100"
+   ],
+   "max_num_ref_frames": [
+    "4"
+   ],
+   "first_nals": [
+    "7",
+    "8",
+    "9",
+    "7",
+    "8",
+    "6",
+    "5",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9"
+   ],
+   "warnings": [
+    "[libx264 @ 0x7a86c20a80] profile High, level 4.0, 4:2:0, 8-bit"
+   ]
+  },
+  "lvl41_60": {
+   "cmd": "ffmpeg -hide_banner -y -f lavfi -i testsrc2=size=1920x1080:rate=60 -t 1 -c:v libx264 -preset veryfast -level 4.1 -profile:v high -pix_fmt yuv420p -g 120 -sc_threshold 0 -f mpegts h264_lvl41_60.ts",
+   "level_idc": [
+    "41"
+   ],
+   "profile_idc": [
+    "100"
+   ],
+   "max_num_ref_frames": [
+    "4"
+   ],
+   "first_nals": [
+    "7",
+    "8",
+    "9",
+    "7",
+    "8",
+    "6",
+    "5",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9"
+   ],
+   "warnings": [
+    "[libx264 @ 0x7967400a80] MB rate (489600) > level limit (245760)",
+    "[libx264 @ 0x7967400a80] profile High, level 4.1, 4:2:0, 8-bit"
+   ]
+  },
+  "lvl42_60": {
+   "cmd": "ffmpeg -hide_banner -y -f lavfi -i testsrc2=size=1920x1080:rate=60 -t 1 -c:v libx264 -preset veryfast -level 4.2 -profile:v high -pix_fmt yuv420p -g 120 -sc_threshold 0 -f mpegts h264_lvl42_60.ts",
+   "level_idc": [
+    "42"
+   ],
+   "profile_idc": [
+    "100"
+   ],
+   "max_num_ref_frames": [
+    "4"
+   ],
+   "first_nals": [
+    "7",
+    "8",
+    "9",
+    "7",
+    "8",
+    "6",
+    "5",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9",
+    "1",
+    "9"
+   ],
+   "warnings": [
+    "[libx264 @ 0x7aea808a80] profile High, level 4.2, 4:2:0, 8-bit"
+   ]
+  },
+  "hls_h264_60": {
+   "cmd": "ffmpeg -hide_banner -y -f lavfi -i testsrc2=size=1920x1080:rate=60 -t 2 -c:v libx264 -preset veryfast -profile:v high -r 60 -pix_fmt yuv420p -f hls -hls_segment_type fmp4 -hls_time 1 -hls_list_size 0 -master_pl_name master.m3u8 hls_h264_60/v.m3u8",
+   "master": "#EXTM3U\n#EXT-X-VERSION:7\n#EXT-X-STREAM-INF:BANDWIDTH=7180368,AVERAGE-BANDWIDTH=7180368,RESOLUTION=1920x1080,CODECS=\"avc1.64002a\"\nv.m3u8\n\n"
+  },
+  "hls_h264_30": {
+   "cmd": "ffmpeg -hide_banner -y -f lavfi -i testsrc2=size=1920x1080:rate=60 -t 2 -c:v libx264 -preset veryfast -profile:v high -r 30 -pix_fmt yuv420p -f hls -hls_segment_type fmp4 -hls_time 1 -hls_list_size 0 -master_pl_name master.m3u8 hls_h264_30/v.m3u8",
+   "master": "#EXTM3U\n#EXT-X-VERSION:7\n#EXT-X-STREAM-INF:BANDWIDTH=5499579,AVERAGE-BANDWIDTH=5499579,RESOLUTION=1920x1080,CODECS=\"avc1.640028\"\nv.m3u8\n\n"
+  },
+  "hls_hevc_30": {
+   "cmd": "ffmpeg -hide_banner -y -f lavfi -i testsrc2=size=1920x1080:rate=60 -t 2 -c:v libx265 -preset veryfast -tag:v hvc1 -r 30 -pix_fmt yuv420p -f hls -hls_segment_type fmp4 -hls_time 1 -hls_list_size 0 -master_pl_name master.m3u8 hls_hevc_30/v.m3u8",
+   "master": "#EXTM3U\n#EXT-X-VERSION:7\n#EXT-X-STREAM-INF:BANDWIDTH=4911699,AVERAGE-BANDWIDTH=4911699,RESOLUTION=1920x1080,CODECS=\"hvc1.1.6.L120.90\"\nv.m3u8\n\n"
+  },
+  "hls_av1_30": {
+   "cmd": "ffmpeg -hide_banner -y -f lavfi -i testsrc2=size=1920x1080:rate=60 -t 2 -c:v libsvtav1 -preset 12 -r 30 -pix_fmt yuv420p -f hls -hls_segment_type fmp4 -hls_time 1 -hls_list_size 0 -master_pl_name master.m3u8 hls_av1_30/v.m3u8",
+   "master": "#EXTM3U\n#EXT-X-VERSION:7\n#EXT-X-STREAM-INF:BANDWIDTH=5958207,AVERAGE-BANDWIDTH=5958207,RESOLUTION=1920x1080,CODECS=\"av01.0.08M.08\"\nv.m3u8\n\n"
+  }
+ },
+ "decode_order": {
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -frames:v 9 -an -c:v libx264 -preset medium -bf 3 -b-pyramid none dec_order.mp4",
+  "packets_pts_dts_flags": [
+   "0,-512,K__",
+   "2048,0,___",
+   "512,512,___",
+   "1024,1024,___",
+   "1536,1536,___",
+   "4096,2048,___",
+   "2560,2560,___",
+   "3072,3072,___",
+   "3584,3584,___"
+  ],
+  "frames_pts_type": [
+   "0,I,",
+   "512,B",
+   "1024,B",
+   "1536,B",
+   "2048,P",
+   "2560,B",
+   "3072,B",
+   "3584,B",
+   "4096,P"
+  ]
+ },
+ "hevc": {
+  "tag_default": {
+   "cmd": "ffmpeg -hide_banner -y -f lavfi -i testsrc2=size=1280x720:rate=30 -t 1 -c:v libx265 -preset ultrafast  tag_default.mp4",
+   "codec_tag_string": "hev1"
+  },
+  "tag_hvc1": {
+   "cmd": "ffmpeg -hide_banner -y -f lavfi -i testsrc2=size=1280x720:rate=30 -t 1 -c:v libx265 -preset ultrafast -tag:v hvc1 tag_hvc1.mp4",
+   "codec_tag_string": "hvc1"
+  },
+  "hdr10": {
+   "cmd": "ffmpeg -hide_banner -y -f lavfi -i testsrc2=size=1920x1080:rate=30 -t 1 -vf format=yuv420p10le -c:v libx265 -preset ultrafast -profile:v main10 -tag:v hvc1 -color_primaries bt2020 -color_trc smpte2084 -colorspace bt2020nc -x265-params \"colorprim=bt2020:transfer=smpte2084:colormatrix=bt2020nc:master-display=G(13250,34500)B(7500,3000)R(34000,16000)WP(15635,16450)L(10000000,1):max-cll=1000,400:repeat-headers=1\" hdr10.mp4",
+   "first_frame": {
+    "frames": [
+     {
+      "pix_fmt": "yuv420p10le",
+      "color_space": "bt2020nc",
+      "color_primaries": "bt2020",
+      "color_transfer": "smpte2084",
+      "side_data_list": [
+       {
+        "side_data_type": "H.26[45] User Data Unregistered SEI message"
+       },
+       {
+        "side_data_type": "H.26[45] User Data Unregistered SEI message"
+       },
+       {
+        "side_data_type": "Mastering display metadata",
+        "red_x": "34000/50000",
+        "red_y": "16000/50000",
+        "green_x": "13250/50000",
+        "green_y": "34500/50000",
+        "blue_x": "7500/50000",
+        "blue_y": "3000/50000",
+        "white_point_x": "15635/50000",
+        "white_point_y": "16450/50000",
+        "min_luminance": "1/10000",
+        "max_luminance": "10000000/10000"
+       },
+       {
+        "side_data_type": "Content light level metadata",
+        "max_content": 1000,
+        "max_average": 400
+       }
+      ]
+     }
+    ]
+   },
+   "stream": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+     {
+      "profile": "Main 10",
+      "codec_tag_string": "hvc1",
+      "pix_fmt": "yuv420p10le",
+      "color_space": "bt2020nc",
+      "color_transfer": "smpte2084",
+      "color_primaries": "bt2020"
+     }
+    ]
+   }
+  },
+  "hlg": {
+   "cmd": "ffmpeg -hide_banner -y -f lavfi -i testsrc2=size=1920x1080:rate=30 -t 1 -vf format=yuv420p10le -c:v libx265 -preset ultrafast -profile:v main10 -tag:v hvc1 -color_primaries bt2020 -color_trc arib-std-b67 -colorspace bt2020nc -x265-params \"colorprim=bt2020:transfer=arib-std-b67:colormatrix=bt2020nc\" hlg.mp4",
+   "first_frame": {
+    "frames": [
+     {
+      "pix_fmt": "yuv420p10le",
+      "color_space": "bt2020nc",
+      "color_primaries": "bt2020",
+      "color_transfer": "arib-std-b67",
+      "side_data_list": [
+       {
+        "side_data_type": "H.26[45] User Data Unregistered SEI message"
+       }
+      ]
+     }
+    ]
+   }
+  }
+ },
+ "twopass": {
+  "one_pass": {
+   "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libx264 -preset medium -b:v 1500k abr1.mp4",
+   "time": {
+    "user": 31.75,
+    "sys": 1.09,
+    "cpu": 32.84,
+    "wall": 14.47,
+    "load1_before": 26.41,
+    "load1_after": 33.64
+   },
+   "frames": 240,
+   "bytes": 2049966,
+   "kbps": 1640.0,
+   "peak2s_kbps": 3093.6,
+   "keyframes": [
+    0.0,
+    2.042,
+    3.792,
+    5.875,
+    7.417,
+    8.5
+   ],
+   "vmaf_mean": 90.94,
+   "vmaf_p1": 78.86,
+   "vmaf_min": 76.06,
+   "vmaf_frames": 240
+  },
+  "two_pass": {
+   "cmd_pass1": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libx264 -preset medium -b:v 1500k -pass 1 -passlogfile tp -f null -",
+   "cmd_pass2": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libx264 -preset medium -b:v 1500k -pass 2 -passlogfile tp twopass.mp4",
+   "time_pass1": {
+    "user": 15.56,
+    "sys": 0.67,
+    "cpu": 16.24,
+    "wall": 6.08,
+    "load1_before": 49.38,
+    "load1_after": 50.71
+   },
+   "time_pass2": {
+    "user": 26.19,
+    "sys": 0.74,
+    "cpu": 26.93,
+    "wall": 8.95,
+    "load1_before": 50.71,
+    "load1_after": 53.16
+   },
+   "frames": 240,
+   "bytes": 1912344,
+   "kbps": 1529.9,
+   "peak2s_kbps": 2015.5,
+   "keyframes": [
+    0.0,
+    2.042,
+    3.792,
+    5.875,
+    7.417,
+    8.5
+   ],
+   "vmaf_mean": 90.3,
+   "vmaf_p1": 75.5,
+   "vmaf_min": 72.51,
+   "vmaf_frames": 240,
+   "pass1_options": "#options: 1920x1080 fps=24/1 timebase=1/24 bitdepth=8 cabac=1 ref=1 deblock=1:0:0 analyse=0x1:0 me=dia subme=2 psy=1 psy_rd=1.00:0.00 mixed_ref=0 me_range=16 chroma_me=1 trellis=0 8x8dct=0 cqm=0 deadzone=21,11 fast_pskip=1 chroma_qp_offset=0 threads=15 lookahead_threads=5 sliced_threads=0 nr=0 decimate=1 interlaced=0 bluray_compat=0 constrained_intra=0 bframes=3 b_pyramid=2 b_adapt=1 b_bias=0 direct=1 weightb=1 open_gop=0 weightp=2 keyint=250 keyint_min=24 scenecut=40 intra_refresh=0 rc_lookahead=40 rc=abr mbtree=1 bitrate=1500 ratetol=1.0 qcomp=0.60 qpmin=0 qpmax=69 qpstep=4 ip_ratio=1.40 aq=1:1.00",
+   "pass2_options": "options: cabac=1 ref=3 deblock=1:0:0 analyse=0x3:0x113 me=hex subme=7 psy=1 psy_rd=1.00:0.00 mixed_ref=1 me_range=16 chroma_me=1 trellis=1 8x8dct=1 cqm=0 deadzone=21,11 fast_pskip=1 chroma_qp_offset=-2 threads=15 lookahead_threads=2 sliced_threads=0 nr=0 decimate=1 interlaced=0 bluray_compat=0 constrained_intra=0 bframes=3 b_pyramid=2 b_adapt=1 b_bias=0 direct=1 weightb=1 open_gop=0 weightp=2 keyint=250 keyint_min=24 scenecut=40 intra_refresh=0 rc_lookahead=40 rc=2pass mbtree=1 bitrate=1500 ratetol=1.0 qcomp=0.60 qpmin=0 qpmax=69 qpstep=4 cplxblur=20.0 qblur=0.5 ip_ratio=1.40 aq=1:1.00"
+  }
+ },
+ "compare_choice": {
+  "x264_medium": 28,
+  "x265_medium": 28,
+  "svt_8": 39,
+  "svt_4": 41
+ },
+ "svt_presets_crf35": {
+  "4": "svt_4_crf35",
+  "6": "svt_6_crf35",
+  "8": "svt_8_crf35",
+  "10": "svt_10_crf35"
+ },
+ "svt_default_log": [
+  "Svt[info]: -------------------------------------------",
+  "Svt[info]: SVT [version]:\tSVT-AV1 Encoder Lib v4.2.0",
+  "Svt[info]: SVT [build]  :\tApple LLVM 21.0.0 (clang-2100.3.34.2)\t 64 bit",
+  "Svt[info]: LIB Build date: Jul 13 2026 18:06:33",
+  "Svt[info]: -------------------------------------------",
+  "Svt[info]: Level of Parallelism: 4",
+  "Svt[info]: Number of PPCS 59",
+  "Svt[info]: [asm level on system : up to neon_i8mm]",
+  "Svt[info]: [asm level selected : up to neon_i8mm]",
+  "Svt[info]: -------------------------------------------",
+  "Svt[info]: SVT [config]: main profile\ttier (auto)\tlevel (auto)",
+  "Svt[info]: SVT [config]: width / height / fps numerator / fps denominator \t\t: 1920 / 1080 / 24 / 1",
+  "Svt[info]: SVT [config]: bit-depth / color format \t\t\t\t\t: 8 / YUV420",
+  "Svt[info]: SVT [config]: preset / tune / pred struct \t\t\t\t\t: 8 / PSNR / random access",
+  "Svt[info]: SVT [config]: gop size / mini-gop size / key-frame type \t\t\t: 161 / 16 / key frame",
+  "Svt[info]: SVT [config]: BRC mode / rate factor \t\t\t\t\t: CRF / 35.00 ",
+  "Svt[info]: SVT [config]: AQ mode / Variance Boost \t\t\t\t\t: 2 / 0",
+  "Svt[info]: SVT [config]: sharpness / luminance-based QP bias \t\t\t\t: 0 / 0",
+  "Svt[info]: SVT [config]: QP scale compress strength \t\t\t\t\t: 0",
+  "Svt[info]: -------------------------------------------"
+ ],
+ "finished": "2026-11-13T06:52:12+0900"
+}
