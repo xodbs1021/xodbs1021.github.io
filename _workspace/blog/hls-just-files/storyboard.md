@@ -4,7 +4,7 @@
 
 주장: 라이브 미디어 목록은 끝에 새 조각 줄이 붙고 맨 앞 조각이 빠지며 MEDIA-SEQUENCE가 1씩 오른다. 끝나면 ENDLIST가 붙는다.
 
-- 왼쪽 회색 판에 목록 글자(고정폭): #EXTM3U · TARGETDURATION:6 · MEDIA-SEQUENCE:100, EXTINF 6줄(seg100–105).
+- 왼쪽 회색 판에 목록 글자(고정폭): #EXTM3U · TARGETDURATION:6 · MEDIA-SEQUENCE:100, EXTINF 줄과 그 다음 줄의 주소(seg100.ts …)를 한 쌍으로 6쌍(리뷰 반영: 실제 목록 문법대로 두 줄).
 - 40–60 seg106 줄이 아래에서 올라오며 붙음(accentSoft 배경, 「끝에 새 조각이 붙음」 이름표).
 - 66–86 seg100 줄이 취소선과 함께 왼쪽으로 빠짐(「맨 앞 조각이 빠짐」).
 - 88–108 줄이 한 칸 올라가고 MEDIA-SEQUENCE 100 → 101(accent 강조).

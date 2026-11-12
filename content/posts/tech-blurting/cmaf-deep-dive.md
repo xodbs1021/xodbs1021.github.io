@@ -1,14 +1,14 @@
 ---
 title: "CMAF는 HLS와 DASH가 같은 조각 파일을 쓰게 합니다"
 date: 2026-06-22T11:15:31+09:00
-lastmod: "2026-11-12T22:00:00+09:00"
-description: "HLS와 DASH는 매니페스트가 다르지만 fMP4 미디어는 맞출 수 있습니다. CMAF(ISO/IEC 23000-19, 3판 2024)는 그 조각 · 청크 형식을 정합니다. FFmpeg 9.0.2로 만든 2초 CMAF 조각을 Bento4로 풀어 init과 moof+mdat 청크 4개, tfdt 간격, 브랜드를 확인했고, 공유로 줄어드는 것은 인코딩이 아니라 포장과 저장이라는 점, tfdt가 어긋나면 오류 없이 구간이 사라지는 사례, 청크와 LL-HLS 파트 · LL-DASH의 관계, 한 파일로 여러 DRM을 쓰려면 cbcs로 맞춰야 하는 조건을 규격 문서로 정리했습니다."
+lastmod: "2026-11-12T22:56:00+09:00"
+description: "HLS와 DASH는 매니페스트가 다르지만 fMP4 미디어는 맞출 수 있습니다. CMAF(ISO/IEC 23000-19, 3판 2024)는 그 조각 · 청크 형식을 정합니다. FFmpeg 9.0.2의 CMAF 플래그(+cmaf)로 만든 2초 fMP4 조각을 Bento4로 풀어 init과 moof+mdat 청크 4개, tfdt 간격, 브랜드를 확인했고, 공유로 줄어드는 것은 인코딩이 아니라 포장과 저장이라는 점, tfdt가 어긋나면 오류 없이 구간이 사라지는 사례, 청크와 LL-HLS 파트 · LL-DASH의 관계, 한 파일로 여러 DRM을 쓰려면 cbcs로 맞춰야 하는 조건을 규격 문서로 정리했습니다."
 categories: ["tech-blurting"]
 tags: ["CMAF", "fMP4", "HLS", "DASH", "CENC", "cbcs"]
 draft: false
 ---
 
-HLS는 오랫동안 MPEG-2 TS 조각을, DASH는 fMP4(fragmented MP4) 조각을 주로 썼습니다. 둘 다 내는 서비스는 같은 영상을 두 형식으로 포장하고 따로 저장했고, CDN도 두 벌을 캐시했습니다. HLS가 `EXT-X-MAP`으로 fMP4 조각을 받게 되면서(RFC 8216, 프로토콜 버전 6) 미디어를 한 벌로 맞출 길이 열렸고, CMAF(Common Media Application Format, ISO/IEC 23000-19, 2024년 3판)가 그 fMP4 트랙 · 조각 · 청크 형식을 정합니다. 맞추면 매니페스트만 두 벌이 남습니다. 다만 줄어드는 것은 포장과 저장이지 인코딩이 아니고, 암호화 방식과 플레이어 지원이 맞아야 합니다. FFmpeg 9.0.2로 2초 CMAF 조각을 만들어 풀어 보니, 0.5초짜리 moof+mdat 청크 4개가 한 파일에 들어 있었습니다.
+HLS는 오랫동안 MPEG-2 TS 조각을, DASH는 fMP4(fragmented MP4) 조각을 주로 썼습니다. 둘 다 내는 서비스는 같은 영상을 두 형식으로 포장하고 따로 저장했고, CDN도 두 벌을 캐시했습니다. HLS가 `EXT-X-MAP`으로 fMP4 조각을 받게 되면서(RFC 8216, 프로토콜 버전 6) 미디어를 한 벌로 맞출 길이 열렸고, CMAF(Common Media Application Format, ISO/IEC 23000-19, 2024년 3판)가 그 fMP4 트랙 · 조각 · 청크 형식을 정합니다. 맞추면 매니페스트만 두 벌이 남습니다. 다만 줄어드는 것은 포장과 저장이지 인코딩이 아니고, 암호화 방식과 플레이어 지원이 맞아야 합니다. FFmpeg 9.0.2의 CMAF 플래그(`+cmaf`)로 2초 fMP4 조각을 만들어 풀어 보니, 0.5초짜리 moof+mdat 청크 4개가 한 파일에 들어 있었습니다.
 
 ## HLS와 DASH는 매니페스트만 다르고 미디어 형식은 맞출 수 있습니다 {#1-cmaf가-끝낸-hlsdash-분열}
 
@@ -61,6 +61,7 @@ flowchart TB
 `avcC`에 든 SPS · PPS가 디코더 초기화 정보입니다. HLS 목록의 `EXT-X-MAP`이 이 파일을 가리키고, 애플 저작 규격 8.20은 fMP4를 쓰면 `EXT-X-MAP`이 있어야 한다(MUST)고 정합니다. 2초 조각 `seg-1.m4s`(764,492바이트)는 이렇게 풀렸습니다.
 
 ```text
+# mdat 크기는 상자 머리 8바이트를 뺀 본문 크기
 [styp] 브랜드 msdh, 호환 msdh · msix
 [moof] mfhd 순번 1 | traf: tfhd, tfdt 0,     trun 표본 15개
 [mdat] 191,479 바이트
@@ -74,7 +75,7 @@ flowchart TB
 
 `moof`는 그 청크 표본들의 크기 · 길이 · 키프레임 여부(`trun`)와 시작 시각(`tfdt`)을 담고, 뒤의 `mdat`가 그 표본 데이터입니다. 이어지는 `seg-2.m4s`의 첫 `tfdt`는 30720(2초)이었습니다.
 
-### 조각 브랜드는 cmfs이고 msdh · msix는 DASH 브랜드입니다 {#5-m4s-미디어-세그먼트-박스-트리}
+### CMAF 조각 브랜드는 cmfs인데 FFmpeg 조각에는 DASH 브랜드만 있었습니다 {#5-m4s-미디어-세그먼트-박스-트리}
 
 브랜드는 파일이 어떤 형식 규칙을 따르는지 밝히는 네 글자 이름표이고, `ftyp`(init)과 `styp`(조각)의 브랜드 목록에 적습니다. MP4 등록 기관(MP4RA)의 [브랜드 목록](https://github.com/mp4ra/mp4ra.github.io/blob/CENC/data/brands.csv)에서 CMAF와 DASH 브랜드는 이렇게 나뉩니다.
 
@@ -129,7 +130,7 @@ CENC(Common Encryption, [ISO/IEC 23001-7:2023](https://webstore.iec.ch/en/public
 
 그래서 한 벌의 암호화 파일로 여러 DRM을 쓰는 것은 대상 기기가 모두 `cbcs`를 받을 때만 됩니다. `cenc`만 받는 대상이 남아 있으면 같은 인코딩을 `cenc`와 `cbcs`로 따로 암호화해 두 벌을 둬야 합니다. 그래도 다시 인코딩하지는 않습니다. 암호화는 인코딩이 아닙니다.
 
-Shaka Packager로 FairPlay용 `cbcs`를 만드는 명령은 공식 문서 예시에서 이렇게 줄일 수 있습니다. Shaka Packager는 포장과 암호화를 하는 도구이고 인코딩은 하지 않습니다([README](https://github.com/shaka-project/shaka-packager/blob/v3.9.3/README.md)).
+Shaka Packager로 FairPlay용 `cbcs`를 만드는 명령은 공식 문서 예시에서 이렇게 줄일 수 있습니다. Shaka Packager는 README가 「packaging and encryption」 도구로 소개하는 포장과 암호화 도구입니다([README](https://github.com/shaka-project/shaka-packager/blob/v3.9.3/README.md)).
 
 ```bash
 # Shaka Packager 3.9.3 raw_key 문서의 FairPlay 예시를 줄인 것(키 값은 자리표시)
@@ -161,7 +162,7 @@ CMAF 한 벌로 HLS와 DASH를 함께 내기 전에 확인할 것은 이렇습�
 - **암호화**: 대상 기기가 모두 `cbcs`를 받는지 확인합니다. 아니면 암호화 파일은 두 벌입니다.
 - **패키저 기능**: Shaka Packager 3.9.3은 저지연에서 LL-DASH만 지원하고 LL-HLS는 아직입니다. FFmpeg의 `hls` 묶개는 LL-HLS 파트를 만들지 않습니다.
 - **광고 표시**: HLS 쪽은 비표준 `EXT-X-CUE-OUT/IN`이 아니라 `EXT-X-DATERANGE`의 `SCTE35-OUT` · `SCTE35-IN`(RFC 8216 4.3.2.7.1)이나 개정 초안 부록 D의 Interstitials로 적습니다. DASH와의 차이는 [DASH 글](/posts/tech-blurting/dash-vs-hls/)에 있습니다.
-- **라이브 뒤 다시보기**: `EXT-X-ENDLIST`만 붙이면 VOD가 되는 것은 앞 조각을 빼지 않은 `EVENT` 목록일 때입니다. 창이 밀리는 라이브 목록은 이미 빠진 조각이 없으므로 따로 다시보기 문서를 만들어야 합니다. PokeClip은 끝난 목록을 다시 열지 않고 세션마다 새 주소를 주며([세션 주소 글](/posts/0-to-1/pokeclip-session-url-and-endlist/)), 회차 단위로 VOD 문서를 굳힙니다([회차 다시보기 글](/posts/projects/pokeclip-round-vod/)).
+- **라이브 뒤 다시보기**: `EXT-X-ENDLIST`만 붙이면 VOD가 되는 것은 앞 조각을 빼지 않은 `EVENT` 목록일 때입니다. 창이 밀리는 라이브 목록은 앞 조각이 이미 빠졌으므로 `EXT-X-ENDLIST`만 붙여서는 전체 다시보기가 되지 않고, 따로 다시보기 문서를 만들어야 합니다. PokeClip은 끝난 목록을 다시 열지 않고 세션마다 새 주소를 주며([세션 주소 글](/posts/0-to-1/pokeclip-session-url-and-endlist/)), 회차 단위로 VOD 문서를 굳힙니다([회차 다시보기 글](/posts/projects/pokeclip-round-vod/)).
 
 미디어를 맞추는 일은 매니페스트를 맞추는 일보다 조건이 많습니다. 먼저 대상 기기 목록과 그 기기의 DRM 방식을 표로 만들고, `cbcs` 하나로 덮이는지부터 확인하십시오.
 

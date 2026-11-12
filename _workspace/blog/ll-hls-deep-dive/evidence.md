@@ -26,3 +26,5 @@
 | Shaka Packager 「Only LL-DASH is supported. LL-HLS support is yet to come.」 | v3.9.3(2026-07-27) low_latency.rst | 문헌값 |
 
 삭제: 「2초 · 10배」, 25초 분해, 100만 RPS, 「HTTP/1.1 chunked · CDN 100% 호환」, 「200~500ms 표준」, 50ms 폴링 코드, CDN 3사 지원 단정, 델타 90%, 화질 보고 1초, 「fMP4만」, FFmpeg LL-HLS 명령, 비용 30% · 도입 현황, AI 이미지 4장.
+
+리뷰 반영(2026-11-12): hls.js는 1.0.0부터 LL-HLS를 지원하되 PRELOAD-HINT는 해석만 함(v1.0.0 릴리스 노트 「The only features not implemented in v1.0.0 are "Hinted Part and Map Preloading"」, README 「Parsed but missing feature support (#5074)」), WWDC19 502 링크, GS네오텍 인용을 원문 그대로, 게시 지연 재설명을 한 문장으로.

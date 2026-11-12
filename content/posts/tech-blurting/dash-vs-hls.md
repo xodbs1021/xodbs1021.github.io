@@ -1,7 +1,7 @@
 ---
 title: "DASH는 목록 대신 MPD 규칙으로 조각 주소를 계산합니다"
 date: 2026-06-20T04:17:40+09:00
-lastmod: "2026-11-12T22:00:00+09:00"
+lastmod: "2026-11-12T22:56:00+09:00"
 description: "HLS 플레이어는 조각 주소가 적힌 목록을 계속 다시 받고, DASH 플레이어는 MPD의 SegmentTemplate 규칙과 시계로 조각 번호를 계산할 수 있습니다. MPEG의 제안 요청(2010-04)부터 ISO/IEC 23009-1 1판(2012-04)과 6판(2026-07)까지의 연혁, Period · AdaptationSet · Representation 계층과 HLS 태그의 대응, 광고 구간을 적는 Period와 DATERANGE, ContentProtection과 EXT-X-KEY, 기기별 기본 재생기와 저지연 모드를 규격 · 공식 문서로 비교했습니다."
 categories: ["tech-blurting"]
 tags: ["DASH", "MPD", "HLS", "SegmentTemplate", "DRM", "Media3"]
@@ -17,7 +17,7 @@ HLS 플레이어는 라이브 내내 조각 주소가 적힌 목록을 다시 �
 | 날짜 | 일 | 근거 |
 |---|---|---|
 | 2010-04 | MPEG 제안 요청 N11338 | Stockhammer 논문 참고문헌 |
-| 2011-11 | 각국 표준 기관 투표로 ISO/IEC 23009-1 승인, 2011년 12월 98차 MPEG 회의에서 발표 | [98차 MPEG 회의 보고](https://multimediacommunication.blogspot.com/2011/12/mpeg-news-report-from-98th-meeting.html) |
+| 2011-11 | 24개 국가 표준 기관의 만장일치 찬성으로 ISO/IEC 23009-1 승인, 2011-12-02 98차 MPEG 회의 보도문으로 발표 | [보도문 재게재(DigitalTVNews, 2011-12-02)](https://www.digitaltvnews.net/?p=20783) |
 | 2011 | Qualcomm · Netflix · Microsoft · Akamai · Ericsson · Samsung이 DASH-IF 시작, 2012년 정식 출범 | [SVTA 발표문](https://www.svta.org/2024/07/23/dash-if-becomes-part-of-the-svta/) |
 | 2012-04-03 | ISO/IEC 23009-1:2012(1판) 발행 | [IEC 웹스토어 판 기록](https://webstore.iec.ch/en/publication/114980) |
 | 2024-07-23 | DASH-IF가 SVTA(Streaming Video Technology Alliance)의 작업 그룹으로 합류 | SVTA 발표문 |
@@ -40,7 +40,7 @@ flowchart TB
   R --> T["Segment<br/>Template<br/>init · $Number$"]
 ```
 
-아래는 [CMAF 글](/posts/tech-blurting/cmaf-deep-dive/)의 실측에서 FFmpeg 9.0.2가 쓴 MPD를 줄인 것입니다(그 실측은 녹화 파일이라 `type="static"`입니다).
+아래는 [CMAF 글](/posts/tech-blurting/cmaf-deep-dive/)의 실측에서 FFmpeg 9.0.2가 쓴 MPD를 줄인 것입니다(그 실측은 FFmpeg 합성 영상 4초를 입력으로 만든 파일이라 `type="static"`입니다).
 
 ```xml
 <MPD type="static" mediaPresentationDuration="PT4.0S" maxSegmentDuration="PT2.0S"
@@ -113,7 +113,7 @@ DASH는 `ContentProtection` 요소를 여러 개 둡니다. 하나는 공통 암
 
 HLS는 미디어 목록의 `EXT-X-KEY`로 적습니다. FairPlay Streaming이면 방식은 `SAMPLE-AES`, 키 형식은 `com.apple.streamingkeydelivery`여야 하고(애플 저작 규격 13.2 · 13.3), 키 주소는 보통 `skd://`로 시작합니다.
 
-「CENC가 없으면 DRM마다 세 번 인코딩한다」는 설명은 틀립니다. 암호화는 인코딩한 결과를 다시 잠그는 일이라 다시 인코딩하지 않습니다. 실제 갈림은 암호화 방식입니다. FairPlay는 `cbcs`만 받고 Android TV의 PlayReady SL2000은 `cenc`만 받으므로, 둘을 함께 지원하려면 같은 인코딩을 두 방식으로 암호화해 두 벌을 둡니다. 대상이 모두 `cbcs`를 받으면 한 벌로 됩니다([CMAF 글](/posts/tech-blurting/cmaf-deep-dive/)).
+「CENC가 없으면 DRM마다 세 번 인코딩한다」는 설명은 틀립니다. 갈림은 인코딩이 아니라 암호화 방식(`cenc` · `cbcs`)에서 생기고, 대상이 모두 `cbcs`를 받을 때만 암호화 파일 한 벌로 됩니다([CMAF 글의 DRM 절](/posts/tech-blurting/cmaf-deep-dive/)).
 
 ## 어느 기기가 무엇을 재생하는지가 선택을 정합니다 {#6-그래서-왜-hls가-이겼나}
 
@@ -134,14 +134,7 @@ AVPlayer 문서는 이 재생기가 로컬 · 원격 파일 미디어와 「HTTP
 
 ## 두 형식 모두 저지연 모드가 따로 있습니다
 
-일반 HLS와 일반 DASH는 모두 조각이 다 만들어진 뒤에 받습니다. 저지연은 각자 다른 방식으로 풉니다.
-
-| 방식 | 핵심 | 확인한 지원 |
-|---|---|---|
-| LL-HLS | 부분 조각(파트), 보류 목록 요청, PRELOAD-HINT | hls.js 1.0.0+, [LL-HLS 글](/posts/tech-blurting/ll-hls-deep-dive/) |
-| LL-DASH | CMAF 청크를 만들면서 chunked 전송, `availabilityTimeOffset`로 일찍 요청 | Media3의 「초저지연 CMAF 라이브 재생」, FFmpeg `-ldash`, Shaka Packager |
-
-LL-HLS는 파트를 다 만든 뒤 한 번에 보내고(개정 초안 6.2.6절), LL-DASH는 만들어지는 청크를 흘려보냅니다. 두 방식 모두 CMAF 청크를 바탕으로 쓸 수 있지만, 서버와 CDN에 요구하는 동작이 다릅니다.
+일반 HLS와 일반 DASH는 모두 조각이 다 만들어진 뒤에 받습니다. LL-HLS는 부분 조각(파트)과 보류 목록 요청으로, LL-DASH는 만들어지는 CMAF 청크를 chunked 전송으로 흘려보내고 `availabilityTimeOffset`으로 일찍 요청하게 해서 이 대기를 줄입니다. Media3는 DASH의 「초저지연 CMAF 라이브 재생」을 지원한다고 적습니다. 두 방식이 청크를 어떻게 다르게 쓰는지는 [CMAF 글](/posts/tech-blurting/cmaf-deep-dive/)에, LL-HLS의 규칙과 도구 지원은 [LL-HLS 글](/posts/tech-blurting/ll-hls-deep-dive/)에 있습니다.
 
 ## CMAF로 미디어를 맞추면 매니페스트 두 벌만 남습니다 {#7-그래서-둘이-수렴-중--cmaf의-미래}
 
@@ -160,7 +153,7 @@ HLS가 fMP4를 받게 되면서, CMAF 조각 한 벌을 HLS 목록과 DASH MPD�
 
 - [ISO/IEC 23009-1:2026 DASH](https://webstore.iec.ch/en/publication/114980) (6판, 2026-07-14, 판 기록에 1판 2012-04-03)
 - [Thomas Stockhammer, 「Dynamic Adaptive Streaming over HTTP – Design Principles and Standards」](https://www.w3.org/2010/11/web-and-tv/papers/webtv2_submission_64.pdf) (W3C Web and TV 워크숍, 2010) — 3GPP AHS, MPEG N11338(2010-04)
-- [Christian Timmerer, 「MPEG news: a report from the 98th meeting」](https://multimediacommunication.blogspot.com/2011/12/mpeg-news-report-from-98th-meeting.html) (2011-12-08)
+- [MPEG 98차 회의 보도문 「MPEG ratifies draft standard for DASH」 재게재](https://www.digitaltvnews.net/?p=20783) (DigitalTVNews, 2011-12-02) · [Christian Timmerer, 「MPEG news: a report from the 98th meeting」](https://multimediacommunication.blogspot.com/2011/12/mpeg-news-report-from-98th-meeting.html) (2011-12-08)
 - [SVTA, 「DASH Industry Forum (DASH-IF) Becomes Part of the SVTA」](https://www.svta.org/2024/07/23/dash-if-becomes-part-of-the-svta/) (2024-07-23)
 - [DASH-IF, Timing Model 지침](https://dashif.org/Guidelines-TimingModel/) — 13.3 가용 창, 13.6.2 MPD 갱신 사이의 새 조각
 - [DASH-IF, Content Protection 식별자 목록](https://dashif.org/identifiers/content_protection/)

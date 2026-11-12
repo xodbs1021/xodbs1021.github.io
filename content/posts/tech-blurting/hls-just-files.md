@@ -1,7 +1,7 @@
 ---
 title: "HLS는 라이브 영상을 재생 목록과 조각 파일로 나눕니다"
 date: 2026-06-20T04:06:03+09:00
-lastmod: "2026-11-12T22:00:00+09:00"
+lastmod: "2026-11-12T22:56:00+09:00"
 description: "HLS는 영상을 몇 초짜리 조각 파일로 자르고, 그 목록을 텍스트 재생 목록으로 알려 줍니다. 플레이어는 둘 다 HTTP GET으로 받습니다. 다변형 목록과 미디어 목록의 관계, 라이브 목록이 밀리는 규칙(목표 길이 3배 · 애플 6조각), EXTINF와 목표 길이의 반올림 규칙, TS · fMP4 · 묶음 오디오 조각, IDR 시작 규칙, 브라우저 재생 경로와 hls.js의 TS → fMP4 변환, 조각 404 처리를 RFC 8216 · 개정 초안 22판 · 애플 저작 규격으로 확인했습니다."
 categories: ["tech-blurting"]
 tags: ["HLS", "M3U8", "RFC 8216", "hls.js", "MSE", "라이브 스트리밍"]
@@ -16,11 +16,11 @@ draft: false
 
 파일이므로 HTTP가 이미 가진 장치를 그대로 씁니다. Apple의 [HLS 개요 문서](https://developer.apple.com/documentation/http-live-streaming)는 HLS가 평범한 웹 서버와 CDN으로 콘텐츠를 배포한다고 적습니다. 같은 조각을 받는 시청자가 많으면 CDN 가장자리 서버가 한 번 받아 둔 사본을 나눠 줄 수 있습니다.
 
-목록 파일의 형식은 MP3 재생 목록으로 쓰이던 M3U에서 왔습니다. [RFC 8216 4절](https://www.rfc-editor.org/rfc/rfc8216#section-4)은 재생 목록 형식이 M3U에서 파생됐고 `EXTM3U`와 `EXTINF` 두 태그를 물려받았다고 적습니다. 목록 파일은 UTF-8로 쓰고, 주소가 `.m3u8`이나 `.m3u`로 끝나거나 HTTP Content-Type이 `application/vnd.apple.mpegurl`이어야 합니다.
+목록 파일의 형식은 MP3 재생 목록으로 쓰이던 M3U에서 왔습니다. [RFC 8216 4절](https://www.rfc-editor.org/rfc/rfc8216#section-4)은 재생 목록 형식이 M3U에서 파생됐고 `EXTM3U`와 `EXTINF` 두 태그를 물려받았다고 적습니다. 목록 파일은 UTF-8로 쓰고, 주소가 `.m3u8`이나 `.m3u`로 끝나거나 HTTP Content-Type이 `application/vnd.apple.mpegurl`이나 `audio/mpegurl`이어야 합니다.
 
 ## 다변형 재생 목록이 화질별 미디어 재생 목록을 가리킵니다 {#3-m3u8-두-가지-종류--master와-media}
 
-재생 목록은 두 층입니다. 위층의 다변형 재생 목록(Multivariant Playlist)은 같은 영상을 화질별로 만든 변형(variant)과 오디오 · 자막 묶음을 나열합니다. RFC 8216은 이것을 「Master Playlist」라고 불렀고, 개정 초안은 이름을 바꿨습니다([개정 초안 4.4.6절](https://www.ietf.org/archive/id/draft-pantos-hls-rfc8216bis-22.txt)). 아래층의 미디어 재생 목록(Media Playlist)이 실제 조각 주소를 나열합니다. [[fig-hls-layers]]에서 플레이어가 위에서 아래로 내려가는 순서를 보십시오.
+재생 목록은 두 층입니다. 위층의 다변형 재생 목록(Multivariant Playlist)은 같은 영상을 화질별로 만든 변형(variant)과 오디오 · 자막 묶음을 나열합니다. RFC 8216은 이것을 「Master Playlist」라고 불렀고, 개정 초안은 이름을 바꿨습니다([개정 초안 부록 A](https://www.ietf.org/archive/id/draft-pantos-hls-rfc8216bis-22.txt)). 아래층의 미디어 재생 목록(Media Playlist)이 실제 조각 주소를 나열합니다. [[fig-hls-layers]]에서 플레이어가 위에서 아래로 내려가는 순서를 보십시오.
 
 ```mermaid {#fig-hls-layers kind="개념도" caption="HLS 재생 목록의 두 층. 다변형 재생 목록이 화질별 미디어 재생 목록과 오디오 묶음을 가리키고, 미디어 재생 목록이 조각 주소를 나열합니다. 플레이어는 위에서 아래로 내려가며 변형 하나를 고르고 그 목록의 조각을 받습니다. RFC 8216 4절과 개정 초안 22판 4.4.6절을 줄여 그렸습니다." source="https://www.rfc-editor.org/rfc/rfc8216#section-4"}
 flowchart TB
@@ -71,7 +71,7 @@ PokeClip의 라이브 목록은 4초 조각 7개, 28초 창으로 정했습니�
 | 바꾸지 않음 | 미디어 목록의 목표 길이 값은 바뀌면 안 됨(MUST NOT) | [RFC 8216 6.2.1](https://www.rfc-editor.org/rfc/rfc8216#section-6.2.1) |
 | 0.5초 초과 금지 | 애플 기기에서는 조각이 목표 길이를 0.5초 넘게 넘으면 안 됨(MUST NOT) | [애플 저작 규격](https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html) 7.7 |
 
-조각이 정확히 6초가 되지 않는 이유는 조각을 키프레임에서 자르기 때문입니다. FFmpeg의 HLS 묶개 문서도 `hls_time`이 지난 뒤 다음 키프레임에서 조각을 자른다고 적습니다([FFmpeg 형식 문서](https://ffmpeg.org/ffmpeg-formats.html#hls-2)). 송출의 키프레임 간격이 흔들리면 조각 하나가 길어질 수 있습니다. PokeClip에서는 7.66초 조각 하나가 반올림 8로 목표 길이 6을 넘었습니다. 목표 길이를 바꿀 수 없어 목록이 둘로 갈렸고, 다시보기가 마지막 7.5분만 덮었습니다([회차 다시보기 글](/posts/projects/pokeclip-round-vod/)).
+조각이 정확히 6초가 되지 않는 이유는 조각을 키프레임에서 자르기 때문입니다. FFmpeg의 HLS 묶개 문서도 `hls_time`이 지난 뒤 다음 키프레임에서 조각을 자른다고 적습니다([FFmpeg 형식 문서](https://ffmpeg.org/ffmpeg-formats.html#hls-2)). 그래서 조각 길이는 키프레임이 어디에 오느냐에 따라 달라집니다. PokeClip에서는 길어진 원인을 확인하지 못한 7.66초 조각 하나가 반올림 8로 목표 길이 6을 넘었습니다. 목표 길이를 바꿀 수 없어 목록이 둘로 갈렸고, 다시보기가 마지막 7.5분만 덮었습니다([회차 다시보기 글](/posts/projects/pokeclip-round-vod/)).
 
 ## 조각 파일은 TS · fMP4 · 묶음 오디오 가운데 하나입니다 {#2-hls의-두-가지-파일--m3u8과-ts}
 

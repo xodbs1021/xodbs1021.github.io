@@ -1,18 +1,18 @@
 ---
 title: "LL-HLS는 부분 조각과 보류 응답으로 목록 대기를 줄입니다"
 date: 2026-06-20T09:20:35+09:00
-lastmod: "2026-11-12T22:00:00+09:00"
+lastmod: "2026-11-12T22:56:00+09:00"
 description: "일반 HLS는 조각이 다 만들어져야 목록에 올리고, 플레이어는 목록 끝에서 목표 길이 세 배 뒤에 섭니다. LL-HLS는 조각을 부분 조각(파트)으로 먼저 올리고, _HLS_msn · _HLS_part로 다음 목록을 걸어 두는 보류 응답, PRELOAD-HINT, 화질 보고, _HLS_skip 델타 목록으로 그 대기를 줄입니다. PART-HOLD-BACK 규칙(개정 초안 2배 · 3배, 애플 3배)과 PokeClip의 2.5배, 파트 전송 규칙, HTTP/2 이상과 대기 요청 합치기를 요구하는 서버 구성, LHLS · LL-DASH와의 차이를 규격과 소스로 확인했습니다."
 categories: ["tech-blurting"]
 tags: ["LL-HLS", "HLS", "저지연", "PART-HOLD-BACK", "CDN", "PokeClip"]
 draft: false
 ---
 
-일반 HLS에서 새 조각은 다 만들어진 뒤에야 목록에 오르고, 플레이어는 목록 끝에서 목표 길이 세 배 뒤에 섭니다. 목표 길이가 6초면 조각을 만드는 6초와 시작 거리 18초가 지연에 들어갑니다. Apple이 2019년 WWDC에서 발표한 LL-HLS(Low-Latency HLS)는 조각을 더 작은 부분 조각(Partial Segment, 이하 파트)으로 먼저 목록에 올리고, 플레이어가 다음 목록과 다음 파트를 미리 요청해 두면 서버가 준비되는 순간 답하게 했습니다. 재생 위치는 파트 길이를 기준으로 한 `PART-HOLD-BACK`이 정합니다. Apple 문서는 이 방식이 공용 인터넷에서 지연을 일반 TV 방송 수준으로 낮춘다고 설명합니다. 대신 서버와 CDN은 HTTP/2 이상, 보류 요청 처리, 같은 요청 합치기를 갖춰야 합니다.
+일반 HLS에서 새 조각은 다 만들어진 뒤에야 목록에 오르고, 플레이어는 목록 끝에서 목표 길이 세 배 뒤에 섭니다. 목표 길이가 6초면 조각을 만드는 6초와 시작 거리 18초가 지연에 들어갑니다. Apple이 [2019년 WWDC](https://developer.apple.com/videos/play/wwdc2019/502/)에서 발표한 LL-HLS(Low-Latency HLS)는 조각을 더 작은 부분 조각(Partial Segment, 이하 파트)으로 먼저 목록에 올리고, 플레이어가 다음 목록과 다음 파트를 미리 요청해 두면 서버가 준비되는 순간 답하게 했습니다. 재생 위치는 파트 길이를 기준으로 한 `PART-HOLD-BACK`이 정합니다. Apple 문서는 이 방식이 공용 인터넷에서 지연을 일반 TV 방송 수준으로 낮춘다고 설명합니다. 대신 서버와 CDN은 HTTP/2 이상, 보류 요청 처리, 같은 요청 합치기를 갖춰야 합니다.
 
 ## 일반 HLS는 조각이 다 만들어져야 목록에 올립니다 {#1-일반-hls의-25초-지연은-정확히-어디서-나오나}
 
-개정 초안 22판 3.2절은 라이브 지연의 한 몫을 「게시 지연」이라고 부릅니다. 조각은 완전히 인코딩되고 포장되기 전에는 배포할 수 없고, 실시간으로 만드는 긴 조각은 그 길이만큼 지연을 만든다는 것입니다([개정 초안 22판](https://www.ietf.org/archive/id/draft-pantos-hls-rfc8216bis-22.txt)). 여기에 플레이어가 목록 끝에서 목표 길이 세 배 뒤에 서는 시작 거리가 더해집니다([일반 HLS 지연 글](/posts/tech-blurting/hls-deep-dive/)).
+조각은 다 인코딩 · 포장하기 전에는 배포할 수 없어 긴 조각일수록 늦게 목록에 오르고(개정 초안 22판 3.2절의 「게시 지연」), 그 위에 목표 길이 세 배의 시작 거리가 더해집니다. 두 몫의 규칙은 [일반 HLS 지연 글](/posts/tech-blurting/hls-deep-dive/)에 있습니다.
 
 ### 조각만 짧게 줄이면 키프레임과 요청이 늘어납니다 {#그냥-세그먼트를-짧게-만들면-안-되나}
 
@@ -66,7 +66,7 @@ GET /live/index.m3u8?_HLS_msn=42&_HLS_part=2
 
 ## 다음 파트는 PRELOAD-HINT로 먼저 요청합니다 {#4-preload-hint--세-번째-핵심-기술}
 
-목록을 받고 나서 새 파트를 요청하면 왕복이 한 번 더 듭니다. `EXT-X-PRELOAD-HINT`는 아직 없는 다음 파트(또는 init)의 주소를 알려, 플레이어가 그것이 준비되기 전에 요청을 보내 두게 합니다. 서버는 그 요청을 붙잡아 두었다가 응답할 수 있을 때 답합니다(4.4.5.3절). Apple 문서는 이것을 전 세계 규모에서 저지연을 내려면 꼭 없애야 하는 불필요한 왕복을 줄이는 장치로 설명합니다. 연결을 미리 맺으려는 장치가 아닙니다. 저지연 서버 구성에서는 `EXT-X-PART`가 있고 `EXT-X-ENDLIST`가 없는 목록마다 다음 파트를 가리키는 `PRELOAD-HINT`를 넣어야 합니다(부록 B.1).
+목록을 받고 나서 새 파트를 요청하면 왕복이 한 번 더 듭니다. `EXT-X-PRELOAD-HINT`는 아직 없는 다음 파트(또는 init)의 주소를 알려, 플레이어가 그것이 준비되기 전에 요청을 보내 두게 합니다. 서버는 그 요청을 붙잡아 두었다가 응답할 수 있을 때 답합니다(4.4.5.3절). Apple 문서는 이것을 전 세계 규모에서 저지연을 내려면 꼭 없애야 하는 불필요한 왕복을 줄이는 장치로 설명합니다. 연결을 미리 맺으려는 장치가 아닙니다. 저지연 서버 구성에서는 `EXT-X-PART`가 있고 `EXT-X-ENDLIST`가 없는 목록마다 다음 파트를 가리키는 `PRELOAD-HINT`를 넣어야 합니다(부록 B.1). 다만 플레이어가 모두 이 요청을 보내지는 않습니다. hls.js는 1.0.0부터 LL-HLS를 지원하지만 `PRELOAD-HINT`는 해석만 하고 미리 요청하지 않습니다([#5074](https://github.com/video-dev/hls.js/issues/5074)).
 
 ### 파트는 다 준비될 때까지 한 바이트도 보내지 않습니다 {#partial-전송--http11-chunked-transfer-encoding}
 
@@ -109,7 +109,7 @@ LL-HLS 문법은 일반 HLS와 호환되므로, 서버가 요건을 못 채우�
 - 목록 요청은 멱등이고, 목록은 GZIP으로 압축하며, 모든 렌디션을 파트 목표 길이 오차 안에서 함께 갱신합니다.
 - CDN과 프록시 캐시는 이미 캐시 채우기가 진행 중인 보류 요청을 알아보고 같은 요청을 그 채우기까지 붙잡아 둡니다. 캐시는 `Age` 응답 머리를 붙입니다.
 
-CDN 입장에서 같은 목록 주소라도 `_HLS_msn` · `_HLS_part` · `_HLS_skip`이 다르면 다른 응답입니다. 그래서 캐시 키에 이 쿼리를 넣어야 합니다. PokeClip의 CloudFront 라이브 목록 정책은 이 세 쿼리만 캐시 키에 넣고 엣지에 1초 보관합니다([CDN 캐시 실측 글](/posts/0-to-1/pokeclip-cdn-cache-auth-measurement/)). CDN 업체 GS네오텍의 고객 사례(2025-08-18)에 따르면, 치지직은 「LL-HLS 기반 스트리밍 도입」에 맞춰 「HLS 세그먼트 등을 1초 이내에 전달」하도록 CDN 캐시 정책을 다시 설계했습니다([GS네오텍 고객 사례](https://www.gsneotek.com/customer_case_CDN/?q=YToyOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjtzOjQ6InBhZ2UiO2k6MTt9&bmode=view&idx=167352811&t=board)).
+CDN 입장에서 같은 목록 주소라도 `_HLS_msn` · `_HLS_part` · `_HLS_skip`이 다르면 다른 응답입니다. 그래서 캐시 키에 이 쿼리를 넣어야 합니다. PokeClip의 CloudFront 라이브 목록 정책은 이 세 쿼리만 캐시 키에 넣고 엣지에 1초 보관합니다([CDN 캐시 실측 글](/posts/0-to-1/pokeclip-cdn-cache-auth-measurement/)). CDN 업체 GS네오텍의 고객 사례(2025-08-18)에 따르면, 치지직은 LL-HLS 기반 스트리밍을 도입하면서 「스트리밍에 필요한 파일들(HLS 세그먼트 등)을 1초 이내에 전달」하도록 CDN 캐시 정책을 다시 설계했습니다([GS네오텍 고객 사례](https://www.gsneotek.com/customer_case_CDN/?q=YToyOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjtzOjQ6InBhZ2UiO2k6MTt9&bmode=view&idx=167352811&t=board)).
 
 [[fig-ll-hls-cdn]]은 두 시청자가 같은 다음 목록을 보류 요청할 때 엣지와 원본이 하는 일입니다.
 
@@ -138,7 +138,7 @@ sequenceDiagram
 
 | 방식 | 핵심 | 확인한 지원 |
 |---|---|---|
-| LL-HLS | 파트 · 보류 목록 · PRELOAD-HINT · 화질 보고 | hls.js 1.0.0(2021-04-01)부터 지원, MediaMTX(gohlslib)가 생성 |
+| LL-HLS | 파트 · 보류 목록 · PRELOAD-HINT · 화질 보고 | hls.js 1.0.0(2021-04-01)부터 파트 · 보류 목록 · 델타 · 화질 보고를 지원하고 PRELOAD-HINT는 해석만 함([#5074](https://github.com/video-dev/hls.js/issues/5074)), MediaMTX(gohlslib)가 생성 |
 | LHLS | hls.js 쪽 커뮤니티 초안, `#EXT-X-PREFETCH`로 만드는 중인 조각을 미리 알림 | FFmpeg `dash` 묶개의 `-lhls`(실험 기능, 「Apple의 LHLS가 아님」) |
 | LL-DASH | CMAF 청크를 만들면서 chunked 전송 | FFmpeg `dash` 묶개 `-ldash`, Shaka Packager(LL-HLS는 아직 미지원) |
 | WebRTC | 시청자마다 RTP 세션 | CDN 캐시 대신 미디어 서버가 전송 |
@@ -154,7 +154,7 @@ FFmpeg 9.0.2의 `hls` 묶개 옵션에는 `EXT-X-PART`를 만드는 설정이 �
 - **「LL-HLS는 fMP4만」** — 파트는 일반 조각 형식이면 되고 TS도 규격 안입니다.
 - **「FFmpeg로 LL-HLS를 만든다」** — FFmpeg의 `hls` 묶개는 `EXT-X-PART`를 만들지 않습니다. `-lhls`는 다른 초안입니다.
 
-LL-HLS를 들이려면 플레이어보다 서버와 CDN이 보류 요청, `_HLS_*` 캐시 키, 같은 요청 합치기를 지원하는지 먼저 확인하십시오. 그다음 파트 길이를 시청자 왕복 시간 기준으로 잡고, `PART-HOLD-BACK`이 그 세 배 이상인지 보십시오.
+LL-HLS를 들이려면 플레이어보다 서버와 CDN이 보류 요청, `_HLS_*` 캐시 키, 같은 요청 합치기를 지원하는지 먼저 확인하십시오. 그다음 파트 길이를 시청자 왕복 시간 기준으로 잡고, `PART-HOLD-BACK`이 파트 목표 길이의 세 배 이상인지 보십시오.
 
 ## 출처
 
@@ -162,7 +162,8 @@ LL-HLS를 들이려면 플레이어보다 서버와 CDN이 보류 요청, `_HLS_
 - [Apple, Enabling Low-Latency HTTP Live Streaming (HLS)](https://developer.apple.com/documentation/http-live-streaming/enabling-low-latency-http-live-streaming-hls) (2024-05-21 개정)
 - [Apple, HLS Authoring Specification for Apple Devices](https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html) (개정 2025-06-26) — 7.4, 14.1–14.5
 - [bluenviron/gohlslib v2.4.3 `muxer_stream.go`](https://github.com/bluenviron/gohlslib/blob/v2.4.3/muxer_stream.go#L468) — PART-HOLD-BACK = 파트 목표 길이 × 2.5
-- [hls.js v1.0.0 릴리스](https://github.com/video-dev/hls.js/releases/tag/v1.0.0) (2021-04-01, Apple Low-Latency HLS 지원)
+- [hls.js v1.0.0 릴리스](https://github.com/video-dev/hls.js/releases/tag/v1.0.0) (2021-04-01, Apple Low-Latency HLS 지원, 「Hinted Part and Map Preloading」만 미구현) · [hls.js README](https://github.com/video-dev/hls.js#readme) — `EXT-X-PRELOAD-HINT`는 「Parsed but missing feature support」([#5074](https://github.com/video-dev/hls.js/issues/5074))
+- [Apple WWDC19 「Introducing Low-Latency HLS」](https://developer.apple.com/videos/play/wwdc2019/502/)
 - [FFmpeg 형식 문서 — dash 묶개 `-lhls` · `-ldash`](https://ffmpeg.org/ffmpeg-formats.html#dash-2) · 로컬 FFmpeg 9.0.2 `ffmpeg -h muxer=hls`(2026-11-12)
 - [Shaka Packager v3.9.3 low_latency.rst](https://github.com/shaka-project/shaka-packager/blob/v3.9.3/docs/source/tutorials/low_latency.rst)
 - [GS네오텍 고객 사례 「치지직(Chzzk) | 초저지연 실시간 스트리밍을 위한 LL-HLS 기반 CDN 최적화」](https://www.gsneotek.com/customer_case_CDN/?q=YToyOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjtzOjQ6InBhZ2UiO2k6MTt9&bmode=view&idx=167352811&t=board) (2025-08-18, 2026-11-12 확인)

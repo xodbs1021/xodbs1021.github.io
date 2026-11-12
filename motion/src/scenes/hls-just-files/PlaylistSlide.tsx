@@ -24,6 +24,8 @@ type Layout = {
   readonly headY: readonly number[];
   readonly rowY0: number;
   readonly row: number;
+  /** 한 조각(EXTINF 줄 + 주소 줄) 안의 줄 간격. row = 2 × line. */
+  readonly line: number;
   readonly code: number;
   readonly tag: number;
   readonly textX: number;
@@ -37,35 +39,37 @@ type Layout = {
 };
 
 const DESKTOP: Layout = {
-  panel: { x: 120, y: 40, w: 1040, h: 900 },
-  headY: [80, 150, 220],
-  rowY0: 310,
-  row: 82,
-  code: TEXT.label,
+  panel: { x: 120, y: 30, w: 1040, h: 980 },
+  headY: [64, 120, 176],
+  rowY0: 254,
+  row: 100,
+  line: 50,
+  code: TEXT.small,
   tag: TEXT.small,
   textX: 170,
   tags: {
-    add: { x: 1220, y: 760 },
-    remove: { x: 1220, y: 310 },
-    history: { x: 1220, y: 214 },
-    end: { x: 1220, y: 790 },
+    add: { x: 1220, y: 860 },
+    remove: { x: 1220, y: 254 },
+    history: { x: 1220, y: 172 },
+    end: { x: 1220, y: 860 },
   },
   copy: { add: "끝에 새 조각이 붙음", remove: "맨 앞 조각이 빠짐", end: "방송 끝 · 더 바뀌지 않음" },
 };
 
 const MOBILE: Layout = {
-  panel: { x: 40, y: 150, w: 1000, h: 1010 },
-  headY: [190, 270, 350],
-  rowY0: 450,
-  row: 88,
+  panel: { x: 40, y: 110, w: 1000, h: 1080 },
+  headY: [136, 192, 248],
+  rowY0: 326,
+  row: 120,
+  line: 58,
   code: MOBILE_TEXT.label,
   tag: MOBILE_TEXT.small,
   textX: 80,
   tags: {
-    add: { x: 40, y: 1200 },
-    remove: { x: 560, y: 1200 },
+    add: { x: 40, y: 1214 },
+    remove: { x: 560, y: 1214 },
     history: { x: 40, y: 40 },
-    end: { x: 40, y: 1200 },
+    end: { x: 40, y: 1214 },
   },
   copy: { add: "끝에 붙음", remove: "앞에서 빠짐", end: "방송 끝 · ENDLIST" },
 };
@@ -181,8 +185,8 @@ export const PlaylistSlide: React.FC<Props> = ({ layout = "desktop" }) => {
               style={{
                 position: "absolute",
                 left: l.textX - 14,
-                top: y - 8,
-                height: l.code * 1.4 + 16,
+                top: y - 6,
+                height: l.row - 4,
                 width: l.panel.w - (l.textX - l.panel.x) * 2 + 28,
                 borderRadius: 12,
                 background: r > 0 ? COLOR.line : COLOR.accentSoft,
@@ -197,7 +201,17 @@ export const PlaylistSlide: React.FC<Props> = ({ layout = "desktop" }) => {
               opacity={a * (1 - r) * intro}
               strike={r > 0}
             >
-              {`#EXTINF:6.000, seg${n}.ts`}
+              {"#EXTINF:6.000,"}
+            </Code>
+            <Code
+              x={l.textX - r * 80}
+              y={y + l.line + (1 - a) * 40}
+              size={l.code}
+              color={r > 0 ? COLOR.muted : COLOR.ink}
+              opacity={a * (1 - r) * intro}
+              strike={r > 0}
+            >
+              {`seg${n}.ts`}
             </Code>
           </div>
         );

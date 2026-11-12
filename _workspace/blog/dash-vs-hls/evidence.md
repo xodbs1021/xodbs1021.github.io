@@ -20,3 +20,5 @@
 | Shaka Player HLS · DASH | README | 문헌값 |
 
 삭제: 점유율 60/32와 이미지, 「Apple 견제 30개 기업」, 2012-11 발표, HLS 코덱 「제한적」, MPD 50KB · 10배 · 지연 수치 · 비교표, 「YouTube 광고 때문」, 「CENC 없으면 3번 인코딩」, 「브라우저 네이티브 Safari만/없음」 표, 배터리 · 30~50% · VHS 비유, 치지직 · SOOP, 「Shaka Player는 YouTube가 씀」, AI 이미지 4장.
+
+리뷰 반영(2026-11-12): 2011-11 승인 근거를 MPEG 98차 보도문 재게재본(DigitalTVNews 2011-12-02, 「ratified unanimously by positive votes from 24 national bodies in November 2011」)으로, MPD 예시 입력은 4초 합성 영상, DRM · 저지연 절은 CMAF · LL-HLS 글로 링크하고 한 문장으로 줄임.

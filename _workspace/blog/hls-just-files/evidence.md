@@ -22,3 +22,5 @@
 | PokeClip 28초 창, 7.66초 → 반올림 8 분할 | live-window-without-fork, pokeclip-round-vod | 공개 기록 |
 
 삭제: 「모든 걸 바꿨다 · 독점」, 3G 숫자, WinAMP 기원, 「최근 3~5개」, 「첫 패킷 항상 PAT」, 「MSE는 fMP4만」, 「3번 재시도 후 건너뜀」, 서명 60초 · 대시보드 · 지연 18~25초, PTS/DTS 절, AI 이미지 5장, ExplanationLab latency 연결.
+
+리뷰 반영(2026-11-12): Master → Multivariant 근거를 개정 초안 부록 A로, Content-Type에 audio/mpegurl(RFC 8216 4절) 추가, 7.66초 조각은 원인 미확인으로(round-vod 정본), PlaylistSlide를 EXTINF · 주소 두 줄로.

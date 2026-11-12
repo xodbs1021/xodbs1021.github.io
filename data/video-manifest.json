@@ -184,8 +184,8 @@
   "hls-deep-dive-hold-back-start": {
     "scene": "HoldBackStart",
     "alt": "6초 조각 칸이 시간축에 늘어서 있고 목록 끝 표시가 마지막 완성 조각 뒤에 있다. 재생점은 목록 끝에서 18초 뒤인 시작 위치에 서고, 그 구간에 목표 길이 6초 × 3 = 18초 띠가 붙는다. 오른쪽의 만드는 중인 조각이 다 차면 목록 끝이 한 칸 뛰고, 재생점과 지금 시각 사이에 시청 지연 표시가 따라간다. 아래에 목록이 바뀌었으면 6초 뒤, 그대로면 3초 뒤 다시 받는다는 이름표가 있다",
-    "sha256": "c76ac619de5da789f6e06f3105a5529af0ec13eec2a634f39f5e6117c82b9d3f",
-    "bytes": 242465,
+    "sha256": "e93960fea3bbd0ae0fab96b88bb47e9cc1b96adecca38959fb10f2a40596381e",
+    "bytes": 253337,
     "codec": "h264",
     "pixFmt": "yuv420p",
     "width": 1920,
@@ -195,8 +195,8 @@
     "faststart": true,
     "poster": "/images/hls-deep-dive-hold-back-start-poster.jpg",
     "mobile": {
-      "sha256": "0096a73e080d469691d96af0762e619df9f93284c86520b4a8cad863d81e74ec",
-      "bytes": 233907,
+      "sha256": "c0362976729e19310ce98587d3aa1a0d513cc244cd8f576995d3b60ff2ff3432",
+      "bytes": 239216,
       "codec": "h264",
       "pixFmt": "yuv420p",
       "width": 1080,
@@ -210,8 +210,8 @@
   "hls-just-files-playlist-slide": {
     "scene": "PlaylistSlide",
     "alt": "라이브 미디어 목록 화면에서 EXT-X-MEDIA-SEQUENCE가 100이고 seg100부터 seg105까지 EXTINF 줄 여섯 개가 있다. 끝에 seg106 줄이 붙자 맨 앞 seg100 줄이 지워지며 번호가 101로 오르고, 한 번 더 seg107이 붙고 seg101이 빠져 102가 된 뒤 마지막 줄에 EXT-X-ENDLIST가 붙는다",
-    "sha256": "e9182177a576358cbd3448a4a882e134f1132b96f3906d84ecbb398b89ce62b0",
-    "bytes": 329083,
+    "sha256": "ff484da779d79c5786e898579d62b4cdf8f3bddffadcfeb548900693242bc96e",
+    "bytes": 318471,
     "codec": "h264",
     "pixFmt": "yuv420p",
     "width": 1920,
@@ -221,8 +221,8 @@
     "faststart": true,
     "poster": "/images/hls-just-files-playlist-slide-poster.jpg",
     "mobile": {
-      "sha256": "8ff01a31a3453ba48f6db3639ef3a929b3e8167df67b1af7ed80d31576e87a79",
-      "bytes": 346308,
+      "sha256": "3843860847eb7963fe95f481381ee0028a105abd349b71b6b665dbc677a7f9ac",
+      "bytes": 343797,
       "codec": "h264",
       "pixFmt": "yuv420p",
       "width": 1080,

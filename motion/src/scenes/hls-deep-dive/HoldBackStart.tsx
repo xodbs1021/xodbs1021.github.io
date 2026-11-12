@@ -35,6 +35,7 @@ type Layout = {
     readonly band: string;
     readonly end: string;
     readonly start: string;
+    readonly now: string;
     readonly making: string;
     readonly delay: string;
     readonly reload: readonly string[];
@@ -62,6 +63,7 @@ const DESKTOP: Layout = {
     band: "목표 길이 6초 × 3 = 18초",
     end: "목록 끝",
     start: "재생 시작 위치",
+    now: "재생 위치(목록 끝 − 18초)",
     making: "만드는 중 · 목록에 없음",
     delay: "시청 지연 = 18초 + 만들던 조각",
     reload: ["목록이 바뀌었으면 6초 뒤 다시", "그대로면 3초 뒤 다시"],
@@ -89,6 +91,7 @@ const MOBILE: Layout = {
     band: "6초 × 3 = 18초",
     end: "목록 끝",
     start: "재생 시작",
+    now: "재생 위치",
     making: "만드는 중",
     delay: "지연 = 18초 + 만들던 몫",
     reload: ["바뀌었으면 6초 뒤 다시 받기", "그대로면 3초 뒤 다시 받기"],
@@ -114,6 +117,8 @@ export const HoldBackStart: React.FC<Props> = ({ layout = "desktop" }) => {
   const now = END0 + elapsed;
   const playhead = START + elapsed;
   const reloadTags = progress(frame, T.reload, 16);
+  /** 재생점이 시작 위치를 떠나면 시작 위치 표시는 사라지고, 끝에는 재생점 이름표 하나만 남는다. */
+  const startFade = 1 - progress(frame, T.run + 40, 20);
   const firstCellS = Math.max(0, l.s0);
   const cells = Array.from({ length: (END0 - firstCellS) / TD }, (_, i) => firstCellS + i * TD);
 
@@ -211,12 +216,15 @@ export const HoldBackStart: React.FC<Props> = ({ layout = "desktop" }) => {
           width: 0,
           height: l.startLabelY - (l.cellY - 40),
           borderLeft: `4px dashed ${COLOR.accent}`,
-          opacity: start * progress(frame, T.run, 12),
+          opacity: start * progress(frame, T.run, 12) * startFade,
         }}
       />
       <Playhead x={xOf(playhead)} top={l.cellY - 40} height={l.cellH + 80} color={COLOR.accent} opacity={start} />
-      <Label x={xOf(START)} y={l.startLabelY} size={l.text.tag} color={COLOR.accent} weight={760} anchor="center" opacity={start}>
+      <Label x={xOf(START)} y={l.startLabelY} size={l.text.tag} color={COLOR.accent} weight={760} anchor="center" opacity={start * startFade}>
         {l.copy.start}
+      </Label>
+      <Label x={xOf(playhead)} y={l.startLabelY} size={l.text.tag} color={COLOR.accent} weight={760} anchor="center" opacity={join}>
+        {l.copy.now}
       </Label>
 
       {/* 지금 시각 — 회색 점선. */}

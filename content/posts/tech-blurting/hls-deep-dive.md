@@ -1,7 +1,7 @@
 ---
 title: "일반 HLS는 라이브 끝에서 목표 길이 세 배 뒤부터 재생합니다"
 date: 2026-05-30T00:00:00+09:00
-lastmod: "2026-11-12T22:00:00+09:00"
+lastmod: "2026-11-12T22:56:00+09:00"
 description: "일반 HLS 플레이어는 목록 끝에서 목표 길이의 세 배보다 가까운 조각에서 재생을 시작하지 않습니다(RFC 8216 6.3.3). 목록을 다시 받는 간격(바뀌면 목표 길이, 그대로면 절반), 조각 길이를 줄일 때 늘어나는 요청과 키프레임, 조각 경계의 화질 전환, 목록과 조각을 다르게 캐시하고 라이브 끝 조각의 같은 요청을 합치는 CDN 구성, HTTP/3 위의 HLS, PokeClip에서 실제로 재생을 끊은 원인을 규격과 공개 기록으로 정리했습니다."
 categories: ["tech-blurting"]
 tags: ["HLS", "라이브 지연", "CDN", "캐시", "QUIC", "PokeClip"]
@@ -30,7 +30,7 @@ RFC 8216은 「ENDLIST가 없고 보통 재생을 하려는 클라이언트는 �
 | 플레이어 | 다시 받았는데 그대로면 목표 길이의 절반을 기다림(MUST) | 같은 절 |
 | 서버 | 새 판은 직전 판보다 목표 길이 절반 이후, 1.5배 이전에 내놓음(MUST) | [RFC 8216 6.2.1](https://www.rfc-editor.org/rfc/rfc8216#section-6.2.1) |
 
-개정 초안 22판은 바뀐 목록 뒤의 대기를 「목표 길이」에서 「목록 마지막 조각의 길이」로 바꿨고, 그대로인 목록을 목표 길이의 1.5배 넘게 받았으면 서버 이상으로 보고 다른 변형으로 옮기라고 권합니다(6.3.4절).
+개정 초안 22판은 바뀐 목록 뒤의 대기를 「목표 길이」에서 「목록 마지막 조각의 길이」로 바꿨고, 그대로인 목록을 목표 길이의 1.5배 넘게 받았으면 서버 이상으로 보고 다른 변형으로 옮기라고 권합니다(6.3.4절). 서버 쪽 6.2.1절에서는 「절반 이후」 하한을 빼고 「직전에 조각을 붙인 때부터 1.5배 안에」라는 상한만 남겼습니다.
 
 요청 수는 숫자보다 산식으로 보는 편이 정확합니다. 한 시청자가 변형 하나를 볼 때 초당 요청은 대략 「1 ÷ 조각 길이」번의 조각 요청과, 목록 재요청 간격으로 정해지는 목록 요청의 합입니다. 오디오를 별도 묶음으로 내면 오디오 목록과 조각 요청이 같은 꼴로 더해집니다. 여기에 시청자 수를 곱한 값이 CDN이 받는 요청이고, 그 가운데 캐시에서 답하지 못한 몫이 원본으로 갑니다.
 
@@ -89,7 +89,7 @@ sequenceDiagram
   E->>V: B · 200
 ```
 
-엣지가 많으면 엣지마다 원본에 한 번씩 갑니다. 엣지와 원본 사이에 캐시 층을 하나 더 두면(CloudFront의 Origin Shield 같은 계층 캐시) 원본이 받는 요청을 그 층의 수로 줄일 수 있습니다. PokeClip은 되감기 원본(S3) 앞에 서울 Origin Shield를 둡니다.
+엣지가 많으면 엣지마다 원본에 한 번씩 갑니다. 엣지와 원본 사이에 캐시 층을 하나 더 두면(CloudFront의 [Origin Shield](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/origin-shield.html) 같은 계층 캐시) 원본이 받는 요청을 그 층의 수로 줄일 수 있습니다. PokeClip은 되감기 원본(S3) 앞에 서울 Origin Shield를 둡니다.
 
 ## HTTP 위라는 말이 TCP만 뜻하지는 않습니다 {#qa-현대-플랫폼이-ll-hlswebrtc-쓰는-추세인데-왜-tcp라고-하나}
 
@@ -105,7 +105,7 @@ PokeClip에서 재생을 실제로 끊거나 구간을 지운 원인은 대역�
 |---|---|---|
 | hls.js 오류 0건인데 녹화 142초 중 62초가 사라짐 | 녹화 파일마다 tfdt(조각 첫 표본의 디코딩 시각)가 0 근처에서 다시 시작 | [오류 0건 글](/posts/0-to-1/pokeclip-zero-errors-missing-playback/) |
 | 같은 파일인데 8.10초만 잡히다가 39.87초 전체가 잡힘 | init이 아니라 tfdt 193바이트 위치의 값 | [tfdt 대조 글](/posts/0-to-1/pokeclip-cdn-timeline-normalization/) |
-| HTTP 200인데 검은 화면 | 서버 변환 오류, 목록 앞쪽 GAP 조각, hls.js 생성자 예외 | [검은 화면 글](/posts/0-to-1/pokeclip-black-screen-three-causes/) |
+| HTTP 200인데 검은 화면 | hls.js 설정 검사(생성자) 예외. 함께 보인 변환 오류와 GAP 조각은 11월 소스 대조에서 화면을 막은 원인이 아니었던 것으로 정정 | [검은 화면 글](/posts/0-to-1/pokeclip-black-screen-three-causes/) |
 | 일시정지 뒤 다음 조각 404 | 되감기 창이 밀려 조각이 창 밖으로 빠짐 | [되감기 404 글](/posts/projects/rewind-missing-segment/) |
 
 목록이 아직 확정되지 않은 조각을 공개하면 플레이어가 없는 조각을 요청합니다. PokeClip 되감기 목록이 연속으로 확정된 조각까지만 공개하는 이유입니다([목록 공개 경계 글](/posts/0-to-1/pokeclip-manifest-window-boundaries/)).
@@ -123,6 +123,7 @@ PokeClip에서 재생을 실제로 끊거나 구간을 지운 원인은 대역�
 - [Apple, HLS Authoring Specification for Apple Devices](https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html) (개정 2025-06-26) — 7.4 · 7.5 · 8.15
 - [hls.js API 문서](https://github.com/video-dev/hls.js/blob/master/docs/API.md) — `liveSyncDurationCount`, `abrEwmaFastLive`
 - [RFC 9114: HTTP/3](https://www.rfc-editor.org/rfc/rfc9114) · [RFC 9000: QUIC](https://www.rfc-editor.org/rfc/rfc9000)
+- [AWS, CloudFront Origin Shield](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/origin-shield.html)
 - PokeClip 기록: [라이브 창](/posts/0-to-1/pokeclip-live-window-without-fork/) · [CDN 캐시 키와 원본 인증](/posts/0-to-1/pokeclip-cdn-cache-auth-measurement/) · [오류 0건](/posts/0-to-1/pokeclip-zero-errors-missing-playback/) · [tfdt 대조](/posts/0-to-1/pokeclip-cdn-timeline-normalization/) · [검은 화면](/posts/0-to-1/pokeclip-black-screen-three-causes/) · [목록 공개 경계](/posts/0-to-1/pokeclip-manifest-window-boundaries/) · [되감기 404](/posts/projects/rewind-missing-segment/)
 
 다음 편: [LL-HLS는 부분 조각과 보류 응답으로 목록 대기를 줄입니다](/posts/tech-blurting/ll-hls-deep-dive/)

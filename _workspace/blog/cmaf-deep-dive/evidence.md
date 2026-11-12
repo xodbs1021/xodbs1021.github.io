@@ -22,3 +22,5 @@
 | DASH-IF 가용 창 | DASH-IF Timing Model 13.3 | 문헌값 |
 
 삭제: 「2026-10-29 정정」 인용문, illustrativeMetrics, 「HLS v7(2016)」, 차트 6개(절감 · 지연 · TTL · 오버헤드 · 퍼널), 「major_brand cmfc」, Constraint 7항목, 「Shaka가 자동 보장」, iOS 10 · Android 5, LL 목록 예시(→ ll-hls), TTL 절(→ hls-deep-dive), PlayReady 비중, 가상의 --enable_fairplay_encryption, EXT-X-CUE-OUT/IN, SSAI · 비콘 · 채택사, QC 파이프라인, 장애 3종 표와 「운영 경험」 문장, 치지직 문장, AI 이미지 2장, data/legacy-figure-gaps.json의 cmaf 항목.
+
+리뷰 반영(2026-11-12): ENDLIST 문장 뜻 바로잡음, 소제목을 FFmpeg 조각에 DASH 브랜드만 있었다는 실측으로, 「CMAF 조각」 → 「CMAF 플래그로 만든 fMP4 조각」, mdat 크기는 머리 8바이트를 뺀 본문, Shaka Packager는 README 표현(packaging and encryption)대로.
