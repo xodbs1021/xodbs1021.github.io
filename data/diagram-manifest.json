@@ -491,6 +491,15 @@
       "bytes": 27857
     }
   },
+  "72fa77fc073f03db": {
+    "source": "content/posts/0-to-1/pokeclip-path-reconciler-design-history.md",
+    "wide": {
+      "file": "72fa77fc073f03db-wide.svg",
+      "width": 436,
+      "height": 1014,
+      "bytes": 27306
+    }
+  },
   "739f42862ff8619e": {
     "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
     "wide": {
@@ -617,6 +626,15 @@
       "bytes": 19989
     }
   },
+  "8ba87d6c34a66d8d": {
+    "source": "content/posts/0-to-1/pokeclip-media-host-restart-lifecycle.md",
+    "wide": {
+      "file": "8ba87d6c34a66d8d-wide.svg",
+      "width": 392,
+      "height": 749,
+      "bytes": 22461
+    }
+  },
   "8f61df44c006ef0f": {
     "source": "content/posts/tech-blurting/live-transcoding-infrastructure.md",
     "wide": {
@@ -675,6 +693,15 @@
       "width": 600,
       "height": 223,
       "bytes": 17640
+    }
+  },
+  "9ee4a3f09e01e0e4": {
+    "source": "content/posts/0-to-1/pokeclip-dependency-upgrade-contracts.md",
+    "wide": {
+      "file": "9ee4a3f09e01e0e4-wide.svg",
+      "width": 184,
+      "height": 781,
+      "bytes": 22491
     }
   },
   "a336f961a86fde2d": {
@@ -944,6 +971,15 @@
       "bytes": 25212
     }
   },
+  "ec83684892b0a5b7": {
+    "source": "content/posts/0-to-1/pokeclip-scratch-volume-ownership.md",
+    "wide": {
+      "file": "ec83684892b0a5b7-wide.svg",
+      "width": 392,
+      "height": 595,
+      "bytes": 24425
+    }
+  },
   "ed88d5fe785fe73f": {
     "source": "content/posts/tech-blurting/opus-deep-dive.md",
     "wide": {
@@ -975,6 +1011,15 @@
       "width": 392,
       "height": 486,
       "bytes": 20949
+    }
+  },
+  "f8da79bff278d16e": {
+    "source": "content/posts/0-to-1/pokeclip-nginx-playback-request-boundary.md",
+    "wide": {
+      "file": "f8da79bff278d16e-wide.svg",
+      "width": 392,
+      "height": 782,
+      "bytes": 22382
     }
   },
   "fdc7e37322cf0959": {

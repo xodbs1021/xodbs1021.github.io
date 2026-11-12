@@ -1,7 +1,7 @@
 ---
 title: "Go로 다 짜려던 미디어 서버를 MediaMTX에 맡겼습니다"
 date: 2026-10-15T11:27:08+09:00
-lastmod: 2026-11-11T14:14:52+09:00
+lastmod: "2026-11-12T13:39:17+09:00"
 author: "김태윤"
 categories: ["0-to-1"]
 tags: ["PokeClip", "MediaMTX", "Architecture", "LL-HLS", "오픈소스"]
@@ -77,7 +77,7 @@ MediaMTX를 들이자 직접 짜지 않은 코드를 읽어야 하는 책임이 
 
 8월 25일 이 방침을 바꿨습니다. 우회가 더 비싸거나 불가능하면 상류를 직접 고치고, 기본은 상류 PR이며 포크는 그 PR이 머지되기 전까지의 수단으로 둡니다. 한 프로토콜이라도 깊게 파 보라는 멘토 조언과, 우리 계층에서 우회할 수 없는 제약이 실제로 생긴 것이 계기였습니다. 8월 28일에는 대상에서 LL-HLS 라이브러리 gohlslib을 빼고 MediaMTX 저장소로 좁혔습니다. gohlslib을 고치지 않고 라이브 창 요구를 다시 정한 과정은 [라이브 창 글](/posts/0-to-1/pokeclip-live-window-without-fork/)에 있습니다.
 
-지금 제품 이미지는 상류 v1.21.1 위에 우리 수정을 얹은 포크 빌드 `v1.21.1-pokeclip.2`입니다([`media/Dockerfile.mtxhook` 85행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/Dockerfile.mtxhook#L85)). 11월 6일 멈춘 dev 미디어 서버의 핀은 `v1.21.2-pokeclip.1`이었습니다. 포크에는 상류 심사 중인 수정과, 상류에 머지됐지만 우리 베이스보다 뒤 판에 들어간 수정이 함께 실려 있습니다. 앞의 예가 사용자별 SRT 암호를 받게 하는 [bluenviron/mediamtx#6306](https://github.com/bluenviron/mediamtx/pull/6306)으로, 제가 올렸고 11월 11일 기준 열려 있습니다. 뒤의 예가 v1.21.2에 들어간 [#6292](https://github.com/bluenviron/mediamtx/pull/6292)입니다. 실린 수정이 모두 상류 릴리스에 들어가면 포크를 걷어내고 공식 이미지로 돌아간다는 조건을 Dockerfile에 적어 두었습니다([75–84행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/Dockerfile.mtxhook#L75-L84)).
+지금 제품 이미지는 상류 v1.21.1 위에 우리 수정을 얹은 포크 빌드 `v1.21.1-pokeclip.2`입니다([`media/Dockerfile.mtxhook` 85행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/Dockerfile.mtxhook#L85)). 11월 6일 멈춘 dev 미디어 서버의 핀은 `v1.21.2-pokeclip.1`이었습니다. 포크에는 상류에 올린 수정과, 상류에 머지됐지만 우리 베이스보다 뒤 판에 들어간 수정이 함께 실려 있습니다. 올린 수정 가운데 [#6206](https://github.com/bluenviron/mediamtx/pull/6206)·[#6261](https://github.com/bluenviron/mediamtx/pull/6261)은 머지되지 않고 닫혔고, 같은 문제를 메인테이너가 다시 구현한 수정이 v1.21.3에 들어갔습니다. 앞의 예가 사용자별 SRT 암호를 받게 하는 [bluenviron/mediamtx#6306](https://github.com/bluenviron/mediamtx/pull/6306)으로, 제가 올렸고 11월 11일 기준 열려 있습니다. 뒤의 예가 v1.21.2에 들어간 [#6292](https://github.com/bluenviron/mediamtx/pull/6292)입니다. 실린 수정이 모두 상류 릴리스에 들어가면 포크를 걷어내고 공식 이미지로 돌아간다는 조건을 Dockerfile에 적어 두었습니다([75–84행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/Dockerfile.mtxhook#L75-L84)).
 
 ## 버전을 올릴 때마다 같은 입력을 다시 통과시켜야 합니다
 

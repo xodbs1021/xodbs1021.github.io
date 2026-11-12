@@ -323,6 +323,32 @@
       "poster": "/images/pokeclip-database-authoritative-manifest-publishing-late-writer-fenced-mobile-poster.jpg"
     }
   },
+  "pokeclip-dependency-upgrade-contracts-hls-session-after-cut": {
+    "scene": "HlsSessionAfterCut",
+    "alt": "송출을 끊은 0초 뒤로 요청 점이 이어지며, 10초까지는 200, 10초부터 40초까지는 세션이 살아 있어도 404, 40초 뒤로는 401 칸이 차례로 채워지고 404 구간에 404 창 30초 이름표가 뜨는 장면",
+    "sha256": "b3ba087b7dc05b6f344e65d8a29a13c189feeed42e40aba669498e10364fcdc2",
+    "bytes": 158936,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-dependency-upgrade-contracts-hls-session-after-cut-poster.jpg",
+    "mobile": {
+      "sha256": "ba2f8232a11f0df42303ec4fcd8b6738b87e9a9160eb45f3594703433d474036",
+      "bytes": 155139,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-dependency-upgrade-contracts-hls-session-after-cut-mobile-poster.jpg"
+    }
+  },
   "pokeclip-editing-upload-authorization-upload-request-path": {
     "scene": "UploadRequestPath",
     "alt": "편집자 · clip 서버 · 렌더 일꾼 · 업로드 일꾼 · YouTube 상자가 한 줄로 있다. 처음에 clip 서버 위로 점선 「승인 대기함」 상자와 「7월 설계」가 보였다가 「8월 30일 · 만들지 않음」으로 바뀌며 흐려져 사라진다. 이어 요청이 편집자에서 clip 서버, 렌더 일꾼, 업로드 일꾼으로 가고, 업로드 일꾼이 아래 Auth에 「채널 주인 번호」를 보내 강조색 「채널 주인의 토큰」을 받은 뒤 YouTube로 올려 YouTube 상자가 강조되고 「기본 비공개」가 뜨는 장면",
@@ -557,6 +583,32 @@
       "poster": "/images/pokeclip-manifest-window-boundaries-publish-boundary-mobile-poster.jpg"
     }
   },
+  "pokeclip-media-host-restart-lifecycle-crash-leftover-container": {
+    "scene": "CrashLeftoverContainer",
+    "alt": "위 줄 고치기 전에는 systemd 유닛에 SIGKILL이 오자 MediaMTX 컨테이너가 옛 비밀을 든 채 남고 nginx의 헬스 경로는 고정 200을 내며, 비밀 파일이 지워진 뒤 사이드카가 재시작하면서 파일 자리에 디렉터리가 생겨 다음 기동이 실패를 되풀이한다. 아래 줄 고친 뒤에는 같은 SIGKILL 뒤 ExecStopPost가 compose를 내리고, bind 원본 자리에는 create_host_path: false가 디렉터리 생성을 막으며, --force-recreate로 새 컨테이너가 뜨는 장면",
+    "sha256": "940a0a28f0b4ee65b7702b46fc77647266b5c3c5e4b6d9d4e5260b98b82b693f",
+    "bytes": 310837,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 12,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-media-host-restart-lifecycle-crash-leftover-container-poster.jpg",
+    "mobile": {
+      "sha256": "cb9932314612dc8e007154b2f4c5b6816809912b81d3e63df42c1af44d609acd",
+      "bytes": 301666,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 12,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-media-host-restart-lifecycle-crash-leftover-container-mobile-poster.jpg"
+    }
+  },
   "pokeclip-media-timeline-over-wall-clock-chapter-rule": {
     "scene": "ChapterRule",
     "alt": "영상 조각 다섯 개가 한 띠로 이어지는 동안, 앞 세 조각은 표시 시각을 이어 적어 장 1이 되고, 2분 틈 뒤의 조각에서 표시 시각이 건너뛰며 장 2가 열리고, 0.3초 일찍 온 다섯째 조각은 표시 시각을 앞 조각 끝보다 조금 당겨 적고 장 3을 여는 장면. 끝에는 세 단계 요약이 남는다",
@@ -635,6 +687,32 @@
       "poster": "/images/pokeclip-multiaudio-end-to-end-verification-multiaudio-stage-proof-mobile-poster.jpg"
     }
   },
+  "pokeclip-nginx-playback-request-boundary-playback-query-guard": {
+    "scene": "PlaybackQueryGuard",
+    "alt": "재생 요청 다섯 개가 차례로 nginx로 들어와, /A/list?path=A만 청록 선으로 재생 서버 9996에 닿고 /A/list?path=B, path가 두 번인 요청, pa%74h 키 요청, /A/..%2fB/list?path=B는 nginx에서 403을 받고 멈춘 뒤 상류 도달 0 이름표가 뜨는 장면",
+    "sha256": "28f91317003ed9f17bbb88cfe65ce3f6232a28f4e07cc7422f637255601a4041",
+    "bytes": 167826,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 12,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-nginx-playback-request-boundary-playback-query-guard-poster.jpg",
+    "mobile": {
+      "sha256": "057ae1246f4a940318fffe9e3566e602b53107e7682b035363f807d6bc4fdf73",
+      "bytes": 183801,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 12,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-nginx-playback-request-boundary-playback-query-guard-mobile-poster.jpg"
+    }
+  },
   "pokeclip-obs-shared-encoder-srt-shared-encoder-start": {
     "scene": "SharedEncoderStart",
     "alt": "위에 「프로필 설정 적용」 「STREAMING_STARTING · keyint 2」 「인코더 생성」 「출력 시작」 네 상자가 차례로 강조되고, 아래 「x264 1개」 상자에서 RTMP → 치지직과 SRT → PokeClip 두 줄로 같은 점이 함께 흐른다. 「본방 정지」에 두 줄이 같이 멈추고 「SRT도 함께 정지」가 뜬다. 이어 「녹화 중 · keyint ≠ 2」 상태에서 다시 시작하자 STREAMING_STARTING 상자에 빨간 「실행 중 GOP 변경 불가」가, SRT 줄 끝에 빨간 「SRT 시작 거절」이 뜨고 RTMP 줄만 흐르는 장면",
@@ -685,6 +763,32 @@
       "audio": 0,
       "faststart": true,
       "poster": "/images/pokeclip-one-time-pairing-contract-pairing-code-lifetime-mobile-poster.jpg"
+    }
+  },
+  "pokeclip-path-reconciler-design-history-auth-queue-serial": {
+    "scene": "AuthQueueSerial",
+    "alt": "송출 연결 10개가 한꺼번에 도착하지만 인증 관문을 0.3초씩 하나씩만 지나 수락 칸에 쌓이고, 수락 시각 막대가 0.3초에서 3.057초까지 늘어나며, 새 HLS 세션과 목록 API 요청도 진행 중인 인증이 끝날 때까지 기다리는 장면",
+    "sha256": "3c50d9924bbed45ab4c646a27c173ef42c50d40175fea7309dfe5fb96b9c38e6",
+    "bytes": 270583,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-path-reconciler-design-history-auth-queue-serial-poster.jpg",
+    "mobile": {
+      "sha256": "dfe67d968c59a407e422827ee2949f182a90e3c57087d3bb18d5b2cc26a7d7c4",
+      "bytes": 278787,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-path-reconciler-design-history-auth-queue-serial-mobile-poster.jpg"
     }
   },
   "pokeclip-playback-producer-boundaries-three-axis-upload": {
@@ -789,6 +893,32 @@
       "audio": 0,
       "faststart": true,
       "poster": "/images/pokeclip-round-vod-round-document-mobile-poster.jpg"
+    }
+  },
+  "pokeclip-scratch-volume-ownership-volume-first-copy": {
+    "scene": "VolumeFirstCopy",
+    "alt": "빈 볼륨이 처음 붙는 세 경우가 나란히 진행돼, 이미지에 경로가 없으면 복사할 것이 없어 볼륨이 root:root로 남고 UID 10002 녹화기의 쓰기가 실패하며, 이미지에 10002 소유 빈 디렉터리가 있으면 소유권이 복사돼 쓰기가 성공하고, 볼륨에 이전 데이터가 있으면 복사하지 않아 소유가 그대로 남는 장면",
+    "sha256": "866ac88c01cafc582e8e3e53b49acb056b9b9805285298279146b2d04afae414",
+    "bytes": 211054,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 9,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-scratch-volume-ownership-volume-first-copy-poster.jpg",
+    "mobile": {
+      "sha256": "642337cef3e74831c2c50c9654e98d5adb433f63cd53e4f60be3ca5b791b4f8a",
+      "bytes": 220747,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 9,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-scratch-volume-ownership-volume-first-copy-mobile-poster.jpg"
     }
   },
   "pokeclip-secret-storage-migration-plan-secret-path-one-connection": {
