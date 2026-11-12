@@ -1,0 +1,26 @@
+rep 1
+  sep 1920:1080: real=3.17 user=13.74 sys=0.42 cpu=14.16
+  sep 1280:720: real=2.21 user=11.94 sys=0.33 cpu=12.27
+  sep 854:480: real=1.43 user=7.83 sys=0.24 cpu=8.07
+  split: real=6.37 user=28.44 sys=1.00 cpu=29.44
+  decode-only: real=0.66 user=3.47 sys=0.09 cpu=3.56
+rep 2
+  sep 1920:1080: real=3.51 user=17.15 sys=0.56 cpu=17.71
+  sep 1280:720: real=2.78 user=11.55 sys=0.45 cpu=12.00
+  sep 854:480: real=1.82 user=8.16 sys=0.32 cpu=8.48
+  split: real=8.41 user=29.94 sys=1.15 cpu=31.09
+  decode-only: real=0.66 user=3.70 sys=0.07 cpu=3.77
+rep 3
+  sep 1920:1080: real=4.26 user=17.67 sys=0.63 cpu=18.30
+  sep 1280:720: real=2.20 user=12.32 sys=0.41 cpu=12.73
+  sep 854:480: real=1.61 user=8.60 sys=0.32 cpu=8.92
+  split: real=4.95 user=31.96 sys=1.14 cpu=33.10
+  decode-only: real=0.72 user=3.50 sys=0.10 cpu=3.60
+
+# A3 따로 세 프로세스 vs split 한 프로세스 CPU 시간 (2026-11-13 02:25 KST, AI 실행, /usr/bin/time -p, user+sys 초)
+입력 src1080.mp4: testsrc2 1920x1080 30fps 20초, libx264 veryfast 8000k -g 60
+sep: ffmpeg -i src1080.mp4 -vf scale=W:H -c:v libx264 -preset veryfast -b:v B -f null -  (1920:1080 6000k / 1280:720 3000k / 854:480 1200k)
+split: ffmpeg -i src1080.mp4 -filter_complex "[0:v]split=3[a][b][c];[b]scale=1280:720[b2];[c]scale=854:480[c2]" -map "[a]" -c:v libx264 -preset veryfast -b:v 6000k -f null - -map "[b2]" -c:v libx264 -preset veryfast -b:v 3000k -f null - -map "[c2]" -c:v libx264 -preset veryfast -b:v 1200k -f null -
+decode-only: ffmpeg -i src1080.mp4 -f null -
+합계: sep 34.50 / 38.19 / 39.95, split 29.44 / 31.09 / 33.10, decode-only 3.56 / 3.77 / 3.60
+주의: 같은 기계에서 다른 세션 작업이 함께 돌았음(load average 11~22).
