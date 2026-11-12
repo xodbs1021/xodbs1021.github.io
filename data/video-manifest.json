@@ -27,9 +27,9 @@
   },
   "av1-vp9-deep-dive-av1-ref-slots": {
     "scene": "Av1RefSlots",
-    "alt": "맨 위 부호화 순서 줄에 0(키 프레임), 4(ALTREF), 1, 2, 3, 4(다시 표시) 칸이 있고, 가운데 참조 슬롯 8칸, 아래 화면 출력 0–4 칸이 있다. 키 프레임이 슬롯 8개를 모두 채우고, ALTREF 4는 show_frame=0으로 슬롯에만 들어가 출력되지 않는다. 프레임 1, 2, 3은 슬롯 7개를 참조하며 출력되고, 마지막에 show_existing_frame=1이 슬롯의 4를 다시 부호화하지 않고 화면 출력 4로 보내는 장면",
-    "sha256": "1d8a6bac62a5f987ef69d65e410c04033ef7d6832d34a6f9e8b8ec173354401c",
-    "bytes": 275868,
+    "alt": "맨 위 부호화 순서 줄에 0(키 프레임), 4(ALTREF), 1, 2, 3, 4(다시 표시) 칸이 있고, 가운데 참조 슬롯 8칸, 아래 화면 출력 0–4 칸이 있다. 키 프레임이 슬롯 8개를 모두 채우고, ALTREF 4는 show_frame=0으로 슬롯에만 들어가 출력되지 않는다. 프레임 1, 2, 3은 참조 이름 7개가 가리키는 슬롯(겹칠 수 있음)을 참조하며 출력되고, 마지막에 show_existing_frame=1이 슬롯의 4를 다시 부호화하지 않고 화면 출력 4로 보내는 장면",
+    "sha256": "a27de6f0ce73a19a639d8a012d116da310ee287a62b625310126ca4c1422c860",
+    "bytes": 279140,
     "codec": "h264",
     "pixFmt": "yuv420p",
     "width": 1920,
@@ -39,8 +39,8 @@
     "faststart": true,
     "poster": "/images/av1-vp9-deep-dive-av1-ref-slots-poster.jpg",
     "mobile": {
-      "sha256": "efd5b62bf346f8b004b57848893f6305af8d0935bda6d72a6cb5f8ca6f45f803",
-      "bytes": 282760,
+      "sha256": "e2da44c93e618d7148dee26684dfdc30d434db14a84206e8732af1558fe9a016",
+      "bytes": 283811,
       "codec": "h264",
       "pixFmt": "yuv420p",
       "width": 1080,

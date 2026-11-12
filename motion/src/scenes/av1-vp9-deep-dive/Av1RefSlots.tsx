@@ -31,9 +31,9 @@ const SEVEN = [0, 1, 2, 3, 4, 5, 6] as const;
 const STEPS: readonly Step[] = [
   { start: 18, label: "0", sub: "KEY", refresh: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 }, output: 0, status: ["KEY_FRAME", "슬롯 8개를 모두 채움"] },
   { start: 66, label: "4", sub: "ALTREF", hidden: true, refresh: { 6: 4 }, refs: SEVEN, status: ["show_frame=0", "슬롯에만 넣고 출력 안 함"] },
-  { start: 114, label: "1", refresh: { 1: 1 }, refs: SEVEN, output: 1, status: ["프레임 1–3", "슬롯 8개 중 7개 참조"] },
-  { start: 148, label: "2", refresh: { 2: 2 }, refs: SEVEN, output: 2, status: ["프레임 1–3", "슬롯 8개 중 7개 참조"] },
-  { start: 182, label: "3", refresh: { 3: 3 }, refs: SEVEN, output: 3, status: ["프레임 1–3", "슬롯 8개 중 7개 참조"] },
+  { start: 114, label: "1", refresh: { 1: 1 }, refs: SEVEN, output: 1, status: ["프레임 1–3", "참조 이름 7개로 슬롯 참조"] },
+  { start: 148, label: "2", refresh: { 2: 2 }, refs: SEVEN, output: 2, status: ["프레임 1–3", "참조 이름 7개로 슬롯 참조"] },
+  { start: 182, label: "3", refresh: { 3: 3 }, refs: SEVEN, output: 3, status: ["프레임 1–3", "참조 이름 7개로 슬롯 참조"] },
   { start: 222, label: "4", sub: "다시 표시", existing: true, refresh: {}, output: 4, status: ["show_existing_frame=1", "슬롯의 프레임을 그대로 출력"] },
 ];
 const STEP_LEN = 32;
