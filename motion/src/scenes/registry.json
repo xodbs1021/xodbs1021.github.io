@@ -532,5 +532,53 @@
     "posterFrame": 320,
     "alt": "위쪽에 12번, 13번, 14번 조각 칸이 있고 13번과 14번이 차례로 완성된다. 왼쪽 HLS 칸에는 조각마다 목록 다시 받기와 GET seg 요청이 차례로 쌓여 네트워크 요청이 4번이 되고, 오른쪽 DASH 칸에는 시계 t=26초에서 13번, t=28초에서 14번을 계산하는 점선 칸과 GET 요청만 쌓여 네트워크 요청이 2번이 된다",
     "mobile": true
+  },
+  {
+    "id": "OptionScopeOverride",
+    "post": "ffmpeg-deep-dive",
+    "kind": "video",
+    "posterFrame": 280,
+    "alt": "왼쪽 칸에서는 -b:v 3000k, -b:v 1500k, -b:v 600k 칩이 차례로 들어오며 앞의 두 칩이 취소선으로 덮이고, 720p·540p·360p 줄 모두 목표 600k가 되어 막대가 699kbps, 657kbps, 650kbps로 비슷하게 자란다. 오른쪽 칸에서는 -b:v:0 3000k, -b:v:1 1500k, -b:v:2 600k 칩이 각 화질에 걸려 막대가 3,118kbps, 1,581kbps, 650kbps로 갈라진다",
+    "mobile": true
+  },
+  {
+    "id": "VbvBuffer",
+    "post": "x264-live-rate-control-gop",
+    "kind": "video",
+    "posterFrame": 320,
+    "alt": "위아래 두 줄에 bufsize 750k와 bufsize 6,000k의 0.25초 구간 비트레이트 막대 40개가 왼쪽부터 차례로 서고, 3,000kbps 점선을 넘은 막대만 강조색으로 칠해진다. 위 줄의 최고 막대에 4,316, 아래 줄에 5,605 이름표가 뜨고, 오른쪽 세로 막대는 버퍼 수위가 큰 장면에서 내려갔다 다시 차는 모습을 보여 준다",
+    "mobile": true
+  },
+  {
+    "id": "SharedSegments",
+    "post": "ffmpeg-hls-dash-muxer",
+    "kind": "video",
+    "posterFrame": 300,
+    "alt": "위 칸은 입력 20초가 x264 인코더 두 개로 나뉘어 HLS 조각 줄과 DASH 조각 줄에 2초 조각 10개씩, 모두 두 벌이 쌓이고 '인코더 2 · 조각 두 벌 15.1MB' 이름표가 뜬다. 아래 칸은 x264 인코더 하나가 조각 한 줄 10개를 쌓고, manifest.mpd와 media_0.m3u8 상자에서 같은 조각 줄로 화살표가 그려지며 '인코더 1 · 조각 한 벌 7.56MB' 이름표가 뜬다",
+    "mobile": true
+  },
+  {
+    "id": "ConvexHullClimb",
+    "post": "abr-ladder-design",
+    "kind": "video",
+    "posterFrame": 320,
+    "alt": "VMAF 대 비트레이트(로그 눈금) 그래프에서 360p·540p·720p·1080p 네 곡선이 왼쪽부터 함께 그려지고, 각 지점에서 가장 높은 곡선을 잇는 강조색 굵은 선이 따라간다. 오른쪽 위 이름표가 윗선 540p에서 720p, 1080p로 바뀌고, 끝에서 곡선마다 해상도 이름이 붙는다",
+    "mobile": true
+  },
+  {
+    "id": "GpuMemoryPath",
+    "post": "nvenc-gpu-transcoding",
+    "kind": "video",
+    "posterFrame": 300,
+    "alt": "위쪽 GPU 상자 안에 NVDEC, GPU 메모리, scale_cuda, NVENC가 나란히 있다. 앞 절반에는 -hwaccel_output_format cuda 표시와 함께 점이 네 상자를 차례로 지나 GPU 안에서만 이동한다. 뒤 절반에는 그 옵션이 없다는 표시와 함께 GPU 메모리와 scale_cuda가 회색 점선이 되고, 점이 NVDEC에서 아래 시스템 메모리 상자로 내려갔다가 다시 NVENC로 올라간다. 경로에 GPU → CPU, CPU → GPU 이름표가 붙는다",
+    "mobile": true
+  },
+  {
+    "id": "SpeedBelowRealtime",
+    "post": "live-transcoding-infrastructure",
+    "kind": "video",
+    "posterFrame": 310,
+    "alt": "위에 0초부터 56초까지의 벽시계 축이 있고, 아래 동시 3개와 동시 6개 두 줄에 조각이 실시간이면 끝날 시각을 뜻하는 흐린 회색 눈금이 2초마다 있다. 재생점이 오른쪽으로 가면서 1080p 조각 칸이 실제 완성 시각에 하나씩 나타난다. 3개 줄은 눈금 바로 뒤를 따라가고, 6개 줄은 점점 오른쪽으로 밀린다. 끝에 speed 1.01 · 19번째 조각 0.5초 늦음, speed 0.75 · 19번째 조각 14.2초 늦음 이름표가 뜬다",
+    "mobile": true
   }
 ]

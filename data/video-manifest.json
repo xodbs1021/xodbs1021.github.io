@@ -1,4 +1,30 @@
 {
+  "abr-ladder-design-convex-hull-climb": {
+    "scene": "ConvexHullClimb",
+    "alt": "VMAF 대 비트레이트(로그 눈금) 그래프에서 360p·540p·720p·1080p 네 곡선이 왼쪽부터 함께 그려지고, 각 지점에서 가장 높은 곡선을 잇는 강조색 굵은 선이 따라간다. 오른쪽 위 이름표가 윗선 540p에서 720p, 1080p로 바뀌고, 끝에서 곡선마다 해상도 이름이 붙는다",
+    "sha256": "a65a0e8d665311ae212a27f129006b2f3a512443096d84d6971dd0686312600b",
+    "bytes": 226506,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/abr-ladder-design-convex-hull-climb-poster.jpg",
+    "mobile": {
+      "sha256": "755c9addf54e8a302bda13c03c238918ad8e0db46b772d8f7f7c8d6f484ea4a7",
+      "bytes": 205129,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/abr-ladder-design-convex-hull-climb-mobile-poster.jpg"
+    }
+  },
   "aws-gcp-bidirectional-cutover-experiment-cutover-queue-pause": {
     "scene": "CutoverQueuePause",
     "alt": "트래픽 봇의 요청이 접수 큐를 거쳐 AWS 앱으로 흐르다가, 전환 중에는 앱으로 전달이 멈추고 요청이 접수 큐에 쌓이며, 전환이 끝나자 쌓인 요청부터 GCP 앱과 Cloud SQL 쪽으로 넘어가는 장면",
@@ -155,6 +181,58 @@
       "poster": "/images/dash-vs-hls-template-vs-reload-mobile-poster.jpg"
     }
   },
+  "ffmpeg-deep-dive-option-scope-override": {
+    "scene": "OptionScopeOverride",
+    "alt": "왼쪽 칸에서는 -b:v 3000k, -b:v 1500k, -b:v 600k 칩이 차례로 들어오며 앞의 두 칩이 취소선으로 덮이고, 720p·540p·360p 줄 모두 목표 600k가 되어 막대가 699kbps, 657kbps, 650kbps로 비슷하게 자란다. 오른쪽 칸에서는 -b:v:0 3000k, -b:v:1 1500k, -b:v:2 600k 칩이 각 화질에 걸려 막대가 3,118kbps, 1,581kbps, 650kbps로 갈라진다",
+    "sha256": "0a37821666712d8ab94165c1e9eadfd978eef5d7106840e2a6f923338533926e",
+    "bytes": 238612,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/ffmpeg-deep-dive-option-scope-override-poster.jpg",
+    "mobile": {
+      "sha256": "10ff4301a1ae6a705d0612dff730e7a4a3ee018311c5e1127b7ba31de888fc24",
+      "bytes": 197453,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/ffmpeg-deep-dive-option-scope-override-mobile-poster.jpg"
+    }
+  },
+  "ffmpeg-hls-dash-muxer-shared-segments": {
+    "scene": "SharedSegments",
+    "alt": "위 칸은 입력 20초가 x264 인코더 두 개로 나뉘어 HLS 조각 줄과 DASH 조각 줄에 2초 조각 10개씩, 모두 두 벌이 쌓이고 '인코더 2 · 조각 두 벌 15.1MB' 이름표가 뜬다. 아래 칸은 x264 인코더 하나가 조각 한 줄 10개를 쌓고, manifest.mpd와 media_0.m3u8 상자에서 같은 조각 줄로 화살표가 그려지며 '인코더 1 · 조각 한 벌 7.56MB' 이름표가 뜬다",
+    "sha256": "4108a93bf591238027903ecfee1f384953743f8e4a980760a18fd01261f5d104",
+    "bytes": 221976,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/ffmpeg-hls-dash-muxer-shared-segments-poster.jpg",
+    "mobile": {
+      "sha256": "fd0dfb5ad9e11f7c2020302e3c5cff3ed87fb3383b3a8dfab7cf32dde1f97962",
+      "bytes": 216190,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/ffmpeg-hls-dash-muxer-shared-segments-mobile-poster.jpg"
+    }
+  },
   "harness-session-isolation-worktree-root-session-state-split": {
     "scene": "SessionStateSplit",
     "alt": "위에 「세션 A · 워크트리 A」와 「세션 B · 워크트리 B」 상자가 있다. 두 세션에서 점이 하나씩 선을 따라 내려와 아래 「공유 상태 폴더 하나」에 나란히 앉고, 세션 A가 빨개지며 「B의 표식 때문에 종료 차단」이 뜬다. 이어 공유 폴더가 청록 「A의 상태」와 「B의 상태」 두 폴더로 갈라지고, 점이 각자 바로 아래 자기 폴더로 내려가며 「A의 표식만 읽음」과 맨 아래 회색 「전: 공유 폴더 하나 → A가 B의 표식 때문에 종료 차단」이 뜨는 장면",
@@ -231,6 +309,32 @@
       "audio": 0,
       "faststart": true,
       "poster": "/images/hls-just-files-playlist-slide-mobile-poster.jpg"
+    }
+  },
+  "live-transcoding-infrastructure-speed-below-realtime": {
+    "scene": "SpeedBelowRealtime",
+    "alt": "위에 0초부터 56초까지의 벽시계 축이 있고, 아래 동시 3개와 동시 6개 두 줄에 조각이 실시간이면 끝날 시각을 뜻하는 흐린 회색 눈금이 2초마다 있다. 재생점이 오른쪽으로 가면서 1080p 조각 칸이 실제 완성 시각에 하나씩 나타난다. 3개 줄은 눈금 바로 뒤를 따라가고, 6개 줄은 점점 오른쪽으로 밀린다. 끝에 speed 1.01 · 19번째 조각 0.5초 늦음, speed 0.75 · 19번째 조각 14.2초 늦음 이름표가 뜬다",
+    "sha256": "0a5e59e6af11c2980aa20bffb51b3c9377b0e2559932462aa3b3040a518b8f4c",
+    "bytes": 200429,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/live-transcoding-infrastructure-speed-below-realtime-poster.jpg",
+    "mobile": {
+      "sha256": "a5f4f348ecf5e8fb4dbc6810c4c79099773bcc4974929788fbc674402b35e182",
+      "bytes": 207210,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/live-transcoding-infrastructure-speed-below-realtime-mobile-poster.jpg"
     }
   },
   "ll-hls-deep-dive-blocking-part-flow": {
@@ -322,6 +426,32 @@
     "audio": 0,
     "faststart": true,
     "poster": "/images/multicloud-migration-film-poster.jpg"
+  },
+  "nvenc-gpu-transcoding-gpu-memory-path": {
+    "scene": "GpuMemoryPath",
+    "alt": "위쪽 GPU 상자 안에 NVDEC, GPU 메모리, scale_cuda, NVENC가 나란히 있다. 앞 절반에는 -hwaccel_output_format cuda 표시와 함께 점이 네 상자를 차례로 지나 GPU 안에서만 이동한다. 뒤 절반에는 그 옵션이 없다는 표시와 함께 GPU 메모리와 scale_cuda가 회색 점선이 되고, 점이 NVDEC에서 아래 시스템 메모리 상자로 내려갔다가 다시 NVENC로 올라간다. 경로에 GPU → CPU, CPU → GPU 이름표가 붙는다",
+    "sha256": "c5884c1afe01c5cb59ee4768a7cb5a7f4d841abb7f42a5260b97d522ff5e3937",
+    "bytes": 231491,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/nvenc-gpu-transcoding-gpu-memory-path-poster.jpg",
+    "mobile": {
+      "sha256": "76dd2600da22b19e02b29d14bdf64a27aecc28b2f2c368dea0b813277eb7b193",
+      "bytes": 249266,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/nvenc-gpu-transcoding-gpu-memory-path-mobile-poster.jpg"
+    }
   },
   "pokeclip-audio-assignment-user-state-auto-assign-restore": {
     "scene": "AutoAssignRestore",
@@ -1727,6 +1857,32 @@
       "audio": 0,
       "faststart": true,
       "poster": "/images/whip-whep-modern-ingest-whip-round-trips-mobile-poster.jpg"
+    }
+  },
+  "x264-live-rate-control-gop-vbv-buffer": {
+    "scene": "VbvBuffer",
+    "alt": "위아래 두 줄에 bufsize 750k와 bufsize 6,000k의 0.25초 구간 비트레이트 막대 40개가 왼쪽부터 차례로 서고, 3,000kbps 점선을 넘은 막대만 강조색으로 칠해진다. 위 줄의 최고 막대에 4,316, 아래 줄에 5,605 이름표가 뜨고, 오른쪽 세로 막대는 버퍼 수위가 큰 장면에서 내려갔다 다시 차는 모습을 보여 준다",
+    "sha256": "c32b3bb533f0e2c48c57da58ff4406bffe1d9d4063a4739645f01d196c5106c4",
+    "bytes": 144871,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/x264-live-rate-control-gop-vbv-buffer-poster.jpg",
+    "mobile": {
+      "sha256": "df44d91db6e34ed146f39327a89cc04375a2c1486c8637a83ab4c38edf771010",
+      "bytes": 141680,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/x264-live-rate-control-gop-vbv-buffer-mobile-poster.jpg"
     }
   }
 }
