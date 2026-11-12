@@ -1,7 +1,7 @@
 ---
 title: "Flash 없이도 방송 송출 주소가 rtmp로 시작하는 이유"
 date: 2026-06-20T03:09:07+09:00
-lastmod: "2026-11-12T14:14:56+09:00"
+lastmod: "2026-11-12T15:32:05+09:00"
 description: "Flash Player는 2020년 말 지원이 끝났지만 OBS 내장 서비스 84개 가운데 81개가 rtmp·rtmps 주소로 송출합니다. RTMP가 Flash 부속 규약에서 송출 입구가 된 경위, 핸드셰이크·connect·publish 순서, 청크 인터리빙, 트랙 번호가 없던 옛 사양과 Enhanced RTMP, OBS가 프레임을 버리는 기준, SRT·RIST·WHIP과 견줄 때 볼 것을 공식 사양과 OBS 소스로 확인했습니다."
 categories: ["tech-blurting"]
 tags: ["RTMP", "Enhanced RTMP", "OBS", "SRT", "WHIP", "라이브 송출"]
@@ -12,7 +12,7 @@ Adobe는 2020년 12월 31일 Flash Player 지원을 끝냈지만, OBS Studio 32.
 
 ## RTMP는 Flash Player와 서버가 메시지를 주고받던 규약이었습니다 {#1-rtmp는-영상-프로토콜이-아니라-flash-부속품이었다}
 
-RTMP(Real-Time Messaging Protocol)는 Macromedia가 Flash Player와 자기 서버를 잇는 데 쓴 규약입니다. 2002년 Macromedia는 Flash Communication Server MX를 내놓으면서 클라이언트 쪽 지원은 Flash Player 6에 이미 들어 있다고 밝혔습니다([MacTech, 2002-07-09](https://www.mactech.com/2002/07/09/macromedia-announces-flash-communication-server-mx/)). 이 서버가 뒤에 Flash Media Server가 됐고, Adobe는 2009년 1월 20일 RTMP 사양을 공개하겠다고 발표했습니다([Computerworld](https://www.computerworld.com/article/1578036/adobe-to-publish-streaming-specification.html)). 지금 읽을 수 있는 사양은 2012년 12월 21일 자 「Adobe's Real Time Messaging Protocol」입니다([Veovera 보관 사본](https://veovera.github.io/enhanced-rtmp/docs/legacy/rtmp-v1-0-spec.pdf)).
+RTMP(Real-Time Messaging Protocol)는 Macromedia가 Flash Player와 자기 서버를 잇는 데 쓴 규약입니다. 2002년 Macromedia는 Flash Communication Server MX를 내놓으면서 클라이언트 쪽 지원은 Flash Player 6에 이미 들어 있다고 밝혔습니다([MacTech, 2002-07-09](https://www.mactech.com/2002/07/09/macromedia-announces-flash-communication-server-mx/)). Enhanced RTMP 사양도 RTMP의 첫 공개 판을 2002년으로 적습니다([E-RTMP v1 문서](https://github.com/veovera/enhanced-rtmp/blob/main/docs/enhanced/enhanced-rtmp-v1.md)). Adobe는 2009년 1월 20일 RTMP 사양을 공개하겠다고 발표했고, 당시 기사는 RTMP를 Flash Media Server에서 콘텐츠를 보내려고 만든 규약으로 소개했습니다([Computerworld](https://www.computerworld.com/article/1578036/adobe-to-publish-streaming-specification.html)). 지금 읽을 수 있는 사양은 2012년 12월 21일 자 「Adobe's Real Time Messaging Protocol」입니다([Veovera 보관 사본](https://veovera.github.io/enhanced-rtmp/docs/legacy/rtmp-v1-0-spec.pdf)).
 
 사양은 RTMP를 영상 전용 규약이 아니라 「TCP 같은 신뢰성 있는 스트림 위에서 영상·오디오·데이터 메시지를 다중화하는 양방향 서비스」로 정의합니다(1절). 영상과 오디오도 메시지 종류 가운데 하나입니다. 메시지 종류 8은 오디오, 9는 영상, 20은 AMF0로 인코딩한 명령, 18은 메타데이터 같은 데이터 메시지입니다(7.1절). `connect`나 `publish` 같은 명령도 같은 연결 위로 원격 호출처럼 오갑니다.
 
@@ -20,7 +20,7 @@ Flash Player가 사라져도 이 규약이 쓸모를 잃지 않은 것은 양쪽
 
 ## 송출 주소는 앱 이름과 스트림 키로 나뉩니다 {#2-obs에서-본-그-url--구조-분해}
 
-OBS의 「서버」 칸에는 앱 이름까지 들어간 주소를, 「스트림 키」 칸에는 송출 이름을 넣습니다. OBS 32.0.0에 들어 있는 치지직(CHZZK) 항목은 아래 주소 하나와 H.264 코덱만 적어 둡니다.
+OBS의 「서버」 칸에는 앱 이름까지 들어간 주소를, 「스트림 키」 칸에는 송출 이름을 넣습니다. OBS 32.0.0에 들어 있는 치지직(CHZZK) 항목은 서버 주소 하나(아래)와 지원 코덱 H.264를 적고, 권장 설정으로 키프레임 간격 1초, B 프레임 0, 최대 60fps, 영상 최대 8,000kbps, 오디오 최대 192kbps, 해상도 `1920x1080`을 둡니다([services.json 2580–2605행](https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/rtmp-services/data/services.json#L2580-L2605)).
 
 ```text
 rtmp://global-rtmp.lip2.navercorp.com:8080/relay   + 스트림 키
@@ -28,15 +28,15 @@ rtmp://global-rtmp.lip2.navercorp.com:8080/relay   + 스트림 키
 규약              호스트                 포트   앱 이름
 ```
 
-OBS의 RTMP 출력은 서버 칸 주소를 RTMP 연결 주소로 넘기고, 스트림 키는 송출할 스트림 이름으로 따로 넘깁니다([rtmp-stream.c 1178·1206행](https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/obs-outputs/rtmp-stream.c#L1178-L1206)). 주소의 앱 이름은 `connect` 명령에, 스트림 키는 `publish` 명령의 이름 인자에 실립니다(사양 7.2.1.1·7.2.2.6절). 포트를 생략하면 1935를 씁니다. `rtmps://`는 같은 메시지를 TLS 연결 안에서 보냅니다. 같은 목록의 YouTube RTMPS 항목은 `rtmps://a.rtmps.youtube.com:443/live2`처럼 443 포트를 씁니다.
+OBS의 RTMP 출력은 서버 칸 주소를 RTMP 연결 주소로 넘기고, 스트림 키는 송출할 스트림 이름으로 따로 넘깁니다([rtmp-stream.c 1178·1206행](https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/obs-outputs/rtmp-stream.c#L1178-L1206)). 주소의 앱 이름은 `connect` 명령에, 스트림 키는 `publish` 명령의 이름 인자에 실립니다(사양 7.2.1.1·7.2.2.6절). OBS의 librtmp는 포트를 생략하면 `rtmp://`에 1935, `rtmps://`에 443을 씁니다([rtmp.c 715–723행](https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/obs-outputs/librtmp/rtmp.c#L715-L723)). `rtmps://`는 같은 메시지를 TLS 연결 안에서 보냅니다. 같은 목록의 YouTube RTMPS 항목은 `rtmps://a.rtmps.youtube.com:443/live2`처럼 443 포트를 씁니다.
 
 서버는 `publish` 이름으로 어느 채널의 송출인지 고르므로, 별도 인증이 없다면 스트림 키를 아는 사람은 같은 채널로 송출을 시작할 수 있습니다. SRT는 이 값을 streamid로, WHIP은 HTTP Bearer 토큰으로 넘깁니다. RFC 9725도 WHIP 토큰을 「RTMP 주소와 스트림 키를 나눠 주는 방식과 비슷하게」 나눠 줄 수 있다고 적었습니다([RFC 9725 4.7.1절](https://www.rfc-editor.org/rfc/rfc9725.html#section-4.7.1)).
 
 ## 첫 영상 메시지 전에 TCP·핸드셰이크·connect·publish를 차례로 거칩니다 {#3-obs-방송-시작-누르고-첫-프레임까지--135ms}
 
-RTMP 송출은 TCP 연결 위에서 핸드셰이크를 하고, 명령 세 개를 차례로 보낸 뒤 영상을 보냅니다. [[fig-rtmp-publish]]에서 송출기가 응답을 기다리는 지점이 몇 번인지 보면 됩니다.
+RTMP 송출은 TCP 연결 위에서 핸드셰이크를 하고, 명령 세 개를 차례로 보내 응답을 받은 뒤 영상을 보냅니다. [[fig-rtmp-publish]]에서 송출기가 응답을 기다리는 지점이 몇 번인지 보면 됩니다.
 
-```mermaid {#fig-rtmp-publish kind="개념도" caption="RTMP 송출이 첫 영상 메시지까지 거치는 순서. 핸드셰이크 C0·S0은 1바이트, C1·S1·C2·S2는 1,536바이트라 양쪽이 주고받는 바이트는 합쳐 6,146바이트입니다. connect 뒤 서버는 Window Acknowledgement Size와 Set Peer Bandwidth를 보내고, publish 뒤 onStatus로 송출 시작을 알립니다. Adobe RTMP 사양 5.2절과 7.3.1절 송출 흐름을 줄여 다시 그렸습니다." source="https://veovera.github.io/enhanced-rtmp/docs/legacy/rtmp-v1-0-spec.pdf"}
+```mermaid {#fig-rtmp-publish kind="개념도" caption="RTMP 송출이 첫 영상 메시지까지 거치는 순서. 핸드셰이크 C0·S0은 1바이트, C1·S1·C2·S2는 1,536바이트라 양쪽이 주고받는 바이트는 합쳐 6,146바이트입니다. connect 뒤 서버는 Window Acknowledgement Size와 Set Peer Bandwidth를 보내고, publish 뒤 onStatus(NetStream.Publish.Start)로 송출 시작을 알립니다. 그림은 OBS(librtmp)의 동작대로 publish 응답을 받은 뒤 미디어를 보냅니다. 사양 7.3.1절 예시는 응답 전에 오디오를 보내기도 합니다. Adobe RTMP 사양 5.2절·7.3.1절과 OBS librtmp RTMP_ConnectStream을 바탕으로 다시 그렸습니다." source="https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/obs-outputs/librtmp/rtmp.c#L1180-L1213"}
 %%{init: {"sequence": {"width": 96, "actorMargin": 16}}}%%
 sequenceDiagram
   accTitle: RTMP 송출 연결 순서
@@ -57,7 +57,7 @@ sequenceDiagram
   O->>S: 오디오 · 영상
 ```
 
-핸드셰이크에서 C0와 S0은 RTMP 버전 한 바이트(값 3)이고, C1·S1에는 시각 4바이트, 0 4바이트, 임의 바이트 1,528개가 들어갑니다. C2·S2는 상대의 C1·S1을 거의 그대로 되돌려 보내는 값입니다(5.2.2–5.2.4절). 송출기는 S1을 받아야 C2를 보내고, S2를 받아야 다른 데이터를 보낼 수 있습니다(5.2.1절). 그래서 TCP 연결, 핸드셰이크, `connect`, `createStream`까지 응답을 기다리는 왕복이 차례로 쌓입니다.
+핸드셰이크에서 C0와 S0은 RTMP 버전 한 바이트(값 3)이고, C1·S1에는 시각 4바이트, 0 4바이트, 임의 바이트 1,528개가 들어갑니다. C2·S2는 상대의 C1·S1을 거의 그대로 되돌려 보내는 값입니다(5.2.2–5.2.4절). 송출기는 S1을 받아야 C2를 보내고, S2를 받아야 다른 데이터를 보낼 수 있습니다(5.2.1절). OBS의 librtmp는 `publish`에 대한 응답(`NetStream.Publish.Start`)을 받은 뒤에야 미디어를 보냅니다([rtmp.c 1180–1213·3383–3386행](https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/obs-outputs/librtmp/rtmp.c#L1180-L1213)). 그래서 TCP 연결, 핸드셰이크, `connect`, `createStream`, `publish`까지 응답을 기다리는 왕복이 다섯 번 차례로 쌓입니다.
 
 `connect`는 앱 단위 연결(NetConnection)을 열고, `createStream`은 그 안에 메시지 스트림(NetStream) 하나를 만들어 번호를 받습니다. 사양상 한 연결에 스트림을 여럿 만들 수 있지만, 송출에서는 보통 스트림 하나를 엽니다. 이 순서에 걸리는 시간은 송출기와 서버 사이 왕복 시간(RTT)에 따라 달라집니다. 단계별 ms 값은 사양에 없고 따로 재지 않았습니다.
 
@@ -80,7 +80,7 @@ Veovera Software Organization이 정리한 Enhanced RTMP(E-RTMP)가 이 칸을 �
 | 판 | 확인한 문서 | 더한 것 |
 |---|---|---|
 | v1 | 2023-03-23 첫 베타, 2023-07-31 승인([v1 문서](https://github.com/veovera/enhanced-rtmp/blob/main/docs/enhanced/enhanced-rtmp-v1.md)) | FourCC로 HEVC · AV1 · VP9 신호, HDR 색 정보, 메타데이터 패킷 |
-| v2 | v2-2026-01-31-r2 정식판([v2 문서](https://github.com/veovera/enhanced-rtmp/blob/main/docs/enhanced/enhanced-rtmp-v2.md)) | 오디오 · 영상 멀티트랙, Opus · FLAC · AC-3 · E-AC-3, 다중 채널 오디오, 재연결 요청 |
+| v2 | 2024-03-17 알파, 2025-04-17 정식판(r1), 확인한 판은 2026-01-31 개정판 r2([v2 문서](https://github.com/veovera/enhanced-rtmp/blob/main/docs/enhanced/enhanced-rtmp-v2.md)) | 오디오 · 영상 멀티트랙, Opus · FLAC · AC-3 · E-AC-3, 다중 채널 오디오, 재연결 요청 |
 
 OBS는 29.1(2023-05-02)에서 Enhanced RTMP로 AV1·HEVC를 보내는 기능을 넣었고, 그때는 YouTube 베타에만 켜져 있었습니다([OBS 29.1 릴리스 노트](https://github.com/obsproject/obs-studio/releases/tag/29.1.0)). OBS 32.0.0의 YouTube RTMPS 항목에는 h264·hevc·av1이, 치지직과 Twitch 항목에는 h264만 적혀 있습니다. 사양에 칸이 생긴 것과 그 칸을 쓸 수 있는 것은 다릅니다. 송출기와 받는 서버가 모두 지원해야 새 코덱이나 멀티트랙이 실제로 오갑니다.
 
@@ -100,7 +100,7 @@ OBS에는 RTMP 말고도 송출 규약 셋이 들어왔습니다. 들어온 판�
 
 | 규약 | 전송 | OBS에 들어온 판 | 사양 | 암호화 |
 |---|---|---|---|---|
-| RTMP · E-RTMP | TCP | 처음부터, E-RTMP 코덱은 29.1(2023-05) | Adobe 사양(2012), E-RTMP v2(2026-01) | RTMPS(TLS)를 쓸 때 |
+| RTMP · E-RTMP | TCP | 처음부터, E-RTMP 코덱은 29.1(2023-05) | Adobe 사양(2012), E-RTMP v2(2025-04 정식) | RTMPS(TLS)를 쓸 때 |
 | SRT | UDP + 재전송 | [25.0](https://github.com/obsproject/obs-studio/releases/tag/25.0.0)(2020-03) | Haivision 오픈소스(2017), [인터넷 드래프트](https://datatracker.ietf.org/doc/draft-sharabayko-srt/)(만료) | passphrase를 줄 때 AES |
 | RIST | UDP + 재전송 | [27.2](https://github.com/obsproject/obs-studio/releases/tag/27.2.0)(2022-02) | VSF [TR-06-1 Simple Profile](https://static.vsf.tv/download/technical_recommendations/VSF_TR-06-1_2018_10_17.pdf)(2018-10) | OBS 29.0부터 설정 칸 |
 | WHIP | UDP(WebRTC) | [30.0](https://github.com/obsproject/obs-studio/releases/tag/30.0.0)(2023-11) | [RFC 9725](https://www.rfc-editor.org/rfc/rfc9725.html)(2025-03) | DTLS-SRTP 필수 |
@@ -124,11 +124,12 @@ RTMP를 다른 규약으로 바꿀지 고를 때 갈리는 질문은 「규약�
 
 - [Adobe's Real Time Messaging Protocol (2012-12-21), Veovera 보관 사본](https://veovera.github.io/enhanced-rtmp/docs/legacy/rtmp-v1-0-spec.pdf) — 1절 정의, 5.2절 핸드셰이크, 5.3·5.4.1절 청크, 7절 명령과 송출 흐름
 - [Adobe Flash Video File Format Specification 10.1, Veovera 보관 사본](https://veovera.github.io/enhanced-rtmp/docs/legacy/video-file-format-v10-1-spec.pdf) — E.4.2.1 AUDIODATA
-- [veovera/enhanced-rtmp](https://github.com/veovera/enhanced-rtmp) — [v1 문서](https://github.com/veovera/enhanced-rtmp/blob/main/docs/enhanced/enhanced-rtmp-v1.md), [v2 문서](https://github.com/veovera/enhanced-rtmp/blob/main/docs/enhanced/enhanced-rtmp-v2.md)(2026-11-12 확인)
+- [veovera/enhanced-rtmp](https://github.com/veovera/enhanced-rtmp) — [v1 문서](https://github.com/veovera/enhanced-rtmp/blob/main/docs/enhanced/enhanced-rtmp-v1.md), [v2 문서](https://github.com/veovera/enhanced-rtmp/blob/main/docs/enhanced/enhanced-rtmp-v2.md), [v2 커밋 기록](https://github.com/veovera/enhanced-rtmp/commits/main/docs/enhanced/enhanced-rtmp-v2.md)(2026-11-12 확인)
 - [MacTech, 「Macromedia announces Flash Communication Server MX」 (2002-07-09)](https://www.mactech.com/2002/07/09/macromedia-announces-flash-communication-server-mx/)
 - [Computerworld, 「Adobe to publish streaming specification」 (2009-01-20)](https://www.computerworld.com/article/1578036/adobe-to-publish-streaming-specification.html)
 - [Adobe, Flash Player EOL General Information](https://www.adobe.com/products/flashplayer/end-of-life.html)
 - [obsproject/obs-studio 32.0.0 `services.json`](https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/rtmp-services/data/services.json) — 서비스 84개의 주소와 코덱 목록(2026-11-12 집계)
+- [obsproject/obs-studio 32.0.0 `librtmp/rtmp.c`](https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/obs-outputs/librtmp/rtmp.c) — 기본 포트, publish 응답 뒤 미디어 시작
 - [obsproject/obs-studio 32.0.0 `rtmp-stream.c`](https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/obs-outputs/rtmp-stream.c) — 주소·키 전달, 청크 4,096바이트, 프레임 버림 기준 700·900ms, 동적 비트레이트
 - [obsproject/obs-studio 32.0.0 `OBSBasic.cpp`](https://github.com/obsproject/obs-studio/blob/32.0.0/frontend/widgets/OBSBasic.cpp#L792-L794) · [`obs-output.c`](https://github.com/obsproject/obs-studio/blob/32.0.0/libobs/obs-output.c#L2976-L2983) — 재연결 기본값과 대기 증가
 - OBS 릴리스 노트 [25.0](https://github.com/obsproject/obs-studio/releases/tag/25.0.0) · [27.2](https://github.com/obsproject/obs-studio/releases/tag/27.2.0) · [29.0](https://github.com/obsproject/obs-studio/releases/tag/29.0.0) · [29.1](https://github.com/obsproject/obs-studio/releases/tag/29.1.0) · [30.0](https://github.com/obsproject/obs-studio/releases/tag/30.0.0)
