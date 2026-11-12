@@ -2,7 +2,7 @@
 title: "FFmpeg로 읽는 라이브 미디어 파이프라인 — 입력부터 인코딩과 출력까지"
 date: 2026-06-21T04:18:25+09:00
 categories: ["tech-blurting"]
-lastmod: 2026-10-29T09:00:00+09:00
+lastmod: "2026-11-12T13:54:31+09:00"
 draft: false
 ---
 
@@ -1056,8 +1056,8 @@ demux → decode → filter → encode → mux 5단계 파이프라인입니다.
 대규모는 FFmpeg(인코딩) + Shaka Packager(패키징) 분리.
 독립 스케일링, DRM 통합, LL-HLS 완전 지원이 가능합니다.
 
-운영은 Kubernetes + jrottenberg/ffmpeg:nvidia 이미지로
-nvidia.com/gpu 자원 할당해서 NVENC 채널 관리했습니다."
+운영은 Kubernetes + jrottenberg/ffmpeg:nvidia 이미지에
+nvidia.com/gpu 자원을 할당해 NVENC 채널을 나누는 구성을 씁니다."
 ```
 
 ---
