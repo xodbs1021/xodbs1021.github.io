@@ -1,370 +1,142 @@
 ---
-title: "Flash는 2020년에 죽었는데 RTMP는 왜 안 죽나"
+title: "Flash 없이도 방송 송출 주소가 rtmp로 시작하는 이유"
 date: 2026-06-20T03:09:07+09:00
+lastmod: "2026-11-12T15:32:05+09:00"
+description: "Flash Player는 2020년 말 지원이 끝났지만 OBS 내장 서비스 84개 가운데 81개가 rtmp·rtmps 주소로 송출합니다. RTMP가 Flash 부속 규약에서 송출 입구가 된 경위, 핸드셰이크·connect·publish 순서, 청크 인터리빙, 트랙 번호가 없던 옛 사양과 Enhanced RTMP, OBS가 프레임을 버리는 기준, SRT·RIST·WHIP과 견줄 때 볼 것을 공식 사양과 OBS 소스로 확인했습니다."
 categories: ["tech-blurting"]
+tags: ["RTMP", "Enhanced RTMP", "OBS", "SRT", "WHIP", "라이브 송출"]
 draft: false
 ---
 
-OBS 켜본 사람은 다 알 거다. 방송 설정에 들어가면 "서버"와 "스트림 키"를 입력하라고 한다. 그 서버 주소가 `rtmp://`로 시작한다.
+Adobe는 2020년 12월 31일 Flash Player 지원을 끝냈지만, OBS Studio 32.0.0에 들어 있는 송출 서비스 84개 가운데 81개는 아직 `rtmp://`나 `rtmps://` 주소로 송출합니다([services.json](https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/rtmp-services/data/services.json)). RTMP는 Flash Player와 미디어 서버가 메시지를 주고받던 규약이었고, 사양이 공개된 뒤 Flash 없이 송출기와 서버 사이에 남았습니다. 「RTMP는 새 코덱과 여러 오디오 트랙을 못 싣는다」는 약점은 2023년 이후 Enhanced RTMP가 사양으로 메웠습니다. 남은 약점은 TCP 위에서 돈다는 점입니다. 망이 막히면 OBS의 송신 대기열이 차고, 쌓인 길이가 700ms를 넘으면 OBS가 프레임을 버립니다.
 
-2026년인데 왜 아직도 RTMP일까. 만든 회사(Adobe)는 Flash 지원을 2020년 12월에 공식 종료했고, Flash 자체는 진작에 죽었는데.
+## RTMP는 Flash Player와 서버가 메시지를 주고받던 규약이었습니다 {#1-rtmp는-영상-프로토콜이-아니라-flash-부속품이었다}
 
-치지직, 트위치, 유튜브 라이브 — 다 RTMP로 받는다. 이번 글은 [지난 글](../cdn-for-live-streaming/)에 이어, 1996년 Flash 시대에 태어난 프로토콜이 왜 30년이 지나도 안 죽는지 정리한 노트다.
+RTMP(Real-Time Messaging Protocol)는 Macromedia가 Flash Player와 자기 서버를 잇는 데 쓴 규약입니다. 2002년 Macromedia는 Flash Communication Server MX를 내놓으면서 클라이언트 쪽 지원은 Flash Player 6에 이미 들어 있다고 밝혔습니다([MacTech, 2002-07-09](https://www.mactech.com/2002/07/09/macromedia-announces-flash-communication-server-mx/)). Enhanced RTMP 사양도 RTMP의 첫 공개 판을 2002년으로 적습니다([E-RTMP v1 문서](https://github.com/veovera/enhanced-rtmp/blob/main/docs/enhanced/enhanced-rtmp-v1.md)). Adobe는 2009년 1월 20일 RTMP 사양을 공개하겠다고 발표했고, 당시 기사는 RTMP를 Flash Media Server에서 콘텐츠를 보내려고 만든 규약으로 소개했습니다([Computerworld](https://www.computerworld.com/article/1578036/adobe-to-publish-streaming-specification.html)). 지금 읽을 수 있는 사양은 2012년 12월 21일 자 「Adobe's Real Time Messaging Protocol」입니다([Veovera 보관 사본](https://veovera.github.io/enhanced-rtmp/docs/legacy/rtmp-v1-0-spec.pdf)).
 
----
+사양은 RTMP를 영상 전용 규약이 아니라 「TCP 같은 신뢰성 있는 스트림 위에서 영상·오디오·데이터 메시지를 다중화하는 양방향 서비스」로 정의합니다(1절). 영상과 오디오도 메시지 종류 가운데 하나입니다. 메시지 종류 8은 오디오, 9는 영상, 20은 AMF0로 인코딩한 명령, 18은 메타데이터 같은 데이터 메시지입니다(7.1절). `connect`나 `publish` 같은 명령도 같은 연결 위로 원격 호출처럼 오갑니다.
 
-## 1. RTMP는 영상 프로토콜이 아니라 Flash 부속품이었다
+Flash Player가 사라져도 이 규약이 쓸모를 잃지 않은 것은 양쪽 끝이 Flash에 묶여 있지 않았기 때문입니다. 송출기는 메시지를 보내기만 하면 되고, 서버는 받은 메시지를 다른 형식으로 다시 묶으면 됩니다. Adobe는 2021년 1월 12일부터 Flash Player에서 Flash 콘텐츠 실행을 막았지만([Adobe](https://www.adobe.com/products/flashplayer/end-of-life.html)), 송출기와 서버 사이의 RTMP는 그 차단과 상관이 없었습니다.
 
-RTMP를 이해하려면 1990년대 후반 인터넷이 어땠는지 알아야 한다.
+## 송출 주소는 앱 이름과 스트림 키로 나뉩니다 {#2-obs에서-본-그-url--구조-분해}
 
-![1996년 Flash 시대](/images/flash-era-streaming.png)
+OBS의 「서버」 칸에는 앱 이름까지 들어간 주소를, 「스트림 키」 칸에는 송출 이름을 넣습니다. OBS 32.0.0에 들어 있는 치지직(CHZZK) 항목은 서버 주소 하나(아래)와 지원 코덱 H.264를 적고, 권장 설정으로 키프레임 간격 1초, B 프레임 0, 최대 60fps, 영상 최대 8,000kbps, 오디오 최대 192kbps, 해상도 `1920x1080`을 둡니다([services.json 2580–2605행](https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/rtmp-services/data/services.json#L2580-L2605)).
 
-```
-1996년 인터넷 환경:
-- 평균 대역폭: 56 Kbps 다이얼업 모뎀
-- 브라우저: 넷스케이프 네비게이터
-- HTML5? 없음
-- JavaScript? 매우 제한적
-- 영상 코덱? 없음
+```text
+rtmp://global-rtmp.lip2.navercorp.com:8080/relay   + 스트림 키
+└─┬─┘ └──────────────┬──────────────┘ └─┬─┘ └─┬─┘
+규약              호스트                 포트   앱 이름
 ```
 
-웹에서 영상을 보여줄 방법이 사실상 없었다. 영상 파일을 받아서 RealPlayer나 Windows Media Player로 봤다. **웹과 영상이 분리돼 있던 시대**.
+OBS의 RTMP 출력은 서버 칸 주소를 RTMP 연결 주소로 넘기고, 스트림 키는 송출할 스트림 이름으로 따로 넘깁니다([rtmp-stream.c 1178·1206행](https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/obs-outputs/rtmp-stream.c#L1178-L1206)). 주소의 앱 이름은 `connect` 명령에, 스트림 키는 `publish` 명령의 이름 인자에 실립니다(사양 7.2.1.1·7.2.2.6절). OBS의 librtmp는 포트를 생략하면 `rtmp://`에 1935, `rtmps://`에 443을 씁니다([rtmp.c 715–723행](https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/obs-outputs/librtmp/rtmp.c#L715-L723)). `rtmps://`는 같은 메시지를 TLS 연결 안에서 보냅니다. 같은 목록의 YouTube RTMPS 항목은 `rtmps://a.rtmps.youtube.com:443/live2`처럼 443 포트를 씁니다.
 
-이때 등장한 게 **Macromedia Flash** (1996년). 원래는 애니메이션 도구였는데 2002년 Flash MX부터 영상 재생 기능이 들어갔다.
+서버는 `publish` 이름으로 어느 채널의 송출인지 고르므로, 별도 인증이 없다면 스트림 키를 아는 사람은 같은 채널로 송출을 시작할 수 있습니다. SRT는 이 값을 streamid로, WHIP은 HTTP Bearer 토큰으로 넘깁니다. RFC 9725도 WHIP 토큰을 「RTMP 주소와 스트림 키를 나눠 주는 방식과 비슷하게」 나눠 줄 수 있다고 적었습니다([RFC 9725 4.7.1절](https://www.rfc-editor.org/rfc/rfc9725.html#section-4.7.1)).
 
-장점이 강력했다.
-- 모든 브라우저 동일 동작 (Flash Player만 설치하면 끝)
-- 운영체제 무관 (Windows, Mac, Linux 다 됨)
-- DRM 지원
+## 첫 영상 메시지 전에 TCP·핸드셰이크·connect·publish를 차례로 거칩니다 {#3-obs-방송-시작-누르고-첫-프레임까지--135ms}
 
-2005년 유튜브가 출범하면서 Flash가 인터넷 영상 표준이 됐다.
+RTMP 송출은 TCP 연결 위에서 핸드셰이크를 하고, 명령 세 개를 차례로 보내 응답을 받은 뒤 영상을 보냅니다. [[fig-rtmp-publish]]에서 송출기가 응답을 기다리는 지점이 몇 번인지 보면 됩니다.
 
-### RTMP의 진짜 정체 — Flash Media Server 전용 통신
-
-Flash Player가 영상을 받으려면 프로토콜이 필요했다. Macromedia(나중에 Adobe 인수)가 만든 게 **RTMP (Real-Time Messaging Protocol)**.
-
-```
-2002년 RTMP 1.0 출시
-- 목적: Flash Player ↔ Flash Media Server 통신
-- 전송 단위: 메시지 (Message)
-- 기반: TCP 포트 1935
-```
-
-처음엔 폐쇄적 프로토콜. Adobe Flash Media Server를 사야만 쓸 수 있었다. **2009년에 Adobe가 스펙을 공개**하면서 오픈소스 RTMP 서버들이 나왔다 (nginx-rtmp-module, SRS, OvenMediaEngine 등).
-
-이 시점이 결정적이다. 마침 트위치/저스틴TV가 라이브 스트리밍을 띄우던 시기였고, 공개된 RTMP가 그 인프라의 기반이 됐다.
-
----
-
-## 2. OBS에서 본 그 URL — 구조 분해
-
-방송 설정 화면에서 본 적 있는 그 주소.
-
-![RTMP URL 구조 분해](/images/rtmp-url-structure.png)
-
-```
-rtmp://rtmp.chzzk.naver.com/live/abcd-1234-efgh
-└┬─┘ └─────────┬─────────┘ └┬┘ └────────┬────────┘
-프로토콜    호스트         앱     스트림 키
+```mermaid {#fig-rtmp-publish kind="개념도" caption="RTMP 송출이 첫 영상 메시지까지 거치는 순서. 핸드셰이크 C0·S0은 1바이트, C1·S1·C2·S2는 1,536바이트라 양쪽이 주고받는 바이트는 합쳐 6,146바이트입니다. connect 뒤 서버는 Window Acknowledgement Size와 Set Peer Bandwidth를 보내고, publish 뒤 onStatus(NetStream.Publish.Start)로 송출 시작을 알립니다. 그림은 OBS(librtmp)의 동작대로 publish 응답을 받은 뒤 미디어를 보냅니다. 사양 7.3.1절 예시는 응답 전에 오디오를 보내기도 합니다. Adobe RTMP 사양 5.2절·7.3.1절과 OBS librtmp RTMP_ConnectStream을 바탕으로 다시 그렸습니다." source="https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/obs-outputs/librtmp/rtmp.c#L1180-L1213"}
+%%{init: {"sequence": {"width": 96, "actorMargin": 16}}}%%
+sequenceDiagram
+  accTitle: RTMP 송출 연결 순서
+  accDescr: TCP 연결 뒤 송출기가 C0와 C1을 보내고 서버가 S0, S1, S2로 답한 다음 송출기가 C2를 보낸다. 이어 connect, createStream, publish 명령을 차례로 보내고 응답을 받은 뒤 오디오와 영상 메시지를 보낸다.
+  participant O as OBS
+  participant S as 서버
+  O->>S: TCP 연결
+  O->>S: C0 + C1
+  S->>O: S0 + S1 + S2
+  O->>S: C2
+  O->>S: connect(앱 이름)
+  S->>O: 창 크기 · 대역 설정
+  S->>O: _result
+  O->>S: createStream
+  S->>O: _result(id)
+  O->>S: publish(키)
+  S->>O: onStatus
+  O->>S: 오디오 · 영상
 ```
 
-각 부분의 역할.
+핸드셰이크에서 C0와 S0은 RTMP 버전 한 바이트(값 3)이고, C1·S1에는 시각 4바이트, 0 4바이트, 임의 바이트 1,528개가 들어갑니다. C2·S2는 상대의 C1·S1을 거의 그대로 되돌려 보내는 값입니다(5.2.2–5.2.4절). 송출기는 S1을 받아야 C2를 보내고, S2를 받아야 다른 데이터를 보낼 수 있습니다(5.2.1절). OBS의 librtmp는 `publish`에 대한 응답(`NetStream.Publish.Start`)을 받은 뒤에야 미디어를 보냅니다([rtmp.c 1180–1213·3383–3386행](https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/obs-outputs/librtmp/rtmp.c#L1180-L1213)). 그래서 TCP 연결, 핸드셰이크, `connect`, `createStream`, `publish`까지 응답을 기다리는 왕복이 다섯 번 차례로 쌓입니다.
 
-**프로토콜**: `rtmp` / `rtmps` / `rtmpt`
-- `rtmps`: TLS 암호화 (RTMP over TLS, 포트 443)
-- `rtmpt`: HTTP 80 터널링 (회사 방화벽 우회)
+`connect`는 앱 단위 연결(NetConnection)을 열고, `createStream`은 그 안에 메시지 스트림(NetStream) 하나를 만들어 번호를 받습니다. 사양상 한 연결에 스트림을 여럿 만들 수 있지만, 송출에서는 보통 스트림 하나를 엽니다. 이 순서에 걸리는 시간은 송출기와 서버 사이 왕복 시간(RTT)에 따라 달라집니다. 단계별 ms 값은 사양에 없고 따로 재지 않았습니다.
 
-**호스트**: 서버 주소. 포트 생략 시 1935.
+## 큰 영상 메시지는 청크로 쪼개 제어 메시지와 섞어 보냅니다 {#4-메시지--청크--rtmp의-인터리빙}
 
-**앱 (Application)**: 서버 안의 논리적 공간. `live`, `vod`, `chat` 같은 이름. 같은 서버에서 여러 용도를 구분.
+RTMP는 메시지를 청크(chunk)라는 조각으로 나눠 보냅니다. 청크마다 청크 스트림 번호가 붙어 있어, 받는 쪽은 번호별로 조각을 모아 메시지를 다시 만듭니다(5.3절). 사양은 이유를 「영상처럼 크고 우선순위가 낮은 메시지가 오디오나 제어처럼 작고 우선순위가 높은 메시지를 막지 않게」라고 적습니다. 최대 청크 크기는 기본 128바이트이고, 어느 쪽이든 Set Chunk Size 메시지로 바꿀 수 있습니다(5.4.1절). OBS는 보내는 청크 크기를 4,096바이트로 올립니다([rtmp-stream.c 1208행](https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/obs-outputs/rtmp-stream.c#L1208)).
 
-**스트림 키**: 어떤 스트림인지 식별. **동시에 같은 키로 송출하면 충돌**. 보통 인증 토큰 역할도 함.
+영상에서 위 줄은 영상 메시지를 통째로 보낼 때, 아래 줄은 청크로 쪼갤 때입니다. 작은 오디오·제어 칸이 언제 도착하는지 보십시오.
 
-치지직에서 방송 시작할 때 발급받은 스트림 키가 곧 인증 수단이다. 누군가에게 알려주면 그 사람이 내 채널에 송출할 수 있다. 유출되면 큰일 난다.
+{{< motion scene="ChunkInterleave" id="fig-chunks" kind="개념도" caption="영상 메시지를 통째로 보내면 오디오와 제어 메시지가 그 뒤에서 기다립니다. 청크로 쪼개면 영상 청크 사이에 끼어 먼저 도착하고, 받는 쪽은 청크를 다시 한 메시지로 합칩니다. 청크 수와 끼어드는 위치는 설명용 배치입니다." >}}
 
----
+청크가 푸는 것은 응용 계층의 줄 서기입니다. 청크는 결국 TCP 연결 하나로 나가므로, TCP 세그먼트 하나를 잃으면 뒤에 온 바이트는 재전송이 올 때까지 응용으로 올라가지 못합니다. 이 머리 막힘(head-of-line blocking)은 청크로 풀리지 않습니다. SRT와 WebRTC가 UDP 위에서 재전송을 따로 설계한 이유가 여기에 있습니다.
 
-## 3. OBS "방송 시작" 누르고 첫 프레임까지 — 135ms
+## 옛 RTMP에는 트랙 번호가 없었고 Enhanced RTMP가 그 칸을 더했습니다 {#audio-message에-트랙-id가-없다--멀티-오디오-불가의-진짜-이유}
 
-OBS의 "방송 시작" 버튼을 누르고 실제 데이터가 흐르기까지 무슨 일이 벌어지나.
+옛 RTMP의 오디오 메시지 본문은 FLV의 AUDIODATA 형식입니다. 머리에는 코덱(SoundFormat), 표본률(SoundRate), 표본 크기(SoundSize), 모노·스테레오(SoundType)만 있고 트랙 번호 칸이 없습니다([FLV 사양 10.1, E.4.2.1절](https://veovera.github.io/enhanced-rtmp/docs/legacy/video-file-format-v10-1-spec.pdf)). 영상 코덱 번호에도 HEVC와 AV1이 없었습니다. 그래서 「RTMP로는 오디오를 여러 트랙으로 못 보내고 새 코덱도 못 쓴다」는 말이 오래 맞았습니다.
 
-![RTMP 연결 시퀀스](/images/rtmp-connection-sequence.png)
+Veovera Software Organization이 정리한 Enhanced RTMP(E-RTMP)가 이 칸을 더했습니다([veovera/enhanced-rtmp](https://github.com/veovera/enhanced-rtmp)).
 
-5단계의 핸드셰이크가 순차적으로 일어난다.
+| 판 | 확인한 문서 | 더한 것 |
+|---|---|---|
+| v1 | 2023-03-23 첫 베타, 2023-07-31 승인([v1 문서](https://github.com/veovera/enhanced-rtmp/blob/main/docs/enhanced/enhanced-rtmp-v1.md)) | FourCC로 HEVC · AV1 · VP9 신호, HDR 색 정보, 메타데이터 패킷 |
+| v2 | 2024-03-17 알파, 2025-04-17 정식판(r1), 확인한 판은 2026-01-31 개정판 r2([v2 문서](https://github.com/veovera/enhanced-rtmp/blob/main/docs/enhanced/enhanced-rtmp-v2.md)) | 오디오 · 영상 멀티트랙, Opus · FLAC · AC-3 · E-AC-3, 다중 채널 오디오, 재연결 요청 |
 
-**1단계: TCP 연결** (~30ms)
-```
-OBS → 서버: SYN → SYN-ACK → ACK
-```
+OBS는 29.1(2023-05-02)에서 Enhanced RTMP로 AV1·HEVC를 보내는 기능을 넣었고, 그때는 YouTube 베타에만 켜져 있었습니다([OBS 29.1 릴리스 노트](https://github.com/obsproject/obs-studio/releases/tag/29.1.0)). OBS 32.0.0의 YouTube RTMPS 항목에는 h264·hevc·av1이, 치지직과 Twitch 항목에는 h264만 적혀 있습니다. 사양에 칸이 생긴 것과 그 칸을 쓸 수 있는 것은 다릅니다. 송출기와 받는 서버가 모두 지원해야 새 코덱이나 멀티트랙이 실제로 오갑니다.
 
-**2단계: RTMP Handshake** (~45ms)
-```
-OBS → 서버: C0+C1 (1537 byte)
-서버 → OBS: S0+S1+S2 (3073 byte)
-OBS → 서버: C2 (1536 byte)
-```
-총 9KB 데이터 교환. 버전 호환 + 타임스탬프 동기화 + 랜덤 데이터 신원 확인.
+PokeClip은 본방은 그대로 RTMP로 치지직에 보내고, 오디오 6트랙은 같은 영상 인코더를 나눠 쓰는 별도 SRT 출력(안은 MPEG-TS)으로 받습니다. 트랙 구성은 [6트랙 입력 계약 글](/posts/0-to-1/pokeclip-six-track-input-contract/), 송출 구조는 [본방 인코더 공유 글](/posts/0-to-1/pokeclip-obs-shared-encoder-srt/)에 있습니다.
 
-**3단계: NetConnection** (~30ms)
-```
-OBS → 서버: connect("live")
-서버 → OBS: _result (Window Ack Size, Set Peer BW)
-```
+## 네트워크가 느리면 OBS 송신 버퍼가 차고 프레임을 버립니다 {#5-obs-빨간-경고의-정체--send-buffer-가득-참}
 
-**4단계: NetStream** (~30ms)
-```
-OBS → 서버: createStream()
-서버 → OBS: _result (streamId = 1)
-OBS → 서버: publish("abcd-1234-efgh", "live")
-서버 → OBS: onStatus (NetStream.Publish.Start)
-```
+OBS의 RTMP 출력은 인코더가 만든 패킷을 대기열에 넣고, 소켓으로 보낼 수 있을 때 꺼내 보냅니다. 영상 패킷이 들어올 때마다 대기열 맨 앞 영상과 맨 뒤 영상의 디코딩 시각 차이를 잽니다. 이 차이가 기본 700ms를 넘으면 버려도 되는 낮은 우선순위 프레임을, 900ms를 넘으면 P 프레임까지 대기열에서 지웁니다. 오디오 패킷과 키프레임은 지우지 않습니다([rtmp-stream.c 1421–1449·1566–1630·1719–1720행](https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/obs-outputs/rtmp-stream.c#L1566-L1630)). OBS 통계 창의 「손실된 프레임 (네트워크)」이 이렇게 버린 수입니다([ko-KR 번역 231행](https://github.com/obsproject/obs-studio/blob/32.0.0/frontend/data/locale/ko-KR.ini#L231)).
 
-**5단계: 영상 송출**
-```
-OBS → 서버: Video Message (계속)
-OBS → 서버: Audio Message (계속)
-```
+고급 설정에서 동적 비트레이트를 켜면 프레임을 지우는 대신, 대기열이 200ms를 넘을 때 인코더 비트레이트를 낮춥니다(같은 파일 43행, 1608–1625행). 어느 쪽이든 원인은 송출기 업로드가 인코더 비트레이트를 따라가지 못하는 것이고, 고치는 길은 비트레이트를 낮추거나 업로드 경로를 바꾸는 것입니다.
 
-총 ~135ms. **이래서 OBS의 "방송 시작"이 즉시 안 보이고 잠깐 텀이 있다.**
+연결이 끊기면 OBS 기본 설정은 자동 재연결을 켜 두고, 첫 재시도까지 2초를 기다리며 최대 25번 시도합니다([OBSBasic.cpp 792–794행](https://github.com/obsproject/obs-studio/blob/32.0.0/frontend/widgets/OBSBasic.cpp#L792-L794)). 재시도마다 대기 시간이 약 1.5배씩 늘고 15분에서 멈춥니다([obs-output.c 32–33·2976–2983행](https://github.com/obsproject/obs-studio/blob/32.0.0/libobs/obs-output.c#L2976-L2983)). 다시 붙을 때는 TCP 연결과 핸드셰이크부터 다시 합니다. 끊긴 동안 시청자 화면이 어떻게 보이고 플랫폼이 몇 초 뒤 방송을 끝내는지는 플랫폼마다 다르며 확인하지 않았습니다.
 
-### NetConnection vs NetStream — 두 단계로 나뉜 이유
+## SRT·WHIP·RIST가 있어도 플랫폼 입구는 RTMP에 남았습니다 {#7-대체-후보들--그런데-왜-안-갈아탔나}
 
-RTMP는 연결을 두 계층으로 나눈다.
+OBS에는 RTMP 말고도 송출 규약 셋이 들어왔습니다. 들어온 판과 날짜는 각 릴리스 노트로 확인했습니다.
 
-```
-[NetConnection: rtmp://chzzk/live]
-    │
-    ├── NetStream 1: 메인 방송 (1080p60)
-    ├── NetStream 2: 백업 (720p30)
-    └── NetStream 3: 채팅 메타데이터
-```
+| 규약 | 전송 | OBS에 들어온 판 | 사양 | 암호화 |
+|---|---|---|---|---|
+| RTMP · E-RTMP | TCP | 처음부터, E-RTMP 코덱은 29.1(2023-05) | Adobe 사양(2012), E-RTMP v2(2025-04 정식) | RTMPS(TLS)를 쓸 때 |
+| SRT | UDP + 재전송 | [25.0](https://github.com/obsproject/obs-studio/releases/tag/25.0.0)(2020-03) | Haivision 오픈소스(2017), [인터넷 드래프트](https://datatracker.ietf.org/doc/draft-sharabayko-srt/)(만료) | passphrase를 줄 때 AES |
+| RIST | UDP + 재전송 | [27.2](https://github.com/obsproject/obs-studio/releases/tag/27.2.0)(2022-02) | VSF [TR-06-1 Simple Profile](https://static.vsf.tv/download/technical_recommendations/VSF_TR-06-1_2018_10_17.pdf)(2018-10) | OBS 29.0부터 설정 칸 |
+| WHIP | UDP(WebRTC) | [30.0](https://github.com/obsproject/obs-studio/releases/tag/30.0.0)(2023-11) | [RFC 9725](https://www.rfc-editor.org/rfc/rfc9725.html)(2025-03) | DTLS-SRTP 필수 |
 
-이론적으로 한 연결에서 여러 스트림 동시 가능. 실제로는 OBS가 1:1로 단순화해서 쓴다.
+SRT는 Haivision이 만들어 2017년 4월 오픈소스로 공개했습니다. 받는 쪽이 정해 둔 시간(latency) 안에서만 재전송을 기다리고, 그 시간을 넘긴 패킷은 건너뜁니다. 자세한 동작은 [SRT latency 글](/posts/tech-blurting/srt-broadcaster-protocol/)에 있습니다. RIST(Reliable Internet Stream Transport)는 방송 업계 단체 VSF(Video Services Forum)의 RIST 활동 그룹이 만든 사양으로, RTP로 나르는 MPEG-TS에 재전송을 더합니다. OBS 29.0은 SRT와 RIST 출력에 암호화·인증 설정을 더했습니다([릴리스 노트](https://github.com/obsproject/obs-studio/releases/tag/29.0.0)). WHIP은 WebRTC 송출 세션을 HTTP 요청 하나로 여는 IETF 표준이고, [WHIP 글](/posts/tech-blurting/whip-whep-modern-ingest/)에서 따로 다룹니다.
 
----
+그래도 플랫폼 입구는 바뀌지 않았습니다. OBS 32.0.0 서비스 목록 84개 가운데 rtmp만 쓰는 항목이 69개, rtmps만 6개, 둘 다 6개이고, 나머지 3개는 HTTPS 주소입니다. 목록에 SRT·RIST·WHIP 주소로 등록된 서비스는 없습니다. 방송자가 다른 규약을 쓰려면 「사용자 지정」 서비스에 받는 쪽이 따로 알려 준 주소를 넣어야 합니다.
 
-## 4. 메시지 + 청크 — RTMP의 인터리빙
+## 바꿀지 판단할 때는 코덱보다 송출기 기본값을 봅니다 {#8-rtmp가-안-죽는-진짜-이유--생태계-관성}
 
-RTMP가 HLS와 근본적으로 다른 점: **메시지 기반**.
+RTMP를 다른 규약으로 바꿀지 고를 때 갈리는 질문은 「규약이 무엇을 할 수 있나」보다 「받는 쪽과 송출기가 지금 무엇을 기본으로 받아 주나」입니다. 자주 섞이는 오해는 아래와 같습니다.
 
-HLS는 파일 단위. RTMP는 메시지 단위.
+- **「RTMP는 HEVC·AV1·여러 오디오 트랙을 못 싣는다」** — 옛 사양 기준으로만 맞습니다. Enhanced RTMP v1이 새 코덱을, v2가 멀티트랙을 더했습니다. 쓸 수 있는지는 받는 서비스의 지원 목록에 달렸고, OBS 서비스 목록의 코덱 칸이 첫 확인 지점입니다.
+- **「청크 인터리빙이 있으니 RTMP에는 머리 막힘이 없다」** — 응용 계층의 큰 메시지 막힘만 풉니다. TCP의 손실 재전송 대기는 그대로입니다.
+- **「SRT로 바꾸면 기본으로 암호화된다」** — libsrt는 passphrase를 설정했을 때만 암호화를 켭니다([SRTO_PASSPHRASE](https://github.com/Haivision/srt/blob/v1.5.3/docs/API/API-socket-options.md#SRTO_PASSPHRASE)). RTMP도 RTMPS를 써야 TLS가 걸립니다.
+- **「프레임이 버려지면 인코더가 느린 것이다」** — 「손실된 프레임 (네트워크)」은 송신 대기열이 700ms를 넘었다는 뜻입니다. 인코딩이 밀려 건너뛴 프레임은 OBS가 따로 셉니다.
 
-```
-RTMP 메시지 종류:
-- Set Chunk Size
-- Acknowledgement
-- User Control (play, pause, seek)
-- Window Acknowledgement Size
-- Set Peer Bandwidth
-- Audio Message (오디오 데이터)
-- Video Message (비디오 데이터)
-- Data Message (메타데이터)
-- Command Message (RPC - 함수 호출)
-```
+망 손실이 잦은 구간을 지나야 하거나 오디오를 트랙별로 남겨야 한다면, 받는 쪽이 SRT나 E-RTMP 멀티트랙을 받는지부터 확인하십시오. 그런 요구가 없고 받는 서비스가 RTMP만 받는다면, 송출 규약보다 업로드 대역과 비트레이트가 먼저 볼 곳입니다.
 
-**영상/오디오 데이터도 메시지 중 하나일 뿐**. RTMP는 본질적으로 양방향 RPC 프로토콜이다.
+## 출처
 
-### Chunk Stream — 큰 메시지가 작은 메시지를 막지 않게
+- [Adobe's Real Time Messaging Protocol (2012-12-21), Veovera 보관 사본](https://veovera.github.io/enhanced-rtmp/docs/legacy/rtmp-v1-0-spec.pdf) — 1절 정의, 5.2절 핸드셰이크, 5.3·5.4.1절 청크, 7절 명령과 송출 흐름
+- [Adobe Flash Video File Format Specification 10.1, Veovera 보관 사본](https://veovera.github.io/enhanced-rtmp/docs/legacy/video-file-format-v10-1-spec.pdf) — E.4.2.1 AUDIODATA
+- [veovera/enhanced-rtmp](https://github.com/veovera/enhanced-rtmp) — [v1 문서](https://github.com/veovera/enhanced-rtmp/blob/main/docs/enhanced/enhanced-rtmp-v1.md), [v2 문서](https://github.com/veovera/enhanced-rtmp/blob/main/docs/enhanced/enhanced-rtmp-v2.md), [v2 커밋 기록](https://github.com/veovera/enhanced-rtmp/commits/main/docs/enhanced/enhanced-rtmp-v2.md)(2026-11-12 확인)
+- [MacTech, 「Macromedia announces Flash Communication Server MX」 (2002-07-09)](https://www.mactech.com/2002/07/09/macromedia-announces-flash-communication-server-mx/)
+- [Computerworld, 「Adobe to publish streaming specification」 (2009-01-20)](https://www.computerworld.com/article/1578036/adobe-to-publish-streaming-specification.html)
+- [Adobe, Flash Player EOL General Information](https://www.adobe.com/products/flashplayer/end-of-life.html)
+- [obsproject/obs-studio 32.0.0 `services.json`](https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/rtmp-services/data/services.json) — 서비스 84개의 주소와 코덱 목록(2026-11-12 집계)
+- [obsproject/obs-studio 32.0.0 `librtmp/rtmp.c`](https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/obs-outputs/librtmp/rtmp.c) — 기본 포트, publish 응답 뒤 미디어 시작
+- [obsproject/obs-studio 32.0.0 `rtmp-stream.c`](https://github.com/obsproject/obs-studio/blob/32.0.0/plugins/obs-outputs/rtmp-stream.c) — 주소·키 전달, 청크 4,096바이트, 프레임 버림 기준 700·900ms, 동적 비트레이트
+- [obsproject/obs-studio 32.0.0 `OBSBasic.cpp`](https://github.com/obsproject/obs-studio/blob/32.0.0/frontend/widgets/OBSBasic.cpp#L792-L794) · [`obs-output.c`](https://github.com/obsproject/obs-studio/blob/32.0.0/libobs/obs-output.c#L2976-L2983) — 재연결 기본값과 대기 증가
+- OBS 릴리스 노트 [25.0](https://github.com/obsproject/obs-studio/releases/tag/25.0.0) · [27.2](https://github.com/obsproject/obs-studio/releases/tag/27.2.0) · [29.0](https://github.com/obsproject/obs-studio/releases/tag/29.0.0) · [29.1](https://github.com/obsproject/obs-studio/releases/tag/29.1.0) · [30.0](https://github.com/obsproject/obs-studio/releases/tag/30.0.0)
+- [RFC 9725: WebRTC-HTTP Ingestion Protocol (WHIP)](https://www.rfc-editor.org/rfc/rfc9725.html) (2025-03)
+- [Haivision/srt v1.5.3 API 소켓 옵션](https://github.com/Haivision/srt/blob/v1.5.3/docs/API/API-socket-options.md)
+- [draft-sharabayko-srt (datatracker)](https://datatracker.ietf.org/doc/draft-sharabayko-srt/)
+- [Haivision, 「Haivision and Wowza Form SRT Alliance」 (2017-04)](https://www.haivision.com/about/press-releases/haivision-wowza-form-srt-alliance-support-new-open-source-low-latency-video-streaming-initiative/)
+- [VSF TR-06-1 RIST Simple Profile (2018-10-17)](https://static.vsf.tv/download/technical_recommendations/VSF_TR-06-1_2018_10_17.pdf)
 
-문제: Video Message는 100KB짜리도 있고, ACK 메시지는 4바이트짜리도 있다. 큰 메시지를 그대로 보내면 그 사이 작은 제어 메시지가 못 들어간다.
-
-해결: 메시지를 **청크(Chunk)** 로 쪼개서 인터리빙(섞어 짜기).
-
-![Message + Chunk 인터리빙](/images/rtmp-message-chunk-interleaving.png)
-
-```
-[전송 순서]
-Video Chunk 1 → ACK → Video Chunk 2 → Video Chunk 3 → Control msg → Video Chunk 4 ...
-```
-
-이게 **RTMP식 HoL Blocking 회피**다. 한 TCP 연결 안에서 메시지를 인터리빙. 큰 비디오 청크 사이에 작은 ACK가 끼어들 수 있다.
-
-### Audio Message에 트랙 ID가 없다 — 멀티 오디오 불가의 진짜 이유
-
-RTMP 스펙을 보면 Audio Message에 트랙 번호 같은 필드가 없다.
-
-```
-RTMP Audio Message:
-- Codec, Sample Rate, Sample Size, Stereo/Mono 정보만
-- 트랙 번호 같은 필드 없음
-```
-
-여러 오디오 트랙을 보내려면 "이 패킷은 트랙 2번이야"를 표시할 필드가 있어야 하는데, 그게 없다.
-
-NetStream을 여러 개 만들면 이론상 가능하지만 영상-오디오 동기화가 안 맞는다. 동기화는 한 NetStream 안에서만 보장된다.
-
-PokeClip 같은 멀티 오디오 분석 파이프라인에서 RTMP 대신 MPEG-TS(PID 기반)를 쓰는 진짜 이유다.
-
----
-
-## 5. OBS 빨간 경고의 정체 — Send Buffer 가득 참
-
-OBS 방송 중 가끔 우하단에 빨간 아이콘이 뜨고 "건너뛴 프레임" 카운트가 올라간다. 정확히 뭐가 일어나나.
-
-![OBS Send Buffer와 드롭 프레임](/images/obs-send-buffer-drop.png)
-
-OBS는 인코딩한 데이터를 즉시 보내지 않는다. **Send Buffer**에 쌓아두고 TCP가 처리할 수 있는 만큼만 보낸다.
-
-```
-[정상]
-인코더 → Send Buffer (5%) → TCP 전송 (잘 흐름)
-
-[네트워크 느림]
-인코더 → Send Buffer (50%, 증가 중) → TCP 전송 (느림)
-
-[네트워크 매우 느림]
-인코더 → Send Buffer (100% 가득) → TCP 못 보냄
-                ↓
-        프레임 드롭 (인코더가 만든 프레임 버림)
-```
-
-방송 중 OBS 우하단 통계의 "건너뛴 프레임"이 카운트되는 게 이거다. **방송 화질이 깨지거나 끊어 보이는 시청자 경험의 시작점**이다.
-
-해결책 두 가지.
-1. 비트레이트 낮추기 (네트워크 부담 줄임)
-2. 더 좋은 인터넷으로 옮기기
-
-### 연결 끊김 자동 처리
-
-라이브 송출 중 RTMP 연결이 끊어지면:
-
-```
-[네트워크 일시 단절]
-OBS의 TCP가 끊김 감지 (수 초 ~ 수십 초)
-→ OBS가 자동 재연결 시도
-→ 재연결 성공 시 새 RTMP 핸드셰이크부터 다시
-→ 그 사이 시청자 화면 끊김
-```
-
-OBS의 "스트림 자동 재시도" 옵션. 기본값 10초 간격 무한 재시도.
-
-치지직 같은 플랫폼은 OBS 재연결 동안 "잠시 연결 중..." 화면. 30초 이상 끊기면 방송 종료 처리.
-
----
-
-## 6. RTMP의 6가지 한계
-
-20년 쓰면서 드러난 RTMP의 문제점.
-
-| # | 문제 | 영향 |
-|---|------|------|
-| 1 | 평문 전송 (RTMPS 보급 느림) | 보안 취약 |
-| 2 | H.265/AV1 미지원 (Adobe 스펙 업데이트 중단) | 차세대 코덱 못 씀 |
-| 3 | 멀티 오디오 트랙 불가 | PokeClip 같은 분석 못 함 |
-| 4 | TCP 지속 연결 → CDN 캐시 불가 | 시청자 측엔 진작에 폐기 |
-| 5 | 포트 1935 방화벽 차단 잦음 | 회사망에서 안 됨 |
-| 6 | 모바일 SDK 약함 | 모바일 송출 불편 |
-
-대안이 여럿 있다.
-
----
-
-## 7. 대체 후보들 — 그런데 왜 안 갈아탔나
-
-![Ingest 프로토콜 비교](/images/ingest-protocols-comparison.png)
-
-각 후보의 특징.
-
-### SRT — 신뢰성 있는 UDP
-
-[지난 시리즈](../streaming-basics-from-scratch/)에서 본 그거다. UDP + ARQ로 재전송, 멀티 트랙(MPEG-TS), 기본 AES 암호화.
-
-근데 안 갈아타는 이유:
-- OBS의 SRT 설정이 RTMP보다 복잡 (latency, maxbw 등 옵션)
-- 플랫폼이 SRT 인제스트 거의 미지원
-- 스트리머가 RTMP로 잘 되는데 옮길 이유 없음
-
-### WHIP — WebRTC 기반 IETF 표준
-
-가장 유력한 후계자.
-
-![WHIP 흐름](/images/whip-flow-vs-rtmp.png)
-
-WebRTC가 양방향 통화용. 거기서 "송출" 방향만 표준화한 게 **WHIP (WebRTC-HTTP Ingestion Protocol)**. 2023년 IETF RFC 9725.
-
-```
-WHIP 흐름:
-1. OBS → 서버: HTTP POST /whip
-   Body: SDP Offer (자기 코덱/네트워크 정보)
-2. 서버 → OBS: HTTP 201 Created
-   Body: SDP Answer
-3. WebRTC 연결 (ICE, DTLS)
-4. RTP로 영상 송출
-```
-
-장점:
-- **지연 200ms 이하** (RTMP의 1/10)
-- IETF 표준
-- NAT/방화벽 통과 강함 (ICE/STUN/TURN)
-- 최신 코덱 다 지원 (H.265, AV1)
-
-**OBS 30 버전부터 WHIP 출력 기본 지원**. 유튜브, 트위치가 베타 테스트 중.
-
-근데 아직 안 퍼진 이유:
-- 플랫폼 인프라가 RTMP 중심 (전환 비용)
-- WebRTC가 UDP라 통신사/지역에 따라 불안정
-- 트랜스코딩 파이프라인 변경 필요
-
-### RIST — 방송 업계 표준
-
-BBC, NBC 같은 방송계 컨소시엄이 만든 신뢰성 전송 프로토콜. UDP + 재전송 + FEC.
-
-- 방송 장비 호환성 우수
-- FEC로 손실 미리 대비 (재전송 안 기다림)
-- MPEG-TS 네이티브
-
-근데 OBS 미지원. 일반 개발자에겐 낯섦. 방송 백홀(스튜디오→방송국)에서나 우세.
-
----
-
-## 8. RTMP가 안 죽는 진짜 이유 — 생태계 관성
-
-기술적으로 RTMP보다 나은 대안이 있다. 그런데 안 죽는다. 이유는 기술이 아니다.
-
-**1. 도입 비용 = 0**
-스트리머가 OBS로 그냥 송출. 추가 설치 없음. 가장 큰 진입 장벽이 없다.
-
-**2. 호환성 100%**
-모든 플랫폼이 받음. 어디로 송출해도 됨.
-
-**3. 20년치 트러블슈팅 자료**
-문제 생기면 검색하면 다 나옴. 새 프로토콜은 도움받을 데 적음.
-
-**4. ingest 지연이 결정적 문제가 아님**
-플랫폼이 어차피 HLS로 트랜스코딩하면서 추가 지연 발생. RTMP의 2-3초가 전체에서 차지하는 비중 작음.
-
-**5. 플랫폼 수익과 무관**
-시청자 경험에 영향 없음. 플랫폼이 RTMP를 바꿀 비즈니스 동기 없음.
-
-### 그럼 언제 바뀌나
-
-현실적인 시나리오:
-
-**시나리오 1**: WHIP이 OBS 기본값이 되는 순간 (5~10년)
-**시나리오 2**: 신규 플랫폼이 처음부터 WHIP/SRT만 받음 (확률 낮음)
-**시나리오 3**: 보안 규제로 강제 전환 (확률 매우 낮음)
-
-가장 현실적인 그림은 **RTMP가 계속 살아있으면서 WHIP이 보조로 들어가는** 양상이다. 치지직도 어느 시점에 "WHIP 송출 베타"를 열 가능성이 높다.
-
----
-
-## 정리하면
-
-RTMP는 기술이 아니라 **생태계 관성**으로 살아남은 프로토콜이다.
-
-1. **출신** — 1996년 Flash 시대에 태어났고, 2009년 스펙 공개로 오픈소스 생태계 형성
-2. **연결 구조** — TCP 1935 + Handshake + NetConnection + NetStream으로 ~135ms 부팅
-3. **메시지 + 청크** — 양방향 RPC 프로토콜, 청크 인터리빙으로 HoL Blocking 회피
-4. **Send Buffer** — OBS 빨간 경고와 드롭 프레임의 정체
-5. **한계** — 멀티 오디오 불가, H.265 미지원, CDN 캐시 안 됨, 방화벽 잘 막힘
-6. **대체 후보** — WHIP(가장 유력), SRT, RIST
-7. **안 죽는 이유** — 도입 비용 0 + 호환성 100% + 비즈니스 동기 부재
-
-다음 글부터는 시청자 측의 표준 — **HLS**를 깊이 들어간다. M3U8 플레이리스트의 진짜 구조부터.
-
----
-
-**참고**
-- [RTMP 1.0 Specification (Adobe, 2012)](https://rtmp.veriskope.com/docs/spec/)
-- [WHIP IETF RFC 9725](https://datatracker.ietf.org/doc/rfc9725/)
-- [OBS Studio RTMP/WHIP 지원](https://obsproject.com/)
+다음 편: [라이브 영상이 그냥 파일이라고? — HLS의 미친 발상](/posts/tech-blurting/hls-just-files/)

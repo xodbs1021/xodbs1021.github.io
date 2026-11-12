@@ -895,39 +895,24 @@
     "종료도-http",
     "3-whip의-단순함이-가져온-큰-가치",
     "4-whep--whip의-짝-시청자-측-표준",
-    "whep의-사용-시나리오",
     "5-whep의-진짜-한계--시청자-확장",
-    "6-해답은-하이브리드--시청자가-골라-본다",
-    "사용-케이스별-매핑",
-    "twitch의-실전-구현-2024",
-    "7-실전-구축--ovenmediaengine-예시",
-    "obs에서-whip-송출",
     "8-산업-도입-현황-2024-기준",
-    "9-whipwhep-표준-vs-실제-구현-차이",
-    "정리하면"
+    "whip을-고를-때는-연결-수보다-받는-쪽-조건을-봅니다",
+    "출처"
   ],
   "tech-blurting/webrtc-deep-dive": [
     "1-webrtc가-뭔가--3줄-정의",
     "2-세-가지-핵심-api",
-    "getusermedia--카메라마이크-접근",
-    "rtcpeerconnection--p2p-미디어-전송",
-    "rtcdatachannel--임의-데이터-p2p",
     "3-webrtc의-진짜-어려움--nat-통과",
     "stun--내-공인-ip가-뭐야",
     "turn--마지막-보루-릴레이",
     "ice--stunturn을-조정하는-프레임워크",
     "4-sdp--미디어-협상의-언어",
     "5-p2p의-한계--인원이-많아지면",
-    "p2p-mesh--안-됨",
-    "mcu-multipoint-control-unit--옛날-방식",
-    "sfu-selective-forwarding-unit--현대의-표준",
     "6-simulcast-vs-svc--시청자별-화질-맞춤",
-    "simulcast--여러-독립-스트림",
-    "svc-scalable-video-coding--레이어드-스트림",
-    "7-webrtc-지연--다른-프로토콜과-비교",
     "8-webrtc를-라이브-방송에-쓰려면",
-    "9-실전-도입-가이드",
-    "정리하면"
+    "p2p라도-webrtc에는-시그널링--turn--sfu-서버가-필요합니다",
+    "출처"
   ],
   "tech-blurting/srt-broadcaster-protocol": [
     "1-srt의-출신--방송-업계가-인터넷을-길들인-방법",
@@ -939,9 +924,8 @@
     "7-srt-vs-rtmp-vs-whip--인제스트-프로토콜-비교",
     "8-ffmpeg에서-srt-송출-실전",
     "stream-id로-인증",
-    "9-srs로-srt-서버-구축",
-    "10-pokeclip에서-srt를-쓴-이유",
-    "정리하면"
+    "srt를-고를-때는-latency와-받는-쪽-빌드를-함께-봅니다",
+    "출처"
   ],
   "tech-blurting/ll-hls-deep-dive": [
     "1-일반-hls의-25초-지연은-정확히-어디서-나오나",
@@ -1009,23 +993,14 @@
   ],
   "tech-blurting/rtmp-still-alive": [
     "1-rtmp는-영상-프로토콜이-아니라-flash-부속품이었다",
-    "rtmp의-진짜-정체--flash-media-server-전용-통신",
     "2-obs에서-본-그-url--구조-분해",
     "3-obs-방송-시작-누르고-첫-프레임까지--135ms",
-    "netconnection-vs-netstream--두-단계로-나뉜-이유",
     "4-메시지--청크--rtmp의-인터리빙",
-    "chunk-stream--큰-메시지가-작은-메시지를-막지-않게",
     "audio-message에-트랙-id가-없다--멀티-오디오-불가의-진짜-이유",
     "5-obs-빨간-경고의-정체--send-buffer-가득-참",
-    "연결-끊김-자동-처리",
-    "6-rtmp의-6가지-한계",
     "7-대체-후보들--그런데-왜-안-갈아탔나",
-    "srt--신뢰성-있는-udp",
-    "whip--webrtc-기반-ietf-표준",
-    "rist--방송-업계-표준",
     "8-rtmp가-안-죽는-진짜-이유--생태계-관성",
-    "그럼-언제-바뀌나",
-    "정리하면"
+    "출처"
   ],
   "tech-blurting/cdn-for-live-streaming": [
     "1-cdn은-단순-엣지-서버-분산이-아니다--다층-캐시-구조",
@@ -1117,7 +1092,13 @@
   "tech-blurting/rtmp-mpeg-ts-srt": [
     "rtmp",
     "mpeg-ts",
-    "srt"
+    "pat와-pmt가-어느-pid가-어떤-트랙인지-알려-줍니다",
+    "트랙-데이터는-pes로-묶여-여러-ts-패킷에-나뉘어-실립니다",
+    "받는-쪽은-pid만-보고-트랙을-다시-나눕니다",
+    "srt",
+    "여러-트랙을-보낼-때는-pid-번호보다-pmt와-파일-속-순서를-믿어야-합니다",
+    "측정-조건",
+    "출처"
   ],
   "book-review/clean-architecture-review": [
     "왜-구조가-중요한가",
