@@ -474,7 +474,7 @@
     "post": "whip-whep-modern-ingest",
     "kind": "video",
     "posterFrame": 320,
-    "alt": "송출기와 WHIP 서버 두 세로선 사이로 POST · SDP 제안과 201 Created · SDP 응답이 오가 왕복 1, STUN 연결 확인과 응답이 오가 왕복 2, DTLS 핸드셰이크 두 쌍이 오가 왕복 4가 된 뒤에야 미디어 시작이 붙고 굵은 RTP 미디어 화살표가 송출기에서 서버로 흐른다",
+    "alt": "송출기와 WHIP 서버 두 세로선 사이로 TCP 연결과 TLS 1.3 왕복이 오가 왕복 2, POST · SDP 제안과 201 Created · SDP 응답이 오가 왕복 3, STUN 연결 확인과 응답이 오가 왕복 4, DTLS 핸드셰이크 두 쌍이 오가 왕복 6이 된 뒤에야 미디어 시작이 붙고 굵은 RTP 미디어 화살표가 송출기에서 서버로 흐른다",
     "mobile": true
   },
   {
