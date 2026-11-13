@@ -1,0 +1,8 @@
+sine.wav aac_at -profile:a 22 -b:a 64k -> profile=LD|initial_padding=568
+sine.wav aac_at -profile:a 22 -b:a 128k -> profile=LD|initial_padding=512
+sine.wav aac_at -profile:a 38 -b:a 64k -> profile=ELD|initial_padding=312
+sine.wav aac_at -profile:a 38 -b:a 128k -> profile=ELD|initial_padding=256
+sintel.wav aac_at -profile:a 22 -b:a 64k -> profile=LD|initial_padding=568
+sintel.wav aac_at -profile:a 22 -b:a 128k -> profile=LD|initial_padding=512
+sintel.wav aac_at -profile:a 38 -b:a 64k -> profile=ELD|initial_padding=312
+sintel.wav aac_at -profile:a 38 -b:a 128k -> profile=ELD|initial_padding=256

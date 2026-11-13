@@ -1,0 +1,19 @@
+start 2026-11-13 14:15:57 KST load { 7.08 6.42 3.68 }
+aac_lc_128 | args: -c:a aac -b:a 128k | codec_name=aac|profile=LC|sample_rate=48000|channels=2|initial_padding=1024 | pkt duration(count) 2434 1024 tb 1/48000 | payload bytes 839716 | kbps 129.3
+aac_lc_128_prof | args: -c:a aac -profile:a aac_low -b:a 128k | codec_name=aac|profile=LC|sample_rate=48000|channels=2|initial_padding=1024 | pkt duration(count) 2434 1024 tb 1/48000 | payload bytes 839716 | kbps 129.3
+at_lc_128 | args: -c:a aac_at -b:a 128k | codec_name=aac|profile=LC|sample_rate=48000|channels=2|initial_padding=2112 | pkt duration(count) 2435 1024 tb 1/48000 | payload bytes 831732 | kbps 128.0
+at_he_64 | args: -c:a aac_at -profile:a 4 -b:a 64k | codec_name=aac|profile=HE-AAC|sample_rate=48000|channels=2|initial_padding=2112 | pkt duration(count) 1219 2048 tb 1/48000 | payload bytes 416386 | kbps 64.1
+at_hev2_32 | args: -c:a aac_at -profile:a 28 -b:a 32k | codec_name=aac|profile=HE-AACv2|sample_rate=48000|channels=2|initial_padding=2112 | pkt duration(count) 1219 2048 tb 1/48000 | payload bytes 208200 | kbps 32.0
+at_ld_128 | args: -c:a aac_at -profile:a 22 -b:a 128k | codec_name=aac|profile=LD|sample_rate=48000|channels=2|initial_padding=512 | pkt duration(count) 4868 512 tb 1/48000 | payload bytes 830869 | kbps 127.9
+at_eld_128 | args: -c:a aac_at -profile:a 38 -b:a 128k | codec_name=aac|profile=ELD|sample_rate=48000|channels=2|initial_padding=256 | pkt duration(count) 4867 512 tb 1/48000 | payload bytes 830866 | kbps 127.9
+aac_q0.1 | args: -c:a aac -q:a 0.1 | codec_name=aac|profile=LC|sample_rate=48000|channels=2|initial_padding=1024 | pkt duration(count) 2434 1024 tb 1/48000 | payload bytes 156037 | kbps 24.0
+aac_q0.5 | args: -c:a aac -q:a 0.5 | codec_name=aac|profile=LC|sample_rate=48000|channels=2|initial_padding=1024 | pkt duration(count) 2434 1024 tb 1/48000 | payload bytes 515768 | kbps 79.4
+aac_q1 | args: -c:a aac -q:a 1 | codec_name=aac|profile=LC|sample_rate=48000|channels=2|initial_padding=1024 | pkt duration(count) 2434 1024 tb 1/48000 | payload bytes 945529 | kbps 145.6
+aac_q2 | args: -c:a aac -q:a 2 | codec_name=aac|profile=LC|sample_rate=48000|channels=2|initial_padding=1024 | pkt duration(count) 2434 1024 tb 1/48000 | payload bytes 1839667 | kbps 283.3
+aac_q5 | args: -c:a aac -q:a 5 | codec_name=aac|profile=LC|sample_rate=48000|channels=2|initial_padding=1024 | pkt duration(count) 2434 1024 tb 1/48000 | payload bytes 2663197 | kbps 410.1
+at_q0 | args: -c:a aac_at -q:a 0 | codec_name=aac|profile=LC|sample_rate=48000|channels=2|initial_padding=2112 | pkt duration(count) 2435 1024 tb 1/48000 | payload bytes 1795086 | kbps 276.4
+at_q4 | args: -c:a aac_at -q:a 4 | codec_name=aac|profile=LC|sample_rate=48000|channels=2|initial_padding=2112 | pkt duration(count) 2435 1024 tb 1/48000 | payload bytes 1021049 | kbps 157.2
+at_q9 | args: -c:a aac_at -q:a 9 | codec_name=aac|profile=LC|sample_rate=48000|channels=2|initial_padding=2112 | pkt duration(count) 2435 1024 tb 1/48000 | payload bytes 588886 | kbps 90.6
+at_q14 | args: -c:a aac_at -q:a 14 | codec_name=aac|profile=LC|sample_rate=48000|channels=2|initial_padding=2112 | pkt duration(count) 2435 1024 tb 1/48000 | payload bytes 309357 | kbps 47.6
+opus_128 | codec_name=opus|sample_rate=48000|channels=2|initial_padding=312 | pkt 2595 960 tb 1/48000
+end 2026-11-13 14:16:05 KST load { 6.69 6.35 3.69 }
