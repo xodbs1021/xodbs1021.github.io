@@ -1,0 +1,15 @@
+# 압축 전 바이트 수와 x264 6Mbps 출력 크기 (AI(Claude Code) 실행)
+시작: 2026-11-13 16:09:36 KST  load: 65.69 40.32 40.20
+head: illegal line count -- 0
+기종: MacBook Air Mac17,3 Apple M5 32GB 팬 없음, macOS 27.0.1, ffmpeg version 9.0.2, 
+$ ffmpeg -hide_banner -v error -f lavfi -i testsrc2=size=1920x1080:rate=30 -t 10 -f rawvideo -pix_fmt rgb24 - | wc -c
+rgb24: 1866240000 바이트 (10초 300프레임) → 초당 186.6240 MB, 한 시간 671.8464 GB, 프레임당 6220800 바이트
+$ ffmpeg -hide_banner -v error -f lavfi -i testsrc2=size=1920x1080:rate=30 -t 10 -f rawvideo -pix_fmt yuv420p - | wc -c
+yuv420p: 933120000 바이트 (10초 300프레임) → 초당 93.3120 MB, 한 시간 335.9232 GB, 프레임당 3110400 바이트
+$ ffmpeg -hide_banner -v error -y -f lavfi -i testsrc2=size=1920x1080:rate=30 -t 10 -c:v libx264 -preset veryfast -b:v 6M -maxrate 6M -bufsize 12M -g 60 -pix_fmt yuv420p -f mpegts /tmp/tb6w-basics-6m.ts
+MPEG-TS 파일 7949392 바이트 → 초당 .7949 MB (컨테이너 포함)
+$ ffprobe -v error -select_streams v:0 -show_entries packet=size -of csv=p=0 /tmp/tb6w-basics-6m.ts (합)
+영상 패킷 합 7705731 바이트 → 초당 .7705 MB, 평균 6164.5 kbps
+$ ffprobe ... -show_entries frame=pict_type,pkt_size
+I 5장 평균 58138 바이트, 나머지 295장 평균 25135 바이트
+끝: 2026-11-13 16:10:04 KST
