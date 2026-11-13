@@ -73,6 +73,9 @@ import { SHARED_SEGMENTS_FRAMES, SharedSegments } from "./scenes/ffmpeg-hls-dash
 import { CONVEX_HULL_CLIMB_FRAMES, ConvexHullClimb } from "./scenes/abr-ladder-design/ConvexHullClimb";
 import { GPU_MEMORY_PATH_FRAMES, GpuMemoryPath } from "./scenes/nvenc-gpu-transcoding/GpuMemoryPath";
 import { SPEED_BELOW_REALTIME_FRAMES, SpeedBelowRealtime } from "./scenes/live-transcoding-infrastructure/SpeedBelowRealtime";
+import { DECODE_ORDER_FRAMES, DecodeOrder } from "./scenes/h264-deep-dive/DecodeOrder";
+import { CTU_QUADTREE_FRAMES, CtuQuadtree } from "./scenes/h265-hdr-deep-dive/CtuQuadtree";
+import { AV1_REF_SLOTS_FRAMES, Av1RefSlots } from "./scenes/av1-vp9-deep-dive/Av1RefSlots";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
@@ -800,6 +803,36 @@ export const RemotionRoot: React.FC = () => (
       component={SpeedBelowRealtime}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={SPEED_BELOW_REALTIME_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="DecodeOrder" component={DecodeOrder} durationInFrames={DECODE_ORDER_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="DecodeOrderMobile"
+      component={DecodeOrder}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={DECODE_ORDER_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="CtuQuadtree" component={CtuQuadtree} durationInFrames={CTU_QUADTREE_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="CtuQuadtreeMobile"
+      component={CtuQuadtree}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={CTU_QUADTREE_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="Av1RefSlots" component={Av1RefSlots} durationInFrames={AV1_REF_SLOTS_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="Av1RefSlotsMobile"
+      component={Av1RefSlots}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={AV1_REF_SLOTS_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}

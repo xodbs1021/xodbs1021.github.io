@@ -1,0 +1,45 @@
+{
+ "one_pass_1400k": {
+  "cmd": "ffmpeg -hide_banner -y -i ref.mkv -an -c:v libx264 -preset medium -b:v 1400k abr1_1400k.mp4",
+  "time": {
+   "user": 29.81,
+   "sys": 1.55,
+   "cpu": 31.36,
+   "wall": 31.1,
+   "load1_before": 219.66,
+   "load1_after": 220.67
+  },
+  "frames": 240,
+  "kbps": 1535.6,
+  "peak2s_kbps": 2899.1,
+  "vmaf_mean": 89.93,
+  "vmaf_p1": 75.99,
+  "vmaf_min": 74.87
+ },
+ "two_pass_1625k": {
+  "cmd_pass1": "ffmpeg -hide_banner -y -i ref.mkv -an -c:v libx264 -preset medium -b:v 1625k -pass 1 -passlogfile tp1625k -f null -",
+  "cmd_pass2": "ffmpeg -hide_banner -y -i ref.mkv -an -c:v libx264 -preset medium -b:v 1625k -pass 2 -passlogfile tp1625k twopass_1625k.mp4",
+  "time_pass1": {
+   "user": 15.56,
+   "sys": 0.65,
+   "cpu": 16.21,
+   "wall": 7.09,
+   "load1_before": 215.65,
+   "load1_after": 217.5
+  },
+  "time_pass2": {
+   "user": 25.96,
+   "sys": 0.78,
+   "cpu": 26.73,
+   "wall": 14.45,
+   "load1_before": 217.5,
+   "load1_after": 218.89
+  },
+  "frames": 240,
+  "kbps": 1651.9,
+  "peak2s_kbps": 2168.7,
+  "vmaf_mean": 91.48,
+  "vmaf_p1": 77.57,
+  "vmaf_min": 75.18
+ }
+}

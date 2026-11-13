@@ -26,21 +26,6 @@
       "bytes": 22494
     }
   },
-  "0e691a1aad8fd420": {
-    "source": "content/posts/tech-blurting/h264-deep-dive.md",
-    "wide": {
-      "file": "0e691a1aad8fd420-wide.svg",
-      "width": 1917,
-      "height": 178,
-      "bytes": 25874
-    },
-    "narrow": {
-      "file": "0e691a1aad8fd420-narrow.svg",
-      "width": 392,
-      "height": 1061,
-      "bytes": 25576
-    }
-  },
   "12ec1e92c021bdff": {
     "source": "content/posts/projects/aws-gcp-bidirectional-cutover-experiment.md",
     "wide": {
@@ -92,15 +77,6 @@
       "bytes": 15985
     }
   },
-  "2c797b3098ea69a8": {
-    "source": "content/posts/tech-blurting/h265-hdr-deep-dive.md",
-    "wide": {
-      "file": "2c797b3098ea69a8-wide.svg",
-      "width": 715,
-      "height": 1279,
-      "bytes": 28639
-    }
-  },
   "2d8b574f04ff3307": {
     "source": "content/posts/0-to-1/pokeclip-audio-assignment-user-state.md",
     "wide": {
@@ -141,15 +117,6 @@
       "width": 417,
       "height": 456,
       "bytes": 19462
-    }
-  },
-  "30bf3975985e4d03": {
-    "source": "content/posts/tech-blurting/av1-vp9-deep-dive.md",
-    "wide": {
-      "file": "30bf3975985e4d03-wide.svg",
-      "width": 408,
-      "height": 998,
-      "bytes": 24241
     }
   },
   "4187c5e2b25d2254": {
@@ -329,6 +296,15 @@
       "bytes": 18429
     }
   },
+  "7aed4a8002e3e5e5": {
+    "source": "content/posts/tech-blurting/h264-deep-dive.md",
+    "wide": {
+      "file": "7aed4a8002e3e5e5-wide.svg",
+      "width": 432,
+      "height": 714,
+      "bytes": 25087
+    }
+  },
   "80f1c7018c20790e": {
     "source": "content/posts/0-to-1/pokeclip-mediamtx-build-or-adopt.md",
     "wide": {
@@ -504,6 +480,15 @@
       "width": 334,
       "height": 401,
       "bytes": 26312
+    }
+  },
+  "ce5e2505602d6a83": {
+    "source": "content/posts/tech-blurting/av1-vp9-deep-dive.md",
+    "wide": {
+      "file": "ce5e2505602d6a83-wide.svg",
+      "width": 412,
+      "height": 682,
+      "bytes": 24096
     }
   },
   "d08d15bda13419ef": {

@@ -1,0 +1,73 @@
+06:34:29 start; uptime 6:34  up 44 days,  3:57, 8 users, load averages: 26.28 21.32 36.26
+06:34:29 == h264 headers / level
+06:34:30   auto60_veryfast: level=['42'] refs=['4'] nals=['7', '8', '9', '7', '8', '6', '5', '9', '1', '9', '1', '9'] warn=['[libx264 @ 0x75fac24a80] profile High, level 4.2, 4:2:0, 8-bit']
+06:34:31   auto60_medium: level=['42'] refs=['4'] nals=['7', '8', '9', '7', '8', '6', '5', '9', '1', '9', '1', '9'] warn=['[libx264 @ 0x776d028a80] profile High, level 4.2, 4:2:0, 8-bit']
+06:34:32   auto30_medium: level=['40'] refs=['4'] nals=['7', '8', '9', '7', '8', '6', '5', '9', '1', '9', '1', '9'] warn=['[libx264 @ 0x7a86c20a80] profile High, level 4.0, 4:2:0, 8-bit']
+06:34:33   lvl41_60: level=['41'] refs=['4'] nals=['7', '8', '9', '7', '8', '6', '5', '9', '1', '9', '1', '9'] warn=['[libx264 @ 0x7967400a80] MB rate (489600) > level limit (245760)', '[libx264 @ 0x7967400a80] profile High, level 4.1, 4:2:0, 8-bit']
+06:34:34   lvl42_60: level=['42'] refs=['4'] nals=['7', '8', '9', '7', '8', '6', '5', '9', '1', '9', '1', '9'] warn=['[libx264 @ 0x7aea808a80] profile High, level 4.2, 4:2:0, 8-bit']
+06:34:35   hls h264_60: ['#EXT-X-STREAM-INF:BANDWIDTH=7180368,AVERAGE-BANDWIDTH=7180368,RESOLUTION=1920x1080,CODECS="avc1.64002a"', 'v.m3u8']
+06:34:36   hls h264_30: ['#EXT-X-STREAM-INF:BANDWIDTH=5499579,AVERAGE-BANDWIDTH=5499579,RESOLUTION=1920x1080,CODECS="avc1.640028"', 'v.m3u8']
+06:34:39   hls hevc_30: ['#EXT-X-STREAM-INF:BANDWIDTH=4911699,AVERAGE-BANDWIDTH=4911699,RESOLUTION=1920x1080,CODECS="hvc1.1.6.L120.90"', 'v.m3u8']
+06:34:39   hls av1_30: ['#EXT-X-STREAM-INF:BANDWIDTH=5958207,AVERAGE-BANDWIDTH=5958207,RESOLUTION=1920x1080,CODECS="av01.0.08M.08"', 'v.m3u8']
+06:34:39 == decode order
+06:34:40   packets 0,-512,K__ | 2048,0,___ | 512,512,___ | 1024,1024,___ | 1536,1536,___ | 4096,2048,___ | 2560,2560,___ | 3072,3072,___ | 3584,3584,___
+06:34:40   frames 0,I, | 512,B | 1024,B | 1536,B | 2048,P | 2560,B | 3072,B | 3584,B | 4096,P
+06:34:40 == hevc tags / hdr
+06:34:40   tag default: hev1
+06:34:41   tag hvc1: hvc1
+06:34:42   hdr10 frame {     "frames": [         {             "pix_fmt": "yuv420p10le",             "color_space": "bt2020nc",             "color_primaries": "bt2020",             "color_transfer": "smpte2084",             "side_data_list": [                 {                     "side_data_type": "H.26[45] User Data Unregistered SEI message"                 },                 {                     "side_data_type": "H.26[45] User Data Unregistered SEI message"                 },                 {                     "side_data_type": "Mastering display metadata",                     "red_x": "34000/50000",                     "red_y": "16000/50000",                     "green_x": "13250/50000",                     "green_y": "34500/50000",                     "blue_x": "7500/50000",                     "blue_y": "3000/50000",                     "white_point_x": "15635/50000",                     "white_poin
+06:34:44   hlg frame {     "frames": [         {             "pix_fmt": "yuv420p10le",             "color_space": "bt2020nc",             "color_primaries": "bt2020",             "color_transfer": "arib-std-b67",             "side_data_list": [                 {                     "side_data_type": "H.26[45] User Data Unregistered SEI message"                 }             ]         }     ] } 
+06:34:44 == h264 1-pass ABR vs 2-pass
+06:35:16   1pass 32.84s 1640.0kbps vmaf 90.94 p1 78.86 peak2 3093.6
+06:35:57   2pass 16.24+26.93s 1529.9kbps vmaf 90.3 p1 75.5 peak2 2015.5
+06:35:57 == same VMAF target compare
+06:35:57 encode x264_medium_crf25
+06:36:24   x264_medium_crf25: cpu=36.3s kbps=2467.4 vmaf=96.45 p1=86.79
+06:36:25 encode x264_medium_crf33
+06:36:47   x264_medium_crf33: cpu=27.61s kbps=1105.9 vmaf=84.4 p1=68.84
+06:36:47 encode x264_medium_crf29
+06:37:14   x264_medium_crf29: cpu=32.63s kbps=1625.5 vmaf=91.94 p1=79.41
+06:37:14 encode x264_medium_crf27
+06:38:07   x264_medium_crf27: cpu=36.72s kbps=1992.7 vmaf=94.52 p1=84.03
+06:38:07 encode x264_medium_crf28
+06:38:28   x264_medium_crf28: cpu=33.65s kbps=1799.4 vmaf=93.4 p1=81.91
+06:38:28   x264 medium -> crf 28
+06:38:28 encode x265_medium_crf25
+06:39:06   x265_medium_crf25: cpu=83.23s kbps=1674.7 vmaf=96.35 p1=87.07
+06:39:06 encode x265_medium_crf33
+06:39:39   x265_medium_crf33: cpu=67.76s kbps=673.3 vmaf=86.72 p1=69.45
+06:39:39 encode x265_medium_crf29
+06:40:20   x265_medium_crf29: cpu=74.65s kbps=1055.2 vmaf=92.86 p1=80.86
+06:40:20 encode x265_medium_crf27
+06:41:17   x265_medium_crf27: cpu=82.1s kbps=1331.0 vmaf=94.9 p1=84.14
+06:41:17 encode x265_medium_crf28
+06:41:53   x265_medium_crf28: cpu=78.31s kbps=1183.9 vmaf=94.0 p1=83.0
+06:41:53   x265 medium -> crf 28
+06:41:53 encode svt_8_crf35
+06:42:11   svt_8_crf35: cpu=28.38s kbps=1572.8 vmaf=94.94 p1=79.82
+06:42:11 encode svt_8_crf48
+06:42:29   svt_8_crf48: cpu=29.97s kbps=686.5 vmaf=87.29 p1=65.63
+06:42:29 encode svt_8_crf41
+06:42:51   svt_8_crf41: cpu=29.02s kbps=1054.1 vmaf=92.13 p1=74.19
+06:42:51 encode svt_8_crf38
+06:43:14   svt_8_crf38: cpu=28.75s kbps=1285.4 vmaf=93.62 p1=77.42
+06:43:14 encode svt_8_crf39
+06:43:34   svt_8_crf39: cpu=28.28s kbps=1201.3 vmaf=93.07 p1=77.01
+06:43:34 encode svt_8_crf40
+06:43:55   svt_8_crf40: cpu=29.41s kbps=1128.7 vmaf=92.75 p1=75.41
+06:43:55   svt 8 -> crf 39
+06:43:55 encode svt_4_crf41
+06:44:50   svt_4_crf41: cpu=93.15s kbps=866.5 vmaf=93.19 p1=75.44
+06:44:50 encode svt_4_crf44
+06:46:09   svt_4_crf44: cpu=97.49s kbps=724.2 vmaf=91.62 p1=70.66
+06:46:09 encode svt_4_crf42
+06:48:21   svt_4_crf42: cpu=98.78s kbps=817.8 vmaf=92.67 p1=74.02
+06:48:21   svt 4 -> crf 41
+06:48:21 == svt presets at crf 35
+06:48:21 encode svt_4_crf35
+06:50:36   svt_4_crf35: cpu=89.0s kbps=1261.9 vmaf=95.68 p1=81.34
+06:50:36 encode svt_6_crf35
+06:51:31   svt_6_crf35: cpu=55.17s kbps=1370.2 vmaf=95.52 p1=81.04
+06:51:31 encode svt_10_crf35
+06:52:10   svt_10_crf35: cpu=17.26s kbps=1625.8 vmaf=93.43 p1=78.48
+06:52:13 end; uptime 6:52  up 44 days,  4:14, 8 users, load averages: 219.66 156.94 108.93

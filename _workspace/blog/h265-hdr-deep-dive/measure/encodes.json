@@ -1,0 +1,604 @@
+{
+ "x264_medium_crf25": {
+  "encoder": "x264",
+  "preset": "medium",
+  "crf": 25,
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libx264 -preset medium -crf 25 enc_x264_medium_crf25.mp4",
+  "time": {
+   "user": 34.89,
+   "sys": 1.41,
+   "cpu": 36.3,
+   "wall": 15.04,
+   "load1_before": 59.44,
+   "load1_after": 54.86
+  },
+  "frames": 240,
+  "bytes": 3084223,
+  "kbps": 2467.4,
+  "peak2s_kbps": 3272.6,
+  "keyframes": [
+   0.0,
+   2.042,
+   3.792,
+   5.875,
+   7.417,
+   8.5
+  ],
+  "vmaf_mean": 96.45,
+  "vmaf_p1": 86.79,
+  "vmaf_min": 85.15,
+  "vmaf_frames": 240
+ },
+ "x264_medium_crf33": {
+  "encoder": "x264",
+  "preset": "medium",
+  "crf": 33,
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libx264 -preset medium -crf 33 enc_x264_medium_crf33.mp4",
+  "time": {
+   "user": 26.88,
+   "sys": 0.73,
+   "cpu": 27.61,
+   "wall": 8.74,
+   "load1_before": 51.06,
+   "load1_after": 47.94
+  },
+  "frames": 240,
+  "bytes": 1382345,
+  "kbps": 1105.9,
+  "peak2s_kbps": 1467.2,
+  "keyframes": [
+   0.0,
+   2.042,
+   3.792,
+   5.875,
+   7.417,
+   8.5
+  ],
+  "vmaf_mean": 84.4,
+  "vmaf_p1": 68.84,
+  "vmaf_min": 65.25,
+  "vmaf_frames": 240
+ },
+ "x264_medium_crf29": {
+  "encoder": "x264",
+  "preset": "medium",
+  "crf": 29,
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libx264 -preset medium -crf 29 enc_x264_medium_crf29.mp4",
+  "time": {
+   "user": 31.71,
+   "sys": 0.91,
+   "cpu": 32.63,
+   "wall": 11.37,
+   "load1_before": 45.31,
+   "load1_after": 43.34
+  },
+  "frames": 240,
+  "bytes": 2031911,
+  "kbps": 1625.5,
+  "peak2s_kbps": 2155.2,
+  "keyframes": [
+   0.0,
+   2.042,
+   3.792,
+   5.875,
+   7.417,
+   8.5
+  ],
+  "vmaf_mean": 91.94,
+  "vmaf_p1": 79.41,
+  "vmaf_min": 76.87,
+  "vmaf_frames": 240
+ },
+ "x264_medium_crf27": {
+  "encoder": "x264",
+  "preset": "medium",
+  "crf": 27,
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libx264 -preset medium -crf 27 enc_x264_medium_crf27.mp4",
+  "time": {
+   "user": 34.32,
+   "sys": 2.4,
+   "cpu": 36.72,
+   "wall": 29.88,
+   "load1_before": 41.32,
+   "load1_after": 46.16
+  },
+  "frames": 240,
+  "bytes": 2490852,
+  "kbps": 1992.7,
+  "peak2s_kbps": 2640.8,
+  "keyframes": [
+   0.0,
+   2.042,
+   3.792,
+   5.875,
+   7.417,
+   8.5
+  ],
+  "vmaf_mean": 94.52,
+  "vmaf_p1": 84.03,
+  "vmaf_min": 79.69,
+  "vmaf_frames": 240
+ },
+ "x264_medium_crf28": {
+  "encoder": "x264",
+  "preset": "medium",
+  "crf": 28,
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libx264 -preset medium -crf 28 enc_x264_medium_crf28.mp4",
+  "time": {
+   "user": 32.63,
+   "sys": 1.01,
+   "cpu": 33.65,
+   "wall": 10.44,
+   "load1_before": 45.02,
+   "load1_after": 45.04
+  },
+  "frames": 240,
+  "bytes": 2249258,
+  "kbps": 1799.4,
+  "peak2s_kbps": 2385.1,
+  "keyframes": [
+   0.0,
+   2.042,
+   3.792,
+   5.875,
+   7.417,
+   8.5
+  ],
+  "vmaf_mean": 93.4,
+  "vmaf_p1": 81.91,
+  "vmaf_min": 78.36,
+  "vmaf_frames": 240
+ },
+ "x265_medium_crf25": {
+  "encoder": "x265",
+  "preset": "medium",
+  "crf": 25,
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libx265 -preset medium -crf 25 enc_x265_medium_crf25.mp4",
+  "time": {
+   "user": 81.32,
+   "sys": 1.9,
+   "cpu": 83.23,
+   "wall": 23.65,
+   "load1_before": 53.03,
+   "load1_after": 63.85
+  },
+  "frames": 240,
+  "bytes": 2093408,
+  "kbps": 1674.7,
+  "peak2s_kbps": 2223.2,
+  "keyframes": [
+   0.0,
+   3.792,
+   5.875,
+   7.417
+  ],
+  "vmaf_mean": 96.35,
+  "vmaf_p1": 87.07,
+  "vmaf_min": 85.81,
+  "vmaf_frames": 240
+ },
+ "x265_medium_crf33": {
+  "encoder": "x265",
+  "preset": "medium",
+  "crf": 33,
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libx265 -preset medium -crf 33 enc_x265_medium_crf33.mp4",
+  "time": {
+   "user": 66.11,
+   "sys": 1.66,
+   "cpu": 67.76,
+   "wall": 19.97,
+   "load1_before": 77.52,
+   "load1_after": 91.02
+  },
+  "frames": 240,
+  "bytes": 841657,
+  "kbps": 673.3,
+  "peak2s_kbps": 890.5,
+  "keyframes": [
+   0.0,
+   3.792,
+   5.875,
+   7.417
+  ],
+  "vmaf_mean": 86.72,
+  "vmaf_p1": 69.45,
+  "vmaf_min": 67.75,
+  "vmaf_frames": 240
+ },
+ "x265_medium_crf29": {
+  "encoder": "x265",
+  "preset": "medium",
+  "crf": 29,
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libx265 -preset medium -crf 29 enc_x265_medium_crf29.mp4",
+  "time": {
+   "user": 72.56,
+   "sys": 2.09,
+   "cpu": 74.65,
+   "wall": 26.58,
+   "load1_before": 83.83,
+   "load1_after": 83.71
+  },
+  "frames": 240,
+  "bytes": 1319030,
+  "kbps": 1055.2,
+  "peak2s_kbps": 1397.5,
+  "keyframes": [
+   0.0,
+   3.792,
+   5.875,
+   7.417
+  ],
+  "vmaf_mean": 92.86,
+  "vmaf_p1": 80.86,
+  "vmaf_min": 78.87,
+  "vmaf_frames": 240
+ },
+ "x265_medium_crf27": {
+  "encoder": "x265",
+  "preset": "medium",
+  "crf": 27,
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libx265 -preset medium -crf 27 enc_x265_medium_crf27.mp4",
+  "time": {
+   "user": 79.04,
+   "sys": 3.06,
+   "cpu": 82.1,
+   "wall": 44.92,
+   "load1_before": 88.38,
+   "load1_after": 112.42
+  },
+  "frames": 240,
+  "bytes": 1663794,
+  "kbps": 1331.0,
+  "peak2s_kbps": 1765.2,
+  "keyframes": [
+   0.0,
+   3.792,
+   5.875,
+   7.417
+  ],
+  "vmaf_mean": 94.9,
+  "vmaf_p1": 84.14,
+  "vmaf_min": 83.14,
+  "vmaf_frames": 240
+ },
+ "x265_medium_crf28": {
+  "encoder": "x265",
+  "preset": "medium",
+  "crf": 28,
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libx265 -preset medium -crf 28 enc_x265_medium_crf28.mp4",
+  "time": {
+   "user": 76.41,
+   "sys": 1.9,
+   "cpu": 78.31,
+   "wall": 24.48,
+   "load1_before": 115.35,
+   "load1_after": 119.95
+  },
+  "frames": 240,
+  "bytes": 1479880,
+  "kbps": 1183.9,
+  "peak2s_kbps": 1568.3,
+  "keyframes": [
+   0.0,
+   3.792,
+   5.875,
+   7.417
+  ],
+  "vmaf_mean": 94.0,
+  "vmaf_p1": 83.0,
+  "vmaf_min": 79.96,
+  "vmaf_frames": 240
+ },
+ "svt_8_crf35": {
+  "encoder": "svt",
+  "preset": 8,
+  "crf": 35,
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libsvtav1 -preset 8 -crf 35 enc_svt_8_crf35.mp4",
+  "time": {
+   "user": 27.35,
+   "sys": 1.03,
+   "cpu": 28.38,
+   "wall": 6.09,
+   "load1_before": 119.3,
+   "load1_after": 122.4
+  },
+  "frames": 240,
+  "bytes": 1965962,
+  "kbps": 1572.8,
+  "peak2s_kbps": 2033.5,
+  "keyframes": [
+   0.0,
+   6.708
+  ],
+  "vmaf_mean": 94.94,
+  "vmaf_p1": 79.82,
+  "vmaf_min": 78.69,
+  "vmaf_frames": 240
+ },
+ "svt_8_crf48": {
+  "encoder": "svt",
+  "preset": 8,
+  "crf": 48,
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libsvtav1 -preset 8 -crf 48 enc_svt_8_crf48.mp4",
+  "time": {
+   "user": 28.85,
+   "sys": 1.12,
+   "cpu": 29.97,
+   "wall": 6.94,
+   "load1_before": 132.13,
+   "load1_after": 131.48
+  },
+  "frames": 240,
+  "bytes": 858086,
+  "kbps": 686.5,
+  "peak2s_kbps": 863.8,
+  "keyframes": [
+   0.0,
+   6.708
+  ],
+  "vmaf_mean": 87.29,
+  "vmaf_p1": 65.63,
+  "vmaf_min": 65.45,
+  "vmaf_frames": 240
+ },
+ "svt_8_crf41": {
+  "encoder": "svt",
+  "preset": 8,
+  "crf": 41,
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libsvtav1 -preset 8 -crf 41 enc_svt_8_crf41.mp4",
+  "time": {
+   "user": 27.99,
+   "sys": 1.03,
+   "cpu": 29.02,
+   "wall": 8.11,
+   "load1_before": 135.73,
+   "load1_after": 135.63
+  },
+  "frames": 240,
+  "bytes": 1317686,
+  "kbps": 1054.1,
+  "peak2s_kbps": 1361.7,
+  "keyframes": [
+   0.0,
+   6.708
+  ],
+  "vmaf_mean": 92.13,
+  "vmaf_p1": 74.19,
+  "vmaf_min": 73.77,
+  "vmaf_frames": 240
+ },
+ "svt_8_crf38": {
+  "encoder": "svt",
+  "preset": 8,
+  "crf": 38,
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libsvtav1 -preset 8 -crf 38 enc_svt_8_crf38.mp4",
+  "time": {
+   "user": 27.61,
+   "sys": 1.14,
+   "cpu": 28.75,
+   "wall": 8.47,
+   "load1_before": 143.77,
+   "load1_after": 148.59
+  },
+  "frames": 240,
+  "bytes": 1606689,
+  "kbps": 1285.4,
+  "peak2s_kbps": 1651.4,
+  "keyframes": [
+   0.0,
+   6.708
+  ],
+  "vmaf_mean": 93.62,
+  "vmaf_p1": 77.42,
+  "vmaf_min": 76.58,
+  "vmaf_frames": 240
+ },
+ "svt_8_crf39": {
+  "encoder": "svt",
+  "preset": 8,
+  "crf": 39,
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libsvtav1 -preset 8 -crf 39 enc_svt_8_crf39.mp4",
+  "time": {
+   "user": 27.21,
+   "sys": 1.07,
+   "cpu": 28.28,
+   "wall": 7.21,
+   "load1_before": 155.81,
+   "load1_after": 160.0
+  },
+  "frames": 240,
+  "bytes": 1501645,
+  "kbps": 1201.3,
+  "peak2s_kbps": 1540.0,
+  "keyframes": [
+   0.0,
+   6.708
+  ],
+  "vmaf_mean": 93.07,
+  "vmaf_p1": 77.01,
+  "vmaf_min": 75.66,
+  "vmaf_frames": 240
+ },
+ "svt_8_crf40": {
+  "encoder": "svt",
+  "preset": 8,
+  "crf": 40,
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libsvtav1 -preset 8 -crf 40 enc_svt_8_crf40.mp4",
+  "time": {
+   "user": 28.35,
+   "sys": 1.06,
+   "cpu": 29.41,
+   "wall": 6.85,
+   "load1_before": 159.94,
+   "load1_after": 160.74
+  },
+  "frames": 240,
+  "bytes": 1410916,
+  "kbps": 1128.7,
+  "peak2s_kbps": 1456.6,
+  "keyframes": [
+   0.0,
+   6.708
+  ],
+  "vmaf_mean": 92.75,
+  "vmaf_p1": 75.41,
+  "vmaf_min": 74.54,
+  "vmaf_frames": 240
+ },
+ "svt_4_crf41": {
+  "encoder": "svt",
+  "preset": 4,
+  "crf": 41,
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libsvtav1 -preset 4 -crf 41 enc_svt_4_crf41.mp4",
+  "time": {
+   "user": 89.57,
+   "sys": 3.59,
+   "cpu": 93.15,
+   "wall": 38.36,
+   "load1_before": 163.63,
+   "load1_after": 172.86
+  },
+  "frames": 240,
+  "bytes": 1083183,
+  "kbps": 866.5,
+  "peak2s_kbps": 1267.8,
+  "keyframes": [
+   0.0,
+   6.708
+  ],
+  "vmaf_mean": 93.19,
+  "vmaf_p1": 75.44,
+  "vmaf_min": 72.14,
+  "vmaf_frames": 240
+ },
+ "svt_4_crf44": {
+  "encoder": "svt",
+  "preset": 4,
+  "crf": 44,
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libsvtav1 -preset 4 -crf 44 enc_svt_4_crf44.mp4",
+  "time": {
+   "user": 93.3,
+   "sys": 4.19,
+   "cpu": 97.49,
+   "wall": 53.71,
+   "load1_before": 162.56,
+   "load1_after": 135.7
+  },
+  "frames": 240,
+  "bytes": 905206,
+  "kbps": 724.2,
+  "peak2s_kbps": 1054.0,
+  "keyframes": [
+   0.0,
+   6.708
+  ],
+  "vmaf_mean": 91.62,
+  "vmaf_p1": 70.66,
+  "vmaf_min": 69.51,
+  "vmaf_frames": 240
+ },
+ "svt_4_crf42": {
+  "encoder": "svt",
+  "preset": 4,
+  "crf": 42,
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libsvtav1 -preset 4 -crf 42 enc_svt_4_crf42.mp4",
+  "time": {
+   "user": 92.15,
+   "sys": 6.63,
+   "cpu": 98.78,
+   "wall": 92.62,
+   "load1_before": 137.65,
+   "load1_after": 115.36
+  },
+  "frames": 240,
+  "bytes": 1022221,
+  "kbps": 817.8,
+  "peak2s_kbps": 1194.1,
+  "keyframes": [
+   0.0,
+   6.708
+  ],
+  "vmaf_mean": 92.67,
+  "vmaf_p1": 74.02,
+  "vmaf_min": 71.74,
+  "vmaf_frames": 240
+ },
+ "svt_4_crf35": {
+  "encoder": "svt",
+  "preset": 4,
+  "crf": 35,
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libsvtav1 -preset 4 -crf 35 enc_svt_4_crf35.mp4",
+  "time": {
+   "user": 82.39,
+   "sys": 6.61,
+   "cpu": 89.0,
+   "wall": 97.17,
+   "load1_before": 114.68,
+   "load1_after": 123.27
+  },
+  "frames": 240,
+  "bytes": 1577342,
+  "kbps": 1261.9,
+  "peak2s_kbps": 1848.3,
+  "keyframes": [
+   0.0,
+   6.708
+  ],
+  "vmaf_mean": 95.68,
+  "vmaf_p1": 81.34,
+  "vmaf_min": 77.76,
+  "vmaf_frames": 240
+ },
+ "svt_6_crf35": {
+  "encoder": "svt",
+  "preset": 6,
+  "crf": 35,
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libsvtav1 -preset 6 -crf 35 enc_svt_6_crf35.mp4",
+  "time": {
+   "user": 53.05,
+   "sys": 2.11,
+   "cpu": 55.17,
+   "wall": 27.29,
+   "load1_before": 137.39,
+   "load1_after": 175.58
+  },
+  "frames": 240,
+  "bytes": 1712717,
+  "kbps": 1370.2,
+  "peak2s_kbps": 1963.1,
+  "keyframes": [
+   0.0,
+   6.708
+  ],
+  "vmaf_mean": 95.52,
+  "vmaf_p1": 81.04,
+  "vmaf_min": 77.55,
+  "vmaf_frames": 240
+ },
+ "svt_10_crf35": {
+  "encoder": "svt",
+  "preset": 10,
+  "crf": 35,
+  "cmd": "ffmpeg -hide_banner -y -i /tmp/tb4w-measure/ref.mkv -an -c:v libsvtav1 -preset 10 -crf 35 enc_svt_10_crf35.mp4",
+  "time": {
+   "user": 16.41,
+   "sys": 0.84,
+   "cpu": 17.26,
+   "wall": 9.46,
+   "load1_before": 216.74,
+   "load1_after": 218.59
+  },
+  "frames": 240,
+  "bytes": 2032242,
+  "kbps": 1625.8,
+  "peak2s_kbps": 2068.9,
+  "keyframes": [
+   0.0,
+   6.708
+  ],
+  "vmaf_mean": 93.43,
+  "vmaf_p1": 78.48,
+  "vmaf_min": 77.93,
+  "vmaf_frames": 240
+ }
+}

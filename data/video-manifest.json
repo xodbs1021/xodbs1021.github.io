@@ -25,6 +25,32 @@
       "poster": "/images/abr-ladder-design-convex-hull-climb-mobile-poster.jpg"
     }
   },
+  "av1-vp9-deep-dive-av1-ref-slots": {
+    "scene": "Av1RefSlots",
+    "alt": "맨 위 부호화 순서 줄에 0(키 프레임), 4(ALTREF), 1, 2, 3, 4(다시 표시) 칸이 있고, 가운데 참조 슬롯 8칸, 아래 화면 출력 0–4 칸이 있다. 키 프레임이 슬롯 8개를 모두 채우고, ALTREF 4는 show_frame=0으로 슬롯에만 들어가 출력되지 않는다. 프레임 1, 2, 3은 참조 이름 7개가 가리키는 슬롯(겹칠 수 있음)을 참조하며 출력되고, 마지막에 show_existing_frame=1이 슬롯의 4를 다시 부호화하지 않고 화면 출력 4로 보내는 장면",
+    "sha256": "a27de6f0ce73a19a639d8a012d116da310ee287a62b625310126ca4c1422c860",
+    "bytes": 279140,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 10,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/av1-vp9-deep-dive-av1-ref-slots-poster.jpg",
+    "mobile": {
+      "sha256": "e2da44c93e618d7148dee26684dfdc30d434db14a84206e8732af1558fe9a016",
+      "bytes": 283811,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 10,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/av1-vp9-deep-dive-av1-ref-slots-mobile-poster.jpg"
+    }
+  },
   "aws-gcp-bidirectional-cutover-experiment-cutover-queue-pause": {
     "scene": "CutoverQueuePause",
     "alt": "트래픽 봇의 요청이 접수 큐를 거쳐 AWS 앱으로 흐르다가, 전환 중에는 앱으로 전달이 멈추고 요청이 접수 큐에 쌓이며, 전환이 끝나자 쌓인 요청부터 GCP 앱과 Cloud SQL 쪽으로 넘어가는 장면",
@@ -231,6 +257,58 @@
       "audio": 0,
       "faststart": true,
       "poster": "/images/ffmpeg-hls-dash-muxer-shared-segments-mobile-poster.jpg"
+    }
+  },
+  "h264-deep-dive-decode-order": {
+    "scene": "DecodeOrder",
+    "alt": "위 줄에 표시 순서대로 I, B, B, P 프레임 칸이 있고 아래 줄은 디코딩 순서 칸이다. I가 먼저 디코딩되고, 다음에 I를 참조하는 화살표와 함께 P가 디코딩된다. 그다음 두 B가 차례로 I와 P 양쪽에서 오는 화살표를 받으며 디코딩되어 아래 줄이 I, P, B, B 순서로 채워지는 장면",
+    "sha256": "0f84262016cdc2cb25549b062a1c334d5f5119becf8042fee00666cb5fd39cc3",
+    "bytes": 122915,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 8,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/h264-deep-dive-decode-order-poster.jpg",
+    "mobile": {
+      "sha256": "4713a3458da09df55a358001a88d4fbef8e4ed9aea147b881f925507c3e3d19f",
+      "bytes": 110338,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 8,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/h264-deep-dive-decode-order-mobile-poster.jpg"
+    }
+  },
+  "h265-hdr-deep-dive-ctu-quadtree": {
+    "scene": "CtuQuadtree",
+    "alt": "64×64 CTU 두 칸이 나란히 있다. 왼쪽 평평한 면은 쪼개지지 않고 64×64 한 블록으로 남는다. 오른쪽은 물체 가장자리 원호가 지나가며, 원호가 걸친 블록만 32×32, 16×16, 8×8로 차례로 쪼개지고 원호가 없는 곳은 큰 블록으로 남는 장면",
+    "sha256": "38ac5e93173cf143def23de8aa970521cf593d0dd584e1ae9e537aed0e154cb3",
+    "bytes": 103206,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 10,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/h265-hdr-deep-dive-ctu-quadtree-poster.jpg",
+    "mobile": {
+      "sha256": "a5b1169e2bd7a25770dab310b9b231c4b075635190e3586f2daea1e1a61e10d5",
+      "bytes": 90014,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 10,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/h265-hdr-deep-dive-ctu-quadtree-mobile-poster.jpg"
     }
   },
   "harness-session-isolation-worktree-root-session-state-split": {
