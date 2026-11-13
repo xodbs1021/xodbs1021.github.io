@@ -1,7 +1,7 @@
 ---
 title: "MediaMTX는 LL-HLS 조각 6개 설정으로도 기동했습니다"
 date: "2026-10-15T11:40:52+09:00"
-lastmod: "2026-11-13T23:47:21+09:00"
+lastmod: "2026-11-14T00:17:06+09:00"
 draft: false
 author: "김태윤"
 description: "MediaMTX v1.20.1은 LL-HLS 조각 수 6을 받아 기동한 뒤, 송출이 들어오면 gohlslib 먹서가 7개 하한으로 실패하고 10초마다 같은 실패를 되풀이했습니다. 같은 하한을 Conf.Validate에 넣은 PR #6154(v1.21.0)와, v1.20.1 · v1.21.0 · v1.21.3을 빌드해 45초 송출 중 실패 5번이 기동 거부(종료 코드 1)로 바뀐 것과 경계 여덟 가지 · 환경변수 · API 경로를 확인한 AI 재측정."
@@ -20,7 +20,7 @@ MediaMTX v1.20.1에 LL-HLS(Low-Latency HLS) 조각 수 `hlsSegmentCount: 6`과 `
 
 HLS는 영상을 짧은 조각 파일로 나누고, 그 목록(재생 목록)을 계속 갱신해 내보내는 방식입니다. MediaMTX에서 들어온 스트림을 조각과 목록으로 만드는 부품을 먹서(muxer)라고 부르고, 먹서 자체는 같은 프로젝트의 라이브러리 gohlslib이 맡습니다. `hlsSegmentCount`는 목록에 남길 조각 수이고, MediaMTX는 이 값을 그대로 gohlslib 먹서에 넘깁니다.
 
-두 계층이 받는 범위가 달랐습니다. v1.20.1이 쓰는 gohlslib v2.4.3의 `Muxer.Start()`는 조각 수가 0이면 7로 바꾸고([`muxer.go` 225–227행](https://github.com/bluenviron/gohlslib/blob/v2.4.3/muxer.go#L225-L227)), LL-HLS에서 7개 미만이거나 다른 방식(fMP4 · MPEG-TS)에서 3개 미만이면 오류를 돌려줍니다([316–326행](https://github.com/bluenviron/gohlslib/blob/v2.4.3/muxer.go#L316-L326)). MediaMTX v1.20.1의 설정 검증 `Conf.Validate()`에는 이 하한이 없었습니다. 그래서 설정 파일은 통과하고, 먹서를 처음 만드는 순간에야 실패가 드러났습니다.
+두 계층이 받는 범위가 달랐습니다. v1.20.1이 쓰는 gohlslib v2.4.3의 `Muxer.Start()`는 조각 수가 0이면 7로 바꾸고([`muxer.go` 225–227행](https://github.com/bluenviron/gohlslib/blob/0df41de8f33f2e1f2231e4c4bec9a9331bc6449b/muxer.go#L225-L227)), LL-HLS에서 7개 미만이거나 다른 방식(fMP4 · MPEG-TS)에서 3개 미만이면 오류를 돌려줍니다([316–326행](https://github.com/bluenviron/gohlslib/blob/0df41de8f33f2e1f2231e4c4bec9a9331bc6449b/muxer.go#L316-L326)). MediaMTX v1.20.1의 설정 검증 `Conf.Validate()`에는 이 하한이 없었습니다. 그래서 설정 파일은 통과하고, 먹서를 처음 만드는 순간에야 실패가 드러났습니다.
 
 v1.20.1 바이너리로 경계 근처 값을 하나씩 넣어 봤습니다. 서버는 여덟 가지 모두 기동했고, 하한 아래인 세 경우는 송출 10초 뒤 재생 목록 요청에 `500 muxer instance not available`을 돌려줬습니다. 이 7개 하한은 PokeClip이 라이브 창 길이를 정할 때도 기준이 됐습니다(관련 기록: [LL-HLS 라이브 창은 지연이 아니라 복귀 여유를 정했습니다](/posts/0-to-1/pokeclip-live-window-without-fork/)).
 
@@ -30,7 +30,7 @@ MediaMTX는 먹서가 실패하면 `muxer instance crashed`를 남기고 10초 �
 
 [[fig-segment-count-gate]]의 위 줄이 v1.20.1, 아래 줄이 v1.21.0입니다. 위 줄은 기동한 뒤 실패를 10초마다 쌓고, 아래 줄은 송출을 받기 전에 끝납니다.
 
-{{< motion scene="SegmentCountGate" id="fig-segment-count-gate" kind="개념도" caption="조각 6개 LL-HLS 설정을 v1.20.1은 받아 기동한 뒤 송출 45초 동안 먹서 실패를 10초 간격으로 5번 남기고, v1.21.0은 기동 단계에서 거부해 종료 코드 1로 끝납니다. 실패 시각은 아래 재측정 값(송출 시작 뒤 0.1 · 10.1 · 20.1 · 30.1 · 40.1초)입니다." >}}
+{{< motion scene="SegmentCountGate" id="fig-segment-count-gate" kind="개념도" caption="조각 6개 LL-HLS 설정을 v1.20.1은 받아 기동한 뒤 송출 45초 동안 먹서 실패를 10초 간격으로 5번 남기고, v1.21.0은 기동 단계에서 거부해 종료 코드 1로 끝납니다. 실패 시각은 아래 재측정 값으로, 송출 시작 뒤 약 0.1초부터 10초 간격입니다(세 번 0.04–0.11초, 간격 10.000–10.004초)." >}}
 
 #6154는 재시도 간격을 바꾸지 않고, 설정을 받아들이는 곳에 같은 하한을 넣었습니다. `Conf.Validate()`의 HLS 검사에 LL-HLS는 7 이상, 그 밖의 방식은 3 이상을 요구하는 분기를 더했습니다([`acb78cf5`의 `conf.go` 948–965행](https://github.com/bluenviron/mediamtx/blob/acb78cf594fce0f4c768398fdb04c17bb80a841d/internal/conf/conf.go#L948-L965)). gohlslib 쪽 검사는 그대로 남아 있습니다. 같은 하한을 설정 단계에서 한 번, 먹서를 만들 때 한 번 검사하는 구조입니다.
 
@@ -75,7 +75,7 @@ MPEG-TS는 시험에 없지만 코드에서는 fMP4와 같은 분기(`default`)�
 
 표의 LL-HLS 0 줄은 두 판이 다릅니다. v1.20.1에서는 gohlslib이 0을 7로 바꿔 정상 동작했고, v1.21.0에서는 0이 7보다 작아 기동을 거부합니다. 잘못된 값을 일찍 막는 변경이 기존에 돌던 설정 하나를 실패로 바꾼 것입니다. PR 본문에 이 호환성 변화를 적었고, 그대로 병합됐습니다.
 
-0을 「기본값을 써 달라」는 뜻으로 계속 받으려면 `Conf.Validate()`가 gohlslib의 치환 규칙을 따라 해야 합니다. 그러면 API로 읽은 설정에는 0이 보이는데 실제 조각 수는 7이 됩니다. #6154는 이 치환을 설정 단계로 끌어오지 않고 0을 다른 작은 값처럼 거부했습니다. 기본값을 원하면 키를 지우면 되고, MediaMTX의 기본값은 이미 7입니다([`conf.go` 506행](https://github.com/bluenviron/mediamtx/blob/acb78cf594fce0f4c768398fdb04c17bb80a841d/internal/conf/conf.go#L506)).
+0을 계속 받으려면 `Conf.Validate()`가 0을 하한 검사에서 빼야 합니다. 그러면 gohlslib의 치환 규칙([225–227행](https://github.com/bluenviron/gohlslib/blob/0df41de8f33f2e1f2231e4c4bec9a9331bc6449b/muxer.go#L225-L227))을 설정 검증이 알고 있어야 하고, API로 읽은 설정에는 0이 남은 채 먹서는 조각 7개로 돌 것입니다(측정하지 않음). #6154는 이 치환을 설정 단계로 끌어오지 않고 0을 다른 작은 값처럼 거부했습니다. 기본값을 원하면 키를 지우면 되고, MediaMTX의 기본값은 이미 7입니다([`conf.go` 506행](https://github.com/bluenviron/mediamtx/blob/acb78cf594fce0f4c768398fdb04c17bb80a841d/internal/conf/conf.go#L506)).
 
 하위 라이브러리가 받지 않을 값을 상위 설정이 먼저 받고 있다면, 그 실패는 재시도로 풀리지 않습니다. 비슷한 반복 실패 로그를 본다면 재시도 간격보다 그 값을 받아들인 첫 관문이 어디인지부터 보십시오.
 
@@ -96,7 +96,7 @@ MPEG-TS는 시험에 없지만 코드에서는 fMP4와 같은 분기(`default`)�
 - [bluenviron/mediamtx PR #6154 「hls: validate hlsSegmentCount according to the HLS variant」](https://github.com/bluenviron/mediamtx/pull/6154) — 2026-08-30 병합, 병합 커밋 [acb78cf5](https://github.com/bluenviron/mediamtx/commit/acb78cf594fce0f4c768398fdb04c17bb80a841d)
 - [`acb78cf5`의 `internal/conf/conf.go` 948–965행](https://github.com/bluenviron/mediamtx/blob/acb78cf594fce0f4c768398fdb04c17bb80a841d/internal/conf/conf.go#L948-L965) · [`internal/core/core.go` 1299–1381행](https://github.com/bluenviron/mediamtx/blob/acb78cf594fce0f4c768398fdb04c17bb80a841d/internal/core/core.go#L1299-L1381)
 - [`8402a728`의 `internal/servers/hls/muxer.go`](https://github.com/bluenviron/mediamtx/blob/8402a728e6e1d819cd0c8045d231fd0191d04998/internal/servers/hls/muxer.go) — 실패한 먹서를 10초 뒤 다시 만듦
-- [bluenviron/gohlslib v2.4.3 `muxer.go`](https://github.com/bluenviron/gohlslib/blob/v2.4.3/muxer.go#L316-L326) — 조각 수 하한과 0의 치환
+- [bluenviron/gohlslib v2.4.3(0df41de8) `muxer.go`](https://github.com/bluenviron/gohlslib/blob/0df41de8f33f2e1f2231e4c4bec9a9331bc6449b/muxer.go#L316-L326) — 조각 수 하한과 0의 치환
 - [MediaMTX v1.21.0](https://github.com/bluenviron/mediamtx/releases/tag/v1.21.0) · [v1.20.1](https://github.com/bluenviron/mediamtx/releases/tag/v1.20.1) · [v1.21.3](https://github.com/bluenviron/mediamtx/releases/tag/v1.21.3) 릴리스
 - [LL-HLS 라이브 창은 지연이 아니라 복귀 여유를 정했습니다](/posts/0-to-1/pokeclip-live-window-without-fork/) — 같은 7개 하한이 나온 PokeClip 기록
 
@@ -104,4 +104,4 @@ MPEG-TS는 시험에 없지만 코드에서는 fMP4와 같은 분기(`default`)�
 
 [전체 기술 기록으로 돌아가기](/posts/0-to-1/portfolio-engineering-notes/) · [이 글의 포트폴리오 요약 PDF 37쪽](/portfolio/2026-10-15-v2/full.pdf#page=37)
 
-포트폴리오 요약(2026-10-15판) 37쪽의 수치와 시험 수는 이 글의 11월 13일 재측정과 다릅니다.
+포트폴리오 요약(2026-10-15판) 37쪽의 수치와 시험 수는 이 글의 11월 13일 재측정과 다릅니다. 37쪽의 「검증을 옮겼다」와 달리 gohlslib의 검사는 그대로 두고 같은 하한을 설정 검증에 더했습니다.

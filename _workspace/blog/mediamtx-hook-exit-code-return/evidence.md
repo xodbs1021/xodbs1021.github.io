@@ -16,7 +16,9 @@
 | 시그널 종료 -1 | Go `os.ProcessState.ExitCode` 문서, raw_signal | 2026-11-13 | 문헌 · 실측 |
 | OnExit 있는 6곳(runOnInit/Demand/Connect/Read/Online/Available)만 #6155 효과, 없는 7곳은 #6259(11/13 기준 열림) | seven-hooks 글과 그 evidence | 2026-11-13 | 코드 · 문헌 |
 
-측정 메모: 첫 실행(raw/)은 시그널 경우를 `sh -c 'kill -TERM $$'`로 시도했으나 MediaMTX가 훅 명령의 `$$`를 먼저 치환해 kill이 pid 없이 실패했다(종료 코드 1로 보고됨). 그 경우는 raw에서 지우고, 외부에서 SIGTERM을 보내는 `--signal` 모드로 다시 쟀다(raw_signal/).
+측정 메모: `gotest/hook_344d8c90.txt`는 HLS 측정용으로 `conf_test.go`를 옮겨 넣은 같은 트리에서 돌았다(header의 ` M internal/conf/conf_test.go`). 다른 패키지(`internal/externalcmd`)라 결과와 무관하다. raw/summary.json의 시그널 경우는 손으로 뺐고(`note` 키), 23:11–23:15 창에는 이 버린 실행(`$$` 시그널 시도)이 포함돼 있다.
+
+첫 실행(raw/)은 시그널 경우를 `sh -c 'kill -TERM $$'`로 시도했으나 MediaMTX가 훅 명령의 `$$`를 먼저 치환해 kill이 pid 없이 실패했다(종료 코드 1로 보고됨). 그 경우는 raw에서 지우고, 외부에서 SIGTERM을 보내는 `--signal` 모드로 다시 쟀다(raw_signal/).
 
 옛 값 정리: 10월 판의 비공개 현장 관측 문장은 지우고 AI 재측정으로 바꿨다.
 

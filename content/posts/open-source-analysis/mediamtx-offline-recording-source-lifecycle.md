@@ -1,10 +1,10 @@
 ---
 title: "MediaMTX 대체 화면은 보여 주되 녹화하지 않게 했습니다"
 date: "2026-10-15T11:40:52+09:00"
-lastmod: "2026-11-13T23:47:21+09:00"
+lastmod: "2026-11-14T00:17:06+09:00"
 draft: false
 author: "김태윤"
-description: "MediaMTX의 alwaysAvailable 경로는 소스가 없을 때 띄우는 대체 화면까지 녹화했습니다. 원 PR #5767(AbdElrahmaN31)의 alwaysAvailableRecorded를 이어받아 녹화 시작 · 종료를 setOnline · setOffline으로 옮긴 PR #6182(v1.21.0), 원 커밋에서 1개만 통과하던 회귀 시험 3개와 v1.21.0 바이너리에서 오프라인 구간 녹화 파일이 4개에서 0개로 준 AI 재측정."
+description: "MediaMTX의 alwaysAvailable 경로는 소스가 없을 때 띄우는 대체 화면까지 녹화했습니다. 원 PR #5767(AbdElrahmaN31)의 alwaysAvailableRecorded를 이어받아 녹화 시작 · 종료를 setOnline · setOffline으로 옮긴 PR #6182(v1.21.0), 원 커밋에서 1개만 통과하던 회귀 시험 3개와 v1.21.0 바이너리에서 오프라인 구간 새 녹화 파일이 true 4개 · false 0개였던 AI 재측정."
 categories: ["open-source-analysis"]
 tags: ["MediaMTX", "오픈소스 기여", "상태 전환", "녹화"]
 portfolio_cases: [38]
@@ -45,12 +45,12 @@ stateDiagram-v2
   direction TB
   accTitle: alwaysAvailableRecorded false 경로의 온라인 전환과 녹화
   accDescr: 오프라인 상태에서는 대체 화면을 내보내고 녹화하지 않는다. publisher 연결이나 static source 연결이 setOnline을 불러 온라인이 되며 녹화를 시작한다. 연결이 끊기면 setOffline이 녹화를 멈추고 오프라인으로 돌아간다. 오프라인 중 설정을 다시 읽어도 isOnline이 거짓이라 오프라인 그대로다.
-  [*] --> 오프라인
-  오프라인: 대체 화면 · 녹화 없음
-  온라인: 녹화 중
-  오프라인 --> 온라인: setOnline(publisher · static source)
-  온라인 --> 오프라인: setOffline(끊김)
-  오프라인 --> 오프라인: 재로드 · isOnline 거짓
+  state "오프라인 · 대체 화면 · 녹화 없음" as off
+  state "온라인 · 녹화 중" as on
+  [*] --> off
+  off --> on: setOnline(publisher · static source)
+  on --> off: setOffline(끊김)
+  off --> off: 재로드 · isOnline 거짓
 ```
 
 static source가 준비될 때 지나는 `doSourceStaticSetReady`와 끊길 때 지나는 `doSourceStaticSetNotReady`에 publisher 쪽 조건을 그대로 복사하는 방법도 있었습니다. 그러면 녹화 규칙이 네 함수에 흩어지고, 입력 종류가 늘 때마다 같은 조건을 다시 붙여야 합니다. 옵션의 뜻은 「소스 종류와 상관없이 온라인인 동안만 녹화」이므로, 온라인을 정하는 두 함수에 두는 편을 리뷰에서 제안했고 그대로 구현했습니다. 원 PR의 기준 커밋에는 아직 `setOnline` · `setOffline`이 없었습니다. 두 함수는 그 뒤 7월에 들어온 [#5956](https://github.com/bluenviron/mediamtx/pull/5956)(`runOnOnline` · `runOnOffline` 훅 추가)으로 생겼으므로, 원 PR이 publisher 함수에 직접 녹화를 건 것은 당시 코드에서 자연스러운 선택이었습니다.
@@ -82,9 +82,9 @@ static source가 준비될 때 지나는 `doSourceStaticSetReady`와 끊길 때 
 
 ## 오프라인 중 설정을 다시 읽어도 녹화가 시작되지 않았습니다 {#재로드-중의-상태도-회귀-검증에-넣었다}
 
-[[fig-offline-recording-gate]]는 네 경우를 같은 시간축에 놓은 것입니다. 얇은 띠가 경로 상태(청록 = 온라인), 굵은 막대가 녹화입니다. 빨간 이름표는 원 PR 커밋의 동작입니다.
+[[fig-offline-recording-gate]]는 네 경우를 같은 시간축에 놓은 것입니다. 얇은 띠가 경로 상태(청록 = 온라인), 굵은 막대가 녹화입니다. 빨간 이름표는 원 PR 커밋의 동작이고, 회색 「시험 안 함」은 재로드 뒤 온라인 구간을 시험하지 않았다는 뜻입니다.
 
-{{< motion scene="OfflineRecordingGate" id="fig-offline-recording-gate" kind="개념도" caption="true는 오프라인 구간까지 녹화하고, false는 publisher · static source · 오프라인 중 재로드 세 경우 모두 온라인 구간만 녹화합니다. 원 PR 커밋에서는 static source가 연결돼도 녹화가 없었고, 오프라인 중 재로드에서 녹화가 시작됐습니다. 구간 길이는 설명용입니다." >}}
+{{< motion scene="OfflineRecordingGate" id="fig-offline-recording-gate" kind="개념도" caption="true는 오프라인 구간까지 녹화하고, false는 publisher · static source 두 경우 온라인 구간만 녹화하며, 오프라인 중 재로드는 녹화를 시작하지 않습니다(재로드 뒤 온라인 구간은 시험하지 않았습니다). 원 PR 커밋에서는 static source가 연결돼도 녹화가 없었고, 오프라인 중 재로드에서 녹화가 시작됐습니다. 구간 길이는 설명용입니다." >}}
 
 재로드 시험은 static source 경로가 오프라인일 때 `PATCH /v3/config/paths/patch/mystream`으로 설정을 바꾸고, 녹화 폴더에 파일이 생기지 않는지 봅니다([`path_record_alwaysavailable_test.go` 164–198행](https://github.com/bluenviron/mediamtx/blob/1a6e23a0f7787bb127329bcc42435bf4bcc058dd/internal/core/path_record_alwaysavailable_test.go#L164-L198)). 원 PR 커밋에서는 파일이 1개 생겨 실패했고, 보완 뒤에는 0개였습니다. 병합 커밋에서 세 시험을 `-race`로 한 번 더 돌렸을 때도 모두 통과했고 DATA RACE는 없었습니다.
 

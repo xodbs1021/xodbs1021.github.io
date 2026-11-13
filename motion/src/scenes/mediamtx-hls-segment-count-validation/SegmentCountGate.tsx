@@ -1,7 +1,7 @@
 // 콘티: _workspace/blog/mediamtx-hls-segment-count-validation/storyboard.md 「SegmentCountGate」
 // 위 줄 v1.20.1: 조각 6개 설정으로 기동한 뒤 송출이 들어오자 먹서가 실패하고 10초마다 다시 실패한다.
 // 아래 줄 v1.21.0: 같은 설정을 읽는 순간 기동을 거부한다(종료 코드 1). 실패 시각은 11월 13일 재측정
-// (45초 송출, 송출 시작 뒤 0.1 · 10.1 · 20.1 · 30.1 · 40.1초)을 따른 개념도다.
+// (45초 송출, 송출 시작 뒤 약 0.1초부터 10초 간격 — 세 번 0.04–0.11초, 간격 10.000–10.004초)을 따른 개념도다.
 // layout="mobile" 은 1080×1350 휴대폰판(SegmentCountGateMobile) — 같은 구성을 세로로 늘리고 글자를 48px 이상으로.
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { Label, Tag } from "../../components/Timeline";
@@ -43,10 +43,11 @@ const LAYOUTS = { desktop: DESKTOP, mobile: MOBILE } as const;
 type Props = { readonly layout?: keyof typeof LAYOUTS };
 
 const xAt = (l: Layout, seconds: number) => l.x0 + ((l.x1 - l.x0) * seconds) / AXIS_SECONDS;
-/** 「실패」 이름표(두 글자 + 좌우 여백 22px)의 너비 어림값. 가운데를 실패 시각에 두되 띠 밖으로 나가지 않게 한다. */
+/** 「실패」 이름표(두 글자 + 좌우 여백 22px)의 너비 어림값. 왼쪽 끝을 실패 시각에 두되 띠 오른쪽 밖으로 나가지 않게 한다
+ * (가운데 정렬은 휴대폰판에서 첫 두 이름표가 겹쳤다). */
 const tagWidth = (l: Layout) => l.text * 2 + 44;
 const tagX = (l: Layout, seconds: number) =>
-  Math.min(Math.max(xAt(l, seconds) - tagWidth(l) / 2, l.x0 + 6), l.x1 - tagWidth(l) - 6);
+  Math.min(xAt(l, seconds) + 2, l.x1 - tagWidth(l) - 6);
 
 const Axis: React.FC<{ readonly l: Layout; readonly y: number; readonly opacity: number }> = ({ l, y, opacity }) => (
   <>

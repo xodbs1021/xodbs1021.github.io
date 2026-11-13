@@ -1,7 +1,7 @@
 ---
 title: "MediaMTX 인증 기본값은 환경변수 하나에 함께 바뀌었습니다"
 date: "2026-10-15T11:40:52+09:00"
-lastmod: "2026-11-13T23:47:21+09:00"
+lastmod: "2026-11-14T00:17:06+09:00"
 draft: false
 author: "김태윤"
 description: "MediaMTX v1.21.0은 기본 인증 사용자 목록을 설정마다 슬라이스 머리만 대입해, 환경변수로 사용자를 바꾸면 비교 기준인 전역 기본값까지 함께 바뀌었고, 같은 기본값을 파일에 적으면 nil과 빈 IPs 차이로 거부했습니다. 두 원인을 함께 고친 PR #6205(v1.21.1)와, v1.15.6 · v1.21.0 · v1.21.1 바이너리와 수정 하나씩만 넣은 트리로 확인한 AI 재측정."
@@ -22,7 +22,7 @@ MediaMTX의 인증은 사용자 목록 `authInternalUsers`로 정합니다. 그 
 
 기본 목록의 첫 사용자는 IP 제한이 없습니다. 패키지 변수에서는 이 값이 `IPs` 필드를 비워 둔 nil 슬라이스였고, `mediamtx.yml`에는 `ips: []`로 적혀 있어 불러오면 빈 슬라이스가 됩니다. 뜻은 같지만 `reflect.DeepEqual`은 nil 슬라이스와 비어 있는 슬라이스를 같다고 보지 않습니다([Go `reflect.DeepEqual`](https://pkg.go.dev/reflect#DeepEqual)). 그래서 기본값을 그대로 적은 설정도 「직접 바꾼 설정」으로 판정됐습니다.
 
-PR 본문은 이 차이가 v1.16.0의 [`8a4f2f5f`](https://github.com/bluenviron/mediamtx/commit/8a4f2f5f3f216808d9821124a3f151cb79ce7cea)(#5376)에서 생겼다고 적었습니다. 이 커밋은 `[]`를 nil로 바꿔 주던 `IPNetworks.UnmarshalJSON`을 일반 디코딩으로 바꿨고, 바로 앞 [`a4561a83`](https://github.com/bluenviron/mediamtx/commit/a4561a8339035711d803b1b524b9a21906dd0142)(#5375)이 들인 「nil 슬라이스를 빈 슬라이스로 바꾸는 함수」가 슬라이스 원소 안까지 들어가게 했습니다. 둘 중 하나만 있어도 비교가 깨집니다. 바이너리로 확인한 결과도 경계가 같았습니다.
+PR 본문은 이 차이가 v1.16.0의 [`8a4f2f5f`](https://github.com/bluenviron/mediamtx/commit/8a4f2f5f3f216808d9821124a3f151cb79ce7cea)(#5376)에서 생겼다고 적었습니다. 이 커밋은 `[]`를 nil로 바꿔 주던 `IPNetworks.UnmarshalJSON`을 일반 디코딩으로 바꿨고, 바로 앞 [`a4561a83`](https://github.com/bluenviron/mediamtx/commit/a4561a8339035711d803b1b524b9a21906dd0142)(#5375)이 들인 「nil 슬라이스를 빈 슬라이스로 바꾸는 함수」가 슬라이스 원소 안까지 들어가게 했습니다. 둘 중 하나만 있어도 비교가 깨집니다. 바이너리로는 v1.15.6이 기동하고 v1.21.0이 거부하는 것까지 확인했습니다(v1.16.0 자체는 돌리지 않았습니다).
 
 | 입력 | v1.15.6 | v1.21.0 | v1.21.1 |
 |---|---|---|---|
@@ -55,9 +55,9 @@ flowchart TB
 
 {{< motion scene="SharedDefaultAlias" id="fig-shared-default-alias" kind="개념도" caption="v1.21.0에서는 전역 기본값과 불러온 설정이 같은 저장 공간을 가리켜, 환경변수 alice가 둘을 함께 바꾸고 비교가 같음이 된 뒤 이전 인증 목록이 alice를 덮어씁니다. v1.21.1은 deepClone으로 저장 공간을 나눠 설정 쪽만 바뀌고, 비교가 다름이 돼 기동을 거부합니다." >}}
 
-v1.15.6은 같은 입력을 거부했습니다. 기본값을 공유하는 대입은 v1.8.3부터 있었지만, 환경변수 단계가 공유된 원소를 직접 고치게 된 시점은 이 글에서 좁히지 않았습니다.
+v1.15.6은 같은 입력을 거부했습니다. 기본값을 공유하는 대입은 v1.8.3부터 있었지만, v1.15.6의 환경변수 단계는 `MTX_AUTHINTERNALUSERS_0_*`을 새 사용자로 만들어 목록 끝에 덧붙였습니다. 목록 길이가 달라지므로 비교가 「다름」이 되고 기동을 거부했습니다. v1.16.0의 [`0d95459f`](https://github.com/bluenviron/mediamtx/commit/0d95459f7be8a703a9eb5e0452f987dc56e2d99b)(#5371, 2026-01-24)가 설정 파일이 있어도 환경변수로 기본 사용자를 바꿀 수 있게 하면서, 이미 있는 원소를 제자리에서 덮어쓰도록 바꿨습니다(`prv.Elem().Index(i).Set`). 이때부터 환경변수가 공유된 원소를 고쳐 alice가 조용히 버려졌습니다.
 
-공유는 동시 접근에서도 드러납니다. 실행 중인 MediaMTX는 설정을 다시 읽을 때 `conf.Load()`를 부르고, 그동안 인증 관리자는 그 전에 불러온 목록을 읽습니다. 측정용 시험(한 고루틴이 `conf.Load("")`를 200번, 다른 쪽이 그 전에 만든 `auth.Manager`로 `Authenticate`를 2,000번)을 `-race`로 돌리면, 수정 전 트리 `7bdbc965`에서 매번 DATA RACE가 2건 보고됐습니다. 쓰기는 환경변수 적용(`env.go` 265행), 읽기는 권한 확인(`manager.go` 38행)이었습니다. 병합 커밋 `4906684c`에서는 0건이었습니다. 두 트리 모두 2,000번 인증 중 거부는 0번이었습니다. 같은 값을 다시 쓰는 경쟁이라 잘못된 인증 판단은 관측되지 않았고, PR 본문도 그렇게 적었습니다.
+공유는 동시 접근에서도 드러납니다. 실행 중인 MediaMTX는 설정을 다시 읽을 때 `conf.Load()`를 부르고, 그동안 인증 관리자는 그 전에 불러온 목록을 읽습니다. 측정용 시험(한 고루틴이 `conf.Load("")`를 200번, 다른 쪽이 그 전에 만든 `auth.Manager`로 `Authenticate`를 2,000번)을 `-race`로 돌리면, 수정 전 트리 `7bdbc965`에서 매번 DATA RACE가 2건 보고됐습니다. 두 건 모두 쓰기는 환경변수 적용(`env.go` 265행)이었고, 읽기는 사용자 순회(`manager.go` 156행)와 권한 확인(`manager.go` 38행)이었습니다. 병합 커밋 `4906684c`에서는 0건이었습니다. 두 트리 모두 2,000번 인증 중 거부는 0번이었습니다. 같은 값을 다시 쓰는 경쟁이라 잘못된 인증 판단은 관측되지 않았고, PR 본문도 그렇게 적었습니다.
 
 ## 한쪽만 고치면 시험이 수정 없이도 통과했습니다 {#두-수정-중-하나만-선택할-수-없었던-이유}
 
@@ -109,10 +109,12 @@ v1.15.6은 같은 입력을 거부했습니다. 기본값을 공유하는 대입
 
 - [bluenviron/mediamtx PR #6205 「conf: fix comparison and sharing of the default authInternalUsers」](https://github.com/bluenviron/mediamtx/pull/6205) — 본문의 원인 · 재현 · 영향, 2026-09-20 병합, 병합 커밋 [4906684c](https://github.com/bluenviron/mediamtx/commit/4906684c47aaf32763d67a6109c73113e83e84ef)
 - [`7bdbc965`의 `internal/conf/conf.go`](https://github.com/bluenviron/mediamtx/blob/7bdbc965d5be72fa3b8fcb68ea45813a72d5f578/internal/conf/conf.go#L541-L564) · [`4906684c`의 `conf.go`](https://github.com/bluenviron/mediamtx/blob/4906684c47aaf32763d67a6109c73113e83e84ef/internal/conf/conf.go#L444) · [`conf_test.go`](https://github.com/bluenviron/mediamtx/blob/4906684c47aaf32763d67a6109c73113e83e84ef/internal/conf/conf_test.go)
-- [커밋 8a4f2f5f(#5376)](https://github.com/bluenviron/mediamtx/commit/8a4f2f5f3f216808d9821124a3f151cb79ce7cea) · [a4561a83(#5375)](https://github.com/bluenviron/mediamtx/commit/a4561a8339035711d803b1b524b9a21906dd0142) — v1.16.0 · [9554fc4b(#3460)](https://github.com/bluenviron/mediamtx/commit/9554fc4ba0402a885f1089984a111ad662d04220) — v1.8.3
+- [커밋 8a4f2f5f(#5376)](https://github.com/bluenviron/mediamtx/commit/8a4f2f5f3f216808d9821124a3f151cb79ce7cea) · [a4561a83(#5375)](https://github.com/bluenviron/mediamtx/commit/a4561a8339035711d803b1b524b9a21906dd0142) · [0d95459f(#5371)](https://github.com/bluenviron/mediamtx/commit/0d95459f7be8a703a9eb5e0452f987dc56e2d99b) — v1.16.0 · [9554fc4b(#3460)](https://github.com/bluenviron/mediamtx/commit/9554fc4ba0402a885f1089984a111ad662d04220) — v1.8.3
 - [Go `reflect.DeepEqual`](https://pkg.go.dev/reflect#DeepEqual) — nil 슬라이스와 빈 슬라이스는 같지 않음
 - [MediaMTX v1.21.1](https://github.com/bluenviron/mediamtx/releases/tag/v1.21.1) · [v1.21.0](https://github.com/bluenviron/mediamtx/releases/tag/v1.21.0) · [v1.15.6](https://github.com/bluenviron/mediamtx/releases/tag/v1.15.6) 릴리스
 
 ---
 
 [전체 기술 기록으로 돌아가기](/posts/0-to-1/portfolio-engineering-notes/) · [이 글의 포트폴리오 요약 PDF 39쪽](/portfolio/2026-10-15-v2/full.pdf#page=39)
+
+포트폴리오 요약(2026-10-15판) 39쪽의 「얕은 복사로 중첩 권한 목록이 공유됨」은 이 글과 다릅니다. 대입은 슬라이스 머리만 복사해 사용자 원소 전체가 공유됐습니다.

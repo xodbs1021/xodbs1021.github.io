@@ -1,7 +1,7 @@
 ---
 title: "MediaMTX는 실패한 훅의 종료 코드를 0으로 받았습니다"
 date: "2026-10-15T11:40:52+09:00"
-lastmod: "2026-11-13T23:47:21+09:00"
+lastmod: "2026-11-14T00:17:06+09:00"
 draft: false
 author: "김태윤"
 description: "Windows가 아닌 플랫폼의 MediaMTX는 훅 명령이 5로 끝나도 종료 코드를 계산만 하고 0을 돌려줘, 재시작을 켜면 code 0이 찍히고 끄면 아무 줄도 남지 않았습니다. return 하나를 되돌린 PR #6155(v1.21.0)와, v1.20.1 · v1.21.0을 빌드해 exit 5 · exit 1 · SIGTERM을 재시작 켬 · 끔으로 돌린 AI 재측정, TestCmdExitCode를 병합 전후 커밋에서 돌린 결과."
@@ -18,7 +18,7 @@ MediaMTX v1.20.1의 `runOnInit`에 `sh -c 'exit 5'`를 걸고 재시작을 켜�
 
 ## 자식은 5로 끝났고 MediaMTX가 받은 값은 0이었습니다 {#실패는-자식-프로세스에서-이미-발생하고-있었다}
 
-MediaMTX는 서버 시작, 경로 준비, 연결 같은 사건마다 설정된 외부 명령(훅)을 띄웁니다. 명령을 띄우고 끝나기를 기다리는 일은 `internal/externalcmd`가 맡고, Windows가 아닌 플랫폼에서는 `cmd_os.go`의 `runOSSpecific`이 자식의 종료 코드를 정수로 돌려줍니다.
+MediaMTX는 서버 시작, 경로 준비, 연결 같은 사건마다 설정된 외부 명령(훅)을 띄웁니다. 명령을 띄우고 끝나기를 기다리는 일은 `internal/externalcmd`가 맡고, Windows가 아닌 플랫폼에서는 `cmd_os.go`의 `runOSSpecific` 안에서 자식을 기다리는 고루틴이 종료 코드를 정수로 돌려줍니다.
 
 #6155 직전 커밋 `8402a728`의 그 부분은 아래와 같습니다([`cmd_os.go` 46–49행](https://github.com/bluenviron/mediamtx/blob/8402a728e6e1d819cd0c8045d231fd0191d04998/internal/externalcmd/cmd_os.go#L46-L49)). 자식이 0이 아닌 코드로 끝나면 `cmd.Wait()`가 `*exec.ExitError`를 돌려주고, `ExitCode()`가 5를 계산합니다. 그런데 그 값을 쓰지 않고 다음 줄의 `return 0`으로 내려갑니다.
 
@@ -33,14 +33,14 @@ return 0
 
 ## 재시작을 끄면 0이 정상 종료로 읽혀 로그가 사라졌습니다 {#같은-0이-재시작-설정에-따라-다르게-보였다}
 
-`runOSSpecific`은 정수 0을 `nil`로, 0이 아닌 값을 `command exited with code N` 오류로 바꿔 `run()`에 넘깁니다. `run()`은 이 값과 재시작 설정으로 종료 콜백 `OnExit`를 부를지 정합니다([`cmd.go` 62–94행](https://github.com/bluenviron/mediamtx/blob/8402a728e6e1d819cd0c8045d231fd0191d04998/internal/externalcmd/cmd.go#L62-L94)). [[fig-hook-run-branches]]에서 청록 상자가 #6155 뒤 exit 5가 가는 곳입니다.
+`runOSSpecific`은 그 정수가 0이면 `nil`을, 0이 아니면 `command exited with code N` 오류를 `run()`에 돌려줍니다. `run()`은 이 값과 재시작 설정으로 종료 콜백 `OnExit`를 부를지 정합니다([`cmd.go` 62–94행](https://github.com/bluenviron/mediamtx/blob/8402a728e6e1d819cd0c8045d231fd0191d04998/internal/externalcmd/cmd.go#L62-L94)). [[fig-hook-run-branches]]에서 청록 상자가 #6155 뒤 exit 5가 가는 곳입니다.
 
 ```mermaid {#fig-hook-run-branches kind="재구성" caption="커밋 8402a728의 externalcmd/cmd.go run()을 다시 그렸습니다. 코드가 0이면 runOSSpecific은 nil을, 아니면 command exited with code N 오류를 넘깁니다. v1.20.1은 exit 5도 0으로 넘겨 왼쪽 갈래로 가므로 재시작 켬은 code 0, 끔은 보고 없음으로 끝나고, #6155 뒤에는 청록 상자로 가 두 설정 모두 code 5를 남깁니다. MediaMTX가 직접 멈춘 명령은 이 판단 전에 보고 없이 끝납니다." source="https://github.com/bluenviron/mediamtx/blob/8402a728e6e1d819cd0c8045d231fd0191d04998/internal/externalcmd/cmd.go#L62-L94"}
 flowchart TB
   accTitle: run()이 종료 콜백을 부르는 조건
-  accDescr: runOSSpecific이 넘긴 종료 코드가 0이 아니면 재시작 설정과 상관없이 OnExit에 code N을 남긴다. 0이면 재시작을 켰을 때 OnExit에 code 0을 남기고, 껐을 때는 보고 없이 끝난다.
-  ret["runOSSpecific이<br/>넘긴 종료 코드"] -->|0이면| r["재시작 설정"]
-  ret --> x["0이 아니면<br/>OnExit code N"]
+  accDescr: runOSSpecific이 넘긴 값이 오류(종료 코드 N)면 재시작 설정과 상관없이 OnExit에 code N을 남긴다. nil(종료 코드 0)이면 재시작을 켰을 때 OnExit에 code 0을 남기고, 껐을 때는 보고 없이 끝난다.
+  ret["runOSSpecific이 넘긴 값<br/>(nil · 오류)"] -->|nil| r["재시작 설정"]
+  ret --> x["오류면<br/>OnExit code N"]
   r -->|켬| zero["OnExit<br/>code 0"]
   r -->|끔| none["보고 없음"]
   zero ~~~ none

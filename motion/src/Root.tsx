@@ -971,12 +971,6 @@ export const RemotionRoot: React.FC = () => (
       component={ReloadWaitCycle}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={RELOAD_WAIT_CYCLE_FRAMES}
-    <Composition id="SegmentCountGate" component={SegmentCountGate} durationInFrames={SEGMENT_COUNT_GATE_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
-    <Composition
-      id="SegmentCountGateMobile"
-      component={SegmentCountGate}
-      defaultProps={{ layout: "mobile" as const }}
-      durationInFrames={SEGMENT_COUNT_GATE_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}
@@ -987,12 +981,6 @@ export const RemotionRoot: React.FC = () => (
       component={CloseDuringReload}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={CLOSE_DURING_RELOAD_FRAMES}
-    <Composition id="ExitCodeDiscarded" component={ExitCodeDiscarded} durationInFrames={EXIT_CODE_DISCARDED_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
-    <Composition
-      id="ExitCodeDiscardedMobile"
-      component={ExitCodeDiscarded}
-      defaultProps={{ layout: "mobile" as const }}
-      durationInFrames={EXIT_CODE_DISCARDED_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}
@@ -1003,6 +991,30 @@ export const RemotionRoot: React.FC = () => (
       component={NoWatcherShutdown}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={NO_WATCHER_SHUTDOWN_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="SegmentCountGate" component={SegmentCountGate} durationInFrames={SEGMENT_COUNT_GATE_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="SegmentCountGateMobile"
+      component={SegmentCountGate}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={SEGMENT_COUNT_GATE_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="ExitCodeDiscarded" component={ExitCodeDiscarded} durationInFrames={EXIT_CODE_DISCARDED_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="ExitCodeDiscardedMobile"
+      component={ExitCodeDiscarded}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={EXIT_CODE_DISCARDED_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
     <Composition id="OfflineRecordingGate" component={OfflineRecordingGate} durationInFrames={OFFLINE_RECORDING_GATE_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
     <Composition
       id="OfflineRecordingGateMobile"

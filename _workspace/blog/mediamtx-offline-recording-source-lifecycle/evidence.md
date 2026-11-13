@@ -16,7 +16,7 @@
 | setOnline · setOffline은 #5956(2026-07-18 병합)에서 생겨 원 PR 기준 커밋(09a733e5)에는 없음 | `git log -S'func (pa *path) setOnline'`, merge-base 확인 | 2026-11-13 | 코드 |
 | 기본값 true | 1a6e23a0 conf/path.go 375 | 2026-11-13 | 코드 |
 | 시험 3개: 4a69843a(시험 이식) publisher만 PASS, static source 「recording did not start」, reload 「expected 0 actual 1」 FAIL × 3; 5bff8b89 · 1a6e23a0 · v1.21.0 · v1.21.3 3/3 × 3; 1a6e23a0 -race 1회 PASS, DATA RACE 0 | measure/gotest/offline_*.txt | 23:10–23:16 KST | 실측(AI) |
-| v1.21.0 바이너리: 구간별 새 파일 true 4·4·4, false 0·4·0 (3회 같음) | measure/raw/summary.json | 23:12–23:14 KST | 실측(AI) |
+| v1.21.0 바이너리: 구간별 새 파일 true 4·4·4, false 0·4·0 (3회 같음). 재로드 뒤 온라인 구간은 시험 · 측정하지 않음(영상 4번째 줄 「시험 안 함」) | measure/raw/summary.json | 23:12–23:14 KST | 실측(AI) |
 
 리뷰 본문의 「대안: doSourceStaticSetReady/NotReady에 같은 조건 추가」 대신 공통 전환으로 옮긴 판단은 리뷰 문장(“both gaps close, and the two source-transition sites … collapse into the shared methods”)에 근거한다.
 

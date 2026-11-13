@@ -125,13 +125,13 @@
       "bytes": 19453
     }
   },
-  "3fc6d10d80fba457": {
-    "source": "content/posts/open-source-analysis/mediamtx-offline-recording-source-lifecycle.md",
+  "3f2bc4017d33b3f4": {
+    "source": "content/posts/open-source-analysis/mediamtx-hook-exit-code-return.md",
     "wide": {
-      "file": "3fc6d10d80fba457-wide.svg",
-      "width": 380,
-      "height": 273,
-      "bytes": 14582
+      "file": "3f2bc4017d33b3f4-wide.svg",
+      "width": 370,
+      "height": 514,
+      "bytes": 19730
     }
   },
   "4187c5e2b25d2254": {
@@ -186,15 +186,6 @@
       "width": 432,
       "height": 528,
       "bytes": 21906
-    }
-  },
-  "4d2a244642d0a5af": {
-    "source": "content/posts/open-source-analysis/mediamtx-hook-exit-code-return.md",
-    "wide": {
-      "file": "4d2a244642d0a5af-wide.svg",
-      "width": 380,
-      "height": 498,
-      "bytes": 19551
     }
   },
   "4ec6e740ac6563b4": {
@@ -420,6 +411,15 @@
       "width": 280,
       "height": 736,
       "bytes": 20797
+    }
+  },
+  "b57eaac59c30e6c7": {
+    "source": "content/posts/open-source-analysis/mediamtx-offline-recording-source-lifecycle.md",
+    "wide": {
+      "file": "b57eaac59c30e6c7-wide.svg",
+      "width": 380,
+      "height": 273,
+      "bytes": 14919
     }
   },
   "b7bdf786e51db073": {

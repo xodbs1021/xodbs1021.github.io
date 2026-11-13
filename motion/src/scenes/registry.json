@@ -738,7 +738,7 @@
     "post": "mediamtx-offline-recording-source-lifecycle",
     "kind": "video",
     "posterFrame": 350,
-    "alt": "네 줄이 같은 시간축을 쓴다. 위에 오프라인, 온라인, 오프라인 구간 이름이 있고 각 줄의 상태 띠는 가운데 온라인 구간만 청록이다. 재생점이 왼쪽에서 오른쪽으로 지나가며 녹화 막대가 자란다. true (기본값) 줄은 처음부터 끝까지 검은 막대가 찬다. false · publisher, false · static source, false · 오프라인 중 reload 줄은 온라인 구간에서만 청록 막대가 찬다. static source 줄에는 온라인이 시작될 때 빨간 원 PR: 녹화 없음, reload 줄에는 앞쪽 오프라인 구간의 reload 이름표와 함께 빨간 원 PR: 녹화 시작이 뜬다",
+    "alt": "네 줄이 같은 시간축을 쓴다. 위에 오프라인, 온라인, 오프라인 구간 이름이 있고 각 줄의 상태 띠는 가운데 온라인 구간만 청록이다. 재생점이 왼쪽에서 오른쪽으로 지나가며 녹화 막대가 자란다. true (기본값) 줄은 처음부터 끝까지 검은 막대가 찬다. false · publisher, false · static source 줄은 온라인 구간에서만 청록 막대가 찬다. false · 오프라인 중 reload 줄은 온라인 구간에 막대 대신 회색 점선 시험 안 함이 뜬다. static source 줄에는 온라인이 시작될 때 빨간 원 PR: 녹화 없음, reload 줄에는 앞쪽 오프라인 구간의 reload 이름표와 함께 빨간 원 PR: 녹화 시작이 뜬다",
     "mobile": true
   },
   {

@@ -1,6 +1,6 @@
 // 콘티: _workspace/blog/mediamtx-offline-recording-source-lifecycle/storyboard.md 「OfflineRecordingGate」
 // 네 줄이 같은 시간축(오프라인 → 온라인 → 오프라인)을 공유한다. 얇은 띠는 상태(청록 = 온라인), 굵은 막대는 녹화다.
-// 재생점이 지나가며 녹화 막대가 자란다.
+// 재생점이 지나가며 녹화 막대가 자란다. 재로드 줄은 재로드 뒤 온라인 구간을 시험하지 않았으므로 회색 「시험 안 함」으로 둔다.
 // true 는 오프라인에도 녹화하고, false 는 publisher · static source · 오프라인 중 reload 모두 온라인 구간만 녹화한다.
 // 아래 두 줄에는 원 PR 커밋(4a69843a)의 동작을 빨간 이름표로 겹쳐 둔다. 개념도다(실제 길이 · 시각이 아님).
 // layout="mobile" 은 1080×1350 휴대폰판(OfflineRecordingGateMobile) — 줄 간격만 늘리고 글자는 48px 이상.
@@ -22,6 +22,8 @@ type Case = {
   readonly rec: ReadonlyArray<readonly [number, number]>;
   readonly tone: "ink" | "accent";
   readonly reload?: boolean;
+  /** 온라인 구간을 시험하지 않은 줄 — 녹화 막대 대신 회색 「시험 안 함」. */
+  readonly untested?: boolean;
   /** 원 PR 커밋의 다른 동작 — 이름표와 그 위치(0–1). */
   readonly original?: { readonly at: number; readonly text: string };
 };
@@ -34,7 +36,7 @@ const CASES: readonly Case[] = [
     original: { at: ONLINE.from, text: "원 PR: 녹화 없음" },
   },
   {
-    title: "false · 오프라인 중 reload", rec: [[ONLINE.from, ONLINE.to]], tone: "accent", reload: true,
+    title: "false · 오프라인 중 reload", rec: [], tone: "accent", reload: true, untested: true,
     original: { at: RELOAD_AT, text: "원 PR: 녹화 시작" },
   },
 ];
@@ -131,6 +133,19 @@ export const OfflineRecordingGate: React.FC<Props> = ({ layout = "desktop" }) =>
                 />
               );
             })}
+            {c.untested ? (
+              <div
+                style={{
+                  position: "absolute", left: xAt(ONLINE.from), top: ry, width: w * (ONLINE.to - ONLINE.from), height: l.recH,
+                  borderRadius: 10, boxSizing: "border-box", background: COLOR.surface, border: `3px dashed ${COLOR.muted}`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontFamily: FONT, fontSize: l.text, fontWeight: 700, color: COLOR.muted, whiteSpace: "nowrap",
+                  opacity: sweep >= ONLINE.from ? progress(frame, T.sweepStart + (T.sweepEnd - T.sweepStart) * ONLINE.from, 10) : 0,
+                }}
+              >
+                시험 안 함
+              </div>
+            ) : null}
             {c.reload ? (
               <Tag x={xAt(RELOAD_AT)} y={ry + l.recH / 2 - l.text * 0.72 - 8} size={l.text} tone="ink" anchor="center" opacity={reloadShown}>
                 reload
