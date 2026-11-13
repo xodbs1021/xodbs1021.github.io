@@ -1,0 +1,14 @@
+2026/11/13 21:25:37 INF MediaMTX v1.21.3, darwin, arm64
+2026/11/13 21:25:37 INF configuration loaded from <OUT>/cert/default_v1.21.3_readonly-work/run0/mediamtx.yml
+2026/11/13 21:25:37 INF [RTSP] started with listeners on :28554 (TCP/RTSP), :28000 (UDP/RTP), :28001 (UDP/RTCP)
+2026/11/13 21:25:37 INF [RTMP] started with listener on :21935 (TCP/RTMP)
+2026/11/13 21:25:37 INF [HLS] started with listener on :28888 (TCP/HTTP)
+2026/11/13 21:25:37 INF [WebRTC] started with listeners on :28889 (TCP/HTTP), :28189 (UDP/ICE)
+2026/11/13 21:25:37 INF [SRT] started with listener on :28890 (UDP/SRT)
+2026/11/13 21:25:37 WAR [MoQ] certificate auto.key not found, generating it from scratch
+2026/11/13 21:25:37 WAR [MoQ] failed to save TLS key to auto.key: open auto.key: permission denied
+2026/11/13 21:25:37 WAR [MoQ] failed to save TLS cert to auto.crt: open auto.crt: permission denied
+2026/11/13 21:25:37 INF [MoQ] started with listeners on :28892 (TCP/HTTP2), :28892 (UDP/HTTP3), :28893 (UDP/QUIC)
+2026/11/13 21:25:38 INF shutting down gracefully
+2026/11/13 21:25:38 INF [SRT] closing
+2026/11/13 21:25:38 INF [MoQ] closing

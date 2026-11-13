@@ -1,0 +1,47 @@
+[
+ {
+  "started": true,
+  "save_failed": false,
+  "result": "exited",
+  "exit_code": 0,
+  "sigint_to_exit_ms": 4.61,
+  "last_line": "2026/11/13 21:25:26 INF waiting for running hooks",
+  "i": 0
+ },
+ {
+  "started": true,
+  "save_failed": false,
+  "result": "exited",
+  "exit_code": 0,
+  "sigint_to_exit_ms": 4.6,
+  "last_line": "2026/11/13 21:25:27 INF waiting for running hooks",
+  "i": 1
+ },
+ {
+  "started": true,
+  "save_failed": false,
+  "result": "exited",
+  "exit_code": 0,
+  "sigint_to_exit_ms": 3.46,
+  "last_line": "2026/11/13 21:25:28 INF waiting for running hooks",
+  "i": 2
+ },
+ {
+  "started": true,
+  "save_failed": false,
+  "result": "exited",
+  "exit_code": 0,
+  "sigint_to_exit_ms": 3.73,
+  "last_line": "2026/11/13 21:25:29 INF waiting for running hooks",
+  "i": 3
+ },
+ {
+  "started": true,
+  "save_failed": false,
+  "result": "exited",
+  "exit_code": 0,
+  "sigint_to_exit_ms": 1.57,
+  "last_line": "2026/11/13 21:25:30 INF waiting for running hooks",
+  "i": 4
+ }
+]

@@ -1,0 +1,9 @@
+2026/11/13 21:24:51 INF MediaMTX v1.21.3, darwin, arm64
+2026/11/13 21:24:51 INF configuration loaded from <OUT>/cert/moq_v1.21.3_readonly-work/run2/mediamtx.yml
+2026/11/13 21:24:51 DEB path manager created
+2026/11/13 21:24:51 WAR [MoQ] certificate auto.key not found, generating it from scratch
+2026/11/13 21:24:51 WAR [MoQ] failed to save TLS key to auto.key: open auto.key: permission denied
+2026/11/13 21:24:51 WAR [MoQ] failed to save TLS cert to auto.crt: open auto.crt: permission denied
+2026/11/13 21:24:51 INF [MoQ] started with listeners on :18892 (TCP/HTTP2), :18892 (UDP/HTTP3), :18893 (UDP/QUIC)
+2026/11/13 21:24:52 INF shutting down gracefully
+2026/11/13 21:24:52 INF [MoQ] closing

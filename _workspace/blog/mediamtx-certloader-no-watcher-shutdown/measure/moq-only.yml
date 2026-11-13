@@ -1,0 +1,12 @@
+# mediamtx.yml from PR #6427 (Reproduction): only the MoQ server is on.
+logLevel: debug
+api: no
+rtsp: no
+rtmp: no
+hls: no
+webrtc: no
+srt: no
+moq: yes
+moqHTTP2Address: :18892
+moqHTTP3Address: :18892
+moqQUICAddress: :18893

@@ -1,0 +1,42 @@
+# tree 9540cb6c (v1.21.3), go version go1.27.2 darwin/arm64
+# test copied: internal/certloader/zz_closeautocert_test.go
+# started 2026-11-13T21:21:43+0900
+=== RUN   TestCloseAutoCert
+=== RUN   TestCloseAutoCert/saved
+=== RUN   TestCloseAutoCert/not_saved
+    zz_closeautocert_test.go:50: Close() did not return
+--- FAIL: TestCloseAutoCert (5.01s)
+    --- PASS: TestCloseAutoCert/saved (0.00s)
+    --- FAIL: TestCloseAutoCert/not_saved (5.00s)
+=== RUN   TestCloseAutoCert
+=== RUN   TestCloseAutoCert/saved
+=== RUN   TestCloseAutoCert/not_saved
+    zz_closeautocert_test.go:50: Close() did not return
+--- FAIL: TestCloseAutoCert (5.01s)
+    --- PASS: TestCloseAutoCert/saved (0.00s)
+    --- FAIL: TestCloseAutoCert/not_saved (5.00s)
+=== RUN   TestCloseAutoCert
+=== RUN   TestCloseAutoCert/saved
+=== RUN   TestCloseAutoCert/not_saved
+    zz_closeautocert_test.go:50: Close() did not return
+--- FAIL: TestCloseAutoCert (5.00s)
+    --- PASS: TestCloseAutoCert/saved (0.00s)
+    --- FAIL: TestCloseAutoCert/not_saved (5.00s)
+=== RUN   TestCloseAutoCert
+=== RUN   TestCloseAutoCert/saved
+=== RUN   TestCloseAutoCert/not_saved
+    zz_closeautocert_test.go:50: Close() did not return
+--- FAIL: TestCloseAutoCert (5.00s)
+    --- PASS: TestCloseAutoCert/saved (0.00s)
+    --- FAIL: TestCloseAutoCert/not_saved (5.00s)
+=== RUN   TestCloseAutoCert
+=== RUN   TestCloseAutoCert/saved
+=== RUN   TestCloseAutoCert/not_saved
+    zz_closeautocert_test.go:50: Close() did not return
+--- FAIL: TestCloseAutoCert (5.00s)
+    --- PASS: TestCloseAutoCert/saved (0.00s)
+    --- FAIL: TestCloseAutoCert/not_saved (5.00s)
+FAIL
+FAIL	github.com/bluenviron/mediamtx/internal/certloader	25.525s
+FAIL
+# exit 1 at 2026-11-13T21:22:12+0900

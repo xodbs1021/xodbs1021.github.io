@@ -1,0 +1,47 @@
+[
+ {
+  "started": true,
+  "save_failed": true,
+  "result": "killed_after_10s",
+  "exit_code": null,
+  "sigint_to_exit_ms": null,
+  "last_line": "2026/11/13 21:23:29 INF [MoQ] closing",
+  "i": 0
+ },
+ {
+  "started": true,
+  "save_failed": true,
+  "result": "killed_after_10s",
+  "exit_code": null,
+  "sigint_to_exit_ms": null,
+  "last_line": "2026/11/13 21:23:40 INF [MoQ] closing",
+  "i": 1
+ },
+ {
+  "started": true,
+  "save_failed": true,
+  "result": "killed_after_10s",
+  "exit_code": null,
+  "sigint_to_exit_ms": null,
+  "last_line": "2026/11/13 21:23:51 INF [MoQ] closing",
+  "i": 2
+ },
+ {
+  "started": true,
+  "save_failed": true,
+  "result": "killed_after_10s",
+  "exit_code": null,
+  "sigint_to_exit_ms": null,
+  "last_line": "2026/11/13 21:24:02 INF [MoQ] closing",
+  "i": 3
+ },
+ {
+  "started": true,
+  "save_failed": true,
+  "result": "killed_after_10s",
+  "exit_code": null,
+  "sigint_to_exit_ms": null,
+  "last_line": "2026/11/13 21:24:13 INF [MoQ] closing",
+  "i": 4
+ }
+]
