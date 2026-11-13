@@ -87,6 +87,9 @@ import { ACKS_ISR_COMMIT_FRAMES, AcksIsrCommit } from "./scenes/kafka-core-conce
 import { SILENT_EXEC_FAILURE_FRAMES, SilentExecFailure } from "./scenes/mediamtx-seven-hooks-missing-exit-callback/SilentExecFailure";
 import { HOOK_OUTPUT_DRAIN_FRAMES, HookOutputDrain } from "./scenes/mediamtx-hook-output-backpressure-experiments/HookOutputDrain";
 import { AUTH_BODY_WAIT_FRAMES, AuthBodyWait } from "./scenes/mediamtx-user-srt-passphrase-boundaries/AuthBodyWait";
+import { RELOAD_WAIT_CYCLE_FRAMES, ReloadWaitCycle } from "./scenes/mediamtx-logger-reload-rejected-lifecycle-fix/ReloadWaitCycle";
+import { CLOSE_DURING_RELOAD_FRAMES, CloseDuringReload } from "./scenes/mediamtx-certificate-watcher-close-join/CloseDuringReload";
+import { NO_WATCHER_SHUTDOWN_FRAMES, NoWatcherShutdown } from "./scenes/mediamtx-certloader-no-watcher-shutdown/NoWatcherShutdown";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
@@ -954,6 +957,36 @@ export const RemotionRoot: React.FC = () => (
       component={AuthBodyWait}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={AUTH_BODY_WAIT_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="ReloadWaitCycle" component={ReloadWaitCycle} durationInFrames={RELOAD_WAIT_CYCLE_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="ReloadWaitCycleMobile"
+      component={ReloadWaitCycle}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={RELOAD_WAIT_CYCLE_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="CloseDuringReload" component={CloseDuringReload} durationInFrames={CLOSE_DURING_RELOAD_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="CloseDuringReloadMobile"
+      component={CloseDuringReload}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={CLOSE_DURING_RELOAD_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="NoWatcherShutdown" component={NoWatcherShutdown} durationInFrames={NO_WATCHER_SHUTDOWN_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="NoWatcherShutdownMobile"
+      component={NoWatcherShutdown}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={NO_WATCHER_SHUTDOWN_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}

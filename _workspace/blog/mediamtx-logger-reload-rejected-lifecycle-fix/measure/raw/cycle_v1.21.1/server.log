@@ -1,0 +1,82 @@
+{"timestamp":"2026-11-13T21:18:49.992341+09:00","level":"INF","message":"MediaMTX v1.21.1, darwin, arm64"}
+{"timestamp":"2026-11-13T21:18:49.992446+09:00","level":"INF","message":"configuration loaded from <OUT>/logger/cycle_v1.21.1/mediamtx.yml"}
+{"timestamp":"2026-11-13T21:18:49.994732+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:18:49.995717+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:18:50.046967+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:51951] opened"}
+{"timestamp":"2026-11-13T21:18:50.050668+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:51951] closed: EOF"}
+{"timestamp":"2026-11-13T21:18:50.050693+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:51951] runOnDisconnect command launched"}
+{"timestamp":"2026-11-13T21:18:50.086856+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:18:50.086904+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:18:50.088267+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:18:50.088377+09:00","level":"DEB","message":"[path test] created"}
+{"timestamp":"2026-11-13T21:18:50.088395+09:00","level":"DEB","message":"path manager created"}
+{"timestamp":"2026-11-13T21:18:50.088507+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:18:50.088598+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:18:50.115189+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:51953] [c->s] GET /v3/config/global/get HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept: */*\r\nUser-Agent: curl/8.7.1\r\n\r\n"}
+{"timestamp":"2026-11-13T21:18:50.115492+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:51953] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 3359 bytes)"}
+{"timestamp":"2026-11-13T21:18:50.163874+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:51954] [c->s] GET /v3/config/global/get HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nUser-Agent: Python-urllib/3.14\r\n\r\n"}
+{"timestamp":"2026-11-13T21:18:50.164063+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:51954] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 3359 bytes)"}
+{"timestamp":"2026-11-13T21:18:52.177012+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:52033] opened"}
+{"timestamp":"2026-11-13T21:18:52.180099+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:52033] closed: EOF"}
+{"timestamp":"2026-11-13T21:18:52.180123+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:52033] runOnDisconnect command launched"}
+{"timestamp":"2026-11-13T21:18:52.208589+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:52034] [c->s] PATCH /v3/config/global/patch HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept: */*\r\nContent-Length: 19\r\nContent-Type: application/json\r\nUser-Agent: curl/8.7.1\r\n\r\n{\"logLevel\":\"info\"}"}
+{"timestamp":"2026-11-13T21:18:52.208949+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:18:52.208974+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:18:52.209017+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:52034] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 15 bytes)"}
+{"timestamp":"2026-11-13T21:18:52.210148+09:00","level":"DEB","message":"[API] closed"}
+{"timestamp":"2026-11-13T21:18:52.21019+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:18:52.210289+09:00","level":"DEB","message":"[RTSP] closed"}
+{"timestamp":"2026-11-13T21:18:52.210305+09:00","level":"DEB","message":"path manager is shutting down"}
+{"timestamp":"2026-11-13T21:18:52.210334+09:00","level":"DEB","message":"[path test] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:18:52.210502+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:18:52.210574+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:18:54.301872+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:52049] opened"}
+{"timestamp":"2026-11-13T21:18:54.305987+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:52049] closed: EOF"}
+{"timestamp":"2026-11-13T21:18:54.306021+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:52049] runOnDisconnect command launched"}
+{"timestamp":"2026-11-13T21:18:54.340922+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:18:54.340985+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:18:54.342444+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:18:54.342598+09:00","level":"DEB","message":"[path test] created"}
+{"timestamp":"2026-11-13T21:18:54.342624+09:00","level":"DEB","message":"path manager created"}
+{"timestamp":"2026-11-13T21:18:54.342746+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:18:54.342831+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:18:54.3772+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:52051] [c->s] GET /v3/config/global/get HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept: */*\r\nUser-Agent: curl/8.7.1\r\n\r\n"}
+{"timestamp":"2026-11-13T21:18:54.377462+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:52051] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 3359 bytes)"}
+{"timestamp":"2026-11-13T21:18:54.422313+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:52053] [c->s] GET /v3/config/global/get HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nUser-Agent: Python-urllib/3.14\r\n\r\n"}
+{"timestamp":"2026-11-13T21:18:54.422527+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:52053] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 3359 bytes)"}
+{"timestamp":"2026-11-13T21:18:56.440163+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:52122] opened"}
+{"timestamp":"2026-11-13T21:18:56.445118+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:52122] closed: EOF"}
+{"timestamp":"2026-11-13T21:18:56.445148+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:52122] runOnDisconnect command launched"}
+{"timestamp":"2026-11-13T21:18:56.473518+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:52123] [c->s] PATCH /v3/config/global/patch HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept: */*\r\nContent-Length: 19\r\nContent-Type: application/json\r\nUser-Agent: curl/8.7.1\r\n\r\n{\"logLevel\":\"info\"}"}
+{"timestamp":"2026-11-13T21:18:56.473851+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:18:56.473878+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:18:56.473923+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:52123] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 15 bytes)"}
+{"timestamp":"2026-11-13T21:18:56.474981+09:00","level":"DEB","message":"[API] closed"}
+{"timestamp":"2026-11-13T21:18:56.474998+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:18:56.475072+09:00","level":"DEB","message":"[RTSP] closed"}
+{"timestamp":"2026-11-13T21:18:56.475081+09:00","level":"DEB","message":"path manager is shutting down"}
+{"timestamp":"2026-11-13T21:18:56.475092+09:00","level":"DEB","message":"[path test] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:18:56.475221+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:18:56.475291+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:18:58.587017+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:52134] opened"}
+{"timestamp":"2026-11-13T21:18:58.593121+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:52134] closed: EOF"}
+{"timestamp":"2026-11-13T21:18:58.593157+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:52134] runOnDisconnect command launched"}
+{"timestamp":"2026-11-13T21:18:58.651438+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:18:58.651501+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:18:58.65298+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:18:58.653178+09:00","level":"DEB","message":"[path test] created"}
+{"timestamp":"2026-11-13T21:18:58.653204+09:00","level":"DEB","message":"path manager created"}
+{"timestamp":"2026-11-13T21:18:58.65332+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:18:58.653719+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:18:58.697593+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:52136] [c->s] GET /v3/config/global/get HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept: */*\r\nUser-Agent: curl/8.7.1\r\n\r\n"}
+{"timestamp":"2026-11-13T21:18:58.698035+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:52136] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 3359 bytes)"}
+{"timestamp":"2026-11-13T21:18:58.7518+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:52137] [c->s] GET /v3/config/global/get HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nUser-Agent: Python-urllib/3.14\r\n\r\n"}
+{"timestamp":"2026-11-13T21:18:58.752127+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:52137] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 3359 bytes)"}
+{"timestamp":"2026-11-13T21:19:00.758793+09:00","level":"INF","message":"shutting down gracefully"}
+{"timestamp":"2026-11-13T21:19:00.758909+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:19:00.758973+09:00","level":"DEB","message":"[API] closed"}
+{"timestamp":"2026-11-13T21:19:00.758986+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:19:00.759037+09:00","level":"DEB","message":"[RTSP] closed"}
+{"timestamp":"2026-11-13T21:19:00.759048+09:00","level":"DEB","message":"path manager is shutting down"}
+{"timestamp":"2026-11-13T21:19:00.759065+09:00","level":"DEB","message":"[path test] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:19:00.759084+09:00","level":"INF","message":"waiting for running hooks"}

@@ -1,0 +1,15 @@
+default_v1.21.3_readonly: exited 0/1, killed after 10 s 1, save failed 1, SIGINT to exit ms -–-, last line of run 0: INF [MoQ] closing
+default_v1.21.3_writable: exited 1/1, killed after 10 s 0, save failed 0, SIGINT to exit ms 9.58–9.58, last line of run 0: INF waiting for running hooks
+moq_065f94c2_readonly: exited 5/5, killed after 10 s 0, save failed 5, SIGINT to exit ms 1.54–6.22, last line of run 0: INF waiting for running hooks
+moq_065f94c2_writable: exited 5/5, killed after 10 s 0, save failed 0, SIGINT to exit ms 1.57–4.61, last line of run 0: INF waiting for running hooks
+moq_989ea15a_readonly: exited 0/5, killed after 10 s 5, save failed 5, SIGINT to exit ms -–-, last line of run 0: INF [MoQ] closing
+moq_989ea15a_writable: exited 5/5, killed after 10 s 0, save failed 0, SIGINT to exit ms 1.54–4.63, last line of run 0: INF waiting for running hooks
+moq_b5df4626_readonly: exited 5/5, killed after 10 s 0, save failed 5, SIGINT to exit ms 1.57–4.66, last line of run 0: INF waiting for running hooks
+moq_b5df4626_writable: exited 5/5, killed after 10 s 0, save failed 0, SIGINT to exit ms 1.51–4.63, last line of run 0: INF waiting for running hooks
+moq_v1.21.3_readonly: exited 0/5, killed after 10 s 5, save failed 5, SIGINT to exit ms -–-, last line of run 0: INF [MoQ] closing
+moq_v1.21.3_writable: exited 5/5, killed after 10 s 0, save failed 0, SIGINT to exit ms 1.55–5.9, last line of run 0: INF waiting for running hooks
+closeautocert_065f94c2.txt:    5 PASS:TestCloseAutoCert/not_saved    5 PASS:TestCloseAutoCert/saved 
+closeautocert_7d95a222.txt:    5 PASS:TestCloseAutoCert/not_saved    5 PASS:TestCloseAutoCert/saved 
+closeautocert_989ea15a.txt:    5 FAIL:TestCloseAutoCert/not_saved    5 PASS:TestCloseAutoCert/saved 
+closeautocert_v1.21.1.txt:    5 PASS:TestCloseAutoCert/not_saved    5 PASS:TestCloseAutoCert/saved 
+closeautocert_v1.21.3.txt:    5 FAIL:TestCloseAutoCert/not_saved    5 PASS:TestCloseAutoCert/saved 

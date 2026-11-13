@@ -119,7 +119,7 @@ UTF-8을 지키는 처리와 잘림 알림은 지금 PR에 없습니다. PR 본�
 - [Go `os/exec` `Cmd.WaitDelay`](https://pkg.go.dev/os/exec#Cmd.WaitDelay)
 - [PR #6206](https://github.com/bluenviron/mediamtx/pull/6206) — 닫힘 · [PR #6326 「fix race condition during logger recreation」](https://github.com/bluenviron/mediamtx/pull/6326) — v1.21.3
 - [이슈 #2034 「Prefix hook logs with path」](https://github.com/bluenviron/mediamtx/issues/2034)
-- [안전하게 기다리려던 수정이 교착을 만들 수 있었다](/posts/open-source-analysis/mediamtx-logger-reload-rejected-lifecycle-fix/) — #6206 기록
+- [로그 재설정 중 훅을 기다리게 한 PR은 교착 반례로 닫혔습니다](/posts/open-source-analysis/mediamtx-logger-reload-rejected-lifecycle-fix/) — #6206 기록
 
 ---
 

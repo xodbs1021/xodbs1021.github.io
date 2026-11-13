@@ -1,0 +1,92 @@
+[
+ {
+  "i": 0,
+  "field": "logFile",
+  "value": "reload-a.log",
+  "patch_code": 200,
+  "api_back": true,
+  "patch_to_api_ms": 3038.51,
+  "publisher_dropped": true
+ },
+ {
+  "i": 1,
+  "field": "logFile",
+  "value": "reload-b.log",
+  "patch_code": 200,
+  "api_back": true,
+  "patch_to_api_ms": 3021.71,
+  "publisher_dropped": true
+ },
+ {
+  "i": 2,
+  "field": "logFile",
+  "value": "reload-a.log",
+  "patch_code": 200,
+  "api_back": true,
+  "patch_to_api_ms": 3029.54,
+  "publisher_dropped": true
+ },
+ {
+  "i": 3,
+  "field": "logFile",
+  "value": "reload-b.log",
+  "patch_code": 200,
+  "api_back": true,
+  "patch_to_api_ms": 3031.41,
+  "publisher_dropped": true
+ },
+ {
+  "i": 4,
+  "field": "logFile",
+  "value": "reload-a.log",
+  "patch_code": 200,
+  "api_back": true,
+  "patch_to_api_ms": 3029.24,
+  "publisher_dropped": true
+ },
+ {
+  "i": 5,
+  "field": "logFile",
+  "value": "reload-b.log",
+  "patch_code": 200,
+  "api_back": true,
+  "patch_to_api_ms": 3030.69,
+  "publisher_dropped": true
+ },
+ {
+  "i": 6,
+  "field": "logFile",
+  "value": "reload-a.log",
+  "patch_code": 200,
+  "api_back": true,
+  "patch_to_api_ms": 3031.6,
+  "publisher_dropped": true
+ },
+ {
+  "i": 7,
+  "field": "logFile",
+  "value": "reload-b.log",
+  "patch_code": 200,
+  "api_back": true,
+  "patch_to_api_ms": 3025.91,
+  "publisher_dropped": true
+ },
+ {
+  "i": 8,
+  "field": "logFile",
+  "value": "reload-a.log",
+  "patch_code": 200,
+  "api_back": true,
+  "patch_to_api_ms": 3035.62,
+  "publisher_dropped": true
+ },
+ {
+  "i": 9,
+  "field": "logFile",
+  "value": "reload-b.log",
+  "patch_code": 200,
+  "api_back": true,
+  "patch_to_api_ms": 3027.33,
+  "publisher_dropped": true
+ }
+]

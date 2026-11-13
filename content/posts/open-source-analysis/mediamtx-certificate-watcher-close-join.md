@@ -1,10 +1,10 @@
 ---
-title: "Close가 반환했는데 인증서 watcher는 살아 있었다"
+title: "MediaMTX 인증서 감시 작업은 Close 뒤에도 돌았습니다"
 date: "2026-10-15T11:40:52+09:00"
-lastmod: "2026-10-28T18:38:04+09:00"
+lastmod: "2026-11-13T22:07:44+09:00"
 draft: false
 author: "김태윤"
-description: "종료 요청과 실제 완료를 분리하고 갱신 중간을 통제해 20/20 실패→20/20 통과를 확인한 MediaMTX #6261."
+description: "MediaMTX v1.21.1의 CertLoader.Close()는 인증서 감시 고루틴 watch()를 기다리지 않아, 갱신 중이던 watch()가 Close 뒤에도 로그를 쓰고 비운 인증서를 다시 채울 수 있었습니다. Close가 watch()의 반환을 기다리게 한 PR #6261의 시험을 AI가 다시 돌리자 v1.21.1은 20번 모두 실패, #6261 head와 이후 상류 판은 20번 모두 통과했습니다. #6261은 2026년 10월 25일 닫혔고, 유지보수자가 채널로 다시 구현한 #6417이 v1.21.3에 들어갔습니다."
 categories: ["open-source-analysis"]
 tags: ["MediaMTX", "Go", "동시성", "회귀 테스트", "오픈소스 기여"]
 portfolio_cases: [42]
@@ -12,58 +12,107 @@ portfolio_pages: [38]
 portfolio_edition: "2026-10-15-v2"
 ---
 
-> **2026년 10월 28일 상태 갱신:** #6261은 병합 없이 닫혔습니다. 아래 20/20 결과는 이 제안의 고정 커밋 실험 기록이며 상류 채택 성과가 아닙니다. 유지보수자의 별도 구현 [#6417](https://github.com/bluenviron/mediamtx/pull/6417) 이후 발견한 no-watch 종료 교착은 [후속 글: 시작되지 않은 watcher의 종료를 기다리던 문제](/posts/open-source-analysis/mediamtx-certloader-no-watcher-shutdown/)에서 다룹니다. 후속 수정 #6427과 이 제안의 코드·검증 결과를 구분합니다.
+MediaMTX v1.21.1의 `CertLoader.Close()`는 인증서 감시 고루틴 `watch()`가 끝나기를 기다리지 않고 반환했습니다. `watch()`가 인증서를 다시 읽던 중이면 Close 뒤에도 로그를 쓰고, Close가 비운 인증서를 다시 채울 수 있었습니다. Close가 `watch()`의 반환을 기다리게 한 [PR #6261](https://github.com/bluenviron/mediamtx/pull/6261)의 시험 `TestCloseDuringReload`를 2026년 11월 13일 다시 돌리자, v1.21.1에서는 20번 모두 실패하고 #6261 head와 이후 상류 판에서는 20번 모두 통과했습니다. #6261은 10월 25일 병합 없이 닫혔고, 유지보수자가 같은 날 WaitGroup 대신 채널로 다시 구현한 [#6417](https://github.com/bluenviron/mediamtx/pull/6417)이 v1.21.3에 들어갔습니다.
 
-MediaMTX의 `CertLoader.Close()`는 종료 신호를 보낸 뒤 반환했습니다. 그런데 이미 시작한 인증서 갱신 작업은 계속 실행돼, Close 이후에도 로그를 쓰거나 인증서를 다시 채울 수 있었습니다. 호출자는 정리가 끝났다고 생각하지만 그 객체를 쓰는 작업은 아직 남아 있는 순서였습니다.
+범위와 검증 기준, 제출 결정은 제가 했고 구현과 실측은 AI(Claude Code·Codex)가 했습니다. 이 글의 재측정도 AI(Claude Code)가 실행했습니다.
 
-저는 [PR #6261](https://github.com/bluenviron/mediamtx/pull/6261)에서 **종료 요청→watcher 완료 대기→자원 정리** 순서를 제안했습니다. 그 순서를 검증하려고 인증서 갱신 중간을 멈춘 상태에서 Close를 호출했습니다. 같은 회귀 테스트는 **수정 전 20/20 실패, 수정 후 20/20 통과**했습니다. 이는 아래의 고정 커밋 쌍에서 얻은 결과이며, PR은 2026년 10월 15일 확인 기준 OPEN입니다.
+## select에서 쉬는 watcher만 보면 Close는 맞아 보였습니다 {#평소에는-보이지-않는-수명-경계였다}
 
-## 평소에는 보이지 않는 수명 경계였다
+`CertLoader`는 TLS 인증서와 키 파일을 읽고, 파일이 바뀌면 다시 읽는 구성 요소입니다. RTSP·RTMP·MoQ 서버와 `httpp.Server`가 만들고, 자신이 닫힐 때 함께 닫습니다. v1.21.1에서 `watch()`는 인증서 감시·키 감시·`done` 세 채널을 `select`로 기다립니다. `Close()`는 `done`과 두 감시자를 닫고 `cl.cert`를 nil로 비운 뒤 반환합니다([`certloader.go` 149–202행](https://github.com/bluenviron/mediamtx/blob/048255986f7e04b859b4c4efe651448ec785ecd4/internal/certloader/certloader.go#L149-L202)).
 
-인증서 watcher는 파일 변경을 기다리다가 인증서나 키가 바뀌면 새 내용을 읽습니다. 아무 작업 없이 select에서 대기 중이면 `done`을 닫는 것만으로도 깨어나 종료할 수 있습니다. 이 정상적인 경우만 반복하면 Close의 순서가 올바르다고 생각하기 쉽습니다.
+`watch()`가 `select`에서 쉬고 있으면 `done`이 닫히는 순간 깨어나 반환하므로 문제가 드러나지 않습니다. PR 본문의 탐침에서도 `Initialize()` 뒤 20ms를 쉬고 Close를 부른 100번, 인증서 파일이 바뀌지 않은 채 MoQ 서버를 닫는 재설정 70번 모두 Close 뒤 로그가 없었습니다.
 
-하지만 이미 갱신 처리를 시작했다면 종료 채널을 닫아도 그 작업은 즉시 사라지지 않습니다. 기존 Close는 watcher의 완료를 기다리지 않고 감시 자원과 인증서 상태를 정리했습니다. 남은 작업은 Close 이후에도 `Parent.Log`를 호출하거나 `cl.cert`를 다시 채울 수 있었습니다.
+문제는 `watch()`가 이미 갱신 하나를 처리하고 있을 때입니다. `watch()`는 새 인증서를 `cl.cert`에 넣은 뒤 `Parent.Log`로 로그를 씁니다. 그 로그가 늦는 사이 Close가 끝나면, 루프가 `select`로 돌아왔을 때 세 경우가 모두 준비돼 있습니다. 감시자는 끝날 때 자기 신호 채널을 닫기 때문입니다([`confwatcher.go` 115행](https://github.com/bluenviron/mediamtx/blob/048255986f7e04b859b4c4efe651448ec785ecd4/internal/confwatcher/confwatcher.go#L115)). Go의 `select`는 준비된 경우 가운데 하나를 무작위로 고르므로([Go 명세 「Select statements」](https://go.dev/ref/spec#Select_statements)), 감시자 경우를 골라 인증서를 다시 읽고 `cl.cert`를 다시 채울 수 있습니다. [[fig-close-watch-sequence]]가 그 순서입니다.
 
-여러 채널이 닫히는 경우 select의 준비 상태도 고려해야 했습니다. `done`과 두 감시 채널이 함께 닫혀 있으면, 반복문이 돌아왔을 때 종료 분기만 선택된다고 가정할 수 없습니다. 핵심은 채널이 닫혔다는 사실보다 그 채널을 사용하는 고루틴이 끝났다는 사실이었습니다.
+```mermaid {#fig-close-watch-sequence kind="재구성" caption="v1.21.1 certloader.go 149–202행을 따라 다시 그린 순서. watch()가 새 인증서를 넣고 Parent.Log에서 늦는 동안 Close()는 done과 감시자를 닫고 cl.cert를 비운 뒤 반환합니다. 로그가 끝나면 select의 세 경우가 모두 준비돼 있어, 감시자 경우를 고르면 Close 뒤에 cl.cert가 다시 채워집니다." source="https://github.com/bluenviron/mediamtx/blob/048255986f7e04b859b4c4efe651448ec785ecd4/internal/certloader/certloader.go#L149-L202"}
+%%{init: {"sequence": {"width": 96, "actorMargin": 16}}}%%
+sequenceDiagram
+  accTitle: 갱신 중 Close가 먼저 반환하는 순서
+  accDescr: watch가 인증서를 바꾸고 Parent.Log에서 늦는 동안 Close가 done과 감시자를 닫고 cl.cert를 nil로 만든 뒤 반환한다. 로그가 끝난 watch는 select에서 감시자 경우를 골라 cl.cert를 다시 채울 수 있다.
+  participant W as watch()
+  participant L as Parent.Log
+  participant C as Close()
+  Note over W: cl.cert =<br/>새 인증서
+  W->>L: 갱신 로그
+  Note over L: 늦어짐
+  Note over C: done · 감시자<br/>닫기
+  Note over C: cl.cert = nil
+  C-->>C: 반환
+  L-->>W: 로그 끝
+  Note over W: select 세 경우<br/>모두 준비
+  Note over W: 감시자 쪽이면<br/>cert 다시 채움
+```
 
-## 신호 뒤에 완료 대기를 넣었다
+`watch()`는 Close가 반환한 뒤에도 `Parent.Log`를 부를 수 있었고, 호출자는 비웠다고 믿는 `cl.cert`를 다시 보게 됩니다. 채널이 닫혔다는 사실만으로는 그 채널을 쓰던 고루틴이 끝났다고 말할 수 없었습니다.
 
-수정은 watcher 시작 전에 `WaitGroup`에 등록하고, 고루틴이 끝날 때 완료를 알리도록 하는 것입니다. Close는 종료 요청 뒤 `Wait()`로 작업 완료를 기다린 다음 감시 자원과 인증서를 정리합니다. watcher를 시작하지 않는 초기화 경로에서는 카운터가 0이므로 대기가 바로 끝납니다.
+## 종료 신호 뒤에 watch() 반환을 기다리게 했습니다 {#신호-뒤에-완료-대기를-넣었다}
+
+#6261은 `certloader.go`에 5줄을 더했습니다. `go cl.watch()` 앞에서 `wg.Add(1)`, `watch()` 맨 위에서 `defer cl.wg.Done()`, Close에서 `close(cl.done)` 바로 뒤에 `cl.wg.Wait()`를 두었습니다([head `7d95a222`](https://github.com/bluenviron/mediamtx/commit/7d95a222f8f208f16af79b8ac32b6e4d61a280ba)). RTSP·RTMP 서버가 자기 `run()` 고루틴에 쓰는 모양과 같습니다.
 
 | 순서 | 동작 | 지키려는 조건 |
 |---|---|---|
 | 시작 | 고루틴 실행 전에 `Add(1)` | Close가 시작을 놓치지 않음 |
-| 종료 요청 | `done` 닫기 | 대기 중 watcher를 깨움 |
-| 완료 대기 | `Wait()` | 진행 중 갱신의 반환 확인 |
-| 정리 | 감시 자원·인증서 상태 정리 | 살아 있는 작업이 정리된 상태를 다시 사용하지 않음 |
+| 종료 요청 | `done` 닫기 | 쉬고 있는 `watch()`를 깨움 |
+| 완료 대기 | `Wait()` | 진행 중인 갱신이 끝났음을 확인 |
+| 정리 | 감시자 닫기, `cl.cert = nil` | 끝난 작업만 남은 뒤 상태를 비움 |
 
-기존 서버들의 shutdown 순서나 `CertLoader`의 공개 API를 바꾸지는 않았습니다. 이미 사용하던 종료 패턴에 맞춰 loader 안에서 자신의 작업 수명을 책임지는 범위를 택했습니다. 제 역할은 이 경계와 검증 범위를 확정하는 것이었고, 코드 변경·실측·리뷰는 AI와 협업했습니다.
+`watch()`를 시작하지 않고 `Initialize()`가 끝나는 경로(자동 생성 인증서를 디스크에 저장하지 못한 경우)에서는 카운터가 0이므로 `Wait()`가 바로 반환합니다. 서버들이 자원을 닫는 순서와 `CertLoader`의 공개 API는 바꾸지 않았습니다.
 
-## sleep으로 우연을 기다리지 않고 갱신을 멈췄다
+## 갱신 중간에 로그를 멈춰 Close 순서를 고정했습니다 {#sleep으로-우연을-기다리지-않고-갱신을-멈췄다}
 
-경합 버그를 검증하려고 테스트를 오래 반복하는 방법만으로는 중요한 타이밍을 만난다는 보장이 없습니다. 이 테스트는 실제 인증서와 키 파일을 다시 써 reload를 유발한 뒤, 테스트용 부모 로거의 `Parent.Log`에서 진행을 멈췄습니다. 그 상태에서 Close를 호출합니다.
+경합을 오래 반복하는 것만으로는 중요한 순간을 만난다는 보장이 없습니다. `TestCloseDuringReload`는 시험용 부모 로거가 `Parent.Log` 안에서 멈추게 해 두고 인증서·키 파일을 다시 써 실제 갱신을 일으킵니다. `watch()`가 로그 안으로 들어온 것을 확인하면 Close를 부르고, 0.5초 안에 Close가 반환하면 실패로 봅니다. 끝에는 로그를 풀고 Close가 5초 안에 끝나는지도 봅니다([시험 코드](https://github.com/bluenviron/mediamtx/blob/7d95a222f8f208f16af79b8ac32b6e4d61a280ba/internal/certloader/certloader_test.go#L56-L124)).
 
-검증할 조건은 **갱신 작업을 풀어주기 전에는 Close가 반환하지 않는 것**입니다. 수정 전에는 막혀 있는 갱신 작업을 남긴 채 Close가 반환해 실패했습니다. 수정 후에는 그 작업을 풀어주고 끝난 다음 반환했습니다. 같은 순서를 제가 만들 수 있어야, 20번 통과가 단지 중요한 타이밍을 피한 결과인지와 구별할 수 있었습니다.
+[[fig-close-during-reload]]의 위 줄이 v1.21.1, 아래 줄이 고친 뒤입니다.
 
-2026년 10월 4일 macOS/arm64·Go 1.26.5에서 같은 `TestCloseDuringReload`를 `-race -count=20`으로 실행한 기록은 다음과 같습니다.
+{{< motion scene="CloseDuringReload" id="fig-close-during-reload" kind="개념도" caption="두 줄 모두 watch()가 Parent.Log 안에서 멈춘 채 Close()가 불립니다. v1.21.1의 Close()는 종료 신호와 정리를 마치고 먼저 반환하고, 로그가 풀리면 watch()가 select로 돌아가 감시자 경우를 고르면 cl.cert를 다시 채웁니다. 고친 뒤에는 Close()가 watch()의 반환을 기다린 다음 정리해 cl.cert가 nil로 남습니다. 시험은 갱신 중 Close가 먼저 반환하는 데까지 확인하고, 그 뒤 다시 채우는 단계는 일어날 수 있는 일을 그린 것입니다." >}}
 
-| 비교 대상 | 커밋 | 결과 |
+같은 시험 파일을 다섯 판에 넣고 `go test -race -count=20 -run '^TestCloseDuringReload$' ./internal/certloader`를 돌렸습니다.
+
+| 판 | 결과(20회) | 한 번에 걸린 시간 |
 |---|---|---|
-| 수정 전 base | `04825598` | 20/20 실패: 갱신 중 Close 반환 |
-| 당시 수정본 head | `296e3cea` | 20/20 통과: 갱신 완료까지 대기 |
+| v1.21.1 `04825598` | 모두 실패: `Close() returned while a reload was in progress` | 0.02–0.03초 |
+| #6261 head `7d95a222` | 모두 통과 | 0.52–0.53초 |
+| #6417 머지 `989ea15a` | 모두 통과 | 0.52–0.53초 |
+| v1.21.3 `9540cb6c` | 모두 통과 | 0.52–0.53초 |
+| #6427 머지 `065f94c2` | 모두 통과 | 0.52–0.53초 |
 
-원시 before·after 로그의 개별 PASS/FAIL 40행을 집계한 결과입니다. 현재 PR head 전체를 이번 글 작성 때 다시 실행했다는 뜻은 아닙니다. 동일한 역사적 커밋 쌍의 비교이며, 공개 PR의 테스트 원문과 [포트폴리오 38쪽](/portfolio/2026-10-15-v2/full.pdf#page=38)에서 재현 조건을 확인할 수 있습니다.
+PR 본문에 적은 9월 결과(기준 커밋은 macOS/arm64 `-race`에서 20번 실패, PR은 macOS/arm64와 `golang:1.26-alpine3.24`에서 20번 통과)와 같습니다. 이번에는 macOS에서만 돌렸습니다.
 
-## 통과 시간이 길어진 것을 성능 저하로 읽지 않는다
+## 이 테스트에서는 빨리 반환하는 쪽이 결함입니다 {#통과-시간이-길어진-것을-성능-저하로-읽지-않는다}
 
-수정 전 테스트는 약 0.02초 만에 실패했고, 수정 후 예시는 약 0.52초에 통과했습니다. 이 테스트에서는 빨리 반환하는 것이 결함입니다. 진행을 의도적으로 멈춘 갱신 작업을 남겨 두고 나왔기 때문입니다. 수정 후 걸린 시간에는 테스트가 넣은 대기가 포함돼 있어 처리속도의 전후 비교값으로 사용할 수 없습니다.
+실패한 v1.21.1은 0.02초 만에 끝났고 통과한 판은 0.52초가 걸렸습니다. 이 시험에서 빨리 끝난다는 것은 멈춰 둔 갱신을 남겨 두고 Close가 먼저 나왔다는 뜻입니다. 통과한 판의 0.5초는 시험이 일부러 기다린 시간이라 처리 속도 비교에 쓸 수 없습니다.
 
-실제 동작의 대가는 별도로 있습니다. 갱신 중 로그 목적지가 느리면 watcher의 완료도 늦어지고 Close도 기다립니다. 또 이미 대기 중인 파일 변경이 있으면 한 번 더 갱신하고 끝날 수 있습니다. 종료 함수의 반환을 실제 작업 완료에 맞췄다는 장점과 대기 가능성을 함께 설명해야 합니다. 이 시험은 모든 로그 목적지에서의 종료 상한을 증명하지 않습니다.
+실제 비용은 따로 있습니다. 갱신 중 로그 목적지가 막히면 Close도 함께 기다립니다. 감시자에 다른 변경이 쌓여 있으면 갱신을 한 번 더 하고 끝날 수도 있습니다. 갱신 한 번은 인증서 읽기 한 번과 로그 한 줄입니다. 정상 종료 경로에서는 각 서버가 Close 첫머리에 `closing` 로그를 쓰므로, 막힌 로그 목적지는 그 전부터 종료를 붙잡고 있습니다. 20번 대조가 확인한 것은 갱신 중 Close가 먼저 반환하던 한 순서뿐이고, 다른 경합이 없다는 것이나 느린 로그 목적지에서의 종료 상한은 확인하지 않았습니다.
 
-20회 대조가 확인한 범위는 갱신 중 Close가 먼저 반환하던 특정 순서입니다. 다른 모든 경합의 부재나 느린 로그 목적지에서의 종료 상한까지 증명하지는 않습니다.
+## 상류는 WaitGroup 대신 채널로 다시 구현했습니다
 
-제가 바꾸려 한 계약은 호출자가 Close의 반환 뒤에 무엇을 믿을 수 있는가였습니다. 종료 신호만 보내는 것이라면 남은 작업을 호출자가 고려해야 하지만, watcher 완료까지 기다리면 정리된 인증서를 같은 작업이 다시 채우는 순서를 막을 수 있습니다. **그 완료 보장을 얻는 대신 진행 중 작업의 대기 시간도 Close가 책임지도록 한 선택**입니다.
+aler9는 10월 25일 18:58(KST) 「using a `WaitGroup` to wait for a single routine is redundant. A channel is enough.」라고 적고 PR을 닫았습니다([#6261 댓글](https://github.com/bluenviron/mediamtx/pull/6261#issuecomment-6396229498)). 5분 뒤 머지한 #6417은 종료 요청 채널 `terminate`와 완료 채널 `done`을 나눕니다. Close는 `close(cl.terminate)` 뒤 `<-cl.done`으로 기다리고, `watch()`는 `defer close(cl.done)`으로 끝날 때 `done`을 닫습니다([머지 커밋 `989ea15a`](https://github.com/bluenviron/mediamtx/commit/989ea15a6ef5a70a93a02eaf595f317a4c5bb247)). 기다리는 순서는 #6261과 같습니다. #6417은 시험을 더하지 않았고, 11월 13일 상류 main(`3b1c4e87`)의 `certloader_test.go`에도 `TestCloseDuringReload`는 없습니다(`TestCertReload`·`TestCloseAutoCert`만 있음). 위 표의 #6417 이후 판은 이 시험을 넣어 돌린 결과입니다.
+
+두 구현은 한 곳에서 달랐습니다. WaitGroup은 `watch()`를 시작하지 않으면 카운터가 0이라 Wait가 바로 반환합니다. `done` 채널은 `watch()`만 닫으므로 `watch()`가 없으면 아무도 닫지 않습니다. 그래서 v1.21.3은 인증서를 저장하지 못한 환경에서 종료가 멈췄고, 그 과정은 [인증서를 저장하지 못한 MediaMTX는 종료되지 않았습니다](/posts/open-source-analysis/mediamtx-certloader-no-watcher-shutdown/)에 있습니다. 포크에는 #6261 판([`42e8a20d`](https://github.com/xodbs1021/mediamtx/commit/42e8a20d8081bdebe2b0a0730f5eceecd02e1587))이 실려 있어 no-watch 멈춤이 없습니다.
+
+종료 함수에 기다림을 넣을 때는 기다리는 대상이 아예 시작되지 않는 경로도 함께 보십시오.
+
+## 측정 조건
+
+- 수행: AI(Claude Code)가 2026년 11월 13일 KST 21:18:57–21:20:58에 실행했습니다. 같은 시간에 이 묶음의 로그 재설정 실측이 함께 돌았고, 그 기록의 load average(1분)는 21:18 15.53, 21:20 41.51이었습니다. 이 시험은 통과·실패만 보므로 시간 값은 참고로만 적었습니다.
+- 기종: MacBook Air(Apple M5, 고성능 4·효율 6코어, 32GB, 팬 없음), macOS 27.0.1, Go 1.27.2 darwin/arm64. Linux 컨테이너에서는 돌리지 않았습니다.
+- 판: [v1.21.1](https://github.com/bluenviron/mediamtx/tree/v1.21.1)(`04825598`), #6261 head `7d95a222`(기준 v1.21.1 + 커밋 1개), #6417 머지 `989ea15a`, [v1.21.3](https://github.com/bluenviron/mediamtx/tree/v1.21.3)(`9540cb6c`), #6427 머지 `065f94c2`.
+- 시험: #6261 head의 `TestCloseDuringReload`를 그대로 떼어 낸 파일을 `internal/certloader`에 넣고(#6261 head는 원래 파일 그대로), `go test -race -count=20 -v -run '^TestCloseDuringReload$' ./internal/certloader`. 필요한 `test.TLSCertPubAlt`·`test.Logger`는 다섯 판 모두에 있습니다.
+- 원자료: 시험 파일 · 실행 스크립트 · 판별 출력은 [저장소 `_workspace/blog/mediamtx-certificate-watcher-close-join/measure/`](https://github.com/xodbs1021/xodbs1021.github.io/tree/main/_workspace/blog/mediamtx-certificate-watcher-close-join/measure)에 있습니다.
+
+## 출처
+
+- [bluenviron/mediamtx PR #6261 「certloader: make CertLoader.Close() wait for watch() to return」](https://github.com/bluenviron/mediamtx/pull/6261) — 본문의 문제 · 원인 · 재현 · 영향, aler9 댓글, 2026-10-25 닫힘 · [head 7d95a222](https://github.com/bluenviron/mediamtx/commit/7d95a222f8f208f16af79b8ac32b6e4d61a280ba)
+- [PR #6417 「fix routine leak in CertLoader (#6261)」](https://github.com/bluenviron/mediamtx/pull/6417) — 머지 커밋 989ea15a, v1.21.3
+- [v1.21.1 `internal/certloader/certloader.go`](https://github.com/bluenviron/mediamtx/blob/048255986f7e04b859b4c4efe651448ec785ecd4/internal/certloader/certloader.go) · [`internal/confwatcher/confwatcher.go`](https://github.com/bluenviron/mediamtx/blob/048255986f7e04b859b4c4efe651448ec785ecd4/internal/confwatcher/confwatcher.go)
+- [상류 main 3b1c4e87의 `certloader_test.go`](https://github.com/bluenviron/mediamtx/blob/3b1c4e87f5e1d5ba8bf63f962eadff02605ad4e9/internal/certloader/certloader_test.go) — 2026-11-13 확인
+- [The Go Programming Language Specification 「Select statements」](https://go.dev/ref/spec#Select_statements)
+- [MediaMTX v1.21.3 릴리스](https://github.com/bluenviron/mediamtx/releases/tag/v1.21.3)
+- [xodbs1021/mediamtx 커밋 42e8a20d](https://github.com/xodbs1021/mediamtx/commit/42e8a20d8081bdebe2b0a0730f5eceecd02e1587) — 제품 포크에 실린 #6261 판
+- [인증서를 저장하지 못한 MediaMTX는 종료되지 않았습니다](/posts/open-source-analysis/mediamtx-certloader-no-watcher-shutdown/) — 채널 판의 no-watch 멈춤과 #6427
 
 ---
 
-이 글은 [PokeClip·MediaMTX 기술 기록 모음](/posts/0-to-1/portfolio-engineering-notes/)의 일부입니다. [포트폴리오 전체본 38쪽](/portfolio/2026-10-15-v2/full.pdf#page=38)에서 연결된 사례도 함께 볼 수 있습니다.
+[전체 기술 기록으로 돌아가기](/posts/0-to-1/portfolio-engineering-notes/) · [이 글의 포트폴리오 요약 PDF 38쪽](/portfolio/2026-10-15-v2/full.pdf#page=38)
+
+포트폴리오 요약(2026-10-15판) 38쪽은 PR이 열려 있던 10월 15일 기준이라, 10월 25일 닫힌 지금 상태와 다릅니다.

@@ -1,0 +1,11 @@
+[
+ {
+  "started": true,
+  "save_failed": false,
+  "result": "exited",
+  "exit_code": 0,
+  "sigint_to_exit_ms": 9.58,
+  "last_line": "2026/11/13 21:25:37 INF waiting for running hooks",
+  "i": 0
+ }
+]

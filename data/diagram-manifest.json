@@ -188,6 +188,15 @@
       "bytes": 29396
     }
   },
+  "54e313dbb214f4d5": {
+    "source": "content/posts/open-source-analysis/mediamtx-certificate-watcher-close-join.md",
+    "wide": {
+      "file": "54e313dbb214f4d5-wide.svg",
+      "width": 438,
+      "height": 629,
+      "bytes": 28614
+    }
+  },
   "5efdefe49e60f0d1": {
     "source": "content/posts/projects/pokeclip-media-timeline-over-wall-clock.md",
     "wide": {
@@ -366,6 +375,15 @@
       "width": 392,
       "height": 614,
       "bytes": 19161
+    }
+  },
+  "a98bf83f19416274": {
+    "source": "content/posts/open-source-analysis/mediamtx-certloader-no-watcher-shutdown.md",
+    "wide": {
+      "file": "a98bf83f19416274-wide.svg",
+      "width": 392,
+      "height": 634,
+      "bytes": 22139
     }
   },
   "b444c2613e32344b": {

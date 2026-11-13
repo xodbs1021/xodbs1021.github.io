@@ -1,0 +1,5 @@
+level=debug patch_sent=1794572341.279974 patch_code=200 result=gave_up_after_10s end=1794572351.365143
+level=info patch_sent=1794572353.483845 patch_code=200 result=gave_up_after_10s end=1794572363.577843
+level=debug patch_sent=1794572365.645000 patch_code=200 result=gave_up_after_10s end=1794572375.695239
+level=info patch_sent=1794572377.800530 patch_code=200 result=gave_up_after_10s end=1794572388.008676
+level=debug patch_sent=1794572390.117247 patch_code=200 result=gave_up_after_10s end=1794572400.248105

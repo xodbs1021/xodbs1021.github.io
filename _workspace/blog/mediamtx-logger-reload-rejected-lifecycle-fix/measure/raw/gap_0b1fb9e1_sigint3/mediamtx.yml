@@ -1,0 +1,18 @@
+logLevel: info
+logDestinations: [stdout]
+logStructured: true
+api: true
+apiAddress: 127.0.0.1:19997
+rtsp: true
+rtspTransports: [tcp]
+rtspAddress: :18554
+rtmp: false
+hls: false
+webrtc: false
+srt: false
+moq: false
+paths:
+  test:
+    runOnInit: sh <OUT>/logger/gap_0b1fb9e1_sigint3/hook_sigint3.sh <OUT>/logger/gap_0b1fb9e1_sigint3
+    runOnInitRestart: false
+  all_others:

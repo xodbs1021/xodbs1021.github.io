@@ -1,0 +1,36 @@
+# tree 7d95a222 (v1.21.1-1-g7d95a222), go version go1.27.2 darwin/arm64
+# test copied: internal/certloader/zz_closeautocert_test.go
+# started 2026-11-13T21:21:13+0900
+=== RUN   TestCloseAutoCert
+=== RUN   TestCloseAutoCert/saved
+=== RUN   TestCloseAutoCert/not_saved
+--- PASS: TestCloseAutoCert (0.01s)
+    --- PASS: TestCloseAutoCert/saved (0.00s)
+    --- PASS: TestCloseAutoCert/not_saved (0.00s)
+=== RUN   TestCloseAutoCert
+=== RUN   TestCloseAutoCert/saved
+=== RUN   TestCloseAutoCert/not_saved
+--- PASS: TestCloseAutoCert (0.01s)
+    --- PASS: TestCloseAutoCert/saved (0.00s)
+    --- PASS: TestCloseAutoCert/not_saved (0.00s)
+=== RUN   TestCloseAutoCert
+=== RUN   TestCloseAutoCert/saved
+=== RUN   TestCloseAutoCert/not_saved
+--- PASS: TestCloseAutoCert (0.01s)
+    --- PASS: TestCloseAutoCert/saved (0.00s)
+    --- PASS: TestCloseAutoCert/not_saved (0.00s)
+=== RUN   TestCloseAutoCert
+=== RUN   TestCloseAutoCert/saved
+=== RUN   TestCloseAutoCert/not_saved
+--- PASS: TestCloseAutoCert (0.01s)
+    --- PASS: TestCloseAutoCert/saved (0.00s)
+    --- PASS: TestCloseAutoCert/not_saved (0.00s)
+=== RUN   TestCloseAutoCert
+=== RUN   TestCloseAutoCert/saved
+=== RUN   TestCloseAutoCert/not_saved
+--- PASS: TestCloseAutoCert (0.01s)
+    --- PASS: TestCloseAutoCert/saved (0.00s)
+    --- PASS: TestCloseAutoCert/not_saved (0.00s)
+PASS
+ok  	github.com/bluenviron/mediamtx/internal/certloader	1.491s
+# exit 0 at 2026-11-13T21:21:15+0900

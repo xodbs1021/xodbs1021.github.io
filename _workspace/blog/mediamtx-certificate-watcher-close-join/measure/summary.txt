@@ -1,0 +1,5 @@
+closeduringreload_065f94c2.txt:   18 PASS:(0.52s)    2 PASS:(0.53s) 
+closeduringreload_7d95a222.txt:   19 PASS:(0.52s)    1 PASS:(0.53s) 
+closeduringreload_989ea15a.txt:   16 PASS:(0.52s)    4 PASS:(0.53s) 
+closeduringreload_v1.21.1.txt:   18 FAIL:(0.02s)    2 FAIL:(0.03s) 
+closeduringreload_v1.21.3.txt:   18 PASS:(0.52s)    2 PASS:(0.53s) 

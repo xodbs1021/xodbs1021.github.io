@@ -1,0 +1,157 @@
+{"timestamp":"2026-11-13T21:22:40.867393+09:00","level":"INF","message":"MediaMTX v1.21.1, darwin, arm64"}
+{"timestamp":"2026-11-13T21:22:40.867461+09:00","level":"INF","message":"configuration loaded from <OUT>/logger/file_v1.21.1_sigint3/mediamtx.yml"}
+{"timestamp":"2026-11-13T21:22:40.868568+09:00","level":"INF","message":"[path test] runOnInit command started"}
+{"timestamp":"2026-11-13T21:22:40.868849+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:22:40.87016+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:22:40.937462+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:53222] opened"}
+{"timestamp":"2026-11-13T21:22:40.938227+09:00","level":"INF","message":"[RTSP] [session a2b9d279] created by 127.0.0.1:53222"}
+{"timestamp":"2026-11-13T21:22:40.939667+09:00","level":"INF","message":"[path test] stream is available and online, 1 track (H264)"}
+{"timestamp":"2026-11-13T21:22:40.939863+09:00","level":"INF","message":"[RTSP] [session a2b9d279] is publishing to path 'test'"}
+{"timestamp":"2026-11-13T21:22:40.9407+09:00","level":"INF","message":"[path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones"}
+{"timestamp":"2026-11-13T21:22:41.959537+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:22:41.959616+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:22:41.960909+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:22:41.961027+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:53222] closed: terminated"}
+{"timestamp":"2026-11-13T21:22:41.961082+09:00","level":"INF","message":"[RTSP] [session a2b9d279] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:22:41.961106+09:00","level":"INF","message":"[path test] runOnInit command stopped"}
+{"timestamp":"2026-11-13T21:22:41.961199+09:00","level":"INF","message":"[path test] runOnInit command started"}
+{"timestamp":"2026-11-13T21:22:41.96127+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:22:41.961341+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:22:46.002715+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:53273] opened"}
+{"timestamp":"2026-11-13T21:22:46.003016+09:00","level":"INF","message":"[RTSP] [session 972a9173] created by 127.0.0.1:53273"}
+{"timestamp":"2026-11-13T21:22:46.00463+09:00","level":"INF","message":"[path test] stream is available and online, 1 track (H264)"}
+{"timestamp":"2026-11-13T21:22:46.004644+09:00","level":"INF","message":"[RTSP] [session 972a9173] is publishing to path 'test'"}
+{"timestamp":"2026-11-13T21:22:46.00514+09:00","level":"INF","message":"[path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones"}
+{"timestamp":"2026-11-13T21:22:47.046459+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:22:47.046497+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:22:47.047853+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:22:47.047882+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:53273] closed: terminated"}
+{"timestamp":"2026-11-13T21:22:47.047911+09:00","level":"INF","message":"[RTSP] [session 972a9173] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:22:47.047924+09:00","level":"INF","message":"[path test] runOnInit command stopped"}
+{"timestamp":"2026-11-13T21:22:47.05119+09:00","level":"INF","message":"[path test] runOnInit command started"}
+{"timestamp":"2026-11-13T21:22:47.05122+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:22:47.051329+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:22:51.095537+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:53283] opened"}
+{"timestamp":"2026-11-13T21:22:51.095832+09:00","level":"INF","message":"[RTSP] [session a00b2331] created by 127.0.0.1:53283"}
+{"timestamp":"2026-11-13T21:22:51.096231+09:00","level":"INF","message":"[path test] stream is available and online, 1 track (H264)"}
+{"timestamp":"2026-11-13T21:22:51.096243+09:00","level":"INF","message":"[RTSP] [session a00b2331] is publishing to path 'test'"}
+{"timestamp":"2026-11-13T21:22:51.096761+09:00","level":"INF","message":"[path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones"}
+{"timestamp":"2026-11-13T21:22:52.124032+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:22:52.124065+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:22:52.125399+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:22:52.125446+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:53283] closed: terminated"}
+{"timestamp":"2026-11-13T21:22:52.125477+09:00","level":"INF","message":"[RTSP] [session a00b2331] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:22:52.125493+09:00","level":"INF","message":"[path test] runOnInit command stopped"}
+{"timestamp":"2026-11-13T21:22:52.125556+09:00","level":"INF","message":"[path test] runOnInit command started"}
+{"timestamp":"2026-11-13T21:22:52.125588+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:22:52.125638+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:22:56.230888+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:53342] opened"}
+{"timestamp":"2026-11-13T21:22:56.232293+09:00","level":"INF","message":"[RTSP] [session 237579d9] created by 127.0.0.1:53342"}
+{"timestamp":"2026-11-13T21:22:56.237596+09:00","level":"INF","message":"[path test] stream is available and online, 1 track (H264)"}
+{"timestamp":"2026-11-13T21:22:56.237631+09:00","level":"INF","message":"[RTSP] [session 237579d9] is publishing to path 'test'"}
+{"timestamp":"2026-11-13T21:22:56.241041+09:00","level":"INF","message":"[path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones"}
+{"timestamp":"2026-11-13T21:22:57.300696+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:22:57.300734+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:22:57.302067+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:22:57.302107+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:53342] closed: terminated"}
+{"timestamp":"2026-11-13T21:22:57.302144+09:00","level":"INF","message":"[RTSP] [session 237579d9] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:22:57.302156+09:00","level":"INF","message":"[path test] runOnInit command stopped"}
+{"timestamp":"2026-11-13T21:22:57.302197+09:00","level":"INF","message":"[path test] runOnInit command started"}
+{"timestamp":"2026-11-13T21:22:57.302232+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:22:57.302293+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:23:01.357802+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:53368] opened"}
+{"timestamp":"2026-11-13T21:23:01.358098+09:00","level":"INF","message":"[RTSP] [session a00bb6c2] created by 127.0.0.1:53368"}
+{"timestamp":"2026-11-13T21:23:01.358525+09:00","level":"INF","message":"[path test] stream is available and online, 1 track (H264)"}
+{"timestamp":"2026-11-13T21:23:01.358539+09:00","level":"INF","message":"[RTSP] [session a00bb6c2] is publishing to path 'test'"}
+{"timestamp":"2026-11-13T21:23:01.359065+09:00","level":"INF","message":"[path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones"}
+{"timestamp":"2026-11-13T21:23:02.386339+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:23:02.386418+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:23:02.386609+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:23:02.38666+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:53368] closed: terminated"}
+{"timestamp":"2026-11-13T21:23:02.386726+09:00","level":"INF","message":"[RTSP] [session a00bb6c2] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:23:02.386742+09:00","level":"INF","message":"[path test] runOnInit command stopped"}
+{"timestamp":"2026-11-13T21:23:02.386841+09:00","level":"INF","message":"[path test] runOnInit command started"}
+{"timestamp":"2026-11-13T21:23:02.38693+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:23:02.387986+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:23:06.450968+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:53516] opened"}
+{"timestamp":"2026-11-13T21:23:06.451294+09:00","level":"INF","message":"[RTSP] [session 0a573ef7] created by 127.0.0.1:53516"}
+{"timestamp":"2026-11-13T21:23:06.451713+09:00","level":"INF","message":"[path test] stream is available and online, 1 track (H264)"}
+{"timestamp":"2026-11-13T21:23:06.451727+09:00","level":"INF","message":"[RTSP] [session 0a573ef7] is publishing to path 'test'"}
+{"timestamp":"2026-11-13T21:23:06.452204+09:00","level":"INF","message":"[path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones"}
+{"timestamp":"2026-11-13T21:23:07.470594+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:23:07.470626+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:23:07.471729+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:23:07.471761+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:53516] closed: terminated"}
+{"timestamp":"2026-11-13T21:23:07.471795+09:00","level":"INF","message":"[RTSP] [session 0a573ef7] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:23:07.471807+09:00","level":"INF","message":"[path test] runOnInit command stopped"}
+{"timestamp":"2026-11-13T21:23:07.471851+09:00","level":"INF","message":"[path test] runOnInit command started"}
+{"timestamp":"2026-11-13T21:23:07.472202+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:23:07.472283+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:23:11.516263+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:53546] opened"}
+{"timestamp":"2026-11-13T21:23:11.516619+09:00","level":"INF","message":"[RTSP] [session 813152ed] created by 127.0.0.1:53546"}
+{"timestamp":"2026-11-13T21:23:11.51702+09:00","level":"INF","message":"[path test] stream is available and online, 1 track (H264)"}
+{"timestamp":"2026-11-13T21:23:11.517032+09:00","level":"INF","message":"[RTSP] [session 813152ed] is publishing to path 'test'"}
+{"timestamp":"2026-11-13T21:23:11.517568+09:00","level":"INF","message":"[path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones"}
+{"timestamp":"2026-11-13T21:23:12.550576+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:23:12.550656+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:23:12.552047+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:23:12.552117+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:53546] closed: terminated"}
+{"timestamp":"2026-11-13T21:23:12.552182+09:00","level":"INF","message":"[RTSP] [session 813152ed] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:23:12.552205+09:00","level":"INF","message":"[path test] runOnInit command stopped"}
+{"timestamp":"2026-11-13T21:23:12.552317+09:00","level":"INF","message":"[path test] runOnInit command started"}
+{"timestamp":"2026-11-13T21:23:12.552367+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:23:12.552472+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:23:16.606282+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:53591] opened"}
+{"timestamp":"2026-11-13T21:23:16.606549+09:00","level":"INF","message":"[RTSP] [session 2c1a18e5] created by 127.0.0.1:53591"}
+{"timestamp":"2026-11-13T21:23:16.606952+09:00","level":"INF","message":"[path test] stream is available and online, 1 track (H264)"}
+{"timestamp":"2026-11-13T21:23:16.606964+09:00","level":"INF","message":"[RTSP] [session 2c1a18e5] is publishing to path 'test'"}
+{"timestamp":"2026-11-13T21:23:16.60738+09:00","level":"INF","message":"[path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones"}
+{"timestamp":"2026-11-13T21:23:17.642535+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:23:17.642622+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:23:17.644107+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:23:17.6442+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:53591] closed: terminated"}
+{"timestamp":"2026-11-13T21:23:17.644271+09:00","level":"INF","message":"[RTSP] [session 2c1a18e5] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:23:17.644308+09:00","level":"INF","message":"[path test] runOnInit command stopped"}
+{"timestamp":"2026-11-13T21:23:17.644407+09:00","level":"INF","message":"[path test] runOnInit command started"}
+{"timestamp":"2026-11-13T21:23:17.644549+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:23:17.644673+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:23:21.70427+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:53622] opened"}
+{"timestamp":"2026-11-13T21:23:21.704614+09:00","level":"INF","message":"[RTSP] [session 0c232445] created by 127.0.0.1:53622"}
+{"timestamp":"2026-11-13T21:23:21.705098+09:00","level":"INF","message":"[path test] stream is available and online, 1 track (H264)"}
+{"timestamp":"2026-11-13T21:23:21.705115+09:00","level":"INF","message":"[RTSP] [session 0c232445] is publishing to path 'test'"}
+{"timestamp":"2026-11-13T21:23:21.705604+09:00","level":"INF","message":"[path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones"}
+{"timestamp":"2026-11-13T21:23:22.737256+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:23:22.737301+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:23:22.738405+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:23:22.738501+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:53622] closed: terminated"}
+{"timestamp":"2026-11-13T21:23:22.738525+09:00","level":"INF","message":"[RTSP] [session 0c232445] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:23:22.73854+09:00","level":"INF","message":"[path test] runOnInit command stopped"}
+{"timestamp":"2026-11-13T21:23:22.738614+09:00","level":"INF","message":"[path test] runOnInit command started"}
+{"timestamp":"2026-11-13T21:23:22.738644+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:23:22.73969+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:23:26.794702+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:53680] opened"}
+{"timestamp":"2026-11-13T21:23:26.795138+09:00","level":"INF","message":"[RTSP] [session fd908d2b] created by 127.0.0.1:53680"}
+{"timestamp":"2026-11-13T21:23:26.795979+09:00","level":"INF","message":"[path test] stream is available and online, 1 track (H264)"}
+{"timestamp":"2026-11-13T21:23:26.796006+09:00","level":"INF","message":"[RTSP] [session fd908d2b] is publishing to path 'test'"}
+{"timestamp":"2026-11-13T21:23:26.797207+09:00","level":"INF","message":"[path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones"}
+{"timestamp":"2026-11-13T21:23:27.823767+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:23:27.823795+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:23:27.825104+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:23:27.825139+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:53680] closed: terminated"}
+{"timestamp":"2026-11-13T21:23:27.825167+09:00","level":"INF","message":"[RTSP] [session fd908d2b] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:23:27.825181+09:00","level":"INF","message":"[path test] runOnInit command stopped"}
+{"timestamp":"2026-11-13T21:23:27.825228+09:00","level":"INF","message":"[path test] runOnInit command started"}
+{"timestamp":"2026-11-13T21:23:27.825257+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:23:27.8253+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:23:31.926629+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:53700] opened"}
+{"timestamp":"2026-11-13T21:23:31.927131+09:00","level":"INF","message":"[RTSP] [session dd8b7770] created by 127.0.0.1:53700"}
+{"timestamp":"2026-11-13T21:23:31.927857+09:00","level":"INF","message":"[path test] stream is available and online, 1 track (H264)"}
+{"timestamp":"2026-11-13T21:23:31.927878+09:00","level":"INF","message":"[RTSP] [session dd8b7770] is publishing to path 'test'"}
+{"timestamp":"2026-11-13T21:23:31.928591+09:00","level":"INF","message":"[path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones"}
+{"timestamp":"2026-11-13T21:23:32.977472+09:00","level":"INF","message":"[RTSP] [session dd8b7770] destroyed: torn down by 127.0.0.1:53700"}
+{"timestamp":"2026-11-13T21:23:32.977538+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:53700] closed: EOF"}
+{"timestamp":"2026-11-13T21:23:32.980188+09:00","level":"INF","message":"shutting down gracefully"}
+{"timestamp":"2026-11-13T21:23:32.980352+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:23:32.980444+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:23:32.980532+09:00","level":"INF","message":"[path test] runOnInit command stopped"}
+{"timestamp":"2026-11-13T21:23:32.98061+09:00","level":"INF","message":"waiting for running hooks"}

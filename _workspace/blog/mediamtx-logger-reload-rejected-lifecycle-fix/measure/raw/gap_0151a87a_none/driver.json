@@ -1,0 +1,82 @@
+[
+ {
+  "i": 0,
+  "level": "debug",
+  "patch_code": 200,
+  "api_back": true,
+  "patch_to_api_ms": 15.17,
+  "publisher_dropped": true
+ },
+ {
+  "i": 1,
+  "level": "info",
+  "patch_code": 200,
+  "api_back": true,
+  "patch_to_api_ms": 14.86,
+  "publisher_dropped": true
+ },
+ {
+  "i": 2,
+  "level": "debug",
+  "patch_code": 200,
+  "api_back": true,
+  "patch_to_api_ms": 13.07,
+  "publisher_dropped": true
+ },
+ {
+  "i": 3,
+  "level": "info",
+  "patch_code": 200,
+  "api_back": true,
+  "patch_to_api_ms": 14.55,
+  "publisher_dropped": true
+ },
+ {
+  "i": 4,
+  "level": "debug",
+  "patch_code": 200,
+  "api_back": true,
+  "patch_to_api_ms": 14.29,
+  "publisher_dropped": true
+ },
+ {
+  "i": 5,
+  "level": "info",
+  "patch_code": 200,
+  "api_back": true,
+  "patch_to_api_ms": 14.32,
+  "publisher_dropped": true
+ },
+ {
+  "i": 6,
+  "level": "debug",
+  "patch_code": 200,
+  "api_back": true,
+  "patch_to_api_ms": 15.9,
+  "publisher_dropped": true
+ },
+ {
+  "i": 7,
+  "level": "info",
+  "patch_code": 200,
+  "api_back": true,
+  "patch_to_api_ms": 12.01,
+  "publisher_dropped": true
+ },
+ {
+  "i": 8,
+  "level": "debug",
+  "patch_code": 200,
+  "api_back": true,
+  "patch_to_api_ms": 14.27,
+  "publisher_dropped": true
+ },
+ {
+  "i": 9,
+  "level": "info",
+  "patch_code": 200,
+  "api_back": true,
+  "patch_to_api_ms": 19.37,
+  "publisher_dropped": true
+ }
+]

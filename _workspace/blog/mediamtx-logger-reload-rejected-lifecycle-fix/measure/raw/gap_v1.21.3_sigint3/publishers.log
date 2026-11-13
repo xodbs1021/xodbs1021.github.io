@@ -1,0 +1,50 @@
+[vost#0:0/libx264 @ 0x7c06c70000] Error submitting a packet to the muxer: Broken pipe
+    Last message repeated 1 times
+[out#0/rtsp @ 0x7c06c14480] Error muxing a packet
+[out#0/rtsp @ 0x7c06c14480] Task finished with error code: -32 (Broken pipe)
+[out#0/rtsp @ 0x7c06c14480] Terminating thread with return code -32 (Broken pipe)
+[vost#0:0/libx264 @ 0x7a48824000] Error submitting a packet to the muxer: Broken pipe
+    Last message repeated 1 times
+[out#0/rtsp @ 0x7a48800480] Error muxing a packet
+[out#0/rtsp @ 0x7a48800480] Task finished with error code: -32 (Broken pipe)
+[out#0/rtsp @ 0x7a48800480] Terminating thread with return code -32 (Broken pipe)
+[vost#0:0/libx264 @ 0x7529434000] Error submitting a packet to the muxer: Broken pipe
+    Last message repeated 1 times
+[out#0/rtsp @ 0x752900ca80] Error muxing a packet
+[out#0/rtsp @ 0x752900ca80] Task finished with error code: -32 (Broken pipe)
+[out#0/rtsp @ 0x752900ca80] Terminating thread with return code -32 (Broken pipe)
+[vost#0:0/libx264 @ 0x7aa8c70000] Error submitting a packet to the muxer: Broken pipe
+    Last message repeated 1 times
+[out#0/rtsp @ 0x7aa8c14480] Error muxing a packet
+[out#0/rtsp @ 0x7aa8c14480] Task finished with error code: -32 (Broken pipe)
+[out#0/rtsp @ 0x7aa8c14480] Terminating thread with return code -32 (Broken pipe)
+[vost#0:0/libx264 @ 0x7978c2c000] Error submitting a packet to the muxer: Broken pipe
+    Last message repeated 1 times
+[out#0/rtsp @ 0x7978c14480] Error muxing a packet
+[out#0/rtsp @ 0x7978c14480] Task finished with error code: -32 (Broken pipe)
+[out#0/rtsp @ 0x7978c14480] Terminating thread with return code -32 (Broken pipe)
+[vost#0:0/libx264 @ 0x75b7048000] Error submitting a packet to the muxer: Broken pipe
+    Last message repeated 1 times
+[out#0/rtsp @ 0x75b700ca80] Error muxing a packet
+[out#0/rtsp @ 0x75b700ca80] Task finished with error code: -32 (Broken pipe)
+[out#0/rtsp @ 0x75b700ca80] Terminating thread with return code -32 (Broken pipe)
+[vost#0:0/libx264 @ 0x7cb0c70000] Error submitting a packet to the muxer: Broken pipe
+    Last message repeated 1 times
+[out#0/rtsp @ 0x7cb0c14480] Error muxing a packet
+[out#0/rtsp @ 0x7cb0c14480] Task finished with error code: -32 (Broken pipe)
+[out#0/rtsp @ 0x7cb0c14480] Terminating thread with return code -32 (Broken pipe)
+[vost#0:0/libx264 @ 0x76c3038000] Error submitting a packet to the muxer: Broken pipe
+    Last message repeated 1 times
+[out#0/rtsp @ 0x76c3408a80] Error muxing a packet
+[out#0/rtsp @ 0x76c3408a80] Task finished with error code: -32 (Broken pipe)
+[out#0/rtsp @ 0x76c3408a80] Terminating thread with return code -32 (Broken pipe)
+[vost#0:0/libx264 @ 0x7656c44000] Error submitting a packet to the muxer: Broken pipe
+    Last message repeated 1 times
+[out#0/rtsp @ 0x7657024480] Error muxing a packet
+[out#0/rtsp @ 0x7657024480] Task finished with error code: -32 (Broken pipe)
+[out#0/rtsp @ 0x7657024480] Terminating thread with return code -32 (Broken pipe)
+[vost#0:0/libx264 @ 0x7aacc70000] Error submitting a packet to the muxer: Broken pipe
+    Last message repeated 1 times
+[out#0/rtsp @ 0x7aacc14480] Error muxing a packet
+[out#0/rtsp @ 0x7aacc14480] Task finished with error code: -32 (Broken pipe)
+[out#0/rtsp @ 0x7aacc14480] Terminating thread with return code -32 (Broken pipe)
