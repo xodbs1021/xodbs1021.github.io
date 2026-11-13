@@ -9,7 +9,8 @@ D = time of the "command exited" entry - exit wall clock.
 import csv, json, os, re, signal, subprocess, sys, time
 from datetime import datetime, timezone
 
-HOOK = "/tmp/osa1w-exp/out/hook.sh"
+# hook.sh and nowns live next to this script unless HOOK is set.
+HOOK = os.environ.get("HOOK", os.path.join(os.path.dirname(os.path.abspath(__file__)), "hook.sh"))
 
 CFG = """logLevel: info
 logDestinations: [file]

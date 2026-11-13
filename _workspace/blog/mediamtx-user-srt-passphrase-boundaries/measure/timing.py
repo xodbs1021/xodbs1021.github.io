@@ -4,7 +4,7 @@ usage: python3 -I timing.py <label> <mediamtx-binary> <outroot> <trials> <mode>.
 """
 import csv, os, signal, subprocess, sys, time
 
-HERE = "/tmp/osa1w-exp/srt"
+HERE = os.path.dirname(os.path.abspath(__file__))  # responder.py is next to this script
 CFG = """logLevel: info
 logDestinations: [file]
 logFile: {d}/server.log

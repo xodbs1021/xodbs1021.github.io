@@ -8,7 +8,8 @@ file, and whether any reached the console instead.
 """
 import os, re, signal, subprocess, sys, time
 
-HOOK = "/tmp/osa1w-exp/out/reload_hook.pl"
+# reload_hook.pl lives next to this script unless HOOK is set.
+HOOK = os.environ.get("HOOK", os.path.join(os.path.dirname(os.path.abspath(__file__)), "reload_hook.pl"))
 CFG = """logLevel: info
 logDestinations: [file]
 logFile: {log}

@@ -11,7 +11,7 @@
 | ed775608(#2355) 2023-09-16 | `git log -1 ed775608` | 2026-11-13 | 코드 |
 | 이슈 #3372 launched만, 오타 의심 | https://github.com/bluenviron/mediamtx/issues/3372 , PR #6259 본문 | 2026-11-13 | 문헌 |
 | #6155 v1.21.0 포함 | merge 344d8c90, `git tag --contains` → v1.21.0 | 2026-11-13 | 코드 |
-| #6259 열림, 9/23 생성, head 69280137(10/26 커밋, 10/27 강제 push) | `gh pr view 6259`, 타임라인 API | 2026-11-13 | 문헌 |
+| #6259 열림, 9/23 KST 생성, head 69280137(10/27 KST 커밋 · 강제 push) | `gh pr view 6259`, 타임라인 API | 2026-11-13 | 문헌 |
 | 옛 head acb903fb(10/8)는 path_test.go 포함 | `gh api repos/bluenviron/mediamtx/commits/acb903fb` 파일 목록 | 2026-11-13 | 문헌 |
 | 현재 head 시험 = hooks_test.go TestHookCommandExited, 5종 | head 파일 | 2026-11-13 | 코드 |
 | +21/-0 6개 파일 | PR 본문, `gh pr view --json files` | 2026-11-13 | 문헌 |

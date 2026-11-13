@@ -45,7 +45,7 @@ const DESKTOP: Layout = {
   note: { x: 100, y: 940 },
   vertical: false,
   apiTitle: "GET /v3/paths/list",
-  noteLines: ["v1.21.3 · #6306 모두 같음, v1.21.2는 본문을 읽지 않음"],
+  noteLines: ["대기는 v1.21.3 · #6306 같음 · 사용자 암호는 #6306만"],
   text: { label: TEXT.label, small: TEXT.small },
 };
 
@@ -58,7 +58,7 @@ const MOBILE: Layout = {
   note: { x: 60, y: 1170 },
   vertical: true,
   apiTitle: "목록 API",
-  noteLines: ["v1.21.3 · #6306 모두 같음", "v1.21.2는 본문을 읽지 않음"],
+  noteLines: ["대기는 v1.21.3 · #6306 같음", "사용자 암호는 #6306만"],
   text: { label: MOBILE_TEXT.label, small: MOBILE_TEXT.small },
 };
 

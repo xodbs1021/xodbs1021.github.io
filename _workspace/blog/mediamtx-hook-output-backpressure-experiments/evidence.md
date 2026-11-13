@@ -4,7 +4,7 @@
 
 | 주장 | 근거(공개) | 확인 | 종류 |
 |---|---|---|---|
-| #6380 10/19 열림, head 7bd58e10(10/26 커밋), 열림 | `gh pr view 6380` | 2026-11-13 | 문헌 |
+| #6380 10/20(KST) 열림, head 7bd58e10(10/27 KST 커밋), 열림 | `gh pr view 6380` | 2026-11-13 | 문헌 |
 | 기본 inherit os.Stdout/Stderr, logHookOutput 기본 false | PR 본문 · `cmd_os_other.go` | 2026-11-13 | 코드 |
 | 1초 대기 뒤 버림, 진행 중 쓰기는 제한 밖 | PR 본문 Impact, `output.go` `outputWaitDelay` | 2026-11-13 | 문헌·코드 |
 | 13곳 배선 미시험, TestCmdOutput 범위 | PR 본문 Change | 2026-11-13 | 문헌 |
@@ -26,4 +26,4 @@
 한계: macOS(파이프 16KiB 단위), 파일 목적지만, syslog · 느린 목적지 · 리눅스 미측정, 다른 세션 부하 공존.
 역할: 범위 · 검증 기준 · 제출 결정 = 사용자, 구현 · 실측 = AI, 재측정 = AI(Claude Code).
 
-재현: `cc -O2 -o nowns nowns.c` 뒤 `runall.sh`(경로는 /tmp/osa1w-exp/out 기준 — 바꿔 쓸 것), `reload/reload.py <label> <bin> <새 폴더> 10`.
+재현: `cc -O2 -o nowns nowns.c` 뒤 `BIN_DIR=<mediamtx-fork · mediamtx-pr6380 폴더> ROOT=<새 출력 폴더> measure/runall.sh`, `reload/reload.py <label> <bin> <새 폴더> 10`.

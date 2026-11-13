@@ -6,7 +6,7 @@ reads the server log: "is publishing to path" = accepted.
 """
 import os, re, signal, subprocess, sys, time
 
-HERE = "/tmp/osa1w-exp/srt"
+HERE = os.path.dirname(os.path.abspath(__file__))  # responder.py is next to this script
 BASE = """logLevel: info
 logDestinations: [file]
 logFile: {d}/server.log

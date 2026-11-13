@@ -1,7 +1,7 @@
 ---
 title: "MediaMTX 훅 7곳은 실행 실패를 로그에 남기지 않았습니다"
 date: "2026-10-15T11:40:52+09:00"
-lastmod: "2026-11-13T21:00:00+09:00"
+lastmod: "2026-11-13T22:30:00+09:00"
 draft: false
 author: "김태윤"
 description: "MediaMTX가 외부 명령을 띄우는 13곳 중 7곳은 종료 콜백(OnExit)이 없어, 실행 파일이 없을 때 로그에 command launched만 남았습니다. 7곳에 기존 6곳과 같은 보고를 붙인 PR #6259(2026-11-13 확인 기준 열림)와, v1.21.3과 PR head 69280137을 빌드해 7종 훅 22번 실행의 실패 이유가 0줄에서 22줄로 바뀐 것을 확인한 AI 재측정."
@@ -47,7 +47,7 @@ flowchart TB
 
 기존 6곳이 따르는 규칙은 `externalcmd` 안에 있습니다. 재시작하지 않는 명령은 실패했을 때만 `OnExit`에 닿고, MediaMTX가 직접 멈춘 명령은 닿지 않습니다([`cmd.go` 72–81행](https://github.com/bluenviron/mediamtx/blob/048255986f7e04b859b4c4efe651448ec785ecd4/internal/externalcmd/cmd.go#L72-L81)). 7곳은 모두 재시작하지 않고(`Restart: false`) MediaMTX가 멈추지도 않으므로, 같은 규칙을 붙이면 실패했을 때 한 줄만 늘어납니다.
 
-영상의 위 줄이 v1.21.3, 아래 줄이 #6259입니다. 두 줄 모두 자식 자리가 비어 있고, 아래 줄만 실패가 MediaMTX로 돌아와 로그에 한 줄을 더 남깁니다.
+[[fig-silent-exec-failure]]의 위 줄이 v1.21.3, 아래 줄이 #6259입니다. 두 줄 모두 자식 자리가 비어 있고, 아래 줄만 실패가 MediaMTX로 돌아와 로그에 한 줄을 더 남깁니다.
 
 {{< motion scene="SilentExecFailure" id="fig-silent-exec-failure" kind="개념도" caption="실행 파일이 없으면 fork/exec가 실패해 자식 프로세스가 생기지 않고 stderr도 비어 있습니다. OnExit가 없는 v1.21.3은 launched 한 줄로 끝나고, OnExit를 붙인 #6259는 그 실패를 받아 exited: no such file 줄을 남깁니다. 로그 문구는 아래 재측정의 실제 줄을 줄인 것입니다." >}}
 
@@ -91,7 +91,7 @@ v1.21.3과 #6259 head [`69280137`](https://github.com/bluenviron/mediamtx/pull/6
 
 ## 측정 조건
 
-- 수행: AI(Claude Code)가 2026년 11월 13일 18:43–18:47(KST)에 실행했습니다. load average(1분)는 시작 21.11, 끝 8.96이었습니다. 같은 기계에서 다른 세션의 작업이 함께 돌았지만, 이 시험은 줄 수만 세므로 시간 값은 쓰지 않았습니다.
+- 수행: AI(Claude Code)가 2026년 11월 13일 KST 18:41부터 빌드하고(-race 판은 첫 회 뒤), 18:43(v1.21.3 첫 회, 서버 로그 시각)–18:47에 실행했습니다. 나머지 6회를 시작한 18:45의 load average(1분)는 21.11, 끝난 18:47에는 8.96이었습니다. 같은 기계에서 다른 세션의 작업이 함께 돌았지만, 이 시험은 줄 수만 세므로 시간 값은 쓰지 않았습니다.
 - 기종: MacBook Air(Apple M5, 고성능 4·효율 6코어, 32GB, 팬 없음), macOS 27.0.1.
 - 빌드: Go 1.27.2 darwin/arm64로 [v1.21.3](https://github.com/bluenviron/mediamtx/tree/v1.21.3)(`9540cb6c`)과 #6259 head `69280137`(기준 `065f94c2` + 커밋 1개)을 `go build`. `-race` 판은 head만 따로 빌드했습니다.
 - 도구: FFmpeg 9.0.2(RTSP 송출·읽기), srt-live-transmit 1.5.7(SRT 읽기), macOS `nc`.
@@ -99,6 +99,7 @@ v1.21.3과 #6259 head [`69280137`](https://github.com/bluenviron/mediamtx/pull/6
 - 순서: 서버 시작 → `/test`에 RTSP 송출 7초 → 3초 뒤 RTSP 읽기 2초 · SRT 읽기 2초 · `/ondemand` RTSP 읽기 3초 · `nc -z 127.0.0.1 18554` → 모두 끝나고 4초 뒤 SIGINT. 서버 종료 코드는 7번 모두 0이었습니다.
 - 셈: `<훅> command launched`와 `<훅> command exited: fork/exec /nonexistent/`로 시작하는 줄을 훅별로 셌습니다. 판마다 3회(-race 판 1회).
 - 시험: `go test -race -count=1 -run TestHookCommandExited ./internal/hooks`(head), 같은 `hooks_test.go`를 v1.21.3 트리에 복사해 같은 명령.
+- 원자료: 설정 · 스크립트 · 서버 로그 · 셈 결과는 [저장소 `_workspace/blog/mediamtx-seven-hooks-missing-exit-callback/measure/`](https://github.com/xodbs1021/xodbs1021.github.io/tree/main/_workspace/blog/mediamtx-seven-hooks-missing-exit-callback/measure)에 있습니다.
 
 ## 출처
 

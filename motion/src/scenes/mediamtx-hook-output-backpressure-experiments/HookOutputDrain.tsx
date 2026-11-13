@@ -1,6 +1,6 @@
 // 콘티: _workspace/blog/mediamtx-hook-output-backpressure-experiments/storyboard.md 「HookOutputDrain」
 // 훅 16개(그림에는 6개)가 함께 끝난다. 파이프마다 남은 출력이 로거의 잠금 하나를 지나 파일로 간다.
-// 종료 1초 뒤 파이프를 닫고 남은 출력을 버린다(빨강). 그 뒤에도 command exited 줄이 잠금을 기다려
+// 종료 1초 뒤 파이프를 닫고 남은 출력을 버린다(빨강). 41% 는 전체 출력(16 × 50,000줄) 대비. 그 뒤에도 command exited 줄이 잠금을 기다려
 // 마지막 기록은 2.7초에 남는다. 41% · 2.7초는 #6380 head 16개 조건 실측 중앙값, 파이프별 잔량은 단순화(재구성).
 // layout="mobile" 은 1080×1350 휴대폰판(HookOutputDrainMobile).
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
@@ -145,7 +145,7 @@ export const HookOutputDrain: React.FC<Props> = ({ layout = "desktop" }) => {
         1초: 파이프 닫고 남은 줄 버림
       </Tag>
       <Tag x={l.loss.x} y={l.loss.y} tone="danger" size={l.text.label} opacity={cutOn}>
-        유실 41%
+        전체 줄의 41% 유실
       </Tag>
       <Tag x={l.last.x} y={l.last.y} tone="accent" size={l.text.label} opacity={done}>
         마지막 exited 2.7초
