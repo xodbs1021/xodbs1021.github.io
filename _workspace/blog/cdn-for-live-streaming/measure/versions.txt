@@ -1,0 +1,1 @@
+nginx: nginx version: nginx/1.31.3 (이미지 nginx:1-alpine sha256:28c4e91555d0), 원본 python:3.12-alpine Python 3.12.14
