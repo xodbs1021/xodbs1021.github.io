@@ -1,7 +1,7 @@
 ---
 title: "HE-AAC는 절반 표본률로 부호화하고 고음은 SBR로 채웁니다"
 date: 2026-06-20T10:44:52+09:00
-lastmod: "2026-11-13T14:58:13+09:00"
+lastmod: "2026-11-13T15:18:40+09:00"
 description: "같은 AAC라도 프로파일과 인코더, 그릇에 따라 프레임 길이와 앞에 붙는 표본, 설정 정보를 싣는 자리가 달라집니다. AAC의 규격 연도와 특허 창구, HE-AAC의 SBR · PS, ADTS 머리와 ASC, mp4a 코덱 문자열, FFmpeg 9.0.2의 aac · aac_at 프로파일 옵션, PokeClip의 OBS 6트랙, BS.1770 라우드니스와 loudnorm 1회 · 2회의 차이를 1차 문서와 Sintel 예고편 소리 · 합성음 실측으로 확인했습니다."
 categories: ["tech-blurting"]
 tags: ["AAC", "HE-AAC", "SBR", "FFmpeg", "라우드니스", "loudnorm", "HLS"]
@@ -14,7 +14,7 @@ AAC는 「128kbps면 된다」로 끝나기 쉽지만, 같은 AAC라도 프로�
 
 AAC(Advanced Audio Coding)의 첫 규격은 1997년 12월에 나온 ISO/IEC 13818-7, 곧 MPEG-2 7부입니다([ISO 13818-7:1997 보관본](http://web.archive.org/web/20261022120829/https://www.iso.org/standard/25040.html)). 그 뒤 MPEG-4 오디오 규격 ISO/IEC 14496-3이 AAC를 오디오 객체 유형 가운데 하나로 넣었고, 지금 판은 2019년 12월의 5판입니다. 5판의 첫 수정(Amd 1)은 아직 개발 중입니다([ISO 14496-3:2019 보관본](http://web.archive.org/web/20261106083505/https://www.iso.org/standard/76383.html)). MPEG-4 AAC-LC 디코더는 MPEG-2 AAC-LC 비트스트림도 풉니다([Via LA AAC](https://www.via-la.com/licensing-programs/aac/)).
 
-H.264는 2003년 5월에 첫 판이 나왔습니다([ITU-T H.264](https://www.itu.int/rec/T-REC-H.264)). AAC보다 6년 늦고 다른 규격입니다. MP4와 HLS에서 둘이 늘 함께 보이는 것은 그릇과 기기가 둘을 함께 받기 때문이지, 한 세트로 표준화됐기 때문이 아닙니다.
+H.264는 2003년 5월에 첫 판이 나왔습니다([ITU-T H.264](https://www.itu.int/rec/T-REC-H.264)). AAC보다 6년 늦은 별개 규격이라, MP4와 HLS에서 둘이 함께 보이는 것은 같이 표준화돼서가 아니라 그릇과 기기가 둘을 함께 받기 때문입니다.
 
 ### MP3 특허 프로그램은 2017년에 끝났고 AAC 풀은 지금도 기기에 받습니다 {#mp3-vs-aac}
 
@@ -28,18 +28,17 @@ AAC는 소리를 시간 구간(프레임)으로 잘라 주파수 성분으로 �
 
 ## HE-AAC는 절반 표본률로 부호화하고 SBR이 고음을 채웁니다 {#3-aac-프로파일--언제-뭘-쓰나}
 
-HE-AAC(High-Efficiency AAC)는 AAC-LC 코어를 출력의 절반 표본률로 돌립니다. 48kHz 출력이면 코어는 24kHz로 1,024표본 프레임을 부호화하므로, 코어가 담을 수 있는 주파수는 그 절반인 12kHz까지입니다. 그 위는 SBR(Spectral Band Replication)이 채웁니다. 디코더가 코어로 푼 낮은 대역을 높은 대역으로 옮기고, 인코더가 함께 보낸 포락선(대역별 세기) 정보에 맞춰 깎습니다. 아래 영상에서 청록 막대가 코어가 부호화한 대역이고, 교차 주파수 위의 막대는 SBR이 낮은 대역에서 옮겨 와 포락선에 맞춘 것입니다.
+HE-AAC(High-Efficiency AAC)는 AAC-LC 코어를 출력의 절반 표본률로 돌립니다. 48kHz 출력이면 코어는 24kHz로 1,024표본 프레임을 부호화하므로, 코어가 담을 수 있는 주파수는 그 절반인 12kHz까지입니다. 그 위는 SBR(Spectral Band Replication)이 채웁니다. 디코더가 코어로 푼 낮은 대역을 높은 대역으로 옮기고, 인코더가 함께 보낸 포락선(대역별 세기) 정보에 맞춰 깎습니다. [[fig-sbr-fill]]에서 청록 막대가 코어가 부호화한 대역이고, 교차 주파수 위의 막대는 SBR이 낮은 대역에서 옮겨 와 포락선에 맞춘 것입니다.
 
 {{< motion scene="SbrFill" id="fig-sbr-fill" kind="개념도" caption="HE-AAC 디코더는 24kHz 코어가 푼 낮은 대역을 교차 주파수 위로 옮기고, 함께 받은 포락선에 맞춰 높이를 깎아 고음을 채웁니다. 출력 2,048표본(48kHz에서 42.7ms) 프레임마다 되풀이합니다. 막대 높이와 교차 주파수 위치는 설명용입니다." >}}
 
 옮겨 온 고음은 원래 고음의 파형이 아니라 세기만 맞춘 근사입니다. 그래서 SBR은 비트가 모자란 낮은 비트레이트에서 이득이 있고, 비트가 넉넉하면 코어가 고음까지 직접 부호화하는 편이 낫습니다. 애플 HLS 저작 규격은 오디오 비트레이트가 64kbps를 넘으면 HE-AAC를 쓰지 말라고 합니다(2.4, SHOULD NOT, [Apple HLS Authoring Specification](https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html)).
 
-`aac_at`이 만든 HE-AAC의 ASC(AudioSpecificConfig, 디코더 설정 정보)를 열면 이 구조가 그대로 적혀 있습니다. 첫 객체 유형은 2(AAC-LC)이고 표본률은 24kHz인데, 뒤에 동기 확장 표시(0x2b7)와 함께 객체 유형 5(SBR)와 출력 표본률 48kHz가 붙습니다. LC만 아는 디코더는 앞부분만 읽고 24kHz로 풀고, HE-AAC 디코더는 뒷부분까지 읽어 48kHz로 풉니다.
+`aac_at`이 만든 HE-AAC의 ASC(AudioSpecificConfig, 디코더 설정 정보)는 객체 유형 2(AAC-LC) · 24kHz 뒤에 동기 확장(0x2b7)으로 SBR과 출력 48kHz를 붙입니다(바이트는 아래 ADTS 절). LC만 아는 디코더는 앞부분만 읽어 24kHz로, HE-AAC 디코더는 끝까지 읽어 48kHz로 풉니다.
 
-HE-AAC v2는 PS(Parametric Stereo)를 더합니다. 코어는 모노 한 채널만 부호화하고, 좌우 차이는 몇 개의 매개변수로 보냅니다. 32kbps HE-AAC v2의 ASC에서 채널 구성은 1(모노)이었고, SBR 확장 뒤에 PS 동기 확장(0x548)이 붙었습니다. 그 밖의 프로파일은 쓰임새가 다릅니다.
+HE-AAC v2는 PS(Parametric Stereo)를 더합니다. 코어는 모노 한 채널만 부호화하고, 좌우 차이는 몇 개의 매개변수로 보냅니다. 32kbps HE-AAC v2의 ASC에서 채널 구성은 1(모노)이었고, SBR 확장 뒤에 PS 동기 확장(0x548)이 붙었습니다.
 
-- AAC-LD · ELD: 512표본 프레임으로 지연을 줄인 통신용 프로파일입니다. Chrome 157은 `mp4a.40.23`(LD)과 `mp4a.40.39`(ELD)에 `MediaSource.isTypeSupported()` false를 돌려줬습니다.
-- xHE-AAC: 애플 규격은 USAC(Unified Speech and Audio Coding)를 xHE-AAC라고도 부르고, 코덱 문자열을 `mp4a.40.42`로 적습니다. 그릇은 fMP4여야 합니다(2.25). Via LA는 xHE-AAC 특허를 AAC 프로그램에 추가 비용 없이 넣었습니다.
+AAC-LD · ELD는 512표본 프레임으로 지연을 줄인 통신용 프로파일이고, Chrome 157의 `MediaSource.isTypeSupported()`는 `mp4a.40.23`(LD) · `mp4a.40.39`(ELD)에 false였습니다. xHE-AAC는 애플 규격이 USAC(Unified Speech and Audio Coding)의 다른 이름으로 적는 프로파일로, 문자열은 `mp4a.40.42`, 그릇은 fMP4만입니다(2.25).
 
 ## 같은 128kbps라도 인코더마다 앞에 붙는 표본 수가 다릅니다 {#2-같은-aac라도-인코더가-다르면-음질이-다르다}
 
@@ -60,35 +59,25 @@ HE-AAC v2는 PS(Parametric Stereo)를 더합니다. 코어는 모노 한 채널�
 }
 {{< /chart >}}
 
-같은 LC 128kbps라도 `aac_at`은 내장 `aac`보다 약 23ms를 더 앞에 붙였습니다. LD는 64kbps에서 568표본, 128kbps에서 512표본, ELD는 312표본과 256표본으로 비트레이트에 따라 달랐습니다. 이 값을 담을 자리가 없는 그릇에서는 앞 표본이 그대로 재생됩니다. 같은 내장 `aac` 파일을 ADTS(아래 절)로 옮겨 풀자, MP4로 풀 때보다 표본이 정확히 1,024개(21.3ms) 많았습니다. 조각을 이어 붙이거나 영상과 싱크를 맞출 때 이 차이가 나타납니다.
+같은 LC 128kbps라도 `aac_at`은 내장 `aac`보다 약 23ms를 더 앞에 붙였습니다. 이 값을 담을 자리가 없는 그릇에서는 앞 표본이 그대로 재생됩니다. 같은 내장 `aac` 파일을 ADTS(아래 절)로 옮겨 풀자, MP4로 풀 때보다 표본이 정확히 1,024개(21.3ms) 많았습니다.
 
 ### FFmpeg 9.0.2에는 AAC 인코더가 둘 들어 있고 libfdk_aac는 직접 빌드해야 합니다 {#ffmpeg에서-사용-가능한-aac-인코더}
 
-Homebrew의 FFmpeg 9.0.2(macOS)에는 내장 `aac`와 애플 AudioToolbox를 부르는 `aac_at`이 있습니다. `aac_at`은 `--enable-audiotoolbox`로 구성한 macOS 빌드에만 있습니다. 내장 `aac`는 HE-AAC를 만들지 못해, `-profile:a aac_he`를 주면 「Profile not supported!」로 멈췄습니다. Fraunhofer FDK 라이브러리를 쓰는 `libfdk_aac`는 FFmpeg `configure`의 nonfree 목록에 있어, GPL로 구성한 빌드에 넣으려면 `--enable-nonfree`가 필요하고 결과물은 「nonfree and unredistributable」로 표시됩니다([configure 2045–2048행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/configure#L2045-L2048), [4833–4840행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/configure#L4833-L4840)). 그래서 배포판 바이너리에는 대개 빠져 있습니다. 예전의 `libfaac`는 FFmpeg 3.2에서 지워졌습니다([FFmpeg Changelog](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/Changelog)).
+Homebrew의 FFmpeg 9.0.2(macOS)에는 내장 `aac`와 애플 AudioToolbox를 부르는 `aac_at`이 있습니다. `aac_at`은 `--enable-audiotoolbox`로 구성한 macOS 빌드에만 있습니다. 내장 `aac`는 HE-AAC를 만들지 못해, `-profile:a aac_he`를 주면 「Profile not supported!」로 멈췄습니다. Fraunhofer FDK 라이브러리를 쓰는 `libfdk_aac`는 FFmpeg `configure`의 nonfree 목록에 있어, GPL로 구성한 빌드에 넣으려면 `--enable-nonfree`가 필요하고 결과물은 「nonfree and unredistributable」로 표시됩니다([configure 2045–2048행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/configure#L2045-L2048), [4833–4840행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/configure#L4833-L4840)). 예전의 `libfaac`는 FFmpeg 3.2에서 지워졌습니다([FFmpeg Changelog](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/Changelog)).
 
 ### 위키의 화질 순위는 청취 시험이 아니라 9.1 기준 서술입니다 {#인코더별-음질-차이-같은-비트레이트}
 
-FFmpeg 위키의 AAC 인코딩 안내는 FAQ에서 AAC-LC 화질을 「9.1 내장 `aac`(애플 NMR 사용) > `aac_at` > `libfdk_aac`」 순으로 적고, HE-AAC는 `aac_at`과 `libfdk_aac` 중 어느 쪽이 나은지 불분명하다고 적습니다(2026-07-13 수정판, [FFmpeg Wiki Encode/AAC](https://trac.ffmpeg.org/wiki/Encode/AAC), [보관본](http://web.archive.org/web/20261029055502/https://trac.ffmpeg.org/wiki/Encode/AAC)). 이 순서는 아직 나오지 않은 판의 서술입니다. 지금 공개된 최신판은 9.0.2이고, 저장소에는 `n9.1-dev` 표시만 있습니다([FFmpeg 다운로드](https://ffmpeg.org/download.html)). 같은 페이지에 순위를 뒷받침하는 청취 시험 자료는 없습니다. 이 글도 청취 시험을 하지 않았으므로 인코더 사이의 음질 순위는 적지 않습니다.
+FFmpeg 위키의 AAC 인코딩 안내는 FAQ에서 AAC-LC 화질을 「9.1 내장 `aac`(애플 NMR 사용) > `aac_at` > `libfdk_aac`」 순으로 적고, HE-AAC는 `aac_at`과 `libfdk_aac` 중 어느 쪽이 나은지 불분명하다고 적습니다(2026-07-13 수정판, [FFmpeg Wiki Encode/AAC](https://trac.ffmpeg.org/wiki/Encode/AAC), [보관본](http://web.archive.org/web/20261029055502/https://trac.ffmpeg.org/wiki/Encode/AAC)). 이 순서는 아직 나오지 않은 판의 서술입니다. 지금 공개된 최신판은 9.0.2이고, 저장소에는 [`n9.1-dev` 태그](https://github.com/FFmpeg/FFmpeg/tree/n9.1-dev)만 있습니다([FFmpeg 다운로드](https://ffmpeg.org/download.html)). 같은 페이지에 순위를 뒷받침하는 청취 시험 자료는 없습니다. 이 글도 청취 시험을 하지 않았으므로 인코더 사이의 음질 순위는 적지 않습니다.
 
 ## 스테레오 AAC는 Apple 규격의 32–160kbps 안에서 고릅니다 {#4-비트레이트-가이드--영상-대비-무시할-수준}
 
-애플 규격은 HLS에 스테레오 AAC(LC · HE · HE v2 가운데 하나)를 반드시 넣으라고 하고(2.3, MUST), 스테레오 AAC의 권장 총 비트레이트를 32–160kbps, 5.1 AAC를 320kbps로 둡니다(2.9). 표본률은 정하지 않습니다. YouTube 라이브 인코더 안내는 스테레오 오디오를 44.1kHz · 128kbps로, 5.1을 48kHz · 384kbps로 권합니다([YouTube 고객센터](https://support.google.com/youtube/answer/2853702?hl=en)). 「HLS 표준은 48kHz」라는 규칙은 확인하지 못했습니다. PokeClip처럼 OBS가 48kHz로 보내면 그대로 두는 편이 표본률 변환을 줄입니다.
+애플 규격은 HLS에 스테레오 AAC(LC · HE · HE v2 가운데 하나)를 반드시 넣으라고 하고(2.3, MUST), 스테레오 AAC의 권장 총 비트레이트를 32–160kbps, 5.1 AAC를 320kbps로 둡니다(2.9). 표본률은 정하지 않습니다. YouTube 라이브 인코더 안내는 스테레오 오디오를 44.1kHz · 128kbps로, 5.1을 48kHz · 384kbps로 권합니다([YouTube 고객센터](https://support.google.com/youtube/answer/2853702?hl=en)). 「HLS 표준은 48kHz」라는 규칙은 확인하지 못했습니다.
 
 송출 플랫폼은 OBS 서비스 목록에 상한이 적혀 있습니다. OBS 33.0.0에서 CHZZK(치지직)는 오디오 최대 192kbps, YouTube RTMPS는 160kbps, Twitch는 320kbps입니다([services.json 2309행](https://github.com/obsproject/obs-studio/blob/33.0.0/plugins/rtmp-services/data/services.json#L2309), [138행](https://github.com/obsproject/obs-studio/blob/33.0.0/plugins/rtmp-services/data/services.json#L138), [69행](https://github.com/obsproject/obs-studio/blob/33.0.0/plugins/rtmp-services/data/services.json#L69)).
 
 ## 내장 aac의 VBR은 실험 기능입니다 {#5-cbr-vs-vbr--라이브는-cbr}
 
-FFmpeg 위키는 내장 `aac`의 `-q:a` 실효 범위를 약 0.1–2로 적고, 이 VBR(가변 비트레이트)은 실험 기능이라 CBR보다 낫다는 보장이 없다고 적습니다. `-b:a`로 준 CBR도 정확한 고정은 아니고 「매우 가깝게」 맞춘다고 합니다. `aac_at`은 `-q:a` 0–14를 받고 `-b:a`는 기본이 CBR입니다. 같은 Sintel 소리로 잰 평균 비트레이트는 다음과 같습니다.
-
-| 설정 | 평균 kbps | 설정 | 평균 kbps |
-|---|---|---|---|
-| `aac -b:a 128k` | 129.3 | `aac_at -b:a 128k` | 128.0 |
-| `aac -q:a 0.1` | 24.0 | `aac_at -q:a 14` | 47.6 |
-| `aac -q:a 1` | 145.6 | `aac_at -q:a 9` | 90.6 |
-| `aac -q:a 2` | 283.3 | `aac_at -q:a 4` | 157.2 |
-| `aac -q:a 5` | 410.1 | `aac_at -q:a 0` | 276.4 |
-
-두 인코더는 숫자의 방향부터 반대입니다. 내장 `aac`는 클수록, `aac_at`은 작을수록 비트를 많이 썼습니다. 내장 `aac`는 2를 넘겨도 비트레이트가 계속 올랐지만 그만큼 음질이 나아지는지는 재지 않았습니다. 라이브 송출은 플랫폼 상한과 송출 대역을 넘지 않아야 하므로 `-b:a`로 비트레이트를 정합니다.
+FFmpeg 위키는 내장 `aac`의 `-q:a`(VBR) 실효 범위를 약 0.1–2로 적고 실험 기능이라 CBR보다 낫다는 보장이 없다고 하며, `aac_at`은 `-q:a` 0–14를 받고 `-b:a`가 기본 CBR입니다. 같은 Sintel 소리에서 내장 `aac`는 `-q:a` 1이 145.6kbps, 5가 410.1kbps였고 `aac_at`은 거꾸로 0이 276.4kbps, 14가 47.6kbps였으므로, 플랫폼 상한을 넘으면 안 되는 라이브 송출은 `-b:a`로 비트레이트를 정합니다(`-b:a 128k`는 각각 129.3 · 128.0kbps).
 
 ## ADTS는 프레임마다 머리를 달고 MP4는 ASC를 한 번 적습니다 {#6-aac-컨테이너--단순-코덱이-아니다}
 
@@ -114,7 +103,7 @@ flowchart TB
 ```text
 ADTS 머리  FF F1 4C 80 23 9F FC
   FFF      동기어 12비트
-  1        MPEG-4 표시 · 보호 비트 없음 → 머리 7바이트
+  0 00 1   ID 0(MPEG-4) · layer 00 · protection_absent 1 → 머리 7바이트
   01       프로파일 = 객체 유형 - 1 → 2(AAC-LC)
   0011     표본률 번호 3 → 48kHz
   010      채널 구성 2(스테레오)
@@ -171,11 +160,11 @@ ffmpeg -i <입력> -c:v libx264 … -c:a aac -b:a 128k -ar 48000 -ac 2 -f flv rt
 ffmpeg -i <입력> -c:a aac_at -profile:a 4 -b:a 64k out.m4a
 ```
 
-`-ar`와 `-ac`를 적어 두면 입력 장치가 바뀌어도 송출 형식이 바뀌지 않습니다. 첫 명령을 FLV 파일로 바꿔 돌리면 `ffprobe`가 `aac,LC,48000,2`로 읽었습니다.
+첫 명령을 FLV 파일로 바꿔 돌리면 `ffprobe`가 `aac,LC,48000,2`로 읽었습니다.
 
 ## PokeClip은 OBS 6트랙을 audio1–audio6으로 받습니다 {#9-멀티-오디오-트랙--pokeclip-예시}
 
-PokeClip은 클립에서 배경음악 같은 소리를 빼려고 OBS 믹서의 오디오 트랙 6개를 받습니다. 트랙 1은 시청자가 듣는 본방 믹스로 서버의 `audio1`이 되고, 트랙 2–6은 소스별 소리로 `audio2`–`audio6`이 됩니다([6트랙 입력 계약 글](/posts/0-to-1/pokeclip-six-track-input-contract/)). 녹화 조각에는 영상 1개와 AAC 6개(48kHz 스테레오)가 들어 있었습니다([멀티오디오 검증 글](/posts/0-to-1/pokeclip-multiaudio-end-to-end-verification/)).
+PokeClip은 클립에서 배경음악 같은 소리를 빼려고 OBS 믹서의 오디오 트랙 6개를 받습니다. 시청자가 듣는 본방 오디오 인코더(보통 OBS 트랙 1)의 소리가 서버의 `audio1`이 되고, OBS 트랙 2–6은 소스별 소리로 `audio2`–`audio6`이 됩니다([6트랙 입력 계약 글](/posts/0-to-1/pokeclip-six-track-input-contract/)). 녹화 조각에는 영상 1개와 AAC 6개(48kHz 스테레오)가 들어 있었습니다([멀티오디오 검증 글](/posts/0-to-1/pokeclip-multiaudio-end-to-end-verification/)).
 
 옛 RTMP의 오디오 메시지에는 트랙 번호 칸이 없었고, Enhanced RTMP v2(2025-04-17 정식판)가 멀티트랙을 더했습니다([RTMP 글](/posts/tech-blurting/rtmp-still-alive/#audio-message에-트랙-id가-없다--멀티-오디오-불가의-진짜-이유)). PokeClip은 본방을 RTMP로 보내고, 6트랙은 같은 영상 인코더를 나눠 쓰는 별도 SRT 출력(안은 MPEG-TS)으로 받습니다.
 
@@ -190,11 +179,11 @@ PokeClip은 클립에서 배경음악 같은 소리를 빼려고 OBS 믹서의 �
 | Spotify 재생 | −14 LUFS(재생할 때 맞춤) | [Spotify for Artists](https://support.spotify.com/us/artists/article/loudness-normalization/) |
 | FFmpeg `loudnorm` 기본값 | I −24, LRA 7, TP −2 | [af_loudnorm.c 107–112행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavfilter/af_loudnorm.c#L107-L112) |
 
-「스트리밍 표준은 −16」 같은 하나의 값은 확인하지 못했습니다. Spotify는 업로드한 파일을 바꾸지 않고 재생할 때 크기를 맞추며, 손실 압축을 위해 1dB 여유를 둡니다. PokeClip의 클립 렌더는 고른 소리를 섞은 뒤 −14 LUFS로 맞추고 H.264/AAC로 인코딩합니다([레시피 · 렌더 경계 글](/posts/0-to-1/clip-edit-recipe-render-boundary/)).
+「스트리밍 표준은 −16」 같은 하나의 값은 확인하지 못했습니다. PokeClip의 클립 렌더는 고른 소리를 섞은 뒤 −14 LUFS로 맞추고 H.264/AAC로 인코딩합니다([레시피 · 렌더 경계 글](/posts/0-to-1/clip-edit-recipe-render-boundary/)).
 
 ### loudnorm 한 번 실행은 동적으로, 두 번 실행은 선형으로 맞춥니다
 
-`loudnorm`은 두 가지 방식으로 움직입니다. 측정값을 받지 않으면 소리를 흘려보내며 이득을 계속 바꾸는 동적 방식이고, 이때 입력 표본률을 192kHz로 고정합니다([af_loudnorm.c 740–753행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavfilter/af_loudnorm.c#L740-L753)). 첫 실행에서 잰 값을 `measured_*`로 넘기고 `linear=true`를 주면, 잰 LRA(소리 폭)가 목표 LRA 이하이고 이득을 더한 뒤의 최대 피크가 목표 TP 이하일 때에만 전체에 같은 이득을 곱하는 선형 방식이 됩니다([815–825행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavfilter/af_loudnorm.c#L815-L825)).
+`loudnorm`은 두 가지 방식으로 움직입니다. 선형 방식은 `linear`(기본값 true)일 때 첫 실행에서 잰 `measured_I` · `measured_LRA` · `measured_TP` · `measured_thresh` 네 값을 모두 넘기고, 잰 LRA(소리 폭)가 목표 LRA 이하이며 이득을 더한 뒤의 최대 피크가 목표 TP 이하일 때에만 전체에 같은 이득을 곱합니다([815–826행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavfilter/af_loudnorm.c#L815-L826)). 그 밖의 모든 경우는 소리를 흘려보내며 이득을 계속 바꾸는 동적 방식이고, 이때 입출력 표본률을 192kHz로 둡니다([740–753행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavfilter/af_loudnorm.c#L740-L753)).
 
 4초씩 크고(220 · 440 · 880Hz 합성음) 작은(−9.9dB) 구간이 번갈아 오는 60초 합성음을 I −14 · TP −1 · LRA 11로 맞췄습니다. [[fig-loudnorm-passes]]에서 회색 점선이 원본, 주황 선이 한 번 실행, 청록 선이 두 번 실행입니다.
 
@@ -232,23 +221,11 @@ ffmpeg -i in.wav -af loudnorm=I=-14:TP=-1:LRA=11:measured_I=<input_i>:measured_T
 
 ## 지연과 낮은 비트레이트에서 Opus와 갈립니다 {#11-opus--webrtc가-aac를-거부한-이유}
 
-WebRTC 오디오 규격(RFC 7874)은 모든 단말이 Opus와 G.711(PCMA · PCMU)을 구현하라고 하고, AAC는 그 목록에 없습니다([RFC 7874](https://www.rfc-editor.org/rfc/rfc7874)). Opus는 2.5–60ms 프레임을 고를 수 있고, libopus 1.6.1이 Ogg 머리에 적은 앞 표본(pre-skip)은 312개(6.5ms)였습니다. 모드 전환과 손실 복구는 [Opus 글](/posts/tech-blurting/opus-deep-dive/)에서 다룹니다.
-
-### 프레임 길이와 그릇과 받는 쪽이 다릅니다 {#opus-vs-aac}
-
-| | AAC-LC | Opus |
-|---|---|---|
-| 규격 | ISO/IEC 14496-3 | RFC 6716(2012) |
-| 프레임(48kHz) | 1,024표본 = 21.3ms | 2.5–60ms, 기본 20ms |
-| 측정한 앞 표본 | 1,024(내장) · 2,112(`aac_at`) | 312(6.5ms) |
-| 기본 그릇 | MP4 · ADTS | Ogg(`.opus`) |
-| WebRTC 필수 코덱 | 아님 | 필수(RFC 7874) |
-| 애플 HLS 코덱 표 | 있음 | 없음 |
-| 특허 창구 | Via LA, 기기 대당 | 로열티 없는 허락 + Vectis 하드웨어 풀 |
+WebRTC 오디오 규격(RFC 7874)은 모든 단말이 Opus와 G.711을 구현하라고 하고, AAC는 그 목록에 없습니다([RFC 7874](https://www.rfc-editor.org/rfc/rfc7874)). 프레임 길이(2.5–60ms), 앞 표본(libopus 312개), 그릇과 특허 창구의 차이는 [Opus 글](/posts/tech-blurting/opus-deep-dive/)에서 다룹니다.
 
 ## 서라운드는 AC-3·E-AC-3, 무손실은 FLAC·ALAC이 맡습니다 {#12-ac-3-flac-같은-다른-코덱들}
 
-AAC도 다채널을 부호화합니다. 애플 규격의 다채널 코덱 목록에는 AAC-LC, HE-AAC v1, Apple Lossless, FLAC, AC-3(Dolby Digital), E-AC-3(Dolby Digital Plus), APAC가 있고(2.5), 5.1 권장값은 AAC 320kbps, AC-3 384kbps, E-AC-3 192kbps입니다. 7.1 권장값은 APAC와 E-AC-3에만 적혀 있습니다(2.9). 브라우저에서는 사정이 다릅니다. Chrome 157의 `isTypeSupported()`는 `ac-3`와 `ec-3`에 false였고, caniuse(2026-11-13 확인)도 Chrome · Firefox의 AC-3 · E-AC-3 재생을 「지원 안 함」으로 적습니다([caniuse AC-3 · EC-3](https://caniuse.com/ac3-ec3)).
+AAC도 다채널을 부호화합니다. 애플 규격의 다채널 코덱 목록에는 AAC-LC, HE-AAC v1, Apple Lossless, FLAC, AC-3(Dolby Digital), E-AC-3(Dolby Digital Plus), E-AC-3 JOC(ec+3), APAC가 있고(2.5), 5.1 권장값은 AAC 320kbps, AC-3 384kbps, E-AC-3 192kbps입니다. 7.1 권장값은 APAC와 E-AC-3에만 적혀 있습니다(2.9). 브라우저 MSE는 다릅니다. Chrome 157의 `isTypeSupported()`는 `ac-3`와 `ec-3`에 false였습니다.
 
 ### Apple 규격은 E-AC-3를 낼 때 AC-3도 두라고 합니다 {#netflix-4k-hdr-영화의-오디오}
 
@@ -260,19 +237,11 @@ FLAC은 2024년 12월 RFC 9639로 IETF 규격이 됐습니다([RFC 9639](https:/
 
 ## 오디오 코덱은 받는 쪽 목록에서 거꾸로 고릅니다 {#13-시나리오별-코덱-선택}
 
-코덱은 보내는 쪽의 취향이 아니라 받는 쪽 목록이 정합니다.
-
-| 받는 쪽 | 확인할 목록 | 이 글에서 확인한 값 |
-|---|---|---|
-| 라이브 송출 플랫폼 | OBS `services.json`의 권장값 | 치지직 오디오 최대 192kbps(33.0.0) |
-| 애플 기기 HLS | HLS 저작 규격 2장 | 스테레오 AAC 필수, HE-AAC는 64kbps 이하 |
-| 브라우저 MSE | `isTypeSupported()` · `decodingInfo()` | Chrome 157: AAC LC · HE · xHE, Opus, FLAC 가능, AC-3 · E-AC-3 불가 |
-| WebRTC | RFC 7874 | Opus · G.711 필수 |
+코덱은 받는 쪽 목록이 정합니다. 라이브 송출은 OBS `services.json`의 권장값(치지직 오디오 최대 192kbps), 애플 기기용 HLS는 저작 규격 2장(스테레오 AAC 필수, HE-AAC는 64kbps 이하), 브라우저는 `isTypeSupported()` · `decodingInfo()`의 응답([코덱 디버깅 글](/posts/tech-blurting/codec-decision-and-debugging/#브라우저-개발자-도구)), WebRTC는 RFC 7874(Opus · G.711 필수)를 확인합니다.
 
 ## AAC는 프로파일 · 인코더 · 그릇을 함께 적어야 같은 소리가 됩니다 {#정리하면}
 
 - 「AAC 128kbps」만으로는 부족합니다. LC인지 HE인지, 어느 인코더인지에 따라 프레임 길이, 앞에 붙는 표본, 부호화하는 대역이 달라집니다.
-- HE-AAC는 64kbps 이하에서 고르고, 그 위에서는 LC를 씁니다.
 - ADTS로 옮기면 앞 표본 정보가 사라집니다. 조각을 잇거나 싱크를 맞출 때는 MP4의 편집 목록이 있는 쪽을 기준으로 삼습니다.
 - `loudnorm`은 측정값을 넘기는 두 번 실행에서만 선형으로 맞추며, 그때도 LRA와 피크 조건을 통과해야 합니다. 출력 표본률은 직접 적습니다.
 
@@ -300,8 +269,7 @@ FLAC은 2024년 12월 RFC 9639로 IETF 규격이 됐습니다([RFC 9639](https:/
 - [FFmpeg Wiki, Encode/AAC](https://trac.ffmpeg.org/wiki/Encode/AAC) (2026-07-13 수정판, [보관본](http://web.archive.org/web/20261029055502/https://trac.ffmpeg.org/wiki/Encode/AAC), 원문 주소가 자동 접속을 막아 보관본으로 확인)
 - [YouTube 고객센터, 라이브 스트림 인코더 설정](https://support.google.com/youtube/answer/2853702?hl=en)
 - [OBS Studio 33.0.0 rtmp-services/services.json](https://github.com/obsproject/obs-studio/blob/33.0.0/plugins/rtmp-services/data/services.json)
-- 라우드니스: [ITU-R BS.1770](https://www.itu.int/rec/R-REC-BS.1770) · [EBU R 128-2023](https://tech.ebu.ch/docs/r/r128.pdf) · [중앙전파관리소, 텔레비전 방송 표준 음량기준](https://www.crms.go.kr/lay1/S1T1094C1095/contents.do) (자동 접속 요청에는 400을 돌려주고 보관본이 없어, 2026-11-13 페이지 원문으로 확인) · [Spotify for Artists, Loudness normalization](https://support.spotify.com/us/artists/article/loudness-normalization/)
-- [caniuse, AC-3 (Dolby Digital) and EC-3 (Dolby Digital Plus) codecs](https://caniuse.com/ac3-ec3) · [같은 데이터 ac3-ec3.json](https://github.com/Fyrd/caniuse/blob/main/features-json/ac3-ec3.json) (2026-11-13 확인, caniuse.com은 자동 접속을 막아 같은 데이터 파일로 확인)
+- 라우드니스: [ITU-R BS.1770](https://www.itu.int/rec/R-REC-BS.1770) · [EBU R 128-2023](https://tech.ebu.ch/docs/r/r128.pdf) · [중앙전파관리소, 텔레비전 방송 표준 음량기준](https://www.crms.go.kr/lay1/S1T1094C1095/contents.do) · [Spotify for Artists, Loudness normalization](https://support.spotify.com/us/artists/article/loudness-normalization/)
 - [Sintel](https://durian.blender.org/sharing/) — 시험 소리, © copyright Blender Foundation | durian.blender.org, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 
 다음 편: [Opus는 신호와 비트레이트로 SILK와 CELT를 오갑니다](/posts/tech-blurting/opus-deep-dive/)
