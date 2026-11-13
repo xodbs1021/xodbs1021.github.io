@@ -1,0 +1,14 @@
+# ProducerConfig 기본값 (apache/kafka:4.4.0 클라이언트, kafka-run-class.sh org.apache.kafka.clients.producer.ProducerConfig 출력에서 추출)
+acks = all
+linger.ms = 5
+batch.size = 16384
+enable.idempotence = true
+max.in.flight.requests.per.connection = 5
+delivery.timeout.ms = 120000 (2 minutes)
+request.timeout.ms = 30000 (30 seconds)
+compression.type = none
+consumer group.protocol = classic
+consumer partition.assignment.strategy = class org.apache.kafka.clients.consumer.RangeAssignor,class org.apache.kafka.clients.consumer.CooperativeStickyAssignor
+consumer client.rack = ""
+consumer isolation.level = read_uncommitted
+이미지 apache/kafka:4.4.0 sha256:8e12eba3b69e, 4.4.0

@@ -1,0 +1,23 @@
+## C3 목록 나이 — TTL 1초 vs TTL 1초 + use_stale updating + background_update (시작 2026-11-13 16:17:52 KST, load 95.56 78.61 60.44)
+원본: 목록 응답 전 0.3초 지연, 2초마다 MEDIA-SEQUENCE+1, #GEN에 생성 시각. 시청자 20명이 0.5초 간격으로 엣지 4대를 돌아가며 20초. 나이=받은 시각−원본 생성 시각, 뒤처진 조각 수=floor(받은 시각/2)−MEDIA-SEQUENCE
+$ docker exec tb6-cdn-client-1 python /app/client.py playlist pl-plain 8081 20
+rep=1 tier=1층 origin_playlist_requests=301 load1=70.70 {"kind": "pl-plain", "port": "8081", "responses": 594, "age_p50_ms": 7, "age_p95_ms": 1249, "age_max_ms": 1519, "segments_behind": {"0": 405, "1": 189}}
+$ docker exec tb6-cdn-client-1 python /app/client.py playlist pl-plain 8080 20
+IndexError: list index out of range
+rep=1 tier=2층 origin_playlist_requests=0 load1=70.70 
+$ docker exec tb6-cdn-client-1 python /app/client.py playlist pl-swr 8081 20
+rep=1 tier=1층 origin_playlist_requests=44 load1=54.08 {"kind": "pl-swr", "port": "8081", "responses": 780, "age_p50_ms": 963, "age_p95_ms": 1934, "age_max_ms": 1997, "segments_behind": {"0": 584, "1": 196}}
+$ docker exec tb6-cdn-client-1 python /app/client.py playlist pl-swr 8080 20
+IndexError: list index out of range
+rep=1 tier=2층 origin_playlist_requests=0 load1=54.08 
+$ docker exec tb6-cdn-client-1 python /app/client.py playlist pl-plain 8081 20
+rep=2 tier=1층 origin_playlist_requests=237 load1=42.61 {"kind": "pl-plain", "port": "8081", "responses": 650, "age_p50_ms": 492, "age_p95_ms": 1484, "age_max_ms": 1606, "segments_behind": {"0": 645, "1": 5}}
+$ docker exec tb6-cdn-client-1 python /app/client.py playlist pl-plain 8080 20
+IndexError: list index out of range
+rep=2 tier=2층 origin_playlist_requests=0 load1=42.61 
+$ docker exec tb6-cdn-client-1 python /app/client.py playlist pl-swr 8081 20
+rep=2 tier=1층 origin_playlist_requests=40 load1=32.20 {"kind": "pl-swr", "port": "8081", "responses": 797, "age_p50_ms": 766, "age_p95_ms": 1754, "age_max_ms": 23912, "segments_behind": {"0": 597, "1": 180, "12": 20}}
+$ docker exec tb6-cdn-client-1 python /app/client.py playlist pl-swr 8080 20
+IndexError: list index out of range
+rep=2 tier=2층 origin_playlist_requests=0 load1=29.70 
+## C3 끝 16:19:21 KST

@@ -1,0 +1,13 @@
+## C2 아직 없는 조각의 404 캐시 (시작 2026-11-13 16:17:09 KST, load 92.15 75.54 58.43)
+설정: 엣지 proxy_cache_valid 404 10s, 원본은 첫 요청 3초 뒤부터 200. 엣지1 → 원본(8081) 0.25초 간격 16초
+$ docker exec tb6-cdn-client-1 python /app/client.py late404 8081 late-1-1794554229
+{"name": "late-1-1794554229", "first_request_s": 0, "origin_ready_s": 3.0, "first_200_at_s": 10.63, "trace": [[0.0, 404, "MISS"], [0.29, 404, "HIT"], [10.63, 200, "EXPIRED"], [11.2, 200, "HIT"]]}
+원본 요청: 2
+  origin 1794554230.428
+  origin 1794554241.034
+$ docker exec tb6-cdn-client-1 python /app/client.py late404 8081 late-2-1794554247
+{"name": "late-2-1794554247", "first_request_s": 0, "origin_ready_s": 3.0, "first_200_at_s": 11.24, "trace": [[0.0, 404, "MISS"], [0.29, 404, "HIT"], [11.24, 200, "EXPIRED"], [12.09, 200, "HIT"]]}
+원본 요청: 2
+  origin 1794554248.019
+  origin 1794554259.254
+## C2 끝 16:17:44 KST

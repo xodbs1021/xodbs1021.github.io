@@ -1,7 +1,7 @@
 ---
 title: "재생 실패는 CODECS 선언과 실제 트랙을 대조해 좁힙니다"
 date: 2026-06-21T12:33:24+09:00
-lastmod: "2026-11-13T15:18:40+09:00"
+lastmod: "2026-11-13T17:07:29+09:00"
 description: "재생이 안 될 때는 다변형 목록의 CODECS 선언, init 조각에 든 실제 트랙, 브라우저 디코더의 응답을 따로 확인해야 원인이 좁혀집니다. FFmpeg 9.0.2 HLS 먹서가 HE-AAC에 mp4a.40.2를 적는 이유(codecstring.c), ffprobe csv 필드 순서, Chrome 157의 isTypeSupported 결과, hls.js 1.7.4의 INCOMPATIBLE_CODECS 오류와 Level 필드, FFmpeg 로그 문자열의 소스 위치, CDN 바이트 산식을 1차 문서와 실측으로 확인했습니다."
 categories: ["tech-blurting"]
 tags: ["코덱", "HLS", "ffprobe", "MSE", "hls.js", "디버깅", "FFmpeg"]
@@ -188,3 +188,5 @@ Chrome 157에서는 오류가 나지 않았습니다. 오디오만 담은 HE-AAC
 - MDN: [MediaSource.isTypeSupported()](https://developer.mozilla.org/en-US/docs/Web/API/MediaSource/isTypeSupported_static) · [MediaCapabilities.decodingInfo()](https://developer.mozilla.org/en-US/docs/Web/API/MediaCapabilities/decodingInfo)
 - caniuse(2026-11-13 확인): [AAC](https://caniuse.com/aac) · [Opus](https://caniuse.com/opus) · [FLAC](https://caniuse.com/flac) · [AC-3 · EC-3](https://caniuse.com/ac3-ec3) · 같은 데이터 [aac.json](https://github.com/Fyrd/caniuse/blob/main/features-json/aac.json) · [opus.json](https://github.com/Fyrd/caniuse/blob/main/features-json/opus.json) · [flac.json](https://github.com/Fyrd/caniuse/blob/main/features-json/flac.json) · [ac3-ec3.json](https://github.com/Fyrd/caniuse/blob/main/features-json/ac3-ec3.json) (caniuse.com은 자동 접속을 막아 같은 데이터 파일로 확인)
 - [Sintel](https://durian.blender.org/sharing/) — 시험 영상, © copyright Blender Foundation | durian.blender.org, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
+
+다음 편: [PSNR·SSIM·VMAF는 같은 손상을 서로 다르게 채점합니다](/posts/tech-blurting/video-quality-bitrate-abr/)

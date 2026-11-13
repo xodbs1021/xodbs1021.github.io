@@ -1,0 +1,29 @@
+## V4 해상도별 기본 · 휴대폰 모델 2026-11-13 16:47:02 KST load 80.08 101.25 76.01
+$ ffmpeg -i ref10.mkv -vf scale=960:540:flags=bicubic -c:v libx264 -preset medium -threads 4 -b:v 1000k -maxrate 1000k -bufsize 2000k res540_1000.mp4
+### res540_1000.mp4
+$ ffmpeg -i res540_1000.mp4 -i ref10.mkv -lavfi "[0:v]null,scale=1920:1080:flags=bicubic,setpts=N/24/TB[d];[1:v]setpts=N/24/TB[r];[d][r]libvmaf=model='version=vmaf_v0.6.1\:name=vmaf|version=vmaf_v0.6.1neg\:name=neg|version=vmaf_v0.6.1\:name=phone\:enable_transform=true':feature='name=psnr|name=float_ssim':log_fmt=json:log_path=v4-540.json:n_threads=8" -f null -
+  프레임 240
+  vmaf: 평균 81.368 · 조화평균 80.847 · 하위1% 70.551 · 최소 69.670
+  neg: 평균 78.499 · 조화평균 77.820 · 하위1% 67.208 · 최소 66.369
+  phone: 평균 94.931 · 조화평균 94.822 · 하위1% 88.403 · 최소 87.753
+  psnr_y: 평균 40.977 · 조화평균 40.187 · 하위1% 34.239 · 최소 34.089
+  float_ssim: 평균 0.993 · 조화평균 0.993 · 하위1% 0.985 · 최소 0.984
+$ ffmpeg -i ref10.mkv -vf scale=1280:720:flags=bicubic -c:v libx264 -preset medium -threads 4 -b:v 1600k -maxrate 1600k -bufsize 3200k res720_1600.mp4
+### res720_1600.mp4
+$ ffmpeg -i res720_1600.mp4 -i ref10.mkv -lavfi "[0:v]null,scale=1920:1080:flags=bicubic,setpts=N/24/TB[d];[1:v]setpts=N/24/TB[r];[d][r]libvmaf=model='version=vmaf_v0.6.1\:name=vmaf|version=vmaf_v0.6.1neg\:name=neg|version=vmaf_v0.6.1\:name=phone\:enable_transform=true':feature='name=psnr|name=float_ssim':log_fmt=json:log_path=v4-720.json:n_threads=8" -f null -
+  프레임 240
+  vmaf: 평균 89.755 · 조화평균 89.515 · 하위1% 80.682 · 최소 79.673
+  neg: 평균 87.166 · 조화평균 86.860 · 하위1% 77.598 · 최소 76.648
+  phone: 평균 98.953 · 조화평균 98.934 · 하위1% 95.087 · 최소 94.486
+  psnr_y: 평균 42.981 · 조화평균 42.347 · 하위1% 36.489 · 최소 36.308
+  float_ssim: 평균 0.996 · 조화평균 0.996 · 하위1% 0.991 · 최소 0.991
+$ ffmpeg -i ref10.mkv -vf scale=1920:1080:flags=bicubic -c:v libx264 -preset medium -threads 4 -b:v 1600k -maxrate 1600k -bufsize 3200k res1080_1600.mp4
+### res1080_1600.mp4
+$ ffmpeg -i res1080_1600.mp4 -i ref10.mkv -lavfi "[0:v]null,scale=1920:1080:flags=bicubic,setpts=N/24/TB[d];[1:v]setpts=N/24/TB[r];[d][r]libvmaf=model='version=vmaf_v0.6.1\:name=vmaf|version=vmaf_v0.6.1neg\:name=neg|version=vmaf_v0.6.1\:name=phone\:enable_transform=true':feature='name=psnr|name=float_ssim':log_fmt=json:log_path=v4-1080.json:n_threads=8" -f null -
+  프레임 240
+  vmaf: 평균 92.313 · 조화평균 92.109 · 하위1% 84.983 · 최소 83.933
+  neg: 평균 89.927 · 조화평균 89.690 · 하위1% 81.620 · 최소 81.556
+  phone: 평균 99.600 · 조화평균 99.595 · 하위1% 97.487 · 최소 96.925
+  psnr_y: 평균 44.765 · 조화평균 44.271 · 하위1% 38.273 · 최소 37.968
+  float_ssim: 평균 0.995 · 조화평균 0.995 · 하위1% 0.990 · 최소 0.989
+끝 2026-11-13 16:48:04 KST load 62.65 91.74 74.14

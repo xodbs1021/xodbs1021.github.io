@@ -103,6 +103,58 @@
       "poster": "/images/aws-gcp-bidirectional-cutover-experiment-cutover-queue-pause-mobile-poster.jpg"
     }
   },
+  "buffering-deep-dive-buffer-drain-downswitch": {
+    "scene": "BufferDrainDownswitch",
+    "alt": "왼쪽은 가로축 40초부터 90초, 세로축 버퍼 0–12초인 꺾은선 그래프이고 45–75초가 붉은 1.5 Mbps 구간으로 칠해져 있다. 오른쪽에는 버퍼 초를 보여 주는 세로 막대와 다음 조각 변형 상자 1080p 4.54M · 720p 2.28M · 360p 0.72M가 있다. 위의 이름표가 받는 속도 8 Mbps에서 1.5 Mbps로 바뀌면 꺾은선이 하락 시점의 8.2초에서 내려가 최저 1.66초 표시에 닿고, 그사이 다음 조각이 1080p에서 720p, 360p로 내려간다. 360p로 받으면서 버퍼가 다시 10초 근처로 차고, 8 Mbps로 돌아온 뒤 다음 조각이 720p로 올라간다. 0초로 멈추는 순간은 없다",
+    "sha256": "1e74418ce6c4222faa92224d54c751233a54a495f245174b42e45fa7cfd5bce5",
+    "bytes": 232343,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 12,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/buffering-deep-dive-buffer-drain-downswitch-poster.jpg",
+    "mobile": {
+      "sha256": "0da6f2d16df937109c6e55ba565afb18e602e405808815d9d8475429235f7f51",
+      "bytes": 226181,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 12,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/buffering-deep-dive-buffer-drain-downswitch-mobile-poster.jpg"
+    }
+  },
+  "cdn-for-live-streaming-coalesce-tiers": {
+    "scene": "CoalesceTiers",
+    "alt": "왼쪽에 시청자 200명의 점 격자, 가운데에 엣지 1–4 상자, 오른쪽에 실드와 원본 상자가 있다. 새 조각 요청 200건이 점으로 날아가 네 엣지에 50건씩 쌓이고, 각 엣지는 한 건만 실드로 올려 실드에 4건 이름표가 뜬다. 실드는 그중 한 건만 원본으로 올려 원본에 1건 이름표가 뜬다. 이어서 원본의 응답 하나가 실드, 엣지 넷을 거쳐 시청자 200명에게 내려가며 상자와 점이 모두 청록색으로 바뀐다",
+    "sha256": "8841b97b41e8417abd35c4bf7f7ca44080dca2dc1f1f93cb58ef5a8c50a741fa",
+    "bytes": 563786,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 12,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/cdn-for-live-streaming-coalesce-tiers-poster.jpg",
+    "mobile": {
+      "sha256": "10bb5cf34b695e1168f3878347da7b70d28da834d281fe563f16ffbfcbe9bd09",
+      "bytes": 602782,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 12,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/cdn-for-live-streaming-coalesce-tiers-mobile-poster.jpg"
+    }
+  },
   "chat-highlight-research-and-fallback-chat-spike-to-card": {
     "scene": "ChatSpikeToCard",
     "alt": "위 「채팅 시각 · 5초 창」 축에 5초 창마다 메시지 수 막대가 자라고, 점선 「최근 15분 중앙값」, 실선 「중앙값 × 3」, 그보다 낮은 점선 「10건」이 뜬다. 두 선을 모두 넘은 막대 셋이 강조색으로 바뀌고, 10건만 넘은 회색 막대 하나는 그대로 남는다. 강조된 막대 위에 괄호와 「20초 안 → 한 사건」이 붙는다. 첫 급증 창에서 아래 「영상 위치」 축으로 화살표와 「− 3.9초」가 이어지고, 옮긴 구간이 왼쪽 「앞 15초」, 오른쪽 「뒤 5초」로 늘어 카드 구간이 된다. 그 카드가 오른쪽 「카드 표」로 옮겨 「자동 · 채팅 급증」 카드가 되고, 아래에 「핫키 · 손으로 표시」 카드가 같은 카드 표에 들어오는 장면",
@@ -439,6 +491,32 @@
       "audio": 0,
       "faststart": true,
       "poster": "/images/hls-just-files-playlist-slide-mobile-poster.jpg"
+    }
+  },
+  "kafka-core-concepts-technical-review-acks-isr-commit": {
+    "scene": "AcksIsrCommit",
+    "alt": "왼쪽 acks=1, 오른쪽 acks=all 두 판에 B1 리더 · B2 팔로워 · B3 팔로워가 각각 1,000건 막대를 갖고 있다. B2 · B3가 회색으로 멈춘 사이 B1 막대 끝에 100건 칸이 붙는데, acks=1은 청록 칸과 확인 응답 100건 이름표, acks=all은 점선 칸과 확인 응답 0건(시간 초과) 이름표다. B1이 빨간 장애로 바뀌고 acks=1은 B2, acks=all은 B3가 새 리더가 된다. 끝에 100건 칸이 사라지며 acks=1에는 확인 받은 100건 사라짐, acks=all에는 확인 받은 기록 손실 0 이름표가 뜬다",
+    "sha256": "b30d469537bc0dd8c1f4f5f7ff6e733958f5ee5cdbdf84857344d0aca77a00d6",
+    "bytes": 221897,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 12,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/kafka-core-concepts-technical-review-acks-isr-commit-poster.jpg",
+    "mobile": {
+      "sha256": "f612eebf7d8fd4e3a8c439376aa5f8c117e97b94371c964c606b50301f71a00b",
+      "bytes": 279116,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 12,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/kafka-core-concepts-technical-review-acks-isr-commit-mobile-poster.jpg"
     }
   },
   "live-transcoding-infrastructure-speed-below-realtime": {
@@ -1961,6 +2039,58 @@
       "audio": 0,
       "faststart": true,
       "poster": "/images/stream-id-contract-compatible-migration-deploy-order-mobile-poster.jpg"
+    }
+  },
+  "streaming-basics-from-scratch-frame-to-player": {
+    "scene": "FrameToPlayer",
+    "alt": "위에 초당 바이트 숫자와 가로 막대가 있고, 아래에 카메라·화면(RGB 24비트), 색 줄이기(YUV 4:2:0), 압축(x264 6Mbps), 송출(RTMP · SRT), 포장(HLS 조각), CDN(엣지 캐시) 여섯 단계 상자가 이어지며 오른쪽 끝에 시청자 동그라미 셋이 있다. 네모 표식이 왼쪽 단계부터 오른쪽으로 옮겨 가는 동안 숫자가 초당 186.6MB에서 93.3MB로, 압축 단계에서 0.77MB로 바뀌고 막대도 그만큼 짧아져 거의 사라지며, 지나온 186.6MB · 93.3MB 자리에 눈금이 남는다. 마지막에 CDN 상자에서 같은 표식이 세 갈래로 나뉘어 시청자 셋에게 동시에 닿는다",
+    "sha256": "6d5a032766f08ed591eabc9d2bd56e8f27961f5631ec1dbae025913c054d978f",
+    "bytes": 178737,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 12,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/streaming-basics-from-scratch-frame-to-player-poster.jpg",
+    "mobile": {
+      "sha256": "dd02539fa13153d083a36ae688fca4be45aca434711719835a065f8fa2c44320",
+      "bytes": 198259,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 12,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/streaming-basics-from-scratch-frame-to-player-mobile-poster.jpg"
+    }
+  },
+  "video-quality-bitrate-abr-vmaf-per-frame": {
+    "scene": "VmafPerFrame",
+    "alt": "가로축 0초부터 52초, 세로축 VMAF 70부터 100까지인 그래프다. 회색 점선 평균 93.4가 처음부터 그어져 있고, 화면별 VMAF 꺾은선이 왼쪽에서 오른쪽으로 그려진다. 선은 대부분 90 위를 오르내리다 12.5초 부근에서 크게 떨어지고, 가장 낮은 12.8초 77.1에 원과 이름표가 붙는다. 선을 다 그린 뒤 청록 점선 하위 1% 79.4가 나타나고, 오른쪽에 평균선과 하위 1%선 사이를 잇는 괄호와 14점 차이 이름표가 뜬다",
+    "sha256": "5244066e145f1f8b496daa864e60750bb38486d3704a84429453ca7690d8f377",
+    "bytes": 190975,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 12,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/video-quality-bitrate-abr-vmaf-per-frame-poster.jpg",
+    "mobile": {
+      "sha256": "75bb4ae61834f2e5f16f28ebb8ce7e31e12a3f092e12a21bc3ebd14849ef2378",
+      "bytes": 171468,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 12,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/video-quality-bitrate-abr-vmaf-per-frame-mobile-poster.jpg"
     }
   },
   "webrtc-deep-dive-ice-candidate-pairs": {

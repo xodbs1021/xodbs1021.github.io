@@ -1,0 +1,53 @@
+## K2 min.insync.replicas=2에서 팔로워 둘이 멈췄을 때 (시작 2026-11-13 16:33:11 KST, load 46.55 45.43 43.97)
+$ kafka-topics.sh --create --topic nr --replica-assignment 1:2:3 --config min.insync.replicas=2
+Created topic nr.
+[16:33:16.977] 	Topic: nr	Partition: 0	Leader: 1	Replicas: 1,2,3	Isr: 1,2,3	Elr: 	LastKnownElr: 
+[16:33:20.415] $ docker stop tb6-kafka-kafka2-1 tb6-kafka-kafka3-1
+[16:33:27.420] 	Topic: nr	Partition: 0	Leader: 1	Replicas: 1,2,3	Isr: 1	Elr: 3	LastKnownElr: 
+[16:33:32.818] 	Topic: nr	Partition: 0	Leader: 1	Replicas: 1,2,3	Isr: 1	Elr: 3	LastKnownElr: 
+[16:33:37.859] 	Topic: nr	Partition: 0	Leader: 1	Replicas: 1,2,3	Isr: 1	Elr: 3	LastKnownElr: 
+[16:33:42.478] 	Topic: nr	Partition: 0	Leader: 1	Replicas: 1,2,3	Isr: 1	Elr: 3	LastKnownElr: 
+[16:33:46.990] 	Topic: nr	Partition: 0	Leader: 1	Replicas: 1,2,3	Isr: 1	Elr: 3	LastKnownElr: 
+[16:33:52.717] 	Topic: nr	Partition: 0	Leader: 1	Replicas: 1,2,3	Isr: 1	Elr: 3	LastKnownElr: 
+[16:33:55.416] acks=all 100건 (request.timeout.ms=5000 delivery.timeout.ms=8000 retries=0):
+1 0 records sent, 0.000000 records/sec (0.00 MB/sec), NaN ms avg latency, 0.00 ms max latency, 0 ms 50th, 0 ms 95th, 0 ms 99th, 0 ms 99.9th.
+100 org.apache.kafka.common.errors.NotEnoughReplicasException
+[16:33:57.527] acks=1 100건:
+1 100 records sent, 280.112045 records/sec (0.03 MB/sec), 21.03 ms avg latency, 347.00 ms max latency, 18 ms 50th, 21 ms 95th, 347 ms 99th, 347 ms 99.9th.
+[16:33:59.437] 끝 오프셋: nr:0:0
+[16:34:01.898] $ docker start tb6-kafka-kafka2-1 tb6-kafka-kafka3-1
+[16:34:11.761] 	Topic: nr	Partition: 0	Leader: 1	Replicas: 1,2,3	Isr: 1,2,3	Elr: 	LastKnownElr: 
+
+## K3 acks=1 기록이 리더 장애로 사라지는가 (시작 2026-11-13 16:34:11 KST, load 31.99 41.09 42.42)
+### acks=1, 토픽 loss-1 (replica-assignment 1:2:3, min.insync.replicas=2)
+Created topic loss-1.
+[16:34:17.174] acks=all로 1,000건 먼저: 1 1000 records sent, 1312.335958 records/sec (0.13 MB/sec), 137.10 ms avg latency, 703.00 ms max latency, 136 ms 50th, 144 ms 95th, 145 ms 99th, 703 ms 99.9th.
+[16:34:22.156] 	Topic: loss-1	Partition: 0	Leader: 1	Replicas: 1,2,3	Isr: 1,2,3	Elr: 	LastKnownElr:   끝 오프셋 loss-1:0:1000
+[16:34:28.103] $ docker pause tb6-kafka-kafka2-1 tb6-kafka-kafka3-1
+[16:34:28.522] acks=1, 100건 (리더 kafka1에만): 1 100 records sent, 180.505415 records/sec (0.02 MB/sec), 43.56 ms avg latency, 536.00 ms max latency, 38 ms 50th, 44 ms 95th, 536 ms 99th, 536 ms 99.9th.
+[16:34:31.533] 리더 끝 오프셋 loss-1:0:1000
+[16:34:34.439] $ docker kill tb6-kafka-kafka1-1
+[16:34:35.691] $ docker unpause tb6-kafka-kafka2-1 tb6-kafka-kafka3-1
+[16:34:42.935] 	Topic: loss-1	Partition: 0	Leader: 1	Replicas: 1,2,3	Isr: 1,2,3	Elr: 	LastKnownElr: 
+[16:34:48.754] 	Topic: loss-1	Partition: 0	Leader: 2	Replicas: 1,2,3	Isr: 2,3	Elr: 	LastKnownElr: 
+[16:34:48.833] 새 리더 끝 오프셋 loss-1:0:1000
+[16:34:52.066] $ docker start tb6-kafka-kafka1-1
+[16:36:00.647] 	Topic: loss-1	Partition: 0	Leader: 2	Replicas: 1,2,3	Isr: 1,2,3	Elr: 	LastKnownElr:   복구 뒤 끝 오프셋 loss-1:0:1000
+[16:36:06.361] 처음부터 읽은 레코드 수: 1000
+### acks=all, 토픽 loss-all (replica-assignment 1:2:3, min.insync.replicas=2)
+Created topic loss-all.
+[16:36:36.251] acks=all로 1,000건 먼저: 1 1000 records sent, 234.466589 records/sec (0.02 MB/sec), 1416.30 ms avg latency, 3804.00 ms max latency, 1420 ms 50th, 1468 ms 95th, 1470 ms 99th, 3804 ms 99.9th.
+[16:36:54.576] 	Topic: loss-all	Partition: 0	Leader: 1	Replicas: 1,2,3	Isr: 1,2,3	Elr: 	LastKnownElr:   끝 오프셋 loss-all:0:1000
+[16:37:09.501] $ docker pause tb6-kafka-kafka2-1 tb6-kafka-kafka3-1
+[16:37:09.847] acks=all, 100건 (리더 kafka1에만): 1 0 records sent, 0.000000 records/sec (0.00 MB/sec), NaN ms avg latency, 0.00 ms max latency, 0 ms 50th, 0 ms 95th, 0 ms 99th, 0 ms 99.9th.
+100 org.apache.kafka.common.errors.TimeoutException
+[16:37:18.394] 리더 끝 오프셋 loss-all:0:1000
+[16:37:21.002] $ docker kill tb6-kafka-kafka1-1
+[16:37:22.480] $ docker unpause tb6-kafka-kafka2-1 tb6-kafka-kafka3-1
+[16:37:29.766] 	Topic: loss-all	Partition: 0	Leader: 1	Replicas: 1,2,3	Isr: 1	Elr: 3	LastKnownElr: 
+[16:37:35.428] 	Topic: loss-all	Partition: 0	Leader: 3	Replicas: 1,2,3	Isr: 2,3	Elr: 	LastKnownElr: 
+[16:37:35.499] 새 리더 끝 오프셋 loss-all:0:1000
+[16:37:38.059] $ docker start tb6-kafka-kafka1-1
+[16:39:19.046] 	Topic: loss-all	Partition: 0	Leader: 3	Replicas: 1,2,3	Isr: 1,2,3	Elr: 	LastKnownElr:   복구 뒤 끝 오프셋 loss-all:0:1000
+[16:39:30.643] 처음부터 읽은 레코드 수: 1000
+## 끝 16:39:51 KST

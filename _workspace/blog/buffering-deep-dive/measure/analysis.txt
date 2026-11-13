@@ -1,0 +1,186 @@
+== live-mbl30 hls.js 1.7.4 chrome 157.0.8103.51 mbl 30 applied [[0, 8000], [30.02, 1500], [60, 8000]]
+ levels [660000, 2200000, 4400000]
+  t=   5.0 cur=  9.83 buf= 6.17 lvl=2 load=2 bw=7.94M lat=7.117 ready=4 paused=False
+  t=  10.0 cur= 14.83 buf= 5.17 lvl=2 load=2 bw=7.96M lat=7.118 ready=4 paused=False
+  t=  15.0 cur= 19.83 buf= 6.17 lvl=2 load=2 bw=7.97M lat=7.117 ready=4 paused=False
+  t=  20.0 cur= 24.83 buf= 5.17 lvl=2 load=2 bw=7.97M lat=7.116 ready=4 paused=False
+  t=  25.0 cur= 29.83 buf= 6.17 lvl=2 load=2 bw=7.98M lat=7.119 ready=4 paused=False
+  t=  30.0 cur= 34.83 buf= 5.17 lvl=2 load=2 bw=8.60M lat=7.119 ready=4 paused=False
+  t=  35.0 cur= 39.83 buf= 6.17 lvl=2 load=0 bw=1.52M lat=8.079 ready=4 paused=False
+  t=  40.0 cur= 44.83 buf= 7.17 lvl=0 load=0 bw=1.54M lat=8.079 ready=4 paused=False
+  t=  45.0 cur= 49.83 buf= 6.17 lvl=0 load=0 bw=1.53M lat=8.078 ready=4 paused=False
+  t=  50.0 cur= 54.83 buf= 7.17 lvl=0 load=0 bw=1.52M lat=8.08 ready=4 paused=False
+  t=  55.0 cur= 59.83 buf= 6.17 lvl=0 load=0 bw=1.52M lat=8.078 ready=4 paused=False
+  t=  60.0 cur= 64.83 buf= 7.17 lvl=0 load=0 bw=1.69M lat=8.085 ready=4 paused=False
+  t=  65.0 cur= 69.83 buf= 6.17 lvl=0 load=0 bw=1.96M lat=8.086 ready=4 paused=False
+  t=  70.0 cur= 74.83 buf= 7.17 lvl=0 load=0 bw=2.33M lat=8.083 ready=4 paused=False
+  t=  75.0 cur= 79.83 buf= 6.17 lvl=0 load=0 bw=2.54M lat=8.085 ready=4 paused=False
+  t=  80.0 cur= 84.83 buf= 7.17 lvl=0 load=0 bw=2.82M lat=8.084 ready=4 paused=False
+  t=  85.0 cur= 89.83 buf= 6.17 lvl=0 load=0 bw=3.00M lat=8.086 ready=4 paused=False
+  t=  90.0 cur= 94.83 buf= 7.17 lvl=0 load=1 bw=3.28M lat=7.964 ready=4 paused=False
+  t=  95.0 cur= 99.83 buf= 6.17 lvl=0 load=1 bw=3.60M lat=7.963 ready=4 paused=False
+  ev [1.095, 'video:seeking', 6.001]
+  ev [1.177, 'video:seeked', 6.001]
+  ev [1.177, 'LEVEL_SWITCHED', 2]
+  ev [1.177, 'video:playing', 6.002]
+  ev [31.098, 'ERROR', 'aborted', False, None]
+  ev [35.231, 'LEVEL_SWITCHED', 0]
+  ev [95.213, 'LEVEL_SWITCHED', 1]
+  maxbuf 7.92 min buf after 5s 3.42
+  warn [31.065, '[abr]: Fragment 20 of level 2 is loading too slowly;\n      Fragment duration: 2.000\n      Time to underbuffer: 4.110 s\n      Estimated load time for current fragment: 5.130 s\n      Estimated load time for down switch fragment: 3.099 s\n      TTFB estimate: 40 ms\n      Current BW estimate: 8595368 bps']
+  warn [31.097, '[abr]: Fragment 20 of level 2 is loading too slowly;\n      Fragment duration: 2.000\n      Time to underbuffer: 4.078 s\n      Estimated load time for current fragment: 4.991 s\n      Estimated load time for down switch fragment: 3.192 s\n      TTFB estimate: 40 ms\n      Current BW estimate: 660000 bps\n']
+== live-outage hls.js 1.7.4 chrome 157.0.8103.51 mbl 30 applied [[0, 8000], [30.01, 0], [52.06, 8000]]
+ levels [660000, 2200000, 4400000]
+  t=   5.0 cur=  9.79 buf= 4.21 lvl=2 load=2 bw=7.90M lat=7.158 ready=4 paused=False
+  t=  10.0 cur= 14.79 buf= 5.21 lvl=2 load=2 bw=7.95M lat=7.159 ready=4 paused=False
+  t=  15.0 cur= 19.79 buf= 6.21 lvl=2 load=2 bw=7.97M lat=7.162 ready=4 paused=False
+  t=  20.0 cur= 24.79 buf= 5.21 lvl=2 load=2 bw=7.98M lat=7.159 ready=4 paused=False
+  t=  25.0 cur= 29.79 buf= 6.21 lvl=2 load=2 bw=7.98M lat=7.158 ready=4 paused=False
+  t=  30.0 cur= 34.79 buf= 5.21 lvl=2 load=2 bw=8.51M lat=7.161 ready=4 paused=False
+  t=  35.0 cur= 39.79 buf= 0.21 lvl=2 load=2 bw=8.51M lat=7.161 ready=4 paused=False
+  t=  40.0 cur= 39.97 buf= 0.04 lvl=2 load=2 bw=8.51M lat=7.161 ready=2 paused=False
+  t=  45.0 cur= 39.97 buf= 0.04 lvl=2 load=2 bw=8.51M lat=7.161 ready=2 paused=False
+  t=  50.0 cur= 39.97 buf= 0.04 lvl=2 load=2 bw=8.51M lat=7.161 ready=2 paused=False
+  t=  55.0 cur= 57.89 buf= 2.11 lvl=2 load=2 bw=8.28M lat=8.947 ready=4 paused=False
+  t=  60.0 cur= 62.89 buf= 7.11 lvl=2 load=2 bw=8.14M lat=8.946 ready=4 paused=False
+  t=  65.0 cur= 67.89 buf= 6.11 lvl=2 load=2 bw=8.09M lat=8.945 ready=4 paused=False
+  t=  70.0 cur= 72.89 buf= 7.11 lvl=2 load=2 bw=8.03M lat=8.944 ready=4 paused=False
+  t=  75.0 cur= 77.89 buf= 6.11 lvl=2 load=2 bw=8.01M lat=8.944 ready=4 paused=False
+  t=  80.0 cur= 82.89 buf= 7.11 lvl=2 load=2 bw=7.93M lat=8.943 ready=4 paused=False
+  t=  85.0 cur= 87.89 buf= 6.11 lvl=2 load=2 bw=7.95M lat=8.941 ready=4 paused=False
+  ev [1.132, 'video:seeking', 6.003]
+  ev [1.221, 'video:seeked', 6.003]
+  ev [1.221, 'LEVEL_SWITCHED', 2]
+  ev [1.221, 'video:playing', 6.003]
+  ev [30.037, 'ERROR', 'levelLoadError', False, None]
+  ev [35.183, 'video:waiting', 39.965]
+  ev [35.211, 'ERROR', 'bufferStalledError', False, 0.035099000000002434]
+  ev [51.17, 'video:seeking', 55.03]
+  ev [51.171, 'ERROR', 'aborted', False, None]
+  ev [51.172, 'video:waiting', 55.03]
+  ev [51.911, 'video:seeked', 55.03]
+  ev [51.912, 'video:playing', 55.03]
+  ev [52.009, 'STALL_RESOLVED']
+  ev [52.849, 'video:waiting', 55.967]
+  ev [52.909, 'ERROR', 'bufferStalledError', False, 0.032899000000000456]
+  ev [53.083, 'video:playing', 55.967]
+  ev [53.11, 'STALL_RESOLVED']
+  maxbuf 8.109 min buf after 5s 0
+  warn [30.036, 'ERR 0 while loading http://127.0.0.1:59342/live/v0/index.m3u8']
+  warn [30.036, '[playlist-loader]: A network error (status 0) occurred while loading level: 2 id: 0']
+  warn [35.211, '[gap-controller]: Playback stalling at @39.9649 due to low buffer ({"len":0.035099000000002434,"start":6,"end":39.999999,"buffered":[{"start":6,"end":39.999999}],"bufferedIndex":0})']
+  warn [35.211, '[latency-controller]: Stall detected, adjusting target latency']
+  warn [51.17, '[stream-controller]: Playback: 39.9649 is located too far from the end of live sliding playlist: 62, reset currentTime to : 55.03']
+  warn [52.909, '[gap-controller]: Playback stalling at @55.9671 due to low buffer ({"len":0.032899000000000456,"start":54,"end":55.999999,"buffered":[{"start":6,"end":39.999999},{"start":54,"end":55.999999}],"bufferedIndex":1})']
+  warn [52.909, '[latency-controller]: Stall detected, adjusting target latency']
+== vod-mbl10 hls.js 1.7.4 chrome 157.0.8103.51 mbl 10 applied [[0, 8000], [30.02, 1500], [60.03, 8000]]
+ levels [718912, 2276304, 4536816]
+  t=   5.0 cur=  3.99 buf= 8.09 lvl=2 load=2 bw=7.93M lat=104.421 ready=4 paused=False
+  t=  10.0 cur=  8.99 buf=13.09 lvl=2 load=2 bw=7.97M lat=104.421 ready=4 paused=False
+  t=  15.0 cur= 13.99 buf=18.09 lvl=2 load=2 bw=7.97M lat=104.421 ready=4 paused=False
+  t=  20.0 cur= 18.99 buf=27.09 lvl=2 load=2 bw=7.58M lat=104.421 ready=4 paused=False
+  t=  25.0 cur= 23.99 buf=36.09 lvl=2 load=2 bw=7.80M lat=104.421 ready=4 paused=False
+  t=  30.0 cur= 28.99 buf=43.09 lvl=2 load=2 bw=8.25M lat=104.421 ready=4 paused=False
+  t=  35.0 cur= 33.99 buf=40.09 lvl=2 load=2 bw=4.48M lat=104.421 ready=4 paused=False
+  t=  40.0 cur= 38.99 buf=37.09 lvl=2 load=1 bw=2.27M lat=67.28 ready=4 paused=False
+  t=  45.0 cur= 43.99 buf=36.09 lvl=2 load=1 bw=1.74M lat=67.28 ready=4 paused=False
+  t=  50.0 cur= 48.99 buf=37.09 lvl=2 load=0 bw=1.55M lat=56.654 ready=4 paused=False
+  t=  55.0 cur= 53.99 buf=50.51 lvl=2 load=0 bw=1.54M lat=56.654 ready=4 paused=False
+  t=  60.0 cur= 58.99 buf=45.51 lvl=2 load=0 bw=1.54M lat=56.654 ready=4 paused=False
+  t=  65.0 cur= 63.99 buf=40.51 lvl=2 load=0 bw=1.54M lat=56.654 ready=4 paused=False
+  t=  70.0 cur= 68.99 buf=35.51 lvl=2 load=0 bw=1.54M lat=56.654 ready=4 paused=False
+  t=  75.0 cur= 73.99 buf=30.51 lvl=2 load=0 bw=1.54M lat=56.654 ready=4 paused=False
+  t=  80.0 cur= 79.00 buf=25.50 lvl=1 load=0 bw=1.54M lat=56.654 ready=4 paused=False
+  t=  85.0 cur= 83.99 buf=20.51 lvl=1 load=0 bw=1.54M lat=56.654 ready=4 paused=False
+  t=  90.0 cur= 88.99 buf=15.51 lvl=0 load=0 bw=1.54M lat=56.654 ready=4 paused=False
+  t=  95.0 cur= 93.99 buf=10.51 lvl=0 load=0 bw=1.54M lat=56.654 ready=4 paused=False
+  ev [1.015, 'video:playing', 0]
+  ev [1.015, 'LEVEL_SWITCHED', 2]
+  ev [40.572, 'video:waiting', 39.557]
+  ev [40.573, 'video:playing', 39.557]
+  ev [77.133, 'LEVEL_SWITCHED', 1]
+  ev [85.134, 'LEVEL_SWITCHED', 0]
+  maxbuf 51.005 min buf after 5s 7.34
+== vod-mbl30 hls.js 1.7.4 chrome 157.0.8103.51 mbl 30 applied [[0, 8000], [30.04, 1500], [60.01, 8000]]
+ levels [718912, 2276304, 4536816]
+  t=   5.0 cur=  3.76 buf= 6.32 lvl=2 load=2 bw=7.69M lat=104.423 ready=4 paused=False
+  t=  10.0 cur=  8.76 buf=13.32 lvl=2 load=2 bw=7.69M lat=104.423 ready=4 paused=False
+  t=  15.0 cur= 13.76 buf=18.32 lvl=2 load=2 bw=7.80M lat=104.423 ready=4 paused=False
+  t=  20.0 cur= 18.76 buf=25.32 lvl=2 load=2 bw=7.80M lat=104.423 ready=4 paused=False
+  t=  25.0 cur= 23.76 buf=36.32 lvl=2 load=2 bw=7.66M lat=104.423 ready=4 paused=False
+  t=  30.0 cur= 28.76 buf=41.32 lvl=2 load=2 bw=8.15M lat=104.423 ready=4 paused=False
+  t=  35.0 cur= 33.76 buf=38.32 lvl=2 load=2 bw=4.89M lat=104.423 ready=4 paused=False
+  t=  40.0 cur= 38.76 buf=37.32 lvl=2 load=1 bw=2.19M lat=70.146 ready=4 paused=False
+  t=  45.0 cur= 43.76 buf=36.32 lvl=2 load=1 bw=1.72M lat=70.146 ready=4 paused=False
+  t=  50.0 cur= 48.76 buf=37.32 lvl=2 load=0 bw=1.56M lat=56.594 ready=4 paused=False
+  t=  55.0 cur= 53.76 buf=50.74 lvl=2 load=0 bw=1.55M lat=56.594 ready=4 paused=False
+  t=  60.0 cur= 58.76 buf=45.74 lvl=2 load=0 bw=1.55M lat=56.594 ready=4 paused=False
+  t=  65.0 cur= 63.76 buf=40.74 lvl=2 load=0 bw=1.55M lat=56.594 ready=4 paused=False
+  t=  70.0 cur= 68.76 buf=35.74 lvl=2 load=0 bw=1.55M lat=56.594 ready=4 paused=False
+  t=  75.0 cur= 73.76 buf=30.74 lvl=2 load=0 bw=1.55M lat=56.594 ready=4 paused=False
+  t=  80.0 cur= 78.76 buf=25.74 lvl=1 load=0 bw=1.55M lat=56.594 ready=4 paused=False
+  t=  85.0 cur= 83.76 buf=20.74 lvl=1 load=0 bw=1.55M lat=56.594 ready=4 paused=False
+  t=  90.0 cur= 88.76 buf=15.74 lvl=0 load=0 bw=1.55M lat=56.594 ready=4 paused=False
+  t=  95.0 cur= 93.76 buf=10.74 lvl=0 load=0 bw=1.55M lat=56.594 ready=4 paused=False
+  ev [1.248, 'video:playing', 0]
+  ev [1.248, 'LEVEL_SWITCHED', 2]
+  ev [3.546, 'video:waiting', 2.298]
+  ev [3.549, 'video:playing', 2.299]
+  ev [75.396, 'LEVEL_SWITCHED', 1]
+  ev [85.396, 'LEVEL_SWITCHED', 0]
+  maxbuf 50.987 min buf after 5s 6.321
+== vod-mbs0-mbl10 hls.js 1.7.4 chrome 157.0.8103.51 mbl 10 applied [[0, 8000], [45, 1500], [75, 8000]]
+ levels [718912, 2276304, 4536816]
+  t=   5.0 cur=  4.01 buf= 8.07 lvl=2 load=2 bw=7.93M lat=104.421 ready=4 paused=False
+  t=  10.0 cur=  8.92 buf= 9.16 lvl=2 load=2 bw=7.88M lat=104.421 ready=4 paused=False
+  t=  15.0 cur= 13.92 buf=10.16 lvl=2 load=2 bw=7.85M lat=104.421 ready=4 paused=False
+  t=  20.0 cur= 18.92 buf= 9.16 lvl=2 load=2 bw=7.90M lat=104.421 ready=4 paused=False
+  t=  25.0 cur= 23.92 buf=10.16 lvl=2 load=2 bw=7.92M lat=104.421 ready=4 paused=False
+  t=  30.0 cur= 28.92 buf= 9.16 lvl=2 load=2 bw=7.93M lat=104.421 ready=4 paused=False
+  t=  35.0 cur= 33.92 buf=10.16 lvl=2 load=2 bw=7.94M lat=104.421 ready=4 paused=False
+  t=  40.0 cur= 38.92 buf=11.16 lvl=2 load=2 bw=7.94M lat=104.421 ready=4 paused=False
+  t=  45.0 cur= 43.92 buf= 8.16 lvl=2 load=2 bw=7.95M lat=104.421 ready=4 paused=False
+  t=  50.0 cur= 48.92 buf= 5.16 lvl=2 load=2 bw=4.34M lat=104.421 ready=4 paused=False
+  t=  55.0 cur= 53.92 buf= 2.16 lvl=2 load=1 bw=2.22M lat=52.714 ready=4 paused=False
+  t=  60.0 cur= 58.92 buf= 9.16 lvl=0 load=0 bw=1.68M lat=49.891 ready=4 paused=False
+  t=  65.0 cur= 63.92 buf=10.16 lvl=0 load=0 bw=1.63M lat=49.891 ready=4 paused=False
+  t=  70.0 cur= 68.92 buf= 9.16 lvl=0 load=0 bw=1.59M lat=49.891 ready=4 paused=False
+  t=  75.0 cur= 73.92 buf=10.16 lvl=0 load=0 bw=1.81M lat=49.891 ready=4 paused=False
+  t=  80.0 cur= 78.92 buf=11.16 lvl=0 load=1 bw=2.69M lat=49.891 ready=4 paused=False
+  t=  85.0 cur= 83.93 buf=10.16 lvl=0 load=1 bw=3.27M lat=49.891 ready=4 paused=False
+  t=  90.0 cur= 88.93 buf=11.16 lvl=1 load=1 bw=3.46M lat=49.891 ready=4 paused=False
+  t=  95.0 cur= 93.93 buf=10.16 lvl=1 load=1 bw=3.53M lat=49.891 ready=4 paused=False
+  ev [0.999, 'video:playing', 0]
+  ev [1, 'LEVEL_SWITCHED', 2]
+  ev [6.226, 'video:waiting', 5.227]
+  ev [6.312, 'video:playing', 5.227]
+  ev [57.182, 'LEVEL_SWITCHED', 1]
+  ev [59.235, 'LEVEL_SWITCHED', 0]
+  ev [89.236, 'LEVEL_SWITCHED', 1]
+  maxbuf 11.66 min buf after 5s 1.659
+== vod-mbs0-mbl30 hls.js 1.7.4 chrome 157.0.8103.51 mbl 30 applied [[0, 8000], [45, 1500], [75, 8000]]
+ levels [718912, 2276304, 4536816]
+  t=   5.0 cur=  3.92 buf= 6.16 lvl=2 load=2 bw=7.82M lat=104.42 ready=4 paused=False
+  t=  10.0 cur=  8.92 buf=13.16 lvl=2 load=2 bw=7.91M lat=104.42 ready=4 paused=False
+  t=  15.0 cur= 13.92 buf=18.16 lvl=2 load=2 bw=7.95M lat=104.42 ready=4 paused=False
+  t=  20.0 cur= 18.92 buf=31.16 lvl=2 load=2 bw=7.97M lat=104.42 ready=4 paused=False
+  t=  25.0 cur= 23.92 buf=30.16 lvl=2 load=2 bw=7.97M lat=104.42 ready=4 paused=False
+  t=  30.0 cur= 28.92 buf=29.16 lvl=2 load=2 bw=7.98M lat=104.42 ready=4 paused=False
+  t=  35.0 cur= 33.92 buf=30.16 lvl=2 load=2 bw=7.98M lat=104.42 ready=4 paused=False
+  t=  40.0 cur= 38.92 buf=29.16 lvl=2 load=2 bw=7.98M lat=104.42 ready=4 paused=False
+  t=  45.0 cur= 43.92 buf=28.16 lvl=2 load=2 bw=7.99M lat=104.42 ready=4 paused=False
+  t=  50.0 cur= 48.92 buf=25.16 lvl=2 load=2 bw=4.11M lat=104.42 ready=4 paused=False
+  t=  55.0 cur= 53.92 buf=22.16 lvl=2 load=1 bw=2.17M lat=52.364 ready=4 paused=False
+  t=  60.0 cur= 58.92 buf=21.16 lvl=2 load=1 bw=1.71M lat=52.364 ready=4 paused=False
+  t=  65.0 cur= 63.92 buf=22.16 lvl=2 load=0 bw=1.55M lat=41.844 ready=4 paused=False
+  t=  70.0 cur= 68.92 buf=31.16 lvl=2 load=0 bw=1.53M lat=41.844 ready=4 paused=False
+  t=  75.0 cur= 73.92 buf=30.16 lvl=2 load=0 bw=1.60M lat=41.844 ready=4 paused=False
+  t=  80.0 cur= 78.92 buf=25.57 lvl=1 load=0 bw=1.60M lat=41.844 ready=4 paused=False
+  t=  85.0 cur= 83.92 buf=20.57 lvl=1 load=0 bw=1.60M lat=41.844 ready=4 paused=False
+  t=  90.0 cur= 88.92 buf=15.57 lvl=0 load=0 bw=1.60M lat=41.844 ready=4 paused=False
+  t=  95.0 cur= 93.92 buf=10.57 lvl=0 load=0 bw=1.60M lat=41.844 ready=4 paused=False
+  ev [1.089, 'video:playing', 0]
+  ev [1.089, 'LEVEL_SWITCHED', 2]
+  ev [77.247, 'LEVEL_SWITCHED', 1]
+  ev [85.248, 'LEVEL_SWITCHED', 0]
+  maxbuf 31.659 min buf after 5s 6.16

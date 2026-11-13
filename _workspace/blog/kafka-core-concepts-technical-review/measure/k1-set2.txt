@@ -1,0 +1,30 @@
+## K1b 고정 처리량 2,000건/초에서 지연 (시작 2026-11-13 16:26:06 KST)
+명령: kafka-producer-perf-test.sh --topic bench --num-records 20000 --record-size 1000 --throughput 2000 --bootstrap-server kafka1:9092,kafka2:9092,kafka3:9092 --producer-props acks=<A> linger.ms=<L>
+acks,linger_ms,rep,시각,load1,결과
+1,0,1,16:26:19,21.36,"20000 records sent, 1996.207206 records/sec (1.90 MB/sec), 6.89 ms avg latency, 412.00 ms max latency, 1 ms 50th, 29 ms 95th, 136 ms 99th, 146 ms 99.9th."
+1,5,1,16:26:31,19.34,"20000 records sent, 1977.652526 records/sec (1.89 MB/sec), 8.69 ms avg latency, 480.00 ms max latency, 5 ms 50th, 46 ms 95th, 65 ms 99th, 107 ms 99.9th."
+all,0,1,16:26:43,19.44,"20000 records sent, 1991.635132 records/sec (1.90 MB/sec), 8.47 ms avg latency, 337.00 ms max latency, 2 ms 50th, 37 ms 95th, 77 ms 99th, 126 ms 99.9th."
+all,5,1,16:26:55,17.78,"20000 records sent, 1994.813485 records/sec (1.90 MB/sec), 6.58 ms avg latency, 360.00 ms max latency, 5 ms 50th, 13 ms 95th, 38 ms 99th, 45 ms 99.9th."
+1,0,2,16:27:07,17.79,"20000 records sent, 1997.203915 records/sec (1.90 MB/sec), 2.42 ms avg latency, 431.00 ms max latency, 1 ms 50th, 9 ms 95th, 33 ms 99th, 36 ms 99.9th."
+1,5,2,16:27:19,16.12,"20000 records sent, 1992.825827 records/sec (1.90 MB/sec), 6.06 ms avg latency, 376.00 ms max latency, 5 ms 50th, 12 ms 95th, 34 ms 99th, 38 ms 99.9th."
+all,0,2,16:27:30,14.91,"20000 records sent, 1989.258007 records/sec (1.90 MB/sec), 3.63 ms avg latency, 496.00 ms max latency, 1 ms 50th, 25 ms 95th, 37 ms 99th, 71 ms 99.9th."
+all,5,2,16:27:42,13.89,"20000 records sent, 1993.421708 records/sec (1.90 MB/sec), 9.87 ms avg latency, 635.00 ms max latency, 7 ms 50th, 33 ms 95th, 62 ms 99th, 79 ms 99.9th."
+1,0,3,16:27:54,14.71,"20000 records sent, 1994.415636 records/sec (1.90 MB/sec), 3.89 ms avg latency, 384.00 ms max latency, 1 ms 50th, 14 ms 95th, 51 ms 99th, 71 ms 99.9th."
+1,5,3,16:28:07,14.98,"20000 records sent, 1990.643973 records/sec (1.90 MB/sec), 11.52 ms avg latency, 839.00 ms max latency, 5 ms 50th, 77 ms 95th, 99 ms 99th, 120 ms 99.9th."
+all,0,3,16:28:19,15.23,"20000 records sent, 1992.428771 records/sec (1.90 MB/sec), 15.70 ms avg latency, 669.00 ms max latency, 4 ms 50th, 64 ms 95th, 168 ms 99th, 252 ms 99.9th."
+all,5,3,16:28:31,15.73,"20000 records sent, 1989.851756 records/sec (1.90 MB/sec), 8.60 ms avg latency, 468.00 ms max latency, 6 ms 50th, 28 ms 95th, 60 ms 99th, 70 ms 99.9th."
+## K1c 최대 처리량 (--throughput -1, 200,000건 × 1,000바이트) 재시험
+acks,linger_ms,rep,시각,load1,결과
+1,0,1,16:28:37,16.63,"200000 records sent, 53576.212162 records/sec (51.09 MB/sec), 456.21 ms avg latency, 673.00 ms max latency, 488 ms 50th, 620 ms 95th, 657 ms 99th, 667 ms 99.9th."
+1,5,1,16:28:48,23.51,"200000 records sent, 23640.661939 records/sec (22.55 MB/sec), 1043.75 ms avg latency, 2657.00 ms max latency, 903 ms 50th, 2428 ms 95th, 2620 ms 99th, 2645 ms 99.9th."
+all,0,1,16:29:26,60.95,"200000 records sent, 7269.026677 records/sec (6.93 MB/sec), 2685.91 ms avg latency, 9093.00 ms max latency, 2317 ms 50th, 4772 ms 95th, 5060 ms 99th, 5348 ms 99.9th."
+all,5,1,16:29:52,59.55,"200000 records sent, 9309.253398 records/sec (8.88 MB/sec), 2821.63 ms avg latency, 4929.00 ms max latency, 2907 ms 50th, 4351 ms 95th, 4830 ms 99th, 4917 ms 99.9th."
+1,0,2,16:30:09,72.71,"200000 records sent, 15484.670177 records/sec (14.77 MB/sec), 1674.92 ms avg latency, 3857.00 ms max latency, 1472 ms 50th, 3470 ms 95th, 3703 ms 99th, 3833 ms 99.9th."
+1,5,2,16:30:27,68.65,"200000 records sent, 14679.976512 records/sec (14.00 MB/sec), 1594.52 ms avg latency, 4000.00 ms max latency, 1550 ms 50th, 2976 ms 95th, 3790 ms 99th, 3958 ms 99.9th."
+all,0,2,16:30:50,65.70,"200000 records sent, 11125.945705 records/sec (10.61 MB/sec), 2523.22 ms avg latency, 4414.00 ms max latency, 2613 ms 50th, 4073 ms 95th, 4276 ms 99th, 4369 ms 99.9th."
+all,5,2,16:31:17,71.34,"200000 records sent, 9802.960494 records/sec (9.35 MB/sec), 2959.39 ms avg latency, 5581.00 ms max latency, 2538 ms 50th, 5425 ms 95th, 5502 ms 99th, 5568 ms 99.9th."
+1,0,3,16:31:32,65.91,"200000 records sent, 24536.866642 records/sec (23.40 MB/sec), 1030.84 ms avg latency, 1536.00 ms max latency, 1079 ms 50th, 1398 ms 95th, 1454 ms 99th, 1510 ms 99.9th."
+1,5,3,16:31:46,61.42,"200000 records sent, 19837.333862 records/sec (18.92 MB/sec), 1327.17 ms avg latency, 2546.00 ms max latency, 1272 ms 50th, 2357 ms 95th, 2514 ms 99th, 2541 ms 99.9th."
+all,0,3,16:32:07,55.71,"200000 records sent, 12031.522589 records/sec (11.47 MB/sec), 2306.32 ms avg latency, 4937.00 ms max latency, 2305 ms 50th, 4012 ms 95th, 4730 ms 99th, 4898 ms 99.9th."
+all,5,3,16:32:28,55.32,"200000 records sent, 14279.594460 records/sec (13.62 MB/sec), 1972.80 ms avg latency, 2992.00 ms max latency, 2100 ms 50th, 2736 ms 95th, 2920 ms 99th, 2984 ms 99.9th."
+## 끝 16:32:28 KST

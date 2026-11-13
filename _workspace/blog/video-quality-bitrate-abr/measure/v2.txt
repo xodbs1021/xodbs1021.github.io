@@ -1,0 +1,72 @@
+## V2 흐림 대 블록 — PSNR 맞추기 2026-11-13 16:42:02 KST load 84.09 67.67 54.33
+### gblur sigma=1.0 (압축 없음)
+$ ffmpeg -i ref10.mkv -i ref10.mkv -lavfi "[0:v]gblur=sigma=1.0,scale=1920:1080:flags=bicubic,setpts=N/24/TB[d];[1:v]setpts=N/24/TB[r];[d][r]libvmaf=model='version=vmaf_v0.6.1\:name=vmaf|version=vmaf_v0.6.1neg\:name=neg|version=vmaf_v0.6.1\:name=phone\:enable_transform=true':feature='name=psnr|name=float_ssim':log_fmt=json:log_path=v2-blur1.0.json:n_threads=8" -f null -
+  프레임 240
+  vmaf: 평균 85.346 · 조화평균 84.864 · 하위1% 73.732 · 최소 72.221
+  neg: 평균 84.876 · 조화평균 84.385 · 하위1% 73.484 · 최소 71.985
+  phone: 평균 96.990 · 조화평균 96.908 · 하위1% 90.658 · 최소 89.604
+  psnr_y: 평균 45.616 · 조화평균 44.933 · 하위1% 37.665 · 최소 37.552
+  float_ssim: 평균 0.999 · 조화평균 0.999 · 하위1% 0.997 · 최소 0.997
+### gblur sigma=1.4 (압축 없음)
+$ ffmpeg -i ref10.mkv -i ref10.mkv -lavfi "[0:v]gblur=sigma=1.4,scale=1920:1080:flags=bicubic,setpts=N/24/TB[d];[1:v]setpts=N/24/TB[r];[d][r]libvmaf=model='version=vmaf_v0.6.1\:name=vmaf|version=vmaf_v0.6.1neg\:name=neg|version=vmaf_v0.6.1\:name=phone\:enable_transform=true':feature='name=psnr|name=float_ssim':log_fmt=json:log_path=v2-blur1.4.json:n_threads=8" -f null -
+  프레임 240
+  vmaf: 평균 74.345 · 조화평균 73.230 · 하위1% 59.372 · 최소 57.982
+  neg: 평균 73.728 · 조화평균 72.585 · 하위1% 59.087 · 최소 57.704
+  phone: 평균 90.182 · 조화평균 89.854 · 하위1% 79.346 · 최소 78.097
+  psnr_y: 평균 42.984 · 조화평균 42.151 · 하위1% 34.975 · 최소 34.871
+  float_ssim: 평균 0.998 · 조화평균 0.998 · 하위1% 0.991 · 최소 0.991
+### gblur sigma=1.8 (압축 없음)
+$ ffmpeg -i ref10.mkv -i ref10.mkv -lavfi "[0:v]gblur=sigma=1.8,scale=1920:1080:flags=bicubic,setpts=N/24/TB[d];[1:v]setpts=N/24/TB[r];[d][r]libvmaf=model='version=vmaf_v0.6.1\:name=vmaf|version=vmaf_v0.6.1neg\:name=neg|version=vmaf_v0.6.1\:name=phone\:enable_transform=true':feature='name=psnr|name=float_ssim':log_fmt=json:log_path=v2-blur1.8.json:n_threads=8" -f null -
+  프레임 240
+  vmaf: 평균 63.781 · 조화평균 61.695 · 하위1% 45.893 · 최소 44.588
+  neg: 평균 63.027 · 조화평균 60.882 · 하위1% 45.580 · 최소 44.275
+  phone: 평균 81.777 · 조화평균 80.901 · 하위1% 66.084 · 최소 64.663
+  psnr_y: 평균 41.289 · 조화평균 40.359 · 하위1% 33.361 · 최소 33.262
+  float_ssim: 평균 0.996 · 조화평균 0.996 · 하위1% 0.983 · 최소 0.983
+### gblur sigma=2.4 (압축 없음)
+$ ffmpeg -i ref10.mkv -i ref10.mkv -lavfi "[0:v]gblur=sigma=2.4,scale=1920:1080:flags=bicubic,setpts=N/24/TB[d];[1:v]setpts=N/24/TB[r];[d][r]libvmaf=model='version=vmaf_v0.6.1\:name=vmaf|version=vmaf_v0.6.1neg\:name=neg|version=vmaf_v0.6.1\:name=phone\:enable_transform=true':feature='name=psnr|name=float_ssim':log_fmt=json:log_path=v2-blur2.4.json:n_threads=8" -f null -
+  프레임 240
+  vmaf: 평균 49.595 · 조화평균 45.490 · 하위1% 28.483 · 최소 27.269
+  neg: 평균 48.678 · 조화평균 44.446 · 하위1% 28.140 · 최소 26.921
+  phone: 평균 67.731 · 조화평균 65.230 · 하위1% 45.159 · 최소 43.540
+  psnr_y: 평균 39.558 · 조화평균 38.529 · 하위1% 31.831 · 최소 31.737
+  float_ssim: 평균 0.992 · 조화평균 0.992 · 하위1% 0.968 · 최소 0.968
+$ ffmpeg -i ref10.mkv -c:v libx264 -preset medium -threads 4 -qp 38 qp38.mp4
+### x264 -qp 38 (970529 바이트)
+$ ffmpeg -i qp38.mp4 -i ref10.mkv -lavfi "[0:v]null,scale=1920:1080:flags=bicubic,setpts=N/24/TB[d];[1:v]setpts=N/24/TB[r];[d][r]libvmaf=model='version=vmaf_v0.6.1\:name=vmaf|version=vmaf_v0.6.1neg\:name=neg|version=vmaf_v0.6.1\:name=phone\:enable_transform=true':feature='name=psnr|name=float_ssim':log_fmt=json:log_path=v2-qp38.json:n_threads=8" -f null -
+  프레임 240
+  vmaf: 평균 80.735 · 조화평균 79.679 · 하위1% 60.271 · 최소 59.115
+  neg: 평균 77.861 · 조화평균 76.784 · 하위1% 58.674 · 최소 58.093
+  phone: 평균 94.037 · 조화평균 93.802 · 하위1% 80.140 · 최소 79.118
+  psnr_y: 평균 40.739 · 조화평균 40.190 · 하위1% 34.268 · 최소 34.156
+  float_ssim: 평균 0.978 · 조화평균 0.978 · 하위1% 0.960 · 최소 0.960
+$ ffmpeg -i ref10.mkv -c:v libx264 -preset medium -threads 4 -qp 42 qp42.mp4
+### x264 -qp 42 (692406 바이트)
+$ ffmpeg -i qp42.mp4 -i ref10.mkv -lavfi "[0:v]null,scale=1920:1080:flags=bicubic,setpts=N/24/TB[d];[1:v]setpts=N/24/TB[r];[d][r]libvmaf=model='version=vmaf_v0.6.1\:name=vmaf|version=vmaf_v0.6.1neg\:name=neg|version=vmaf_v0.6.1\:name=phone\:enable_transform=true':feature='name=psnr|name=float_ssim':log_fmt=json:log_path=v2-qp42.json:n_threads=8" -f null -
+  프레임 240
+  vmaf: 평균 68.825 · 조화평균 66.730 · 하위1% 45.423 · 최소 43.507
+  neg: 평균 65.843 · 조화평균 63.778 · 하위1% 43.913 · 최소 42.279
+  phone: 평균 85.788 · 조화평균 84.969 · 하위1% 65.575 · 최소 63.469
+  psnr_y: 평균 38.459 · 조화평균 37.808 · 하위1% 32.437 · 최소 32.244
+  float_ssim: 평균 0.961 · 조화평균 0.961 · 하위1% 0.931 · 최소 0.930
+$ ffmpeg -i ref10.mkv -c:v libx264 -preset medium -threads 4 -qp 46 qp46.mp4
+### x264 -qp 46 (506394 바이트)
+$ ffmpeg -i qp46.mp4 -i ref10.mkv -lavfi "[0:v]null,scale=1920:1080:flags=bicubic,setpts=N/24/TB[d];[1:v]setpts=N/24/TB[r];[d][r]libvmaf=model='version=vmaf_v0.6.1\:name=vmaf|version=vmaf_v0.6.1neg\:name=neg|version=vmaf_v0.6.1\:name=phone\:enable_transform=true':feature='name=psnr|name=float_ssim':log_fmt=json:log_path=v2-qp46.json:n_threads=8" -f null -
+  프레임 240
+  vmaf: 평균 56.709 · 조화평균 53.067 · 하위1% 31.891 · 최소 30.830
+  neg: 평균 53.401 · 조화평균 49.907 · 하위1% 30.330 · 최소 29.544
+  phone: 평균 75.010 · 조화평균 72.965 · 하위1% 49.592 · 최소 48.229
+  psnr_y: 평균 35.492 · 조화평균 34.651 · 하위1% 28.910 · 최소 28.835
+  float_ssim: 평균 0.930 · 조화평균 0.930 · 하위1% 0.878 · 최소 0.878
+끝 2026-11-13 16:47:02 KST load 80.08 101.25 76.01
+### gblur sigma=2.0 (압축 없음)
+bash: metric: command not found
+## V2 추가 2026-11-13 16:55:15 KST load 53.74 75.04 74.10
+### gblur sigma=2.0 (압축 없음)
+$ ffmpeg -i ref10.mkv -i ref10.mkv -lavfi "[0:v]gblur=sigma=2.0,scale=1920:1080:flags=bicubic,setpts=N/24/TB[d];[1:v]setpts=N/24/TB[r];[d][r]libvmaf=model='version=vmaf_v0.6.1\:name=vmaf|version=vmaf_v0.6.1neg\:name=neg|version=vmaf_v0.6.1\:name=phone\:enable_transform=true':feature='name=psnr|name=float_ssim':log_fmt=json:log_path=v2-blur2.0.json:n_threads=8" -f null -
+  프레임 240
+  vmaf: 평균 58.801 · 조화평균 56.111 · 하위1% 39.691 · 최소 38.405
+  neg: 평균 57.983 · 조화평균 55.212 · 하위1% 39.363 · 최소 38.077
+  phone: 평균 77.204 · 조화평균 75.904 · 하위1% 59.120 · 최소 57.608
+  psnr_y: 평균 40.632 · 조화평균 39.665 · 하위1% 32.766 · 최소 32.669
+  float_ssim: 평균 0.995 · 조화평균 0.995 · 하위1% 0.978 · 최소 0.978

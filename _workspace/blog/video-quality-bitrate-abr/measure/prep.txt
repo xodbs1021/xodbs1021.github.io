@@ -1,0 +1,6 @@
+## 준비 2026-11-13 16:30:57 KST load 60.07 42.58 42.67
+$ ffmpeg -ss 20 -i sintel_trailer-1080p.mp4 -t 10 -an -c:v ffv1 ref10.mkv
+$ ffmpeg -i sintel_trailer-1080p.mp4 -an -c:v ffv1 full.mkv
+  ref10: 1920,1080,24/1,240
+  full: 1920,1080,24/1,1253
+끝 2026-11-13 16:33:04 KST load 47.90 45.67 44.04

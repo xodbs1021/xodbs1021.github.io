@@ -1,7 +1,7 @@
 ---
 title: "H.264는 이미 디코딩한 화면으로 다음 블록을 예측합니다"
 date: 2026-06-20T10:38:55+09:00
-lastmod: "2026-11-13T07:55:32+09:00"
+lastmod: "2026-11-13T17:07:29+09:00"
 description: "1080p60 원본 373.248MB/s를 6Mbps로 줄이는 차이는 예측과 양자화에서 나옵니다. H.264의 I · P · B 슬라이스와 디코딩 순서, 매크로블록 8,160개, 정수 변환과 QP, CABAC, 프로파일 · 레벨 표(1080p60은 레벨 4.2)와 avc1 코덱 문자열, NAL 단위와 SPS · PPS, TS와 MP4의 NAL 구분 방식을 규격 · 소스로 확인하고, FFmpeg 9.0.2 · x264로 레벨 자동 선언과 NAL 순서, 1-pass와 2-pass의 VMAF 평균 · 하위 1% · 2초 최대 비트레이트를 직접 쟀습니다."
 categories: ["tech-blurting"]
 tags: ["H.264", "AVC", "x264", "VMAF", "코덱", "FFmpeg"]
@@ -200,7 +200,7 @@ PSNR은 화소 오차의 평균 제곱을 데시벨로 바꾼 값이고, SSIM은
 3. **프레임 정렬.** FFmpeg 필터는 프레임 번호가 아니라 타임스탬프로 두 입력을 맞춥니다([VMAF FFmpeg 문서](https://github.com/Netflix/vmaf/blob/a6ed0f18285cab504b779bbccb0bbaddc3bf44c2/resource/doc/ffmpeg.md)). 아래 측정은 mkv의 밀리초 타임스탬프로는 프레임이 어긋나서 두 입력 모두 `setpts=N/24/TB`로 프레임 번호에 맞췄습니다.
 4. **평균과 하위 백분위.** 기본 출력은 화면별 점수의 산술 평균입니다. FAQ는 사람의 판단이 가장 나쁜 화면 쪽으로 기운다고 적습니다. 이 글의 1-pass 결과는 평균이 90.94였지만 화면별 점수의 하위 1%는 78.86으로 12점 낮았습니다.
 
-해상도별 VMAF 곡선으로 사다리를 고른 결과는 [ABR 사다리 글](/posts/tech-blurting/abr-ladder-design/#6-convex-hull--사다리에서-쓸데없는-점-제거), preset별 VMAF는 [x264 글](/posts/tech-blurting/x264-live-rate-control-gop/#preset은-같은-crf에서-cpu-시간과-파일-크기를-맞바꿉니다)에 있습니다.
+해상도별 VMAF 곡선으로 사다리를 고른 결과는 [ABR 사다리 글](/posts/tech-blurting/abr-ladder-design/#6-convex-hull--사다리에서-쓸데없는-점-제거), preset별 VMAF는 [x264 글](/posts/tech-blurting/x264-live-rate-control-gop/#preset은-같은-crf에서-cpu-시간과-파일-크기를-맞바꿉니다)에 있습니다. 같은 손상을 PSNR · SSIM · VMAF가 서로 다르게 채점하는 예와 NEG 모델은 [화질 지표 글](/posts/tech-blurting/video-quality-bitrate-abr/)에 있습니다.
 
 ## 2-pass는 첫 패스 통계로 평균 비트레이트를 나눠 씁니다 {#9-two-pass-인코딩--화질-짜내기}
 

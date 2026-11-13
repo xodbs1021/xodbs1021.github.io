@@ -1,0 +1,25 @@
+## C3 목록 나이 (재시험: 이름을 매번 새로, 1층만) 시작 2026-11-13 16:19:49 KST, load 20.80 56.62 54.07
+엣지 설정: pl-plain = proxy_cache_valid 200 1s + proxy_cache_lock on / pl-swr = 같은 설정 + proxy_cache_use_stale updating + proxy_cache_background_update on. 원본: 목록 응답 전 0.3초 지연, 2초마다 MEDIA-SEQUENCE+1
+C3a: 시청자 20명이 0.5초 간격으로 엣지 4대를 돌아가며 20초
+$ docker exec tb6-cdn-client-1 python /app/client.py playlist pl-plain 8081 20 pl-plain-r1-1794554389
+rep=1 origin_playlist_requests=203 load1=16.24 {"kind": "pl-plain", "port": "8081", "responses": 664, "age_p50_ms": 501, "age_p95_ms": 1247, "age_max_ms": 1279, "segments_behind": {"0": 264, "1": 400}}
+$ docker exec tb6-cdn-client-1 python /app/client.py playlist pl-swr 8081 20 pl-swr-r1-1794554410
+rep=1 origin_playlist_requests=44 load1=13.13 {"kind": "pl-swr", "port": "8081", "responses": 780, "age_p50_ms": 998, "age_p95_ms": 1764, "age_max_ms": 2023, "segments_behind": {"0": 586, "1": 194}}
+$ docker exec tb6-cdn-client-1 python /app/client.py playlist pl-plain 8081 20 pl-plain-r2-1794554430
+rep=2 origin_playlist_requests=173 load1=10.08 {"kind": "pl-plain", "port": "8081", "responses": 669, "age_p50_ms": 502, "age_p95_ms": 1286, "age_max_ms": 1549, "segments_behind": {"0": 270, "1": 399}}
+$ docker exec tb6-cdn-client-1 python /app/client.py playlist pl-swr 8081 20 pl-swr-r2-1794554451
+rep=2 origin_playlist_requests=44 load1=10.28 {"kind": "pl-swr", "port": "8081", "responses": 750, "age_p50_ms": 920, "age_p95_ms": 1902, "age_max_ms": 1938, "segments_behind": {"0": 578, "1": 172}}
+$ docker exec tb6-cdn-client-1 python /app/client.py playlist pl-plain 8081 20 pl-plain-r3-1794554472
+rep=3 origin_playlist_requests=239 load1=16.20 {"kind": "pl-plain", "port": "8081", "responses": 586, "age_p50_ms": 240, "age_p95_ms": 1238, "age_max_ms": 1857, "segments_behind": {"0": 342, "1": 244}}
+$ docker exec tb6-cdn-client-1 python /app/client.py playlist pl-swr 8081 20 pl-swr-r3-1794554493
+rep=3 origin_playlist_requests=40 load1=18.32 {"kind": "pl-swr", "port": "8081", "responses": 760, "age_p50_ms": 799, "age_p95_ms": 1792, "age_max_ms": 2030, "segments_behind": {"0": 589, "1": 171}}
+C3b: 한 번 받고 20초 쉰 뒤 다시 두 번(엣지1)
+$ docker exec tb6-cdn-client-1 python /app/client.py idle pl-plain 8081 idle-pl-plain-r1-1794554514 20
+{"kind": "pl-plain", "name": "idle-pl-plain-r1-1794554514", "trace": [{"after_idle_s": 0, "x_cache": "MISS", "age_ms": 2, "segments_behind": 0}, {"after_idle_s": 20.0, "x_cache": "EXPIRED", "age_ms": 3, "segments_behind": 0}, {"after_idle_s": 20.0, "x_cache": "HIT", "age_ms": 613, "segments_behind": 1}]}
+$ docker exec tb6-cdn-client-1 python /app/client.py idle pl-swr 8081 idle-pl-swr-r1-1794554536 20
+{"kind": "pl-swr", "name": "idle-pl-swr-r1-1794554536", "trace": [{"after_idle_s": 0, "x_cache": "MISS", "age_ms": 11, "segments_behind": 0}, {"after_idle_s": 20.0, "x_cache": "STALE", "age_ms": 20020, "segments_behind": 10}, {"after_idle_s": 20.0, "x_cache": "HIT", "age_ms": 301, "segments_behind": 1}]}
+$ docker exec tb6-cdn-client-1 python /app/client.py idle pl-plain 8081 idle-pl-plain-r2-1794554558 20
+{"kind": "pl-plain", "name": "idle-pl-plain-r2-1794554558", "trace": [{"after_idle_s": 0, "x_cache": "MISS", "age_ms": 2, "segments_behind": 0}, {"after_idle_s": 20.0, "x_cache": "EXPIRED", "age_ms": 5, "segments_behind": 0}, {"after_idle_s": 20.0, "x_cache": "HIT", "age_ms": 616, "segments_behind": 1}]}
+$ docker exec tb6-cdn-client-1 python /app/client.py idle pl-swr 8081 idle-pl-swr-r2-1794554580 20
+{"kind": "pl-swr", "name": "idle-pl-swr-r2-1794554580", "trace": [{"after_idle_s": 0, "x_cache": "MISS", "age_ms": 2, "segments_behind": 0}, {"after_idle_s": 20.0, "x_cache": "STALE", "age_ms": 20029, "segments_behind": 10}, {"after_idle_s": 20.0, "x_cache": "HIT", "age_ms": 302, "segments_behind": 1}]}
+## C3 끝 16:23:22 KST
