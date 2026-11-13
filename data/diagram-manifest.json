@@ -116,6 +116,15 @@
       "bytes": 19462
     }
   },
+  "35a0c72a03bcaff5": {
+    "source": "content/posts/book-review/clean-architecture-review.md",
+    "wide": {
+      "file": "35a0c72a03bcaff5-wide.svg",
+      "width": 395,
+      "height": 495,
+      "bytes": 19669
+    }
+  },
   "37ea4505730af004": {
     "source": "content/posts/tech-blurting/codec-decision-and-debugging.md",
     "wide": {
@@ -456,6 +465,15 @@
       "width": 417,
       "height": 511,
       "bytes": 20874
+    }
+  },
+  "bfec40a877562d4c": {
+    "source": "content/posts/book-review/clean-architecture-review.md",
+    "wide": {
+      "file": "bfec40a877562d4c-wide.svg",
+      "width": 376,
+      "height": 750,
+      "bytes": 19236
     }
   },
   "c37c03575db72d43": {
