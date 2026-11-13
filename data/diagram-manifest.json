@@ -1,4 +1,13 @@
 {
+  "066ed8dfa3c9e0bd": {
+    "source": "content/posts/book-review/clean-architecture-review.md",
+    "wide": {
+      "file": "066ed8dfa3c9e0bd-wide.svg",
+      "width": 395,
+      "height": 495,
+      "bytes": 19650
+    }
+  },
   "07db9356d4914fc3": {
     "source": "content/posts/0-to-1/pokeclip-reconnect-audio-gap.md",
     "wide": {
@@ -213,6 +222,15 @@
       "width": 438,
       "height": 629,
       "bytes": 28614
+    }
+  },
+  "5de2a654b1d4c22b": {
+    "source": "content/posts/book-review/clean-architecture-review.md",
+    "wide": {
+      "file": "5de2a654b1d4c22b-wide.svg",
+      "width": 376,
+      "height": 750,
+      "bytes": 19230
     }
   },
   "5efdefe49e60f0d1": {
