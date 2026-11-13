@@ -1,0 +1,44 @@
+{
+ "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/157.0.0.0 Safari/537.36",
+ "mse": {
+  "audio/mp4; codecs=\"mp4a.40.2\"": true,
+  "audio/mp4; codecs=\"mp4a.40.5\"": true,
+  "audio/mp4; codecs=\"mp4a.40.29\"": true,
+  "audio/mp4; codecs=\"mp4a.40.42\"": true,
+  "audio/mp4; codecs=\"mp4a.40.23\"": false,
+  "audio/mp4; codecs=\"mp4a.40.39\"": false,
+  "audio/mp4; codecs=\"mp4a.40.34\"": false,
+  "audio/mp4; codecs=\"mp4a.69\"": false,
+  "audio/mpeg": true,
+  "audio/mp4; codecs=\"opus\"": true,
+  "audio/webm; codecs=\"opus\"": true,
+  "audio/mp4; codecs=\"flac\"": true,
+  "audio/mp4; codecs=\"ac-3\"": false,
+  "audio/mp4; codecs=\"ec-3\"": false,
+  "audio/aac": true,
+  "video/mp4; codecs=\"avc1.42c01e,mp4a.40.2\"": true,
+  "video/mp4; codecs=\"avc1.42c01e,mp4a.40.5\"": true
+ },
+ "di": {
+  "mp4a.40.2": true,
+  "mp4a.40.5": true,
+  "mp4a.40.29": true,
+  "opus": true,
+  "ac-3": false,
+  "ec-3": false,
+  "flac": true
+ },
+ "sdp": [
+  "m=audio 9 UDP/TLS/RTP/SAVPF 111 63 9 0 8 13 110 126",
+  "a=rtpmap:111 opus/48000/2",
+  "a=fmtp:111 minptime=10;useinbandfec=1",
+  "a=rtpmap:63 red/48000/2",
+  "a=fmtp:63 111/111",
+  "a=rtpmap:9 G722/8000",
+  "a=rtpmap:0 PCMU/8000",
+  "a=rtpmap:8 PCMA/8000",
+  "a=rtpmap:13 CN/8000",
+  "a=rtpmap:110 telephone-event/48000",
+  "a=rtpmap:126 telephone-event/8000"
+ ]
+}
