@@ -1,7 +1,7 @@
 ---
 title: "부분 목록으로 방송을 지우지 않으려던 경로 조정자를 버렸습니다"
 date: 2026-10-15T11:27:08+09:00
-lastmod: 2026-11-11T19:02:22+09:00
+lastmod: 2026-11-13T22:30:00+09:00
 author: "김태윤"
 categories: ["0-to-1"]
 tags: ["PokeClip", "MediaMTX", "Authentication", "DesignHistory"]
@@ -98,7 +98,7 @@ flowchart TB
 
 ## 응답기 방식은 10월 19일 dev 서버에서 먼저 돌았습니다 {#이후에는-경로를-미리-맞추는-대신-연결에서-계정을-판정하기로-했습니다}
 
-연결마다 Auth에 계정을 묻고 그 계정의 암호를 돌려주는 인증 응답기가 10월 17일 [PR #266](https://github.com/3K-PokeClip/PokeClip-mono/pull/266)로 들어왔고, dev 데모 서버를 응답기에 잇는 구성이 10월 19일 [PR #283](https://github.com/3K-PokeClip/PokeClip-mono/pull/283)으로 머지됐습니다. 같은 날 #6306을 실은 제품 포크로 서버에 반영해 실송출로 확인했습니다. 그 실측 표는 [사용자별 SRT 암호 글](/posts/open-source-analysis/mediamtx-user-srt-passphrase-boundaries/#10월-19일-후속-개발-서버에서-계정별-송출과-차단을-연결했습니다)에 있습니다. Auth 조회 장애와 암호 없는 성공 응답은 그때 판정하지 못했습니다.
+연결마다 Auth에 계정을 묻고 그 계정의 암호를 돌려주는 인증 응답기가 10월 17일 [PR #266](https://github.com/3K-PokeClip/PokeClip-mono/pull/266)로 들어왔고, dev 데모 서버를 응답기에 잇는 구성이 10월 19일 [PR #283](https://github.com/3K-PokeClip/PokeClip-mono/pull/283)으로 머지됐습니다. 같은 날 #6306을 실은 제품 포크로 서버에 반영해 실송출로 확인했습니다. 그 결과는 [사용자별 SRT 암호 글](/posts/open-source-analysis/mediamtx-user-srt-passphrase-boundaries/#10월-19일-후속-개발-서버에서-계정별-송출과-차단을-연결했습니다)에 짧게 남겼습니다. Auth 조회 장애와 암호 없는 성공 응답은 그때 판정하지 못했습니다.
 
 운영 상자의 응답기 연결은 10월 25일 [PR #392](https://github.com/3K-PokeClip/PokeClip-mono/pull/392)로 들어왔습니다. 이 PR은 옛 방식과 응답기 방식 두 모드를 두고, 머지만으로는 어떤 상자의 동작도 바꾸지 않습니다. dev 데모 미디어 상자는 11월 6일 멈췄습니다. #6306은 10월 27일 같은 PR에서 커밋 하나로 다시 썼고, 11월 11일에도 열려 있습니다.
 
@@ -118,7 +118,7 @@ flowchart TB
 - [bluenviron/mediamtx#6306](https://github.com/bluenviron/mediamtx/pull/6306) — 사용자별 SRT 암호(작성자 본인, 열림)
 - [bluenviron/mediamtx#5613](https://github.com/bluenviron/mediamtx/issues/5613) — 같은 기능 요청
 - [MediaMTX 문서 「Authentication」](https://mediamtx.org/docs/features/authentication) · [「Control API」](https://mediamtx.org/docs/features/control-api)
-- [사용자별 SRT 암호를 제안하며 인증 범위와 대기 비용을 함께 살펴봤습니다](/posts/open-source-analysis/mediamtx-user-srt-passphrase-boundaries/) — 10월 19일 dev 서버 실측
+- [MediaMTX가 SRT 암호를 사용자별로 받게 제안했습니다](/posts/open-source-analysis/mediamtx-user-srt-passphrase-boundaries/) — 10월 19일 dev 서버 실측
 - 팀 내부 결정 · 설계 · 실측 기록(비공개) — 10월 1–7일 결정, 10월 5일 설계 최종판과 실측
 
 ---

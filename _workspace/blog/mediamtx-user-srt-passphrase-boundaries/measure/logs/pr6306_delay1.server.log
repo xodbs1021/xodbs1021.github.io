@@ -1,0 +1,109 @@
+2026/11/13 19:08:03 INF MediaMTX v1.21.3-2-g99ea6c00
+, darwin, arm64
+2026/11/13 19:08:03 INF configuration loaded from ./pr6306_delay1/cfg.yml
+2026/11/13 19:08:03 INF [SRT] started with listener on :18890 (UDP/SRT)
+2026/11/13 19:08:03 INF [API] started with listener on 127.0.0.1:19997 (TCP/HTTP)
+2026/11/13 19:08:05 INF [SRT] [conn 127.0.0.1:53558] opened
+2026/11/13 19:08:06 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 19:08:06 INF [SRT] [conn 127.0.0.1:53558] is publishing to path 'test'
+2026/11/13 19:08:07 WAR [SRT] [conn 127.0.0.1:53558] 115 decode errors, last was: skipped 188 bytes
+2026/11/13 19:08:07 INF [SRT] [conn 127.0.0.1:53558] closed: EOF
+2026/11/13 19:08:09 INF [SRT] [conn 127.0.0.1:59372] opened
+2026/11/13 19:08:10 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 19:08:10 INF [SRT] [conn 127.0.0.1:59372] is publishing to path 'test'
+2026/11/13 19:08:11 WAR [SRT] [conn 127.0.0.1:59372] 112 decode errors, last was: skipped 44 bytes
+2026/11/13 19:08:12 INF [SRT] [conn 127.0.0.1:59372] closed: EOF
+2026/11/13 19:08:14 INF [SRT] [conn 127.0.0.1:62752] opened
+2026/11/13 19:08:15 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 19:08:15 INF [SRT] [conn 127.0.0.1:62752] is publishing to path 'test'
+2026/11/13 19:08:16 WAR [SRT] [conn 127.0.0.1:62752] 106 decode errors, last was: skipped 188 bytes
+2026/11/13 19:08:17 INF [SRT] [conn 127.0.0.1:62752] closed: EOF
+2026/11/13 19:08:18 INF [SRT] [conn 127.0.0.1:53906] opened
+2026/11/13 19:08:19 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 19:08:19 INF [SRT] [conn 127.0.0.1:53906] is publishing to path 'test'
+2026/11/13 19:08:20 WAR [SRT] [conn 127.0.0.1:53906] 106 decode errors, last was: skipped 188 bytes
+2026/11/13 19:08:21 INF [SRT] [conn 127.0.0.1:53906] closed: EOF
+2026/11/13 19:08:23 INF [SRT] [conn 127.0.0.1:55153] opened
+2026/11/13 19:08:24 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 19:08:24 INF [SRT] [conn 127.0.0.1:55153] is publishing to path 'test'
+2026/11/13 19:08:25 WAR [SRT] [conn 127.0.0.1:55153] 99 decode errors, last was: skipped 188 bytes
+2026/11/13 19:08:26 INF [SRT] [conn 127.0.0.1:55153] closed: EOF
+2026/11/13 19:08:27 INF [SRT] [conn 127.0.0.1:63782] opened
+2026/11/13 19:08:28 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 19:08:28 INF [SRT] [conn 127.0.0.1:63782] is publishing to path 'test'
+2026/11/13 19:08:29 WAR [SRT] [conn 127.0.0.1:63782] 106 decode errors, last was: skipped 188 bytes
+2026/11/13 19:08:30 INF [SRT] [conn 127.0.0.1:63782] closed: EOF
+2026/11/13 19:08:32 INF [SRT] [conn 127.0.0.1:57175] opened
+2026/11/13 19:08:33 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 19:08:33 INF [SRT] [conn 127.0.0.1:57175] is publishing to path 'test'
+2026/11/13 19:08:34 WAR [SRT] [conn 127.0.0.1:57175] 115 decode errors, last was: skipped 188 bytes
+2026/11/13 19:08:35 INF [SRT] [conn 127.0.0.1:57175] closed: EOF
+2026/11/13 19:08:36 INF [SRT] [conn 127.0.0.1:54346] opened
+2026/11/13 19:08:38 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 19:08:38 INF [SRT] [conn 127.0.0.1:54346] is publishing to path 'test'
+2026/11/13 19:08:39 WAR [SRT] [conn 127.0.0.1:54346] 106 decode errors, last was: skipped 188 bytes
+2026/11/13 19:08:39 INF [SRT] [conn 127.0.0.1:54346] closed: EOF
+2026/11/13 19:08:41 INF [SRT] [conn 127.0.0.1:57767] opened
+2026/11/13 19:08:42 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 19:08:42 INF [SRT] [conn 127.0.0.1:57767] is publishing to path 'test'
+2026/11/13 19:08:43 WAR [SRT] [conn 127.0.0.1:57767] 112 decode errors, last was: skipped 44 bytes
+2026/11/13 19:08:44 INF [SRT] [conn 127.0.0.1:57767] closed: EOF
+2026/11/13 19:08:46 INF [SRT] [conn 127.0.0.1:54085] opened
+2026/11/13 19:08:47 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 19:08:47 INF [SRT] [conn 127.0.0.1:54085] is publishing to path 'test'
+2026/11/13 19:08:48 WAR [SRT] [conn 127.0.0.1:54085] 99 decode errors, last was: skipped 188 bytes
+2026/11/13 19:08:48 INF [SRT] [conn 127.0.0.1:54085] closed: EOF
+2026/11/13 19:08:50 INF [SRT] [conn 127.0.0.1:62228] opened
+2026/11/13 19:08:51 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 19:08:51 INF [SRT] [conn 127.0.0.1:62228] is publishing to path 'test'
+2026/11/13 19:08:52 WAR [SRT] [conn 127.0.0.1:62228] 115 decode errors, last was: skipped 188 bytes
+2026/11/13 19:08:53 INF [SRT] [conn 127.0.0.1:62228] closed: EOF
+2026/11/13 19:08:55 INF [SRT] [conn 127.0.0.1:60306] opened
+2026/11/13 19:08:56 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 19:08:56 INF [SRT] [conn 127.0.0.1:60306] is publishing to path 'test'
+2026/11/13 19:08:57 WAR [SRT] [conn 127.0.0.1:60306] 106 decode errors, last was: skipped 188 bytes
+2026/11/13 19:08:57 INF [SRT] [conn 127.0.0.1:60306] closed: EOF
+2026/11/13 19:08:59 INF [SRT] [conn 127.0.0.1:59891] opened
+2026/11/13 19:09:00 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 19:09:00 INF [SRT] [conn 127.0.0.1:59891] is publishing to path 'test'
+2026/11/13 19:09:01 WAR [SRT] [conn 127.0.0.1:59891] 106 decode errors, last was: skipped 188 bytes
+2026/11/13 19:09:02 INF [SRT] [conn 127.0.0.1:59891] closed: EOF
+2026/11/13 19:09:04 INF [SRT] [conn 127.0.0.1:64880] opened
+2026/11/13 19:09:05 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 19:09:05 INF [SRT] [conn 127.0.0.1:64880] is publishing to path 'test'
+2026/11/13 19:09:06 WAR [SRT] [conn 127.0.0.1:64880] 99 decode errors, last was: skipped 188 bytes
+2026/11/13 19:09:06 INF [SRT] [conn 127.0.0.1:64880] closed: EOF
+2026/11/13 19:09:08 INF [SRT] [conn 127.0.0.1:58294] opened
+2026/11/13 19:09:09 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 19:09:09 INF [SRT] [conn 127.0.0.1:58294] is publishing to path 'test'
+2026/11/13 19:09:10 WAR [SRT] [conn 127.0.0.1:58294] 99 decode errors, last was: skipped 188 bytes
+2026/11/13 19:09:11 INF [SRT] [conn 127.0.0.1:58294] closed: EOF
+2026/11/13 19:09:13 INF [SRT] [conn 127.0.0.1:55922] opened
+2026/11/13 19:09:14 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 19:09:14 INF [SRT] [conn 127.0.0.1:55922] is publishing to path 'test'
+2026/11/13 19:09:15 WAR [SRT] [conn 127.0.0.1:55922] 106 decode errors, last was: skipped 188 bytes
+2026/11/13 19:09:16 INF [SRT] [conn 127.0.0.1:55922] closed: EOF
+2026/11/13 19:09:17 INF [SRT] [conn 127.0.0.1:63141] opened
+2026/11/13 19:09:19 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 19:09:19 INF [SRT] [conn 127.0.0.1:63141] is publishing to path 'test'
+2026/11/13 19:09:20 WAR [SRT] [conn 127.0.0.1:63141] 113 decode errors, last was: skipped 44 bytes
+2026/11/13 19:09:20 INF [SRT] [conn 127.0.0.1:63141] closed: EOF
+2026/11/13 19:09:22 INF [SRT] [conn 127.0.0.1:59764] opened
+2026/11/13 19:09:23 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 19:09:23 INF [SRT] [conn 127.0.0.1:59764] is publishing to path 'test'
+2026/11/13 19:09:24 WAR [SRT] [conn 127.0.0.1:59764] 99 decode errors, last was: skipped 188 bytes
+2026/11/13 19:09:25 INF [SRT] [conn 127.0.0.1:59764] closed: EOF
+2026/11/13 19:09:26 INF [SRT] [conn 127.0.0.1:62172] opened
+2026/11/13 19:09:27 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 19:09:27 INF [SRT] [conn 127.0.0.1:62172] is publishing to path 'test'
+2026/11/13 19:09:28 WAR [SRT] [conn 127.0.0.1:62172] 106 decode errors, last was: skipped 188 bytes
+2026/11/13 19:09:29 INF [SRT] [conn 127.0.0.1:62172] closed: EOF
+2026/11/13 19:09:31 INF [SRT] [conn 127.0.0.1:50073] opened
+2026/11/13 19:09:32 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 19:09:32 INF [SRT] [conn 127.0.0.1:50073] is publishing to path 'test'
+2026/11/13 19:09:33 WAR [SRT] [conn 127.0.0.1:50073] 106 decode errors, last was: skipped 188 bytes
+2026/11/13 19:09:34 INF [SRT] [conn 127.0.0.1:50073] closed: EOF
+2026/11/13 19:09:35 INF shutting down gracefully
+2026/11/13 19:09:35 INF [API] closing
+2026/11/13 19:09:35 INF [SRT] closing
+2026/11/13 19:09:35 INF waiting for running hooks

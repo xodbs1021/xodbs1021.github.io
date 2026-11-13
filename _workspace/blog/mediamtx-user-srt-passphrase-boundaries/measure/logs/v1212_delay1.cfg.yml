@@ -1,0 +1,22 @@
+logLevel: info
+logDestinations: [file]
+logFile: ./v1212_delay1/server.log
+rtsp: no
+rtmp: no
+hls: no
+webrtc: no
+moq: no
+metrics: no
+pprof: no
+playback: no
+srtAddress: :18890
+api: yes
+apiAddress: 127.0.0.1:19997
+readTimeout: 2s
+authMethod: http
+authHTTPAddress: http://127.0.0.1:18081/auth
+authHTTPExclude:
+  - action: api
+paths:
+  test:
+    srtPublishPassphrase: pathpass1234

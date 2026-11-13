@@ -1,0 +1,11 @@
+--- FAIL: TestHookCommandExited (0.01s)
+    hooks_test.go:82: 
+        	Error Trace:	internal/hooks/hooks_test.go:82
+        	Error:      	Not equal: 
+        	            	expected: 1
+        	            	actual  : 0
+        	Test:       	TestHookCommandExited
+        	Messages:   	runOnOffline
+FAIL
+FAIL	github.com/bluenviron/mediamtx/internal/hooks	0.414s
+FAIL

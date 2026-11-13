@@ -1,0 +1,18 @@
+logLevel: info
+logDestinations: [file]
+logStructured: yes
+logFile: ./pr6380_N01_run01/server.log
+logHookOutput: yes
+rtsp: no
+rtmp: no
+hls: no
+webrtc: no
+srt: no
+moq: no
+api: no
+metrics: no
+pprof: no
+playback: no
+paths:
+  p01:
+    runOnInit: ./hook.sh 50000 ./pr6380_N01_run01/exit_p01.ts

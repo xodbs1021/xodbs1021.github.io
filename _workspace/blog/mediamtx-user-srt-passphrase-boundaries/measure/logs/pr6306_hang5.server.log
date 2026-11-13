@@ -1,0 +1,69 @@
+2026/11/13 19:09:35 INF MediaMTX v1.21.3-2-g99ea6c00
+, darwin, arm64
+2026/11/13 19:09:35 INF configuration loaded from ./pr6306_hang5/cfg.yml
+2026/11/13 19:09:35 INF [SRT] started with listener on :18890 (UDP/SRT)
+2026/11/13 19:09:35 INF [API] started with listener on 127.0.0.1:19997 (TCP/HTTP)
+2026/11/13 19:09:37 INF [SRT] [conn 127.0.0.1:52623] opened
+2026/11/13 19:09:39 WAR [SRT] [conn 127.0.0.1:52623] failed to authenticate: invalid HTTP response: net/http: request canceled (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:09:40 INF [SRT] [conn 127.0.0.1:52623] closed: failed to authenticate: invalid HTTP response: net/http: request canceled (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:09:43 INF [SRT] [conn 127.0.0.1:62494] opened
+2026/11/13 19:09:45 WAR [SRT] [conn 127.0.0.1:62494] failed to authenticate: invalid HTTP response: context deadline exceeded (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:09:45 INF [SRT] [conn 127.0.0.1:62494] closed: failed to authenticate: invalid HTTP response: context deadline exceeded (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:09:48 INF [SRT] [conn 127.0.0.1:51064] opened
+2026/11/13 19:09:50 WAR [SRT] [conn 127.0.0.1:51064] failed to authenticate: invalid HTTP response: net/http: request canceled (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:09:53 INF [SRT] [conn 127.0.0.1:51064] closed: failed to authenticate: invalid HTTP response: net/http: request canceled (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:09:54 INF [SRT] [conn 127.0.0.1:58846] opened
+2026/11/13 19:09:56 WAR [SRT] [conn 127.0.0.1:58846] failed to authenticate: invalid HTTP response: net/http: request canceled (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:09:57 INF [SRT] [conn 127.0.0.1:58846] closed: failed to authenticate: invalid HTTP response: net/http: request canceled (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:10:00 INF [SRT] [conn 127.0.0.1:60663] opened
+2026/11/13 19:10:02 WAR [SRT] [conn 127.0.0.1:60663] failed to authenticate: invalid HTTP response: context deadline exceeded (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:10:04 INF [SRT] [conn 127.0.0.1:60663] closed: failed to authenticate: invalid HTTP response: context deadline exceeded (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:10:05 INF [SRT] [conn 127.0.0.1:56676] opened
+2026/11/13 19:10:07 WAR [SRT] [conn 127.0.0.1:56676] failed to authenticate: invalid HTTP response: net/http: request canceled (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:10:09 INF [SRT] [conn 127.0.0.1:56676] closed: failed to authenticate: invalid HTTP response: net/http: request canceled (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:10:11 INF [SRT] [conn 127.0.0.1:61158] opened
+2026/11/13 19:10:13 WAR [SRT] [conn 127.0.0.1:61158] failed to authenticate: invalid HTTP response: context deadline exceeded (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:10:17 INF [SRT] [conn 127.0.0.1:60602] opened
+2026/11/13 19:10:17 INF [SRT] [conn 127.0.0.1:61158] closed: failed to authenticate: invalid HTTP response: context deadline exceeded (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:10:19 WAR [SRT] [conn 127.0.0.1:60602] failed to authenticate: invalid HTTP response: context deadline exceeded (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:10:20 INF [SRT] [conn 127.0.0.1:60602] closed: failed to authenticate: invalid HTTP response: context deadline exceeded (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:10:22 INF [SRT] [conn 127.0.0.1:49567] opened
+2026/11/13 19:10:24 WAR [SRT] [conn 127.0.0.1:49567] failed to authenticate: invalid HTTP response: context deadline exceeded
+2026/11/13 19:10:25 INF [SRT] [conn 127.0.0.1:49567] closed: failed to authenticate: invalid HTTP response: context deadline exceeded
+2026/11/13 19:10:28 INF [SRT] [conn 127.0.0.1:51700] opened
+2026/11/13 19:10:30 WAR [SRT] [conn 127.0.0.1:51700] failed to authenticate: invalid HTTP response: context deadline exceeded (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:10:33 INF [SRT] [conn 127.0.0.1:51700] closed: failed to authenticate: invalid HTTP response: context deadline exceeded (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:10:33 INF [SRT] [conn 127.0.0.1:55882] opened
+2026/11/13 19:10:35 WAR [SRT] [conn 127.0.0.1:55882] failed to authenticate: invalid HTTP response: net/http: request canceled (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:10:37 INF [SRT] [conn 127.0.0.1:55882] closed: failed to authenticate: invalid HTTP response: net/http: request canceled (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:10:39 INF [SRT] [conn 127.0.0.1:50608] opened
+2026/11/13 19:10:41 WAR [SRT] [conn 127.0.0.1:50608] failed to authenticate: invalid HTTP response: context deadline exceeded
+2026/11/13 19:10:44 INF [SRT] [conn 127.0.0.1:50608] closed: failed to authenticate: invalid HTTP response: context deadline exceeded
+2026/11/13 19:10:45 INF [SRT] [conn 127.0.0.1:50255] opened
+2026/11/13 19:10:47 WAR [SRT] [conn 127.0.0.1:50255] failed to authenticate: invalid HTTP response: context deadline exceeded (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:10:48 INF [SRT] [conn 127.0.0.1:50255] closed: failed to authenticate: invalid HTTP response: context deadline exceeded (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:10:50 INF [SRT] [conn 127.0.0.1:64493] opened
+2026/11/13 19:10:52 WAR [SRT] [conn 127.0.0.1:64493] failed to authenticate: invalid HTTP response: net/http: request canceled (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:10:55 INF [SRT] [conn 127.0.0.1:64493] closed: failed to authenticate: invalid HTTP response: net/http: request canceled (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:10:56 INF [SRT] [conn 127.0.0.1:49538] opened
+2026/11/13 19:10:58 WAR [SRT] [conn 127.0.0.1:49538] failed to authenticate: invalid HTTP response: context deadline exceeded
+2026/11/13 19:11:01 INF [SRT] [conn 127.0.0.1:49538] closed: failed to authenticate: invalid HTTP response: context deadline exceeded
+2026/11/13 19:11:02 INF [SRT] [conn 127.0.0.1:65259] opened
+2026/11/13 19:11:04 WAR [SRT] [conn 127.0.0.1:65259] failed to authenticate: invalid HTTP response: net/http: request canceled (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:11:05 INF [SRT] [conn 127.0.0.1:65259] closed: failed to authenticate: invalid HTTP response: net/http: request canceled (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:11:07 INF [SRT] [conn 127.0.0.1:61688] opened
+2026/11/13 19:11:09 WAR [SRT] [conn 127.0.0.1:61688] failed to authenticate: invalid HTTP response: context deadline exceeded (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:11:10 INF [SRT] [conn 127.0.0.1:61688] closed: failed to authenticate: invalid HTTP response: context deadline exceeded (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:11:13 INF [SRT] [conn 127.0.0.1:57356] opened
+2026/11/13 19:11:15 WAR [SRT] [conn 127.0.0.1:57356] failed to authenticate: invalid HTTP response: net/http: request canceled (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:11:17 INF [SRT] [conn 127.0.0.1:57356] closed: failed to authenticate: invalid HTTP response: net/http: request canceled (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:11:19 INF [SRT] [conn 127.0.0.1:61476] opened
+2026/11/13 19:11:21 WAR [SRT] [conn 127.0.0.1:61476] failed to authenticate: invalid HTTP response: context deadline exceeded (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:11:23 INF [SRT] [conn 127.0.0.1:61476] closed: failed to authenticate: invalid HTTP response: context deadline exceeded (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:11:24 INF [SRT] [conn 127.0.0.1:55970] opened
+2026/11/13 19:11:26 WAR [SRT] [conn 127.0.0.1:55970] failed to authenticate: invalid HTTP response: context deadline exceeded (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:11:28 INF [SRT] [conn 127.0.0.1:55970] closed: failed to authenticate: invalid HTTP response: context deadline exceeded (Client.Timeout or context cancellation while reading body)
+2026/11/13 19:11:30 INF shutting down gracefully
+2026/11/13 19:11:30 INF [API] closing
+2026/11/13 19:11:30 INF [SRT] closing
+2026/11/13 19:11:30 INF waiting for running hooks

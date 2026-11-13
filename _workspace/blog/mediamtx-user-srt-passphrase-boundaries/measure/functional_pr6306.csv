@@ -1,0 +1,8 @@
+internal,alice,alicepass123,accepted,EOF
+internal,alice,pathpass1234,rejected,invalid passphrase
+internal,bob,pathpass1234,accepted,EOF
+internal,bob,alicepass123,rejected,invalid passphrase
+http,carol,carolpass123,accepted,EOF
+http,carol,pathpass1234,rejected,invalid passphrase
+http,dave,pathpass1234,accepted,EOF
+http,dave,carolpass123,rejected,invalid passphrase

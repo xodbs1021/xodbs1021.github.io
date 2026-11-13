@@ -123,10 +123,10 @@
 - **CASE 38** · [대체 화면은 보여주되 녹화하지 않기: 기존 PR을 이어 완성한 상태 경계](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-offline-recording-source-lifecycle/)
 - **CASE 39** · [기본값을 복사했는데 왜 다른 설정까지 바뀔까: 인증 설정의 두 가지 회귀](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-auth-defaults-normalization-and-clone/)
 - **CASE 40** · [안전하게 기다리려던 수정이 교착을 만들 수 있었다: 미병합 PR #6206](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-logger-reload-rejected-lifecycle-fix/)
-- **CASE 41** · [시작조차 못 한 명령은 stderr를 남길 수 없다: 빠진 7종 훅 콜백](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-seven-hooks-missing-exit-callback/)
+- **CASE 41** · [MediaMTX 훅 7곳은 실행 실패를 로그에 남기지 않았습니다](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-seven-hooks-missing-exit-callback/)
 - **CASE 42** · [Close가 반환했는데 인증서 watcher는 살아 있었다](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-certificate-watcher-close-join/)
-- **CASE 43** · [훅 로그를 더 모으면 종료도 더 기다릴까: 유실률과 역압력 실험](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-hook-output-backpressure-experiments/)
-- **후속 기록** · [사용자별 SRT 암호를 제안하며 인증 범위와 대기 비용을 함께 살펴봤습니다](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-user-srt-passphrase-boundaries/)
+- **CASE 43** · [MediaMTX 훅 출력을 모으자 동시 종료에서 줄이 빠졌습니다](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-hook-output-backpressure-experiments/)
+- **후속 기록** · [MediaMTX가 SRT 암호를 사용자별로 받게 제안했습니다](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-user-srt-passphrase-boundaries/)
 
 ## SoftBank Shakedown: 배포부터 복구까지 {#shakedown}
 

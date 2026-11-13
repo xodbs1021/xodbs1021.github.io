@@ -1,0 +1,17 @@
+logLevel: info
+logDestinations: [file]
+logFile: ./reload_pr6380_run01/server2.log
+logHookOutput: yes
+rtsp: no
+rtmp: no
+hls: no
+webrtc: no
+srt: no
+moq: no
+api: no
+metrics: no
+pprof: no
+playback: no
+paths:
+  p01:
+    runOnInit: ./reload_hook.pl

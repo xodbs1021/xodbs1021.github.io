@@ -1,0 +1,29 @@
+logLevel: info
+logDestinations: [file]
+logFile: ./functional_internal/server.log
+rtsp: no
+rtmp: no
+hls: no
+webrtc: no
+moq: no
+api: no
+metrics: no
+pprof: no
+playback: no
+srtAddress: :18890
+authMethod: internal
+authInternalUsers:
+  - user: alice
+    pass: alicepw
+    ips: []
+    srtPassphrase: alicepass123
+    permissions:
+      - action: publish
+  - user: bob
+    pass: bobpw
+    ips: []
+    permissions:
+      - action: publish
+paths:
+  test:
+    srtPublishPassphrase: pathpass1234
