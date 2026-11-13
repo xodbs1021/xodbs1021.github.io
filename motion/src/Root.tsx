@@ -81,7 +81,7 @@ import { OPUS_MODE_STRIP_FRAMES, OpusModeStrip } from "./scenes/opus-deep-dive/O
 import { PLAYER_START_CHAIN_FRAMES, PlayerStartChain } from "./scenes/codec-decision-and-debugging/PlayerStartChain";
 import { FRAME_TO_PLAYER_FRAMES, FrameToPlayer } from "./scenes/streaming-basics-from-scratch/FrameToPlayer";
 import { VMAF_PER_FRAME_FRAMES, VmafPerFrame } from "./scenes/video-quality-bitrate-abr/VmafPerFrame";
-import { BUFFER_DRAIN_STALL_FRAMES, BufferDrainStall } from "./scenes/buffering-deep-dive/BufferDrainStall";
+import { BUFFER_DRAIN_DOWNSWITCH_FRAMES, BufferDrainDownswitch } from "./scenes/buffering-deep-dive/BufferDrainDownswitch";
 import { COALESCE_TIERS_FRAMES, CoalesceTiers } from "./scenes/cdn-for-live-streaming/CoalesceTiers";
 import { ACKS_ISR_COMMIT_FRAMES, AcksIsrCommit } from "./scenes/kafka-core-concepts-technical-review/AcksIsrCommit";
 
@@ -895,12 +895,12 @@ export const RemotionRoot: React.FC = () => (
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}
     />
-    <Composition id="BufferDrainStall" component={BufferDrainStall} durationInFrames={BUFFER_DRAIN_STALL_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition id="BufferDrainDownswitch" component={BufferDrainDownswitch} durationInFrames={BUFFER_DRAIN_DOWNSWITCH_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
     <Composition
-      id="BufferDrainStallMobile"
-      component={BufferDrainStall}
+      id="BufferDrainDownswitchMobile"
+      component={BufferDrainDownswitch}
       defaultProps={{ layout: "mobile" as const }}
-      durationInFrames={BUFFER_DRAIN_STALL_FRAMES}
+      durationInFrames={BUFFER_DRAIN_DOWNSWITCH_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}

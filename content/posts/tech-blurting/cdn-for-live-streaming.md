@@ -1,7 +1,7 @@
 ---
 title: "라이브 CDN은 캐시 키와 실드 층으로 원본 요청을 줄입니다"
 date: 2026-06-20T02:36:58+09:00
-lastmod: "2026-11-13T16:54:00+09:00"
+lastmod: "2026-11-13T18:09:41+09:00"
 description: "라이브 조각은 새로 오르는 순간 같은 요청이 몰립니다. CDN은 캐시 키로 같은 파일을 알아보고, 엣지 위에 지역 캐시와 Origin Shield를 쌓고, 같은 순간의 요청을 하나로 합쳐 원본 요청을 줄입니다. nginx 1.31.3 엣지 4대 · 실드 1대로 새 조각에 동시 요청 200건을 보내 원본 요청 수(합치기 켬 1건, 끔 1–200건), 아직 없는 조각의 404 캐시, 목록 stale-while-revalidate의 낡은 응답을 쟀고, CloudFront 캐시 키 · 요청 병합 · 오류 캐시 · 가격 · 무효화, Content Steering, Open Connect를 1차 문서로 확인했습니다."
 categories: ["tech-blurting"]
 tags: ["CDN", "CloudFront", "nginx", "HLS", "캐시", "Origin Shield", "PokeClip"]
@@ -83,7 +83,7 @@ CloudFront는 캐시 키가 같은 요청만 합칩니다. 캐시 키에 쿠키�
 
 nginx는 범위가 더 좁습니다. [문서](https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_cache_lock)대로 `proxy_cache_lock`은 새 캐시 항목을 채울 때만 요청을 하나로 줄입니다. 만료된 항목을 갱신할 때는 걸리지 않습니다. 목록을 1초 TTL로 캐시하고 잠금만 켠 엣지 4대에 시청자 20명이 0.5초마다 목록을 받게 하자, 20초 동안 원본 목록 요청이 173–239건이었습니다(3회).
 
-### 목록에 stale-while-revalidate를 걸면 낡은 목록이 나갑니다 {#stale-while-revalidate--매니페스트-캐시-ttl-줄이는-트릭}
+### 목록에 낡은 응답 허용을 걸면 낡은 목록이 나갑니다 {#stale-while-revalidate--매니페스트-캐시-ttl-줄이는-트릭}
 
 stale-while-revalidate(SWR)는 만료된 응답을 내주면서 뒤에서 새로 받아 오게 하는 `Cache-Control` 확장입니다. [RFC 5861](https://www.rfc-editor.org/rfc/rfc5861)은 표준이 아닌 정보 문서(Informational)이고, 캐시가 정해진 초만큼 낡은 응답을 내줄 수 있다(MAY)고만 적습니다. 그 시간이 지나도록 재검증하지 못했다면 낡은 응답을 더 내주지 않아야 합니다(SHOULD NOT). CloudFront는 2023년 5월 17일부터 이 지시어를 따르고([공지](https://aws.amazon.com/about-aws/whats-new/2023/05/amazon-cloudfront-stale-while-revalidate-stale-if-error-cache-control-directives/)), 낡은 응답은 SWR 값과 최대 TTL 중 작은 값까지만 냅니다([Manage how long content stays in the cache](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Expiration.html)).
 
@@ -95,11 +95,11 @@ nginx에서 비슷한 동작은 `proxy_cache_use_stale updating`과 `proxy_cache
 | 시청자가 받은 목록 나이 p95 | 1.24–1.29초 | 1.76–1.90초 |
 | 20초 쉬었다 받은 첫 목록 | 갱신(나이 3ms) | 낡은 응답(나이 20.0초, 조각 10개 뒤) |
 
-마지막 줄이 위험합니다. 지시어로 켠 nginx의 낡은 응답 허용에는 시간 제한이 없어서, 한동안 요청이 없던 엣지는 다음 첫 시청자에게 20초 묵은 목록을 냈습니다. 같은 경로를 이어 쓴 첫 시도에서는 23.9초 묵은, 조각 12개 뒤의 목록이 20번 나갔습니다. 목록이 조각 10개만큼 뒤처지면 플레이어는 이미 받은 조각만 보이는 목록을 받습니다. LL-HLS의 보류 요청은 「이 번호의 조각이 생길 때까지 붙잡아 달라」는 요청이라, 낡은 목록을 바로 내주는 SWR과 목적이 반대입니다. 둘을 한 경로에 걸면 보류 요청이 기다리지 않고 옛 목록을 받을 수 있다고 봅니다(설정을 읽고 한 추론, 측정하지 않음). 라이브 목록에 SWR을 쓰려면 SWR 값을 목표 길이보다 짧게 두고 실제 나이를 재야 합니다.
+마지막 줄이 위험합니다. 한동안 요청이 없던 엣지는 다음 첫 시청자에게 20초 묵은 목록을 냈습니다. 이 20초는 시간 제한이 없는 nginx 지시어(`proxy_cache_use_stale updating`)의 결과이고, SWR 값을 준 CloudFront는 그 값까지만 낡은 응답을 냅니다(문헌값, 측정하지 않음). 같은 경로를 이어 쓴 첫 시도에서는 23.9초 묵은, 조각 12개 뒤의 목록이 20번 나갔습니다. 목록이 조각 10개만큼 뒤처지면 플레이어는 이미 받은 조각만 보이는 목록을 받습니다. LL-HLS의 보류 요청은 「이 번호의 조각이 생길 때까지 붙잡아 달라」는 요청이라, 낡은 목록을 바로 내주는 SWR과 목적이 반대입니다. 둘을 한 경로에 걸면 보류 요청이 기다리지 않고 옛 목록을 받을 수 있다고 봅니다(설정을 읽고 한 추론, 측정하지 않음). 라이브 목록에 SWR을 쓰려면 SWR 값을 목표 길이보다 짧게 두고 실제 나이를 재야 합니다.
 
 ### 아직 없는 조각의 404도 10초 캐시됩니다
 
-CloudFront는 원본의 404를 오류 캐싱 최소 TTL(기본 10초)과 원본이 보낸 `max-age` 중 긴 시간만큼 캐시하고, 그동안 같은 요청에 캐시한 404로 답합니다([HTTP 4xx and 5xx status codes](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/HTTPStatusCodes.html)). 플레이어가 아직 목록에 오르지 않은 조각을 먼저 요청하면 그 404가 남습니다. nginx에 `proxy_cache_valid 404 10s`를 두고, 첫 요청 3초 뒤부터 조각을 내주는 원본을 0.25초마다 요청하자 시청자의 첫 200은 10.6초와 11.2초에 왔습니다. 원본은 두 번만 요청받았습니다. 원본은 3초에 준비됐지만 시청자는 7초를 더 404로 받은 셈입니다. CloudFront에서는 배포의 오류 응답 설정에서 상태 코드별로 이 최소 TTL을 바꿀 수 있습니다([Custom error pages and error caching](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/DownloadDistValuesErrorPages.html)).
+CloudFront는 원본의 404를 오류 캐싱 최소 TTL(기본 10초)과 원본이 보낸 `max-age` 중 긴 시간만큼 캐시하고, 그동안 같은 요청에 캐시한 404로 답합니다([HTTP 4xx and 5xx status codes](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/HTTPStatusCodes.html)). 플레이어가 아직 목록에 오르지 않은 조각을 먼저 요청하면 그 404가 남습니다. nginx에 `proxy_cache_valid 404 10s`를 두고, 첫 요청 3초 뒤부터 조각을 내주는 원본을 0.25초마다 요청하자 시청자의 첫 200은 10.6초와 11.2초에 왔습니다. 원본은 두 번만 요청받았습니다. 원본은 3초에 준비됐지만 시청자는 7.6–8.2초를 더 404로 받은 셈입니다. CloudFront에서는 배포의 오류 응답 설정에서 상태 코드별로 이 최소 TTL을 바꿀 수 있습니다([Custom error pages and error caching](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/DownloadDistValuesErrorPages.html)).
 
 ## 전송 바이트는 비트레이트 × 시청 시간이고 단가는 공시가와 계약이 정합니다 {#4-인기-스트리머-한-명--8천만-원}
 
@@ -117,7 +117,7 @@ CDN이 내보내는 바이트는 평균 비트레이트 × 시청 시간 × 시�
 
 여러 CDN을 함께 쓰면 한 CDN이 멈춰도 다른 길이 남습니다. 2021년 6월 8일 Fastly는 고객의 정상 설정 변경이 숨은 버그를 건드려 09:47 UTC부터 네트워크의 85%가 오류를 냈고, 49분 안에 95%가 정상으로 돌아왔습니다([Fastly 장애 요약](https://www.fastly.com/blog/summary-of-june-8-outage)). 대가는 캐시가 CDN마다 따로라는 점입니다. 새 조각마다 CDN 수만큼 원본 요청이 늘고, 시청자가 나뉘면 각 CDN의 적중률도 떨어집니다. AWS 문서는 다른 CDN의 원본을 CloudFront 실드 하나로 모아 원본 요청과 캐시 키를 하나로 맞추는 구성을 소개합니다([Origin Shield, Multiple CDNs](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/origin-shield.html#os-use-cases-multi-cdn)).
 
-어느 CDN으로 보낼지는 플레이어가 지연을 재서 고르기보다 서버가 정합니다. 브라우저에는 임의 주소로 ping을 보내는 API가 없습니다. HLS 개정 초안 22판은 Content Steering을 둡니다. 다변형 목록의 `EXT-X-CONTENT-STEERING` 태그가 스티어링 목록 주소(`SERVER-URI`)와 처음 쓸 경로(`PATHWAY-ID`)를 알리고, 같은 변형을 CDN별로 묶은 경로(Pathway) 사이의 우선순위는 플레이어가 주기적으로 받는 스티어링 목록이 정합니다. 플레이어는 이 요청에 `_HLS_pathway`와 추정 처리량 `_HLS_throughput`을 붙이고, 캐시는 `_HLS_throughput`을 캐시 키에서 빼야 합니다(SHOULD). 클라이언트 지원은 선택(OPTIONAL)입니다([개정 초안 4.4.6.6 · 7절](https://www.ietf.org/archive/id/draft-pantos-hls-rfc8216bis-22.txt)). hls.js 1.7.4에도 이 두 쿼리를 붙이는 스티어링 컨트롤러가 들어 있습니다([content-steering-controller.ts](https://github.com/video-dev/hls.js/blob/v1.7.4/src/controller/content-steering-controller.ts)).
+어느 CDN으로 보낼지는 플레이어가 지연을 재서 고르기보다 서버가 정합니다. 브라우저에는 임의 주소로 ping을 보내는 API가 없습니다. HLS 개정 초안 22판은 Content Steering을 둡니다. 다변형 목록의 `EXT-X-CONTENT-STEERING` 태그가 스티어링 목록 주소(`SERVER-URI`)와 처음 쓸 경로(`PATHWAY-ID`)를 알리고, 같은 변형을 CDN별로 묶은 경로(Pathway) 사이의 우선순위는 플레이어가 주기적으로 받는 스티어링 목록이 정합니다. 플레이어는 이 요청에 `_HLS_pathway`와 추정 처리량 `_HLS_throughput`을 붙이고, 캐시는 `_HLS_throughput`처럼 자주 바뀌는 쿼리를 캐시 키에서 빼거나, 스티어링 목록 응답을 아예 캐시하지 않아야 합니다(SHOULD, 7.4절). 클라이언트 지원은 선택(OPTIONAL)입니다([개정 초안 4.4.6.6 · 7절](https://www.ietf.org/archive/id/draft-pantos-hls-rfc8216bis-22.txt)). hls.js 1.7.4에도 이 두 쿼리를 붙이는 스티어링 컨트롤러가 들어 있습니다([content-steering-controller.ts](https://github.com/video-dev/hls.js/blob/v1.7.4/src/controller/content-steering-controller.ts)).
 
 ### 자체 CDN은 ISP 안에 서버를 둡니다 {#6-netflix-open-connect--자체-cdn의-모범}
 
@@ -139,7 +139,7 @@ CDN은 엣지에서 짧은 코드를 돌릴 수 있습니다. CloudFront Functio
 - 수행: AI(Claude Code)가 2026년 11월 13일 16:13–16:25(KST)에 실행했습니다.
 - 기종: MacBook Air(Mac17,3, Apple M5, 32GB, 팬 없음), macOS 27.0.1, Docker 29.8.2. 다른 세션의 작업이 함께 돌아 1분 load average가 12–92였습니다. 지연 대신 요청 수 · 상태 코드 · 목록 나이만 결론에 썼습니다.
 - 구성: compose 프로젝트 하나에 엣지 4대 · 실드 1대(nginx 1.31.3, `nginx:1-alpine`), 원본(Python 3.12.14 HTTP 서버, 응답 전 0.3초 지연, 조각 1MB), 시험 클라이언트가 한 Docker VM 안에 있습니다. 엣지는 8081 포트로 원본에 바로, 8080 포트로 실드를 거쳐 묻습니다. 캐시 설정은 `proxy_cache_valid 200 60s`, `proxy_cache_valid 404 10s`, `proxy_cache_lock on`(켬)과 `off`(끔), `proxy_cache_lock_timeout 10s`.
-- 동시 요청: 스레드 200개가 장벽에서 함께 출발해 `edge{i%4+1}`로 매번 새 이름의 조각을 요청했습니다. 원본 요청 수는 원본 로그에서 그 이름의 줄 수입니다. 조건마다 6회(부하가 높던 3회 + 낮던 3회)입니다.
+- 동시 요청: 스레드 200개가 장벽에서 함께 출발해 `edge{i%4+1}`로 매번 새 이름의 조각을 요청했습니다. 원본 요청 수는 원본 로그에서 그 이름의 줄 수입니다. 실드가 받은 요청 수는 실드 접근 로그 중 시험용으로 정한 형식의 줄만 셌습니다. nginx 이미지의 기본 로그도 같은 요청을 표준 출력에 한 번 더 찍어 전체 줄 수는 두 배였습니다. 조건마다 6회(부하가 높던 3회 + 낮던 3회)입니다.
 - 404: 엣지 1대가 원본에 바로 묻고, 원본은 첫 요청 3초 뒤부터 200을 줍니다. 클라이언트는 0.25초마다 16초 동안 요청했습니다(2회).
 - 목록: 원본은 응답 전 0.3초 지연, 2초마다 미디어 시퀀스를 하나 올리고 만든 시각을 목록에 적습니다. 엣지는 `proxy_cache_valid 200 1s` + `proxy_cache_lock on`, 낡은 응답 허용 구성은 여기에 `proxy_cache_use_stale updating` · `proxy_cache_background_update on`을 더했습니다. 시청자 20명이 0.5초마다 엣지 4대를 돌아가며 20초(3회), 이어서 한 번 받고 20초 쉰 뒤 다시 받기(2회)입니다.
 - 실측은 nginx의 동작입니다. CloudFront의 병합 · 오류 캐시 · SWR은 본문에 링크한 AWS 문서 값이고 이 시험으로 재지 않았습니다.

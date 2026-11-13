@@ -103,9 +103,9 @@
       "poster": "/images/aws-gcp-bidirectional-cutover-experiment-cutover-queue-pause-mobile-poster.jpg"
     }
   },
-  "buffering-deep-dive-buffer-drain-stall": {
-    "scene": "BufferDrainStall",
-    "alt": "왼쪽은 가로축 40초부터 90초, 세로축 버퍼 0–12초인 꺾은선 그래프이고 45–75초가 붉은 1.5 Mbps 구간으로 칠해져 있다. 오른쪽에는 버퍼 초를 보여 주는 세로 막대와 다음 조각 변형 상자 1080p 4.54M · 720p 2.28M · 360p 0.72M가 있다. 위의 이름표가 받는 속도 8 Mbps에서 1.5 Mbps로 바뀌면 꺾은선이 약 11초에서 내려가 최저 1.66초 표시에 닿고, 그사이 다음 조각이 1080p에서 720p, 360p로 내려간다. 360p로 받으면서 버퍼가 다시 10초 근처로 차고, 8 Mbps로 돌아온 뒤 다음 조각이 720p로 올라간다. 0초로 멈추는 순간은 없다",
+  "buffering-deep-dive-buffer-drain-downswitch": {
+    "scene": "BufferDrainDownswitch",
+    "alt": "왼쪽은 가로축 40초부터 90초, 세로축 버퍼 0–12초인 꺾은선 그래프이고 45–75초가 붉은 1.5 Mbps 구간으로 칠해져 있다. 오른쪽에는 버퍼 초를 보여 주는 세로 막대와 다음 조각 변형 상자 1080p 4.54M · 720p 2.28M · 360p 0.72M가 있다. 위의 이름표가 받는 속도 8 Mbps에서 1.5 Mbps로 바뀌면 꺾은선이 하락 시점의 8.2초에서 내려가 최저 1.66초 표시에 닿고, 그사이 다음 조각이 1080p에서 720p, 360p로 내려간다. 360p로 받으면서 버퍼가 다시 10초 근처로 차고, 8 Mbps로 돌아온 뒤 다음 조각이 720p로 올라간다. 0초로 멈추는 순간은 없다",
     "sha256": "1e74418ce6c4222faa92224d54c751233a54a495f245174b42e45fa7cfd5bce5",
     "bytes": 232343,
     "codec": "h264",
@@ -115,7 +115,7 @@
     "duration": 12,
     "audio": 0,
     "faststart": true,
-    "poster": "/images/buffering-deep-dive-buffer-drain-stall-poster.jpg",
+    "poster": "/images/buffering-deep-dive-buffer-drain-downswitch-poster.jpg",
     "mobile": {
       "sha256": "0da6f2d16df937109c6e55ba565afb18e602e405808815d9d8475429235f7f51",
       "bytes": 226181,
@@ -126,7 +126,7 @@
       "duration": 12,
       "audio": 0,
       "faststart": true,
-      "poster": "/images/buffering-deep-dive-buffer-drain-stall-mobile-poster.jpg"
+      "poster": "/images/buffering-deep-dive-buffer-drain-downswitch-mobile-poster.jpg"
     }
   },
   "cdn-for-live-streaming-coalesce-tiers": {

@@ -1,4 +1,4 @@
-# 콘티 — BufferDrainStall (buffering-deep-dive)
+# 콘티 — BufferDrainDownswitch (buffering-deep-dive)
 
 - 주장 하나: 받는 속도가 변형 비트레이트보다 느려지면 버퍼(재생 위치 앞 초)가 줄고, 플레이어가 다음 조각을 낮은 변형으로 받아 버퍼를 다시 채운다. 이 시험(1.5Mbps)에서는 0초까지 가지 않았다.
 - 데이터: measure/vod-mbs0-mbl10.json(hls.js 1.7.4, maxBufferLength 10 · maxBufferSize 0), 측정 40–90초, 0.5초 간격 101점(250ms 표본 중 가장 가까운 값). 50초를 10초로 압축(0.5초 = 3프레임) → kind 재구성.

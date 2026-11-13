@@ -1,7 +1,7 @@
 ---
 title: "PSNR·SSIM·VMAF는 같은 손상을 서로 다르게 채점합니다"
 date: 2026-06-14T10:40:52+09:00
-lastmod: "2026-11-13T17:40:00+09:00"
+lastmod: "2026-11-13T18:09:41+09:00"
 description: "PSNR은 화소 오차를, SSIM은 국소 구조를, VMAF는 사람 점수를 예측합니다. Sintel 예고편으로 같은 PSNR(40.6 대 40.7dB)에서 흐림은 VMAF 58.8, 블록은 80.7로 갈리고, 인코딩 전 선명화가 VMAF를 92.3에서 97.9로 올리는 동안 NEG 모델은 89.9에서 90.6에 머문 것을 쟀습니다. 평균 93.4 뒤에 숨은 하위 1% 79.4, 화면 크기와 시청 거리를 전제한 모델, 프레임률을 보지 못하는 v0 VMAF, 플레이어가 점수가 아니라 BANDWIDTH로 변형을 고르는 이유와 HLS SCORE 속성, 멈춤까지 넣는 ITU-T P.1203을 정리했습니다."
 categories: ["tech-blurting"]
 tags: ["VMAF", "PSNR", "SSIM", "화질 평가", "ABR", "HLS"]
@@ -58,13 +58,13 @@ PSNR이 같다는 것은 틀린 화소의 제곱 합이 같다는 뜻일 뿐입�
 
 VMAF는 화면마다 점수를 내고, 보통 보고하는 값은 그 산술 평균입니다. 예고편 전체(52초, 1,253화면)를 라이브처럼 x264 veryfast · `-tune zerolatency` · CBR 2,500kbps(VBV 버퍼 1초)로 인코딩하자 평균은 93.4였습니다. 아래 그래프에서 회색 점선이 평균이고, 꺾은선은 화면마다의 점수입니다.
 
-{{< motion scene="VmafPerFrame" id="fig-vmaf-per-frame" kind="실측" caption="Sintel 예고편 전체를 CBR 2,500kbps로 인코딩한 결과의 화면별 VMAF(vmaf_v0.6.1). 평균은 93.4지만 12.5–12.9초 수염 노인 클로즈업에서 77.1까지 내려가고, 하위 1%는 79.4로 평균보다 14점 낮습니다. 화면 1,253개의 측정값을 그대로 그렸습니다." >}}
+{{< motion scene="VmafPerFrame" id="fig-vmaf-per-frame" kind="재구성" caption="Sintel 예고편 전체를 CBR 2,500kbps로 인코딩한 결과의 화면별 VMAF(vmaf_v0.6.1). 평균은 93.4지만 12.5–12.9초 수염 노인 클로즈업에서 77.1까지 내려가고, 하위 1%는 79.4로 평균보다 14점 낮습니다. 값은 화면별 실측(소수 첫째 자리 반올림)이고, 52초를 약 8초에 걸쳐 그립니다." >}}
 
-조화평균은 93.2로 평균과 거의 같았습니다. 낮은 화면이 전체의 몇 %뿐이라 평균을 끌어내리지 못한 것입니다. 하위 1%는 79.4, 최저는 77.1이었고, 85점 아래 화면이 91개, 80점 아래가 13개였습니다. 가장 낮은 구간은 장면이 바뀐 직후가 아니라 결이 많은 수염 클로즈업이었습니다. 장면 전환 검출(`scdet`)로 찾은 여섯 번의 전환 가운데 네 번(16.5 · 17.5 · 25.9 · 28.0초)은 직후 화면이 96–100점이었고, 나머지 두 번(23.8 · 27.4초)도 84–90점이었습니다. 비트를 1초 버퍼 안에서만 옮길 수 있는 CBR은 어려운 장면에 비트를 더 줄 수 없습니다([x264 VBV 글](/posts/tech-blurting/x264-live-rate-control-gop/#maxrate와-bufsize가-vbv-상한을-정합니다)). 그래서 평균과 함께 하위 1%나 최저를 적어야 그 장면이 보입니다. [H.264 글](/posts/tech-blurting/h264-deep-dive/#8-화질-평가--psnr-vs-ssim-vs-vmaf)의 1-pass 결과에서도 평균 90.94 뒤에 하위 1% 78.86이 있었습니다.
+조화평균은 93.2로 평균과 거의 같았습니다. 낮은 화면이 전체의 몇 %뿐이라 평균을 끌어내리지 못한 것입니다. 하위 1%는 79.4, 최저는 77.1이었고, 85점 아래 화면이 91개, 80점 아래가 13개였습니다. 가장 낮은 구간은 장면이 바뀐 직후가 아니라 결이 많은 수염 클로즈업이었습니다. 장면 전환 검출(FFmpeg `scene` 점수 0.3 초과)로 찾은 전환은 여섯 번이었고, 전환 직후 다섯 화면이 낮았던 것은 23.8초 한 번(84–87점)뿐이었습니다. 나머지 다섯 번(16.5 · 17.5 · 25.9 · 27.4 · 28.0초)은 94–100점이었습니다. 비트를 1초 버퍼 안에서만 옮길 수 있는 CBR은 어려운 장면에 비트를 더 줄 수 없습니다([x264 VBV 글](/posts/tech-blurting/x264-live-rate-control-gop/#maxrate와-bufsize가-vbv-상한을-정합니다)). 그래서 평균과 함께 하위 1%나 최저를 적어야 그 장면이 보입니다. [H.264 글](/posts/tech-blurting/h264-deep-dive/#8-화질-평가--psnr-vs-ssim-vs-vmaf)의 1-pass 결과에서도 평균 90.94 뒤에 하위 1% 78.86이 있었습니다.
 
 ### 인코더 비교는 같은 지표·같은 모델로만 합니다 {#x264-vs-nvenc}
 
-인코더 사이의 화질 주장은 어느 지표로 쟀는지부터 봅니다. NVIDIA가 Turing NVENC를 x264와 견준 발표는 NVIDIA가 고른 설정이었고 T4 글의 지표는 PSNR뿐이었습니다([NVENC 글](/posts/tech-blurting/nvenc-gpu-transcoding/#3-nvenc-세대--turing부터가-진짜)). 위 실험처럼 PSNR과 VMAF는 순위가 바뀔 수 있으므로, 비교표는 같은 원본 · 같은 모델과 판 · 같은 확대 방법 · 같은 프레임 정렬로 낸 값끼리만 읽습니다([H.264 글](/posts/tech-blurting/h264-deep-dive/#8-화질-평가--psnr-vs-ssim-vs-vmaf)).
+위 실험처럼 PSNR과 VMAF는 순위가 바뀔 수 있으므로, 인코더 비교표는 같은 원본 · 같은 모델과 판 · 같은 확대 방법 · 같은 프레임 정렬로 낸 값끼리만 읽습니다. 보고할 조건은 [H.264 글](/posts/tech-blurting/h264-deep-dive/#8-화질-평가--psnr-vs-ssim-vs-vmaf)에, NVENC 비교 발표가 쓴 지표는 [NVENC 글](/posts/tech-blurting/nvenc-gpu-transcoding/#3-nvenc-세대--turing부터가-진짜)에 있습니다.
 
 ## 선명하게 다듬으면 VMAF는 오르고 NEG 모델은 오르지 않습니다
 
@@ -97,15 +97,15 @@ ABR(Adaptive Bitrate) 플레이어는 받는 속도를 재서 다음 조각을 �
 
 ### 다변형 목록에는 SCORE 칸이 새로 생겼습니다 {#master-playlist}
 
-RFC 8216 개정 초안 22판은 `EXT-X-STREAM-INF`에 `SCORE` 속성을 두었습니다([4.4.6.2](https://www.ietf.org/archive/id/draft-pantos-hls-rfc8216bis-22.txt)). 값은 양의 소수이고 「변형의 재생 체감 품질을 나타내는 추상적 · 상대적 척도」입니다. 어떤 지표로 정할지는 목록 작성자가 고르되 모든 변형에 같은 방법을 써야 하고, 점수가 높은 변형은 작성자가 더 바람직하다고 보는 변형이어야 합니다(MUST). 한 변형에 넣으면 모든 변형에 넣으라고 권하고(SHOULD), 모든 변형에 점수가 있으면 클라이언트는 재생 가능 여부를 거른 뒤 점수로 고르라고 권합니다(6.3.1, SHOULD). hls.js 1.7.4는 이 값을 읽지만, 쓰는 곳은 시작할 때 코덱 묶음(예: H.264 변형들 대 HEVC 변형들)을 고르는 `getStartCodecTier`뿐입니다. 같은 묶음 안의 화질 전환은 여전히 대역폭 추정으로 합니다([rendition-helper.ts 183행](https://github.com/video-dev/hls.js/blob/v1.7.4/src/utils/rendition-helper.ts#L183)).
+RFC 8216 개정 초안 22판은 `EXT-X-STREAM-INF`에 `SCORE` 속성을 두었습니다([4.4.6.2](https://www.ietf.org/archive/id/draft-pantos-hls-rfc8216bis-22.txt)). 값은 양의 소수이고 「변형의 재생 체감 품질을 나타내는 추상적 · 상대적 척도」입니다. 값은 모든 변형에 일관되게 적용할 수 있는 지표나 그 조합이면 되고, 점수가 높은 변형은 작성자가 더 바람직하다고 보는 변형이어야 합니다(MUST). 한 변형에 넣으면 모든 변형에 넣으라고 권하고(SHOULD), 모든 변형에 점수가 있으면 클라이언트는 재생 가능 여부를 거른 뒤 점수로 고르라고 권합니다(6.3.1, SHOULD). hls.js 1.7.4는 이 값을 읽지만, 쓰는 곳은 시작할 때 코덱 묶음(예: H.264 변형들 대 HEVC 변형들)을 고르는 `getStartCodecTier`뿐입니다. 같은 묶음 안의 화질 전환은 여전히 대역폭 추정으로 합니다([rendition-helper.ts 183행](https://github.com/video-dev/hls.js/blob/v1.7.4/src/utils/rendition-helper.ts#L183)).
 
-### 고르는 알고리즘은 버퍼 글에 있습니다 {#화질을-바꿀지는-플레이어가-결정한다}
+### 다음 조각의 변형은 받는 속도와 버퍼로 플레이어가 고릅니다 {#화질을-바꿀지는-플레이어가-결정한다}
 
-다음 조각의 변형은 플레이어가 정합니다. 받은 속도의 이동 평균으로 고르는 방식, 버퍼 길이만으로 고르는 BOLA([Spiteri 외 2016](https://arxiv.org/abs/1601.06748)), 앞으로 몇 조각의 속도를 예측해 고르는 MPC([Yin 외 2015](https://doi.org/10.1145/2785956.2787486))가 있습니다. hls.js와 dash.js의 실제 동작과 기본값은 [버퍼 글](/posts/tech-blurting/buffering-deep-dive/#4-모바일-환경이-버퍼링의-진짜-무대다)에서 측정과 함께 다룹니다.
+hls.js가 대역폭을 추정하는 방식, 버퍼 길이로 고르는 BOLA와 dash.js의 전환 문턱은 [버퍼 글](/posts/tech-blurting/buffering-deep-dive/#4-모바일-환경이-버퍼링의-진짜-무대다)에 측정과 함께 있습니다.
 
 ### 전환이 끊기지 않는 조건은 키프레임 정렬입니다 {#화질-전환-시-왜-안-끊기나}
 
-변형을 조각 경계에서 바꿔도 화면이 이어지려면, 새 변형의 조각이 혼자 디코딩되고 이전 변형과 같은 시각에서 시작해야 합니다. RFC 8216은 같은 내용의 변형이 같은 타임스탬프를 쓰도록 요구하고([6.2.4](https://www.rfc-editor.org/rfc/rfc8216#section-6.2.4)), [애플 저작 규격](https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html)은 영상 조각이 IDR로 시작해야 한다(7.4, MUST)고 정합니다. 그래서 인코더는 모든 변형에서 같은 프레임에 IDR을 두도록 키프레임 간격을 고정합니다. 옵션은 [x264 글](/posts/tech-blurting/x264-live-rate-control-gop/#키프레임은--g와--sc_threshold-0이-고정합니다)에 있습니다.
+변형을 조각 경계에서 바꿔도 화면이 이어지려면 모든 변형이 같은 시각에 IDR로 시작하는 조각을 가져야 합니다([RFC 8216 6.2.4](https://www.rfc-editor.org/rfc/rfc8216#section-6.2.4), [애플 저작 규격](https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html) 7.4). 키프레임 간격을 고정하는 옵션은 [x264 글](/posts/tech-blurting/x264-live-rate-control-gop/#키프레임은--g와--sc_threshold-0이-고정합니다)에 있습니다.
 
 ## 시청 품질은 화질 점수에 멈춤을 더해 봅니다 {#4-오디오도-비트레이트가-있고-멀티-트랙도-있다}
 
@@ -123,15 +123,15 @@ VMAF는 재생된 화면의 화질만 봅니다. 시청자가 겪는 것은 그 
 ## 측정 조건
 
 - 수행: AI(Claude Code)가 2026년 11월 13일 16:30–16:56(KST)에 실행했습니다. 각 조건 1회입니다.
-- 기종: MacBook Air(Mac17,3, Apple M5, 고성능 4 · 효율 6코어, 32GB, 팬 없음), macOS 27.0.1. 1분 load average는 측정 중 30–108이었습니다(다른 세션의 작업 포함). 점수와 파일 크기는 부하의 영향을 받지 않습니다.
+- 기종: MacBook Air(Mac17,3, Apple M5, 고성능 4 · 효율 6코어, 32GB, 팬 없음), macOS 27.0.1. 1분 load average는 측정 중 30–108이었습니다(다른 세션의 작업 포함). 점수는 같은 파일이면 부하와 무관하지만, x264 출력은 다시 실행하면 크기가 조금(약 1%) 달라질 수 있어 파일 크기와 점수는 그 1회의 값입니다.
 - 도구: FFmpeg 9.0.2(Homebrew), x264 core 165 r3222, libvmaf 3.2.1(모델 vmaf_v0.6.1 · vmaf_v0.6.1neg · vmaf_v0.6.1 휴대폰 변환, v1은 vmaf_v1.0.16_3d0h · vmaf_v1.0.16_hfr_3d0h).
 - 입력: [Sintel 예고편](https://durian.blender.org/sharing/) 1080p(© copyright Blender Foundation | durian.blender.org, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)), `https://download.blender.org/durian/trailer/sintel_trailer-1080p.mp4`(sha256 `34bbd52a4b89fdf63c8ace50b268da26653a59508288100cd3c23de276db7931`). 10초 구간은 `ffmpeg -ss 20 -i sintel_trailer-1080p.mp4 -t 10 -an -c:v ffv1 ref10.mkv`(240화면, ABR 사다리 글과 같은 구간), 전체는 `ffmpeg -i sintel_trailer-1080p.mp4 -an -c:v ffv1 full.mkv`(1,253화면, 24fps)입니다. 원본 자체가 이미 한 번 압축된 영상입니다. 프레임률 비교만 `ffmpeg -f lavfi -i testsrc2=size=1920x1080:rate=60 -t 10 -c:v ffv1 ref60.mkv`로 만든 합성 화면입니다.
 - 지표: `ffmpeg -i <결과> -i <원본> -lavfi "[0:v]<전처리>,scale=1920:1080:flags=bicubic,setpts=N/24/TB[d];[1:v]setpts=N/24/TB[r];[d][r]libvmaf=model='version=vmaf_v0.6.1\:name=vmaf|version=vmaf_v0.6.1neg\:name=neg|version=vmaf_v0.6.1\:name=phone\:enable_transform=true':feature='name=psnr|name=float_ssim':log_fmt=json:log_path=out.json:n_threads=8" -f null -`. 두 입력을 프레임 번호로 맞췄고(60fps 비교는 `N/60`, 30fps끼리는 `N/30`), PSNR은 밝기 성분입니다. 조화평균은 libvmaf 방식(n ÷ Σ 1/(x+1) − 1), 하위 1%는 화면 점수를 정렬한 뒤 n × 1%번째 값입니다.
 - 선명화: `ffmpeg -i ref10.mkv -vf unsharp=5:5:<0.8|1.5>:5:5:0 -c:v libx264 -preset medium -threads 4 -b:v 1600k -maxrate 1600k -bufsize 3200k out.mp4`, 비교 원본은 선명화하지 않은 `ref10.mkv`입니다. 디코딩 뒤 선명화는 지표 명령의 전처리에 `unsharp=5:5:0.8:5:5:0`을 넣었습니다.
 - 같은 PSNR: 흐림은 지표 명령의 전처리에 `gblur=sigma=<1.0|1.4|1.8|2.0|2.4>`(압축 없음), 블록은 `ffmpeg -i ref10.mkv -c:v libx264 -preset medium -threads 4 -qp <38|42|46> out.mp4`입니다. 그림은 120번째 화면을 `crop=360:360:1060:300`으로 잘라 이어 붙였습니다.
-- 화면별 점수: `ffmpeg -i full.mkv -c:v libx264 -preset veryfast -tune zerolatency -threads 4 -b:v 2500k -maxrate 2500k -bufsize 2500k -g 48 -keyint_min 48 -sc_threshold 0 cbr.mp4`. 장면 전환은 `ffmpeg -i full.mkv -vf "scdet=threshold=8" -f null -`로 찾았습니다.
+- 화면별 점수: `ffmpeg -i full.mkv -c:v libx264 -preset veryfast -tune zerolatency -threads 4 -b:v 2500k -maxrate 2500k -bufsize 2500k -g 48 -keyint_min 48 -sc_threshold 0 cbr.mp4`. 장면 전환은 `ffmpeg -i full.mkv -vf "select='gt(scene,0.3)',showinfo" -f null -`로 찾았습니다.
 - 해상도 · 모델: `-vf scale=<960:540|1280:720|1920:1080>:flags=bicubic`, 비트레이트 1,000 · 1,600 · 1,600kbps(maxrate 같음, bufsize 두 배).
-- 프레임률: `-b:v 6000k -maxrate 6000k -bufsize 12000k`로 60fps와 `-vf fps=30` 30fps를 인코딩했고, 30fps 원본은 `-vf fps=30`으로 솎았으며, 60fps로 늘릴 때는 전처리 `fps=60`(같은 화면 반복)을 썼습니다. 시험 화면은 4.1초 무렵 한 화면이 모든 조건에서 30 안팎으로 낮게 나와 평균에 함께 들어 있습니다.
+- 프레임률: `-b:v 6000k -maxrate 6000k -bufsize 12000k`로 60fps와 `-vf fps=30` 30fps를 인코딩했고, 30fps 원본은 `-vf fps=30`으로 솎았으며, 60fps로 늘릴 때는 전처리 `fps=60`(같은 화면 반복)을 썼습니다. 시험 화면은 4.1초 무렵 한 화면이 모든 조건에서 30 안팎으로 낮게 나와 평균에 함께 들어 있습니다. 화면 반복(`fps=60`) 비교에서는 FFmpeg가 출력 단계에서 「non monotonically increasing dts」 경고를 냈지만 비교한 화면 수는 600개로 맞았습니다.
 
 ## 출처
 
@@ -143,7 +143,6 @@ VMAF는 재생된 화면의 화질만 봅니다. 시청자가 겪는 것은 그 
 - [Apple, HLS Authoring Specification for Apple Devices](https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html) — 7.4, 9.13
 - [hls.js v1.7.4 rendition-helper.ts](https://github.com/video-dev/hls.js/blob/v1.7.4/src/utils/rendition-helper.ts#L183)
 - [ITU-T P.1203 (10/2017)](https://www.itu.int/rec/T-REC-P.1203), Parametric bitstream-based quality assessment of progressive download and adaptive audiovisual streaming services over reliable transport
-- K. Spiteri, R. Urgaonkar, R. K. Sitaraman, [BOLA: Near-Optimal Bitrate Adaptation for Online Videos](https://arxiv.org/abs/1601.06748) · X. Yin, A. Jindal, V. Sekar, B. Sinopoli, [A Control-Theoretic Approach for Dynamic Adaptive Video Streaming over HTTP](https://doi.org/10.1145/2785956.2787486), SIGCOMM 2015 · [ACM 페이지 보관본](https://web.archive.org/web/20250218053425/https://dl.acm.org/doi/10.1145/2785956.2787486) (ACM이 자동 접속을 막음)
 - YouTube 고객센터: [Recommended upload encoding settings](https://support.google.com/youtube/answer/1722171) · [Choose live encoder settings, bitrates, and resolutions](https://support.google.com/youtube/answer/2853702) (2026-11-13 확인)
 - 치지직, [버퍼링 현상 원인 및 대처 방안, 개선 일정 안내](https://game.naver.com/lounge/chzzk/board/detail/4810101) (2024-09-24) · [OBS Studio 33.0.0 services.json](https://github.com/obsproject/obs-studio/blob/33.0.0/plugins/rtmp-services/data/services.json#L2292-L2315)
 - [Sintel](https://durian.blender.org/sharing/) — 시험 영상, © copyright Blender Foundation | durian.blender.org, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)

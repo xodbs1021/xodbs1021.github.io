@@ -1,7 +1,7 @@
 ---
 title: "Kafka는 파티션 로그를 페이지 캐시에서 바로 내보냅니다"
 date: 2026-05-18T10:00:00+09:00
-lastmod: "2026-11-13T16:52:03+09:00"
+lastmod: "2026-11-13T18:09:41+09:00"
 description: "Kafka는 토픽을 파티션마다 끝에 덧붙이는 로그로 저장하고, 따라잡은 소비자에게는 운영체제 페이지 캐시에서 sendfile로 바로 보냅니다. 쓰기가 확정되는 조건(acks · ISR · min.insync.replicas), 묶어 보내기(linger.ms 5 · batch.size 16KB), 컨슈머 그룹과 4.2에서 정식이 된 공유 그룹, 4.0에서 ZooKeeper를 없앤 KRaft를 Apache Kafka 4.4 문서와 브로커 3대 실측으로 정리했습니다."
 categories: ["tech-blurting"]
 tags: ["Kafka", "KRaft", "복제", "ISR", "페이지 캐시", "컨슈머 그룹"]
@@ -42,7 +42,7 @@ ISR(in-sync replicas)은 리더를 따라잡고 있는 복제본 목록입니다
 | `1` | 리더가 자기 로그에 쓴 뒤 | 팔로워가 복제하기 전이면 사라짐 |
 | `all`(`-1`) | ISR 전원이 받은 뒤 | ISR 복제본이 하나라도 살아 있으면 남음 |
 
-`acks=all`이 기본값이 된 것은 3.0.0부터입니다. 같은 판에서 멱등 프로듀서(`enable.idempotence=true`)도 기본이 됐지만, 3.0.0에서는 버그로 실제로 켜지지 않아 3.0.1에서 고쳐졌습니다([3.0 업그레이드 노트](https://kafka.apache.org/30/getting-started/upgrade/), [KIP-679](https://cwiki.apache.org/confluence/display/KAFKA/KIP-679%3A+Producer+will+enable+the+strongest+delivery+guarantee+by+default)). 4.4.0 클라이언트의 기본값도 `acks=all`, `enable.idempotence=true`였습니다.
+`acks=all`이 기본값이 된 것은 3.0.0부터입니다. 같은 판에서 멱등 프로듀서(`enable.idempotence=true`)도 기본이 됐지만, 3.0.0과 3.1.0에서는 버그로 실제로 켜지지 않았고 3.0.1 · 3.1.1 · 3.2.0에서 고쳐졌습니다([3.0 업그레이드 노트](https://kafka.apache.org/30/getting-started/upgrade/), [KIP-679](https://cwiki.apache.org/confluence/display/KAFKA/KIP-679%3A+Producer+will+enable+the+strongest+delivery+guarantee+by+default)). 4.4.0 클라이언트의 기본값도 `acks=all`, `enable.idempotence=true`였습니다.
 
 `acks=all`만으로는 충분하지 않습니다. ISR이 리더 하나로 줄면 「ISR 전원」이 리더 하나뿐이라 `acks=all`도 리더에만 쓰고 응답합니다. 이를 막는 설정이 `min.insync.replicas`입니다. `acks=all`인 쓰기는 ISR이 이 수보다 작으면 거절되고, 브로커 기본값은 1입니다([브로커 설정](https://kafka.apache.org/44/configuration/broker-configs/)). 4.x는 여기에 더해 ISR이 이 수보다 작으면 확정 위치(high watermark)를 올리지 않습니다. 그래서 `acks` 값과 상관없이 그 사이 쓴 기록은 소비자에게 보이지 않습니다([설계 문서](https://kafka.apache.org/44/design/design/), [ELR 문서](https://kafka.apache.org/44/operations/eligible-leader-replicas/)).
 
@@ -70,7 +70,7 @@ Kafka는 받은 기록을 JVM 힙에 모아 두지 않고 바로 파일 시스�
 
 부하가 낮을 때 이 5ms가 그대로 보이는지 쟀습니다. 초당 2,000건(1,000바이트)으로 고정해 보내자 지연 중앙값은 `linger.ms=0`에서 1–4ms, `linger.ms=5`에서 5–7ms였습니다. 청록 막대가 `linger.ms=5`입니다.
 
-{{< chart id="fig-linger-latency" kind="실측" caption="초당 2,000건(1,000바이트)을 20,000건 보냈을 때 프로듀서 지연 중앙값(p50). 막대는 3회의 중앙값, 라벨은 3회 값입니다. linger.ms=5에서 중앙값이 약 4–5ms 늘었고, acks=1과 acks=all의 차이는 회차 사이 흔들림보다 작았습니다. Kafka 4.4.0 브로커 3대, 노트북 한 대의 Docker 안." source="아래 「측정 조건」" height="300px" >}}
+{{< chart id="fig-linger-latency" kind="실측" caption="초당 2,000건(1,000바이트)을 20,000건 보냈을 때 프로듀서 지연 중앙값(p50). 막대는 3회의 중앙값, 라벨은 3회 값입니다. linger.ms=5에서 중앙값이 약 4ms 늘었고, acks=1과 acks=all의 차이는 회차 사이 흔들림보다 작았습니다. Kafka 4.4.0 브로커 3대, 노트북 한 대의 Docker 안." source="아래 「측정 조건」" height="300px" >}}
 {
   "grid": {"left": 8, "right": 96, "top": 16, "bottom": 28, "containLabel": true},
   "xAxis": {"type": "value", "name": "ms", "min": 0, "max": 8, "interval": 2},
@@ -87,7 +87,7 @@ Kafka는 받은 기록을 JVM 힙에 모아 두지 않고 바로 파일 시스�
 }
 {{< /chart >}}
 
-지연이 중요한 낮은 부하의 서비스라면 이 몇 ms가 기본값의 대가입니다. 반대로 최대 처리량(속도 제한 없이 200,000건)은 같은 조건을 반복해도 회차 사이 2–3배 흔들려, 이 환경에서는 `acks`나 `linger.ms`에 따른 처리량 차이를 결론 낼 수 없었습니다. 브로커와 클라이언트가 한 노트북에서 다른 작업과 CPU를 나눠 썼기 때문입니다.
+지연이 중요한 낮은 부하의 서비스라면 이 몇 ms가 기본값의 대가입니다. 반대로 최대 처리량(속도 제한 없이 200,000건)은 조건마다 6회 돌렸는데 같은 조건 안에서도 최대 약 8배 흔들려(acks=1 · linger 0에서 6,782–53,576건/초), 이 환경에서는 `acks`나 `linger.ms`에 따른 처리량 차이를 결론 낼 수 없었습니다. 브로커와 클라이언트가 한 노트북에서 다른 작업과 CPU를 나눠 썼기 때문입니다.
 
 ## 한 파티션은 그룹 안 한 소비자가 읽고, 공유 그룹은 예외입니다
 
@@ -95,11 +95,11 @@ Kafka는 받은 기록을 JVM 힙에 모아 두지 않고 바로 파일 시스�
 
 소비자는 기본으로 리더에서 읽습니다. 2.4부터는 브로커에 `replica.selector.class`를 지정하고 소비자에 `client.rack`을 주면 같은 랙(데이터센터)의 팔로워에서 읽을 수 있습니다([KIP-392](https://cwiki.apache.org/confluence/display/KAFKA/KIP-392%3A+Allow+consumers+to+fetch+from+closest+replica), [KAFKA-8443](https://issues.apache.org/jira/browse/KAFKA-8443)). 기본값은 null이고, 이때는 리더를 고릅니다.
 
-공유 그룹(share group)은 「파티션 하나에 소비자 하나」 규칙을 풀었습니다. 같은 파티션을 여러 소비자가 나눠 읽고, 소비자 수가 파티션 수보다 많아도 됩니다. 기록은 하나씩 확인 응답하고, 소비자가 가져간 기록은 잠금 시간(`share.record.lock.duration.ms`, 기본 30초) 동안 같은 그룹의 다른 소비자에게 가지 않습니다. 잠금이 풀리면 다시 배달하고 배달 횟수를 세므로, 처리할 수 없는 기록을 따로 걸러 낼 수 있습니다([설계 문서 The Share Consumer](https://kafka.apache.org/44/design/design/)). 순서보다 병렬 처리가 중요한 작업 큐에 맞는 방식입니다. 4.1에서 미리 보기로 들어와 4.2에서 정식이 됐습니다([KIP-932](https://cwiki.apache.org/confluence/display/KAFKA/KIP-932%3A+Queues+for+Kafka), [업그레이드 노트](https://kafka.apache.org/44/getting-started/upgrade/)).
+공유 그룹(share group)은 「파티션 하나에 소비자 하나」 규칙을 풀었습니다. 같은 파티션을 여러 소비자가 나눠 읽고, 소비자 수가 파티션 수보다 많아도 됩니다. 기록은 하나씩 확인 응답하고, 소비자가 가져간 기록은 잠금 시간(`share.record.lock.duration.ms`, 기본 30초) 동안 같은 그룹의 다른 소비자에게 가지 않습니다. 잠금이 풀리면 다시 배달하고 배달 횟수를 세므로, 처리할 수 없는 기록을 따로 걸러 낼 수 있습니다([설계 문서 The Share Consumer](https://kafka.apache.org/44/design/design/)). 순서보다 병렬 처리가 중요한 작업 큐에 맞는 방식입니다. 4.0에서 얼리 액세스, 4.1에서 미리 보기로 들어와 4.2에서 정식이 됐습니다([4.0 릴리스 공지](https://kafka.apache.org/blog/2025/03/18/apache-kafka-4.0.0-release-announcement/), [KIP-932](https://cwiki.apache.org/confluence/display/KAFKA/KIP-932%3A+Queues+for+Kafka), [업그레이드 노트](https://kafka.apache.org/44/getting-started/upgrade/)).
 
 ## 4.0부터 메타데이터는 ZooKeeper 없이 KRaft가 맡습니다 {#보완-및-정리}
 
-어느 브로커가 살아 있는지, 파티션의 리더와 ISR이 무엇인지 같은 메타데이터는 예전에는 ZooKeeper에 두었습니다. KRaft는 이 메타데이터를 Kafka의 컨트롤러 노드들이 Raft 합의로 직접 관리하는 방식입니다. 컨트롤러는 보통 3대나 5대를 두고, 과반이 살아 있어야 클러스터가 계속 동작합니다. 3대면 1대, 5대면 2대의 장애를 견딥니다([KRaft 운영 문서](https://kafka.apache.org/44/operations/kraft/)). 위 시험에서 멈춘 팔로워가 ISR에서 빠진 것도 컨트롤러가 하트비트가 끊긴 것을 보고 처리한 일입니다.
+어느 브로커가 살아 있는지, 파티션의 리더와 ISR이 무엇인지 같은 메타데이터는 예전에는 ZooKeeper에 두었습니다. KRaft는 이 메타데이터를 Kafka의 컨트롤러 노드들이 Raft 합의로 직접 관리하는 방식입니다. 컨트롤러는 보통 3대나 5대를 두고, 과반이 살아 있어야 클러스터가 계속 동작합니다. 3대면 1대, 5대면 2대의 장애를 견딥니다([KRaft 운영 문서](https://kafka.apache.org/44/operations/kraft/)). 위 시험에서 팔로워를 ISR에서 뺀 것도 컨트롤러입니다. 거절 시험의 `docker stop`은 정상 종료라 브로커가 컨트롤러에 종료를 알리는 제어 종료(`controlled.shutdown.enable`, 기본 true)로 곧바로 빠졌고, 리더 장애 시험의 `docker pause`는 하트비트가 끊겨 세션 만료(9초) 뒤에 빠졌습니다. `acks=1` 회차는 멈춘 시간이 9초보다 짧아 ISR이 그대로였습니다.
 
 KRaft가 운영에 쓸 만하다고 인정된 첫 판은 3.3입니다(3.3.1 출시 2022-10-03). ZooKeeper 모드는 4.0.0(2025-03-18)에서 지워졌고, 4.x로 올리려면 먼저 3.3 이상에서 KRaft로 옮겨야 합니다([업그레이드 노트](https://kafka.apache.org/44/getting-started/upgrade/), [내려받기 페이지](https://kafka.apache.org/community/downloads/)). 이 글의 문서와 실측은 2026-10-22에 나온 4.4.0 기준입니다.
 
@@ -111,7 +111,7 @@ KRaft가 운영에 쓸 만하다고 인정된 첫 판은 3.3입니다(3.3.1 출�
 - 기종: MacBook Air(Mac17,3, Apple M5, 고성능 4 · 효율 6코어, 32GB, 팬 없음), macOS 27.0.1, Docker 29.8.2. 같은 기계에서 다른 세션의 작업이 함께 돌아 1분 load average가 측정 중 10–95였습니다.
 - 구성: `apache/kafka:4.4.0` 이미지로 KRaft 컨트롤러 전용 노드 1대와 브로커 3대, 클라이언트 컨테이너 1대를 한 Docker 망에 띄웠습니다. 브로커 둘을 멈춰도 메타데이터 정족수가 유지되도록 컨트롤러를 따로 두었습니다(운영 권장은 3대 이상). 모든 노드가 노트북 한 대의 한 가상 머신 안에 있어 망과 디스크가 분리되지 않았으므로, 처리량 · 지연 수치를 다른 환경에 그대로 옮길 수 없습니다.
 - 기본값: `kafka-run-class.sh org.apache.kafka.clients.producer.ProducerConfig`(acks=all, linger.ms=5, batch.size=16384, enable.idempotence=true), `kafka-configs.sh --describe --all --entity-type brokers --entity-name 1`(min.insync.replicas=1, replica.lag.time.max.ms=30000, unclean.leader.election.enable=false, broker.session.timeout.ms=9000, replica.selector.class=null), `kafka-features.sh describe`(eligible.leader.replicas.version=1).
-- 지연: 토픽 `bench`(파티션 6, 복제 3, `min.insync.replicas=2`)에 `kafka-producer-perf-test.sh --topic bench --num-records 20000 --record-size 1000 --throughput 2000 --producer-props acks=<1|all> linger.ms=<0|5>`. 최대 처리량은 같은 명령에 `--num-records 200000 --throughput -1`로 두 차례(각 조건 4회) 돌렸습니다.
+- 지연: 토픽 `bench`(파티션 6, 복제 3, `min.insync.replicas=2`)에 `kafka-producer-perf-test.sh --topic bench --num-records 20000 --record-size 1000 --throughput 2000 --producer-props acks=<1|all> linger.ms=<0|5>`. 최대 처리량은 같은 명령에 `--num-records 200000 --throughput -1`로 부하가 다른 두 차례에 3회씩(조건마다 6회) 돌렸습니다.
 - 거절: 토픽 `nr`(`--replica-assignment 1:2:3`, `min.insync.replicas=2`)에서 `docker stop`으로 브로커 2 · 3을 멈추고 3–5초마다 `kafka-topics.sh --describe`로 ISR을 본 뒤, `request.timeout.ms=5000 delivery.timeout.ms=8000 retries=0`으로 `acks=all`과 `acks=1`을 100건(100바이트)씩 보냈습니다.
 - 리더 장애: 토픽 `loss-1` · `loss-all`(복제 1:2:3, `min.insync.replicas=2`)에 `acks=all`로 1,000건을 먼저 쓰고, `docker pause`로 브로커 2 · 3을 멈춘 채 `acks=1` 또는 `acks=all`로 100건, `docker kill`로 브로커 1 종료, 브로커 2 · 3 재개, 새 리더 확인, 브로커 1 재시작 순서로 진행했습니다. 끝 오프셋은 `kafka-get-offsets.sh`(소비자가 볼 수 있는 확정 위치), 레코드 수는 `kafka-console-consumer.sh --from-beginning --timeout-ms 8000 | wc -l`로 셌습니다.
 

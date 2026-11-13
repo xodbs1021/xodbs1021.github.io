@@ -1,6 +1,5 @@
-# 치지직 공식 공지 원문 확인 (2026-11-13 16:39 KST, AI(Claude Code))
+# 치지직 공식 공지 원문 사본 확인 (2026-11-13 16:39 KST, AI(Claude Code))
 게시 주소: https://game.naver.com/lounge/chzzk/board/detail/4810101
-본문 API(페이지가 불러오는 JSON): https://comm-api.game.naver.com/nng_main/v1/community/lounge/chzzk/feed/4810101
 제목: 버퍼링 현상 원인 및 대처 방안, 개선 일정 안내
 createdDate 20240924160037 updatedDate 20240924160803
 안녕하세요. 치지직입니다.

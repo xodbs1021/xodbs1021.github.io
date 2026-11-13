@@ -1,16 +1,16 @@
-// 콘티: _workspace/blog/buffering-deep-dive/storyboard.md 「BufferDrainStall」
+// 콘티: _workspace/blog/buffering-deep-dive/storyboard.md 「BufferDrainDownswitch」
 // 실측 재구성: _workspace/blog/buffering-deep-dive/measure/vod-mbs0-mbl10.json
 // (hls.js 1.7.4, maxBufferLength 10 · maxBufferSize 0, Chrome 157 CDP 망 흉내 45초 8→1.5Mbps, 75초 1.5→8Mbps)
 // 40–90초 구간을 0.5초 간격으로 뽑아(250ms 표본 중 가장 가까운 값) 50초를 10초로 압축해 그린다(시간 압축 → kind 재구성).
 // 받는 속도가 떨어지면 버퍼(재생 위치 앞 초)가 1.66초까지 줄고, 다음 조각 변형(loadLevel)이 1080p → 720p → 360p로 내려간 뒤 버퍼가 다시 10초 근처로 찬다.
 // 이 시험에서는 멈춤(버퍼 0)이 없었다 — 장면도 멈춤을 그리지 않는다.
-// layout="mobile" 은 1080×1350 휴대폰판(BufferDrainStallMobile) — 그래프 위, 막대 · 변형 아래.
+// layout="mobile" 은 1080×1350 휴대폰판(BufferDrainDownswitchMobile) — 그래프 위, 막대 · 변형 아래.
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { Label, Tag } from "../../components/Timeline";
 import { progress } from "../../lib/motion";
 import { COLOR, FONT, MOBILE_TEXT, TEXT } from "../../theme";
 
-export const BUFFER_DRAIN_STALL_FRAMES = 360;
+export const BUFFER_DRAIN_DOWNSWITCH_FRAMES = 360;
 
 const T0 = 40; // 측정 시각(초) 시작
 const STEP = 0.5; // 표본 간격(초)
@@ -73,7 +73,7 @@ type Props = { readonly layout?: keyof typeof LAYOUTS };
 
 const tAt = (i: number) => T0 + i * STEP;
 
-export const BufferDrainStall: React.FC<Props> = ({ layout = "desktop" }) => {
+export const BufferDrainDownswitch: React.FC<Props> = ({ layout = "desktop" }) => {
   const frame = useCurrentFrame();
   const l = LAYOUTS[layout];
   const { chart } = l;

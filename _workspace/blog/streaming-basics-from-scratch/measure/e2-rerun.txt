@@ -1,0 +1,5 @@
+# x264 6Mbps 출력 재실행 3회 (2026-11-13 18:08 KST, load 4.62 6.17 8.23)
+$ ffmpeg -f lavfi -i testsrc2=size=1920x1080:rate=30 -t 10 -c:v libx264 -preset veryfast -b:v 6M -maxrate 6M -bufsize 12M -g 60 -pix_fmt yuv420p -f mpegts out.ts (3회)
+회차 1: 파일 8049784 바이트, 영상 패킷 7803004 바이트 = 6242.4 kbps
+회차 2: 파일 8008236 바이트, 영상 패킷 7764606 바이트 = 6211.6 kbps
+회차 3: 파일 8024216 바이트, 영상 패킷 7778851 바이트 = 6223.0 kbps
