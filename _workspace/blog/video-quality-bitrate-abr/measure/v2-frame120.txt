@@ -1,0 +1,3 @@
+frame-120 values (same-psnr image source):
+v2-blur2.0.json: psnr_y=36.780, float_ssim=0.992, vmaf=47.782, neg=46.849
+v2-qp38.json: psnr_y=37.974, float_ssim=0.963, vmaf=75.120, neg=72.450
