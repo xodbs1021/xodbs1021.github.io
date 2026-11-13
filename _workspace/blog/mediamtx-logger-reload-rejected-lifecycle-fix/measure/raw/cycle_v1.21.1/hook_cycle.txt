@@ -1,0 +1,5 @@
+level=debug patch_sent=1794572330.072940 patch_code=200 result=saw_new_level end=1794572330.124548
+level=info patch_sent=1794572332.196359 patch_code=200 result=saw_new_level end=1794572332.240206
+level=debug patch_sent=1794572334.327631 patch_code=200 result=saw_new_level end=1794572334.387403
+level=info patch_sent=1794572336.463662 patch_code=200 result=saw_new_level end=1794572336.511108
+level=debug patch_sent=1794572338.630632 patch_code=200 result=saw_new_level end=1794572338.710981

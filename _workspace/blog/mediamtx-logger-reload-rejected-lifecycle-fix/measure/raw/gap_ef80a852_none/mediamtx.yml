@@ -1,0 +1,16 @@
+logLevel: info
+logDestinations: [stdout]
+logStructured: true
+api: true
+apiAddress: 127.0.0.1:19997
+rtsp: true
+rtspTransports: [tcp]
+rtspAddress: :18554
+rtmp: false
+hls: false
+webrtc: false
+srt: false
+moq: false
+paths:
+  test:
+  all_others:

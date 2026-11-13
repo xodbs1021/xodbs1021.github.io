@@ -1,0 +1,269 @@
+{"timestamp":"2026-11-13T21:10:06.329215+09:00","level":"INF","message":"MediaMTX v1.21.1, darwin, arm64"}
+{"timestamp":"2026-11-13T21:10:06.329279+09:00","level":"INF","message":"configuration loaded from <OUT>/logger/gap_v1.21.1_sigint3/mediamtx.yml"}
+{"timestamp":"2026-11-13T21:10:06.329501+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:10:06.329567+09:00","level":"INF","message":"[path test] runOnInit command started"}
+{"timestamp":"2026-11-13T21:10:06.329621+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:10:06.406107+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:62022] opened"}
+{"timestamp":"2026-11-13T21:10:06.406423+09:00","level":"INF","message":"[RTSP] [session 8b407aa4] created by 127.0.0.1:62022"}
+{"timestamp":"2026-11-13T21:10:06.407005+09:00","level":"INF","message":"[path test] stream is available and online, 1 track (H264)"}
+{"timestamp":"2026-11-13T21:10:06.407021+09:00","level":"INF","message":"[RTSP] [session 8b407aa4] is publishing to path 'test'"}
+{"timestamp":"2026-11-13T21:10:06.407497+09:00","level":"INF","message":"[path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones"}
+{"timestamp":"2026-11-13T21:10:07.440471+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:10:07.440554+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:10:07.441831+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:10:07.441896+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:62022] closed: terminated"}
+{"timestamp":"2026-11-13T21:10:07.441932+09:00","level":"INF","message":"[RTSP] [session 8b407aa4] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:10:07.442005+09:00","level":"INF","message":"[path test] runOnInit command stopped"}
+{"timestamp":"2026-11-13T21:10:07.442056+09:00","level":"DEB","message":"[path test] created"}
+{"timestamp":"2026-11-13T21:10:07.442073+09:00","level":"DEB","message":"path manager created"}
+{"timestamp":"2026-11-13T21:10:07.442098+09:00","level":"INF","message":"[path test] runOnInit command started"}
+{"timestamp":"2026-11-13T21:10:07.442172+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:10:07.443721+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:10:07.453749+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62027] [c->s] GET /v3/config/global/get HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nUser-Agent: Python-urllib/3.14\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:07.453962+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62027] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 3271 bytes)"}
+{"timestamp":"2026-11-13T21:10:11.456566+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62170] [c->s] GET /v3/paths/get/test HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nUser-Agent: Python-urllib/3.14\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:11.456624+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62170] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 280 bytes)"}
+{"timestamp":"2026-11-13T21:10:11.484234+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:62171] opened"}
+{"timestamp":"2026-11-13T21:10:11.4843+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62171] [c->s] OPTIONS rtsp://127.0.0.1:18554/test RTSP/1.0\r\nCSeq: 1\r\nUser-Agent: Lavf63.1.102\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:11.484314+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62171] [s->c] RTSP/1.0 200 OK\r\nCSeq: 1\r\nPublic: DESCRIBE, ANNOUNCE, SETUP, PLAY, RECORD, PAUSE, GET_PARAMETER, TEARDOWN\r\nServer: gortsplib\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:11.484525+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62171] [c->s] ANNOUNCE rtsp://127.0.0.1:18554/test RTSP/1.0\r\nCSeq: 2\r\nContent-Length: 303\r\nContent-Type: application/sdp\r\nUser-Agent: Lavf63.1.102\r\n\r\nv=0\r\no=- 0 0 IN IP4 127.0.0.1\r\ns=No Name\r\nc=IN IP4 127.0.0.1\r\nt=0 0\r\na=tool:libavformat 63.1.102\r\nm=video 0 RTP/AVP 96\r\na=framerate:25\r\na=rtpmap:96 H264/90000\r\na=fmtp:96 packetization-mode=1; sprop-parameter-sets=Z0LADdoFB+wEQAAAAwBAAAAMo8UKqA==,aM4PyA==; profile-level-id=42C00D\r\na=control:streamid=0\r\n"}
+{"timestamp":"2026-11-13T21:10:11.484579+09:00","level":"INF","message":"[RTSP] [session 779a9490] created by 127.0.0.1:62171"}
+{"timestamp":"2026-11-13T21:10:11.484639+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62171] [s->c] RTSP/1.0 200 OK\r\nCSeq: 2\r\nServer: gortsplib\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:11.484776+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62171] [c->s] SETUP rtsp://127.0.0.1:18554/test/streamid=0 RTSP/1.0\r\nCSeq: 3\r\nTransport: RTP/AVP/TCP;unicast;interleaved=0-1;mode=record\r\nUser-Agent: Lavf63.1.102\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:11.484816+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62171] [s->c] RTSP/1.0 200 OK\r\nCSeq: 3\r\nServer: gortsplib\r\nSession: c9ec492244c143078209b92d537c30d0;timeout=55\r\nTransport: RTP/AVP/TCP;unicast;interleaved=0-1\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:11.485048+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62171] [c->s] RECORD rtsp://127.0.0.1:18554/test RTSP/1.0\r\nCSeq: 4\r\nRange: npt=0.000-\r\nSession: c9ec492244c143078209b92d537c30d0\r\nUser-Agent: Lavf63.1.102\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:11.485127+09:00","level":"INF","message":"[path test] stream is available and online, 1 track (H264)"}
+{"timestamp":"2026-11-13T21:10:11.485158+09:00","level":"INF","message":"[RTSP] [session 779a9490] is publishing to path 'test'"}
+{"timestamp":"2026-11-13T21:10:11.485173+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62171] [s->c] RTSP/1.0 200 OK\r\nCSeq: 4\r\nServer: gortsplib\r\nSession: c9ec492244c143078209b92d537c30d0;timeout=55\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:11.485766+09:00","level":"INF","message":"[path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones"}
+{"timestamp":"2026-11-13T21:10:11.512184+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62172] [c->s] GET /v3/paths/get/test HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nUser-Agent: Python-urllib/3.14\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:11.512258+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62172] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 533 bytes)"}
+{"timestamp":"2026-11-13T21:10:12.514092+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62173] [c->s] PATCH /v3/config/global/patch HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nContent-Length: 20\r\nContent-Type: application/json\r\nUser-Agent: Python-urllib/3.14\r\n\r\n{\"logLevel\": \"info\"}"}
+{"timestamp":"2026-11-13T21:10:12.514326+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:10:12.514347+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:10:12.514369+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62173] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 15 bytes)"}
+{"timestamp":"2026-11-13T21:10:12.515538+09:00","level":"DEB","message":"[API] closed"}
+{"timestamp":"2026-11-13T21:10:12.515544+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:10:12.515582+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:62171] closed: terminated"}
+{"timestamp":"2026-11-13T21:10:12.515604+09:00","level":"INF","message":"[RTSP] [session 779a9490] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:10:12.515611+09:00","level":"DEB","message":"[RTSP] closed"}
+{"timestamp":"2026-11-13T21:10:12.515613+09:00","level":"DEB","message":"path manager is shutting down"}
+{"timestamp":"2026-11-13T21:10:12.515626+09:00","level":"INF","message":"[path test] runOnInit command stopped"}
+{"timestamp":"2026-11-13T21:10:12.515629+09:00","level":"DEB","message":"[path test] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:10:12.516275+09:00","level":"INF","message":"[path test] runOnInit command started"}
+{"timestamp":"2026-11-13T21:10:12.516291+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:10:12.516354+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:10:16.554943+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:62200] opened"}
+{"timestamp":"2026-11-13T21:10:16.555234+09:00","level":"INF","message":"[RTSP] [session bdef99d1] created by 127.0.0.1:62200"}
+{"timestamp":"2026-11-13T21:10:16.555602+09:00","level":"INF","message":"[path test] stream is available and online, 1 track (H264)"}
+{"timestamp":"2026-11-13T21:10:16.555617+09:00","level":"INF","message":"[RTSP] [session bdef99d1] is publishing to path 'test'"}
+{"timestamp":"2026-11-13T21:10:16.556045+09:00","level":"INF","message":"[path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones"}
+{"timestamp":"2026-11-13T21:10:17.588425+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:10:17.588458+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:10:17.589573+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:10:17.589605+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:62200] closed: terminated"}
+{"timestamp":"2026-11-13T21:10:17.589632+09:00","level":"INF","message":"[RTSP] [session bdef99d1] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:10:17.589641+09:00","level":"INF","message":"[path test] runOnInit command stopped"}
+{"timestamp":"2026-11-13T21:10:17.589679+09:00","level":"DEB","message":"[path test] created"}
+{"timestamp":"2026-11-13T21:10:17.589714+09:00","level":"DEB","message":"path manager created"}
+{"timestamp":"2026-11-13T21:10:17.58974+09:00","level":"INF","message":"[path test] runOnInit command started"}
+{"timestamp":"2026-11-13T21:10:17.589821+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:10:17.590701+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:10:17.601672+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62209] [c->s] GET /v3/config/global/get HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nUser-Agent: Python-urllib/3.14\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:17.60183+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62209] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 3271 bytes)"}
+{"timestamp":"2026-11-13T21:10:21.608685+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62239] [c->s] GET /v3/paths/get/test HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nUser-Agent: Python-urllib/3.14\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:21.60876+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62239] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 280 bytes)"}
+{"timestamp":"2026-11-13T21:10:21.641483+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:62240] opened"}
+{"timestamp":"2026-11-13T21:10:21.641555+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62240] [c->s] OPTIONS rtsp://127.0.0.1:18554/test RTSP/1.0\r\nCSeq: 1\r\nUser-Agent: Lavf63.1.102\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:21.641566+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62240] [s->c] RTSP/1.0 200 OK\r\nCSeq: 1\r\nPublic: DESCRIBE, ANNOUNCE, SETUP, PLAY, RECORD, PAUSE, GET_PARAMETER, TEARDOWN\r\nServer: gortsplib\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:21.641881+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62240] [c->s] ANNOUNCE rtsp://127.0.0.1:18554/test RTSP/1.0\r\nCSeq: 2\r\nContent-Length: 303\r\nContent-Type: application/sdp\r\nUser-Agent: Lavf63.1.102\r\n\r\nv=0\r\no=- 0 0 IN IP4 127.0.0.1\r\ns=No Name\r\nc=IN IP4 127.0.0.1\r\nt=0 0\r\na=tool:libavformat 63.1.102\r\nm=video 0 RTP/AVP 96\r\na=framerate:25\r\na=rtpmap:96 H264/90000\r\na=fmtp:96 packetization-mode=1; sprop-parameter-sets=Z0LADdoFB+wEQAAAAwBAAAAMo8UKqA==,aM4PyA==; profile-level-id=42C00D\r\na=control:streamid=0\r\n"}
+{"timestamp":"2026-11-13T21:10:21.641946+09:00","level":"INF","message":"[RTSP] [session 9d7533b0] created by 127.0.0.1:62240"}
+{"timestamp":"2026-11-13T21:10:21.642003+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62240] [s->c] RTSP/1.0 200 OK\r\nCSeq: 2\r\nServer: gortsplib\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:21.642146+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62240] [c->s] SETUP rtsp://127.0.0.1:18554/test/streamid=0 RTSP/1.0\r\nCSeq: 3\r\nTransport: RTP/AVP/TCP;unicast;interleaved=0-1;mode=record\r\nUser-Agent: Lavf63.1.102\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:21.642167+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62240] [s->c] RTSP/1.0 200 OK\r\nCSeq: 3\r\nServer: gortsplib\r\nSession: e92bafbae8c64856b388c4be5c19b216;timeout=55\r\nTransport: RTP/AVP/TCP;unicast;interleaved=0-1\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:21.642399+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62240] [c->s] RECORD rtsp://127.0.0.1:18554/test RTSP/1.0\r\nCSeq: 4\r\nRange: npt=0.000-\r\nSession: e92bafbae8c64856b388c4be5c19b216\r\nUser-Agent: Lavf63.1.102\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:21.642438+09:00","level":"INF","message":"[path test] stream is available and online, 1 track (H264)"}
+{"timestamp":"2026-11-13T21:10:21.642448+09:00","level":"INF","message":"[RTSP] [session 9d7533b0] is publishing to path 'test'"}
+{"timestamp":"2026-11-13T21:10:21.642458+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62240] [s->c] RTSP/1.0 200 OK\r\nCSeq: 4\r\nServer: gortsplib\r\nSession: e92bafbae8c64856b388c4be5c19b216;timeout=55\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:21.642947+09:00","level":"INF","message":"[path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones"}
+{"timestamp":"2026-11-13T21:10:21.663866+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62241] [c->s] GET /v3/paths/get/test HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nUser-Agent: Python-urllib/3.14\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:21.663939+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62241] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 532 bytes)"}
+{"timestamp":"2026-11-13T21:10:22.669521+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62242] [c->s] PATCH /v3/config/global/patch HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nContent-Length: 20\r\nContent-Type: application/json\r\nUser-Agent: Python-urllib/3.14\r\n\r\n{\"logLevel\": \"info\"}"}
+{"timestamp":"2026-11-13T21:10:22.669744+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:10:22.669761+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:10:22.669775+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62242] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 15 bytes)"}
+{"timestamp":"2026-11-13T21:10:22.670965+09:00","level":"DEB","message":"[API] closed"}
+{"timestamp":"2026-11-13T21:10:22.670972+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:10:22.671004+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:62240] closed: terminated"}
+{"timestamp":"2026-11-13T21:10:22.671032+09:00","level":"INF","message":"[RTSP] [session 9d7533b0] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:10:22.671041+09:00","level":"DEB","message":"[RTSP] closed"}
+{"timestamp":"2026-11-13T21:10:22.671045+09:00","level":"DEB","message":"path manager is shutting down"}
+{"timestamp":"2026-11-13T21:10:22.671059+09:00","level":"INF","message":"[path test] runOnInit command stopped"}
+{"timestamp":"2026-11-13T21:10:22.671062+09:00","level":"DEB","message":"[path test] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:10:22.671115+09:00","level":"INF","message":"[path test] runOnInit command started"}
+{"timestamp":"2026-11-13T21:10:22.671163+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:10:22.671213+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:10:26.716588+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:62256] opened"}
+{"timestamp":"2026-11-13T21:10:26.716878+09:00","level":"INF","message":"[RTSP] [session 9235b1d2] created by 127.0.0.1:62256"}
+{"timestamp":"2026-11-13T21:10:26.717269+09:00","level":"INF","message":"[path test] stream is available and online, 1 track (H264)"}
+{"timestamp":"2026-11-13T21:10:26.717286+09:00","level":"INF","message":"[RTSP] [session 9235b1d2] is publishing to path 'test'"}
+{"timestamp":"2026-11-13T21:10:26.71781+09:00","level":"INF","message":"[path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones"}
+{"timestamp":"2026-11-13T21:10:27.743538+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:10:27.743576+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:10:27.744859+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:10:27.744936+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:62256] closed: terminated"}
+{"timestamp":"2026-11-13T21:10:27.744974+09:00","level":"INF","message":"[RTSP] [session 9235b1d2] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:10:27.744993+09:00","level":"INF","message":"[path test] runOnInit command stopped"}
+{"timestamp":"2026-11-13T21:10:27.745027+09:00","level":"DEB","message":"[path test] created"}
+{"timestamp":"2026-11-13T21:10:27.745074+09:00","level":"DEB","message":"path manager created"}
+{"timestamp":"2026-11-13T21:10:27.74511+09:00","level":"INF","message":"[path test] runOnInit command started"}
+{"timestamp":"2026-11-13T21:10:27.745183+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:10:27.745256+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:10:27.755108+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62266] [c->s] GET /v3/config/global/get HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nUser-Agent: Python-urllib/3.14\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:27.755351+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62266] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 3271 bytes)"}
+{"timestamp":"2026-11-13T21:10:31.762533+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62311] [c->s] GET /v3/paths/get/test HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nUser-Agent: Python-urllib/3.14\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:31.762622+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62311] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 280 bytes)"}
+{"timestamp":"2026-11-13T21:10:31.790364+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:62312] opened"}
+{"timestamp":"2026-11-13T21:10:31.790424+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62312] [c->s] OPTIONS rtsp://127.0.0.1:18554/test RTSP/1.0\r\nCSeq: 1\r\nUser-Agent: Lavf63.1.102\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:31.790434+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62312] [s->c] RTSP/1.0 200 OK\r\nCSeq: 1\r\nPublic: DESCRIBE, ANNOUNCE, SETUP, PLAY, RECORD, PAUSE, GET_PARAMETER, TEARDOWN\r\nServer: gortsplib\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:31.790638+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62312] [c->s] ANNOUNCE rtsp://127.0.0.1:18554/test RTSP/1.0\r\nCSeq: 2\r\nContent-Length: 303\r\nContent-Type: application/sdp\r\nUser-Agent: Lavf63.1.102\r\n\r\nv=0\r\no=- 0 0 IN IP4 127.0.0.1\r\ns=No Name\r\nc=IN IP4 127.0.0.1\r\nt=0 0\r\na=tool:libavformat 63.1.102\r\nm=video 0 RTP/AVP 96\r\na=framerate:25\r\na=rtpmap:96 H264/90000\r\na=fmtp:96 packetization-mode=1; sprop-parameter-sets=Z0LADdoFB+wEQAAAAwBAAAAMo8UKqA==,aM4PyA==; profile-level-id=42C00D\r\na=control:streamid=0\r\n"}
+{"timestamp":"2026-11-13T21:10:31.790695+09:00","level":"INF","message":"[RTSP] [session a48f1498] created by 127.0.0.1:62312"}
+{"timestamp":"2026-11-13T21:10:31.79074+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62312] [s->c] RTSP/1.0 200 OK\r\nCSeq: 2\r\nServer: gortsplib\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:31.790841+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62312] [c->s] SETUP rtsp://127.0.0.1:18554/test/streamid=0 RTSP/1.0\r\nCSeq: 3\r\nTransport: RTP/AVP/TCP;unicast;interleaved=0-1;mode=record\r\nUser-Agent: Lavf63.1.102\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:31.790858+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62312] [s->c] RTSP/1.0 200 OK\r\nCSeq: 3\r\nServer: gortsplib\r\nSession: 86d67368e3cb4097b3fe68c2cb405607;timeout=55\r\nTransport: RTP/AVP/TCP;unicast;interleaved=0-1\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:31.791039+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62312] [c->s] RECORD rtsp://127.0.0.1:18554/test RTSP/1.0\r\nCSeq: 4\r\nRange: npt=0.000-\r\nSession: 86d67368e3cb4097b3fe68c2cb405607\r\nUser-Agent: Lavf63.1.102\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:31.791083+09:00","level":"INF","message":"[path test] stream is available and online, 1 track (H264)"}
+{"timestamp":"2026-11-13T21:10:31.791092+09:00","level":"INF","message":"[RTSP] [session a48f1498] is publishing to path 'test'"}
+{"timestamp":"2026-11-13T21:10:31.791103+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62312] [s->c] RTSP/1.0 200 OK\r\nCSeq: 4\r\nServer: gortsplib\r\nSession: 86d67368e3cb4097b3fe68c2cb405607;timeout=55\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:31.791515+09:00","level":"INF","message":"[path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones"}
+{"timestamp":"2026-11-13T21:10:31.813989+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62313] [c->s] GET /v3/paths/get/test HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nUser-Agent: Python-urllib/3.14\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:31.814065+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62313] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 534 bytes)"}
+{"timestamp":"2026-11-13T21:10:32.816953+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62315] [c->s] PATCH /v3/config/global/patch HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nContent-Length: 20\r\nContent-Type: application/json\r\nUser-Agent: Python-urllib/3.14\r\n\r\n{\"logLevel\": \"info\"}"}
+{"timestamp":"2026-11-13T21:10:32.817218+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:10:32.817239+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:10:32.81729+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62315] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 15 bytes)"}
+{"timestamp":"2026-11-13T21:10:32.818496+09:00","level":"DEB","message":"[API] closed"}
+{"timestamp":"2026-11-13T21:10:32.818522+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:10:32.818567+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:62312] closed: terminated"}
+{"timestamp":"2026-11-13T21:10:32.818619+09:00","level":"INF","message":"[RTSP] [session a48f1498] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:10:32.818638+09:00","level":"DEB","message":"[RTSP] closed"}
+{"timestamp":"2026-11-13T21:10:32.818704+09:00","level":"DEB","message":"path manager is shutting down"}
+{"timestamp":"2026-11-13T21:10:32.818745+09:00","level":"INF","message":"[path test] runOnInit command stopped"}
+{"timestamp":"2026-11-13T21:10:32.818824+09:00","level":"DEB","message":"[path test] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:10:32.818929+09:00","level":"INF","message":"[path test] runOnInit command started"}
+{"timestamp":"2026-11-13T21:10:32.819007+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:10:32.819084+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:10:37.510799+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:62351] opened"}
+{"timestamp":"2026-11-13T21:10:37.512214+09:00","level":"INF","message":"[RTSP] [session 1c77ae54] created by 127.0.0.1:62351"}
+{"timestamp":"2026-11-13T21:10:37.515025+09:00","level":"INF","message":"[path test] stream is available and online, 1 track (H264)"}
+{"timestamp":"2026-11-13T21:10:37.515071+09:00","level":"INF","message":"[RTSP] [session 1c77ae54] is publishing to path 'test'"}
+{"timestamp":"2026-11-13T21:10:37.520448+09:00","level":"INF","message":"[path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones"}
+{"timestamp":"2026-11-13T21:10:38.551112+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:10:38.551161+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:10:38.552433+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:10:38.552504+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:62351] closed: terminated"}
+{"timestamp":"2026-11-13T21:10:38.552561+09:00","level":"INF","message":"[RTSP] [session 1c77ae54] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:10:38.5526+09:00","level":"INF","message":"[path test] runOnInit command stopped"}
+{"timestamp":"2026-11-13T21:10:38.552631+09:00","level":"DEB","message":"[path test] created"}
+{"timestamp":"2026-11-13T21:10:38.552663+09:00","level":"DEB","message":"path manager created"}
+{"timestamp":"2026-11-13T21:10:38.552754+09:00","level":"INF","message":"[path test] runOnInit command started"}
+{"timestamp":"2026-11-13T21:10:38.552811+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:10:38.552875+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:10:38.564428+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62434] [c->s] GET /v3/config/global/get HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nUser-Agent: Python-urllib/3.14\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:38.564655+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62434] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 3271 bytes)"}
+{"timestamp":"2026-11-13T21:10:42.570396+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62499] [c->s] GET /v3/paths/get/test HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nUser-Agent: Python-urllib/3.14\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:42.5705+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62499] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 280 bytes)"}
+{"timestamp":"2026-11-13T21:10:42.603309+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:62500] opened"}
+{"timestamp":"2026-11-13T21:10:42.603423+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62500] [c->s] OPTIONS rtsp://127.0.0.1:18554/test RTSP/1.0\r\nCSeq: 1\r\nUser-Agent: Lavf63.1.102\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:42.603442+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62500] [s->c] RTSP/1.0 200 OK\r\nCSeq: 1\r\nPublic: DESCRIBE, ANNOUNCE, SETUP, PLAY, RECORD, PAUSE, GET_PARAMETER, TEARDOWN\r\nServer: gortsplib\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:42.603691+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62500] [c->s] ANNOUNCE rtsp://127.0.0.1:18554/test RTSP/1.0\r\nCSeq: 2\r\nContent-Length: 303\r\nContent-Type: application/sdp\r\nUser-Agent: Lavf63.1.102\r\n\r\nv=0\r\no=- 0 0 IN IP4 127.0.0.1\r\ns=No Name\r\nc=IN IP4 127.0.0.1\r\nt=0 0\r\na=tool:libavformat 63.1.102\r\nm=video 0 RTP/AVP 96\r\na=framerate:25\r\na=rtpmap:96 H264/90000\r\na=fmtp:96 packetization-mode=1; sprop-parameter-sets=Z0LADdoFB+wEQAAAAwBAAAAMo8UKqA==,aM4PyA==; profile-level-id=42C00D\r\na=control:streamid=0\r\n"}
+{"timestamp":"2026-11-13T21:10:42.603783+09:00","level":"INF","message":"[RTSP] [session 359ca3f7] created by 127.0.0.1:62500"}
+{"timestamp":"2026-11-13T21:10:42.603845+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62500] [s->c] RTSP/1.0 200 OK\r\nCSeq: 2\r\nServer: gortsplib\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:42.60405+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62500] [c->s] SETUP rtsp://127.0.0.1:18554/test/streamid=0 RTSP/1.0\r\nCSeq: 3\r\nTransport: RTP/AVP/TCP;unicast;interleaved=0-1;mode=record\r\nUser-Agent: Lavf63.1.102\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:42.604122+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62500] [s->c] RTSP/1.0 200 OK\r\nCSeq: 3\r\nServer: gortsplib\r\nSession: ee6c98374e3c46a180c4cc7a00f790c2;timeout=55\r\nTransport: RTP/AVP/TCP;unicast;interleaved=0-1\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:42.604372+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62500] [c->s] RECORD rtsp://127.0.0.1:18554/test RTSP/1.0\r\nCSeq: 4\r\nRange: npt=0.000-\r\nSession: ee6c98374e3c46a180c4cc7a00f790c2\r\nUser-Agent: Lavf63.1.102\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:42.604436+09:00","level":"INF","message":"[path test] stream is available and online, 1 track (H264)"}
+{"timestamp":"2026-11-13T21:10:42.604449+09:00","level":"INF","message":"[RTSP] [session 359ca3f7] is publishing to path 'test'"}
+{"timestamp":"2026-11-13T21:10:42.604465+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62500] [s->c] RTSP/1.0 200 OK\r\nCSeq: 4\r\nServer: gortsplib\r\nSession: ee6c98374e3c46a180c4cc7a00f790c2;timeout=55\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:42.605054+09:00","level":"INF","message":"[path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones"}
+{"timestamp":"2026-11-13T21:10:42.623104+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62501] [c->s] GET /v3/paths/get/test HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nUser-Agent: Python-urllib/3.14\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:42.623246+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62501] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 534 bytes)"}
+{"timestamp":"2026-11-13T21:10:43.628753+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62502] [c->s] PATCH /v3/config/global/patch HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nContent-Length: 20\r\nContent-Type: application/json\r\nUser-Agent: Python-urllib/3.14\r\n\r\n{\"logLevel\": \"info\"}"}
+{"timestamp":"2026-11-13T21:10:43.629455+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:10:43.629507+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:10:43.629561+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62502] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 15 bytes)"}
+{"timestamp":"2026-11-13T21:10:43.630945+09:00","level":"DEB","message":"[API] closed"}
+{"timestamp":"2026-11-13T21:10:43.630993+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:10:43.631077+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:62500] closed: terminated"}
+{"timestamp":"2026-11-13T21:10:43.631138+09:00","level":"INF","message":"[RTSP] [session 359ca3f7] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:10:43.631172+09:00","level":"DEB","message":"[RTSP] closed"}
+{"timestamp":"2026-11-13T21:10:43.631191+09:00","level":"DEB","message":"path manager is shutting down"}
+{"timestamp":"2026-11-13T21:10:43.631224+09:00","level":"INF","message":"[path test] runOnInit command stopped"}
+{"timestamp":"2026-11-13T21:10:43.631234+09:00","level":"DEB","message":"[path test] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:10:43.631315+09:00","level":"INF","message":"[path test] runOnInit command started"}
+{"timestamp":"2026-11-13T21:10:43.631553+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:10:43.632558+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:10:47.675667+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:62510] opened"}
+{"timestamp":"2026-11-13T21:10:47.676009+09:00","level":"INF","message":"[RTSP] [session 817cdf4d] created by 127.0.0.1:62510"}
+{"timestamp":"2026-11-13T21:10:47.676409+09:00","level":"INF","message":"[path test] stream is available and online, 1 track (H264)"}
+{"timestamp":"2026-11-13T21:10:47.676419+09:00","level":"INF","message":"[RTSP] [session 817cdf4d] is publishing to path 'test'"}
+{"timestamp":"2026-11-13T21:10:47.676859+09:00","level":"INF","message":"[path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones"}
+{"timestamp":"2026-11-13T21:10:48.706457+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:10:48.706523+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:10:48.707773+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:10:48.707842+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:62510] closed: terminated"}
+{"timestamp":"2026-11-13T21:10:48.707873+09:00","level":"INF","message":"[RTSP] [session 817cdf4d] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:10:48.707884+09:00","level":"INF","message":"[path test] runOnInit command stopped"}
+{"timestamp":"2026-11-13T21:10:48.707906+09:00","level":"DEB","message":"[path test] created"}
+{"timestamp":"2026-11-13T21:10:48.707925+09:00","level":"DEB","message":"path manager created"}
+{"timestamp":"2026-11-13T21:10:48.708013+09:00","level":"INF","message":"[path test] runOnInit command started"}
+{"timestamp":"2026-11-13T21:10:48.708087+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:10:48.708258+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:10:48.71923+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62514] [c->s] GET /v3/config/global/get HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nUser-Agent: Python-urllib/3.14\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:48.719544+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62514] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 3271 bytes)"}
+{"timestamp":"2026-11-13T21:10:52.808181+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62584] [c->s] GET /v3/paths/get/test HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nUser-Agent: Python-urllib/3.14\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:52.814686+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62584] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 280 bytes)"}
+{"timestamp":"2026-11-13T21:10:52.872807+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62585] [c->s] GET /v3/paths/get/test HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nUser-Agent: Python-urllib/3.14\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:52.873008+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62585] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 280 bytes)"}
+{"timestamp":"2026-11-13T21:10:52.880782+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:62586] opened"}
+{"timestamp":"2026-11-13T21:10:52.880933+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62586] [c->s] OPTIONS rtsp://127.0.0.1:18554/test RTSP/1.0\r\nCSeq: 1\r\nUser-Agent: Lavf63.1.102\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:52.880964+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62586] [s->c] RTSP/1.0 200 OK\r\nCSeq: 1\r\nPublic: DESCRIBE, ANNOUNCE, SETUP, PLAY, RECORD, PAUSE, GET_PARAMETER, TEARDOWN\r\nServer: gortsplib\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:52.881437+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62586] [c->s] ANNOUNCE rtsp://127.0.0.1:18554/test RTSP/1.0\r\nCSeq: 2\r\nContent-Length: 303\r\nContent-Type: application/sdp\r\nUser-Agent: Lavf63.1.102\r\n\r\nv=0\r\no=- 0 0 IN IP4 127.0.0.1\r\ns=No Name\r\nc=IN IP4 127.0.0.1\r\nt=0 0\r\na=tool:libavformat 63.1.102\r\nm=video 0 RTP/AVP 96\r\na=framerate:25\r\na=rtpmap:96 H264/90000\r\na=fmtp:96 packetization-mode=1; sprop-parameter-sets=Z0LADdoFB+wEQAAAAwBAAAAMo8UKqA==,aM4PyA==; profile-level-id=42C00D\r\na=control:streamid=0\r\n"}
+{"timestamp":"2026-11-13T21:10:52.881572+09:00","level":"INF","message":"[RTSP] [session c946adf4] created by 127.0.0.1:62586"}
+{"timestamp":"2026-11-13T21:10:52.881764+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62586] [s->c] RTSP/1.0 200 OK\r\nCSeq: 2\r\nServer: gortsplib\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:52.882035+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62586] [c->s] SETUP rtsp://127.0.0.1:18554/test/streamid=0 RTSP/1.0\r\nCSeq: 3\r\nTransport: RTP/AVP/TCP;unicast;interleaved=0-1;mode=record\r\nUser-Agent: Lavf63.1.102\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:52.882125+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62586] [s->c] RTSP/1.0 200 OK\r\nCSeq: 3\r\nServer: gortsplib\r\nSession: cb8fb66452d84a79be9aff19cf0277f9;timeout=55\r\nTransport: RTP/AVP/TCP;unicast;interleaved=0-1\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:52.882514+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62586] [c->s] RECORD rtsp://127.0.0.1:18554/test RTSP/1.0\r\nCSeq: 4\r\nRange: npt=0.000-\r\nSession: cb8fb66452d84a79be9aff19cf0277f9\r\nUser-Agent: Lavf63.1.102\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:52.882685+09:00","level":"INF","message":"[path test] stream is available and online, 1 track (H264)"}
+{"timestamp":"2026-11-13T21:10:52.882706+09:00","level":"INF","message":"[RTSP] [session c946adf4] is publishing to path 'test'"}
+{"timestamp":"2026-11-13T21:10:52.882782+09:00","level":"DEB","message":"[RTSP] [conn 127.0.0.1:62586] [s->c] RTSP/1.0 200 OK\r\nCSeq: 4\r\nServer: gortsplib\r\nSession: cb8fb66452d84a79be9aff19cf0277f9;timeout=55\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:52.884536+09:00","level":"INF","message":"[path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones"}
+{"timestamp":"2026-11-13T21:10:52.973383+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62587] [c->s] GET /v3/paths/get/test HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nUser-Agent: Python-urllib/3.14\r\n\r\n"}
+{"timestamp":"2026-11-13T21:10:52.973539+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62587] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 534 bytes)"}
+{"timestamp":"2026-11-13T21:10:53.979301+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62588] [c->s] PATCH /v3/config/global/patch HTTP/1.1\r\nHost: 127.0.0.1:19997\r\nAccept-Encoding: identity\r\nConnection: close\r\nContent-Length: 20\r\nContent-Type: application/json\r\nUser-Agent: Python-urllib/3.14\r\n\r\n{\"logLevel\": \"info\"}"}
+{"timestamp":"2026-11-13T21:10:53.981022+09:00","level":"INF","message":"reloading configuration (API request)"}
+{"timestamp":"2026-11-13T21:10:53.981723+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:10:53.981811+09:00","level":"DEB","message":"[API] [conn 127.0.0.1:62588] [s->c] HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\r\nServer: mediamtx\r\n\n(body of 15 bytes)"}
+{"timestamp":"2026-11-13T21:10:53.982974+09:00","level":"DEB","message":"[API] closed"}
+{"timestamp":"2026-11-13T21:10:53.983067+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:10:53.983212+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:62586] closed: terminated"}
+{"timestamp":"2026-11-13T21:10:53.983462+09:00","level":"INF","message":"[RTSP] [session c946adf4] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:10:53.983511+09:00","level":"DEB","message":"[RTSP] closed"}
+{"timestamp":"2026-11-13T21:10:53.983518+09:00","level":"DEB","message":"path manager is shutting down"}
+{"timestamp":"2026-11-13T21:10:53.983532+09:00","level":"INF","message":"[path test] runOnInit command stopped"}
+{"timestamp":"2026-11-13T21:10:53.983538+09:00","level":"DEB","message":"[path test] destroyed: terminated"}
+{"timestamp":"2026-11-13T21:10:53.983951+09:00","level":"INF","message":"[RTSP] started with listeners on :18554 (TCP/RTSP)"}
+{"timestamp":"2026-11-13T21:10:53.984041+09:00","level":"INF","message":"[path test] runOnInit command started"}
+{"timestamp":"2026-11-13T21:10:53.98408+09:00","level":"INF","message":"[API] started with listener on 127.0.0.1:19997 (TCP/HTTP)"}
+{"timestamp":"2026-11-13T21:10:58.088616+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:62596] opened"}
+{"timestamp":"2026-11-13T21:10:58.089291+09:00","level":"INF","message":"[RTSP] [session 645a9563] created by 127.0.0.1:62596"}
+{"timestamp":"2026-11-13T21:10:58.090348+09:00","level":"INF","message":"[path test] stream is available and online, 1 track (H264)"}
+{"timestamp":"2026-11-13T21:10:58.090378+09:00","level":"INF","message":"[RTSP] [session 645a9563] is publishing to path 'test'"}
+{"timestamp":"2026-11-13T21:10:58.091264+09:00","level":"INF","message":"[path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones"}
+{"timestamp":"2026-11-13T21:10:59.145514+09:00","level":"INF","message":"[RTSP] [session 645a9563] destroyed: torn down by 127.0.0.1:62596"}
+{"timestamp":"2026-11-13T21:10:59.145563+09:00","level":"INF","message":"[RTSP] [conn 127.0.0.1:62596] closed: EOF"}
+{"timestamp":"2026-11-13T21:10:59.15488+09:00","level":"INF","message":"shutting down gracefully"}
+{"timestamp":"2026-11-13T21:10:59.154987+09:00","level":"INF","message":"[API] closing"}
+{"timestamp":"2026-11-13T21:10:59.155043+09:00","level":"INF","message":"[RTSP] closing"}
+{"timestamp":"2026-11-13T21:10:59.155092+09:00","level":"INF","message":"[path test] runOnInit command stopped"}
+{"timestamp":"2026-11-13T21:10:59.155101+09:00","level":"INF","message":"waiting for running hooks"}

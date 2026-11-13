@@ -1,0 +1,17 @@
+logLevel: info
+logDestinations: [stdout]
+logStructured: true
+api: true
+apiAddress: 127.0.0.1:19997
+rtsp: true
+rtspTransports: [tcp]
+rtspAddress: :18554
+rtmp: false
+hls: false
+webrtc: false
+srt: false
+moq: false
+runOnDisconnect: sh <OUT>/logger/cycle_v1.21.1/hook_cycle.sh <OUT>/logger/cycle_v1.21.1
+paths:
+  test:
+  all_others:
