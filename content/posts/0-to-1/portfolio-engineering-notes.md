@@ -14,7 +14,7 @@
   "description": "공통 DB 인증, nginx 요청 검증, DVR 발행과 복구, MediaMTX 기여를 만든 판단과 검증을 연결한 기술 글 모음.",
   "draft": false,
   "portfolio_edition": "2026-10-15-v2",
-  "lastmod": "2026-11-12T02:20:00+09:00"
+  "lastmod": "2026-11-13T22:40:00+09:00"
 }
 
 방송 파일을 만들었고 요청도 성공했는데, 브라우저가 인식한 재생 구간은 목록보다 **61.94초 짧았습니다.** 오류 수는 0이었습니다. 이 차이를 추적하며 성공 응답 다음에 무엇을 확인해야 하는지 배웠습니다. 파일의 시간축과 브라우저가 받아들인 구간을 대조해야 사용자가 놓친 장면을 찾을 수 있었습니다.
@@ -27,7 +27,7 @@
 
 - [DB 비밀번호 대신 연결마다 RDS IAM 토큰을 만들었습니다](/posts/0-to-1/pokeclip-shared-db-auth-iam-tls/): 연결마다 만드는 IAM 토큰, verify-full, 공식 15분과 다른 실측 약 20분(1회). (11월 7일 새로 씀) 로그인 뒤 권한과 함수 가로채기는 [공유 DB에선 로그인 뒤 권한과 함수 가로채기를 막았습니다](/posts/0-to-1/pokeclip-shared-db-login-privileges/)로 나눴습니다(11월 12일).
 - [워크트리를 나눠도 섞이던 하네스 검사 상태를 세션별로 나눴습니다](/posts/0-to-1/harness-session-isolation-worktree-root/): 세션별 상태 폴더, 첫 훅에서 고정한 작업 루트, 커밋 가드 회귀, 변이 32개 중 31개 검출. (11월 12일 새로 씀)
-- [시작되지 않은 watcher의 종료를 기다리던 교착](/posts/open-source-analysis/mediamtx-certloader-no-watcher-shutdown/): MediaMTX #6427의 원인, 최소 수정과 재현 조건.
+- [인증서를 저장하지 못한 MediaMTX는 종료되지 않았습니다](/posts/open-source-analysis/mediamtx-certloader-no-watcher-shutdown/): MediaMTX #6427의 원인, 최소 수정과 재현 조건.
 
 - [nginx는 경로의 방송과 쿼리의 방송이 같을 때만 넘깁니다](/posts/0-to-1/pokeclip-nginx-playback-request-boundary/): 경로·쿼리 일치와 정규화 우회 차단.
 - [systemd가 정리를 건너뛰자 옛 비밀 컨테이너가 남았습니다](/posts/0-to-1/pokeclip-media-host-restart-lifecycle/): 비정상 종료 시 수명 불일치와 복구 검증.
@@ -122,9 +122,9 @@
 - **CASE 37** · [실패한 명령이 종료 코드 0으로 보인 이유: 빠진 return 하나의 영향](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-hook-exit-code-return/)
 - **CASE 38** · [대체 화면은 보여주되 녹화하지 않기: 기존 PR을 이어 완성한 상태 경계](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-offline-recording-source-lifecycle/)
 - **CASE 39** · [기본값을 복사했는데 왜 다른 설정까지 바뀔까: 인증 설정의 두 가지 회귀](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-auth-defaults-normalization-and-clone/)
-- **CASE 40** · [안전하게 기다리려던 수정이 교착을 만들 수 있었다: 미병합 PR #6206](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-logger-reload-rejected-lifecycle-fix/)
+- **CASE 40** · [로그 재설정 중 훅을 기다리게 한 PR은 교착 반례로 닫혔습니다](/posts/open-source-analysis/mediamtx-logger-reload-rejected-lifecycle-fix/)
 - **CASE 41** · [MediaMTX 훅 7곳은 실행 실패를 로그에 남기지 않았습니다](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-seven-hooks-missing-exit-callback/)
-- **CASE 42** · [Close가 반환했는데 인증서 watcher는 살아 있었다](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-certificate-watcher-close-join/)
+- **CASE 42** · [MediaMTX 인증서 감시 작업은 Close 뒤에도 돌았습니다](/posts/open-source-analysis/mediamtx-certificate-watcher-close-join/)
 - **CASE 43** · [MediaMTX 훅 출력을 모으자 동시 종료에서 줄이 빠졌습니다](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-hook-output-backpressure-experiments/)
 - **후속 기록** · [MediaMTX가 SRT 암호를 사용자별로 받게 제안했습니다](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-user-srt-passphrase-boundaries/)
 
