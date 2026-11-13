@@ -17,6 +17,8 @@
 | opusenc --expect-loss | opus-codec.org opusenc 설명서 | 문헌값 |
 | FFmpeg libopus 옵션 기본값, opus 인코더 실험 | ffmpeg -h encoder=libopus, libopusenc.c 562–569 | 문헌값 · 실측 |
 | 비트레이트별 모드 비율, 32k voip 구간, FEC 시 CELT 0 · 30.6kbps | measure/opus_modes.txt, opus_misc.txt | 실측 |
+| FEC 문턱: libopus는 FEC && 손실률 > (128−voice_est)>>4 일 때만 SILK 계열(opus_encoder.c v1.6.1 1515–1518). 손실률 1·3·5·8·9·10% → CELT 2,155·2,150·2,132·107·0·0 | measure/fec_packet_loss_sweep.txt, 독립 리뷰 지적 후 재측정 | 실측 · 문헌값 |
+| lookahead = Fs/400 + Fs/250(opus_encoder.c 313, 3082–3090), DTX 패킷 ≤2바이트 미전송(opus.h 145) | libopus v1.6.1 소스 | 문헌값 |
 | pre-skip 312(기본) · 120(lowdelay), 프레임 길이별 패킷 표본 | measure/opus_misc.txt | 실측 |
 | DTX 3B 180개 → 1B 172 + 3B 8(0.42초 간격) | measure/dtx.txt | 실측 |
 | Chrome 157 기본 SDP, getStats 코드 결과 32.6kbps | measure/chrome_probe.json, stats_probe.json | 실측 |

@@ -1,14 +1,14 @@
 ---
 title: "Opus는 신호와 비트레이트로 SILK와 CELT를 오갑니다"
 date: 2026-06-20T15:25:34+09:00
-lastmod: "2026-11-13T14:58:13+09:00"
+lastmod: "2026-11-13T15:18:40+09:00"
 description: "Opus는 음성용 SILK와 음악용 CELT를 한 코덱에 두고, 패킷마다 어느 쪽으로 부호화했는지를 첫 바이트에 적습니다. RFC 6716 · 7587 · 7845 · 7874와 Vectis 특허 풀, libopus 1.6.1의 모드 전환 · 지연 · 인밴드 FEC · DTX, 프레임 길이별 RTP 머리 비용, Chrome 157의 기본 SDP 제안, FFmpeg 9.0.2 libopus 옵션, webrtc-stats의 누적 카운터를 1차 문서와 Sintel 예고편 소리 실측으로 확인했습니다."
 categories: ["tech-blurting"]
 tags: ["Opus", "WebRTC", "SILK", "CELT", "FEC", "DTX", "SDP"]
 draft: false
 ---
 
-Opus는 한 코덱 안에 음성용 SILK와 음악용 CELT를 함께 두고, 패킷마다 어느 쪽으로 부호화했는지를 첫 바이트에 적습니다. Sintel 예고편 소리(51.9초)를 libopus 1.6.1로 인코딩해 패킷 2,597개의 첫 바이트를 읽자, 10kbps에서는 모두 SILK였고 64kbps에서는 모두 CELT였습니다. 32kbps에서는 한 파일 안에서 SILK, 하이브리드, CELT를 오갔고, 같은 설정에 인밴드 FEC를 켜고 손실률 10%를 알려 주자 CELT 패킷이 2,158개에서 0개가 됐습니다. 손실 복구 정보가 SILK 계층에만 실리기 때문입니다. 실측은 모두 이 글을 쓰며 AI(Claude Code)가 FFmpeg 9.0.2와 Chrome 157로 잰 값입니다(아래 「측정 조건」).
+Opus는 한 코덱 안에 음성용 SILK와 음악용 CELT를 함께 두고, 패킷마다 어느 쪽으로 부호화했는지를 첫 바이트에 적습니다. Sintel 예고편 소리(51.9초)를 libopus 1.6.1로 인코딩해 패킷 2,597개의 첫 바이트를 읽자, 10kbps에서는 모두 SILK였고 64kbps에서는 모두 CELT였습니다. 32kbps(`-application voip`)에서는 한 파일 안에서 SILK, 하이브리드, CELT를 오갔고 CELT 패킷이 2,158개였습니다. 같은 설정에 인밴드 FEC를 켜고 예상 손실률 10%를 알려 주자 CELT 패킷이 0개가 됐습니다. 손실 복구 정보는 SILK 계층에만 실리고, libopus는 예상 손실률이 문턱을 넘을 때만 CELT를 버립니다. 이 소리에서는 5%까지 CELT가 거의 그대로였고 8%에서 107개, 9% 이상에서 0개였습니다. 실측은 모두 이 글을 쓰며 AI(Claude Code)가 FFmpeg 9.0.2와 Chrome 157로 잰 값입니다(아래 「측정 조건」).
 
 ## Opus는 2012년 RFC 6716이 됐고 2017년 RFC 8251로 고쳐졌습니다 {#1-opus의-출신--두-회사가-합쳐서-만든-이상한-표준}
 
@@ -20,7 +20,7 @@ Opus는 IETF 코덱 작업반이 2012년 9월 RFC 6716으로 낸 오디오 코�
 
 Opus 라이선스 페이지는 Xiph.Org, Broadcom, Microsoft가 Opus 관련 특허를 로열티 없이 허락한다고 적습니다. 허락받은 쪽이 Opus 구현을 특허로 공격하면 허락이 끝나는 방어 조항이 붙어 있습니다([Opus License](https://opus-codec.org/license/)).
 
-그 허락 밖의 특허권자도 있습니다. Vectis IP는 2023년 1월 16일 Fraunhofer와 Dolby를 중심으로 Opus 필수 특허 300건 이상(17개 패밀리)을 묶은 풀을 열었습니다. 대상은 하드웨어 기기이고, 단독 소프트웨어 · 앱 · 서비스 · 콘텐츠는 겨냥하지 않는다고 밝혔습니다. 요율은 대당 €0.15, 연간 상한 €15M이고, 초기 계약자는 대당 €0.10입니다([Vectis IP 발표](https://www.vectis.com/media/vectis-ip-launches-patent-pool-for-the-opus-codec)). 풀에 든 특허가 Opus에 꼭 필요하다고 법원이 판정한 것은 아닙니다. AV1에서 AOMedia 허락과 Sisvel 풀이 함께 있는 구조와 같습니다([AV1 글](/posts/tech-blurting/av1-vp9-deep-dive/#15-sisvel--av1에-대한-라이센스-위협)).
+그 허락 밖의 특허권자도 있습니다. Vectis IP는 2023년 1월 16일 Fraunhofer와 Dolby를 중심으로 Opus 필수 특허 300건 이상(17개 패밀리)을 묶은 풀을 열었습니다. 대상은 하드웨어 기기이고, 단독 소프트웨어 · 앱 · 서비스 · 콘텐츠는 겨냥하지 않는다고 밝혔습니다. 요율은 대당 €0.15, 연간 상한 €15M이고, 초기 계약자는 대당 €0.10, 연간 상한 €10M입니다([Vectis IP 발표](https://www.vectis.com/media/vectis-ip-launches-patent-pool-for-the-opus-codec)). 풀에 든 특허가 Opus에 꼭 필요하다고 법원이 판정한 것은 아닙니다. AV1에서 AOMedia 허락과 Sisvel 풀이 함께 있는 구조와 같습니다([AV1 글](/posts/tech-blurting/av1-vp9-deep-dive/#15-sisvel--av1에-대한-라이센스-위협)).
 
 ## 패킷 첫 바이트의 구성 번호가 SILK·하이브리드·CELT를 가릅니다 {#2-silk--celt-결합--opus의-진짜-비밀}
 
@@ -56,9 +56,9 @@ Opus 패킷의 첫 바이트(TOC)는 위 5비트가 구성 번호, 그다음 1�
 }
 {{< /chart >}}
 
-CELT 비율은 16kbps에서 82.0%, 32kbps에서 85.3%, 48kbps에서 95.1%였습니다. 같은 파일 안에서도 모드는 신호를 따라 바뀝니다. 아래 영상의 위 줄은 32kbps(`-application voip`)로 인코딩한 패킷을 시간 순으로 칠한 것입니다. 조용한 도입부가 SILK, 이어지는 약 4초가 하이브리드이고, 음악이 커진 9.77초부터 CELT로 넘어갔다가 38초 부근에서 잠시 하이브리드로 돌아옵니다. 아래 줄은 다음 절에서 다룰 FEC를 켠 같은 설정입니다.
+CELT 비율은 16kbps에서 82.0%, 32kbps에서 85.3%, 48kbps에서 95.1%였습니다. 같은 파일 안에서도 모드는 신호를 따라 바뀝니다. [[fig-opus-mode-strip]]의 위 줄은 32kbps(`-application voip`)로 인코딩한 패킷을 시간 순으로 칠한 것입니다. 조용한 도입부가 SILK, 이어지는 약 4초가 하이브리드이고, 7.27초에 처음 CELT로 바뀌고, 9.77초부터 대부분 CELT이며, 38초 부근에서 잠시 하이브리드로 돌아옵니다. 같은 32kbps라도 `-application audio`에서는 CELT 패킷이 2,214개였습니다. 아래 줄은 다음 절에서 다룰 FEC를 켜고 예상 손실률 10%를 준 같은 설정입니다.
 
-{{< motion scene="OpusModeStrip" id="fig-opus-mode-strip" kind="실측" caption="같은 Sintel 예고편 소리를 libopus 32kbps(-application voip)로 인코딩한 패킷의 모드. FEC가 없으면 SILK → 하이브리드 → CELT로 바뀌고(CELT 2,158개), -fec 1 -packet_loss 10을 주면 CELT 없이 SILK와 하이브리드만 남습니다. 구간 경계는 패킷 TOC로 읽은 실측값이고, 51.9초를 약 8초로 줄여 그렸습니다." >}}
+{{< motion scene="OpusModeStrip" id="fig-opus-mode-strip" kind="재구성" caption="같은 Sintel 예고편 소리를 libopus 32kbps(-application voip)로 인코딩한 패킷의 모드. FEC가 없으면 SILK → 하이브리드 → CELT로 바뀌고(CELT 2,158개), FEC를 켜고 예상 손실률 10%를 준 -fec 1 -packet_loss 10에서는 CELT 없이 SILK와 하이브리드만 남습니다(손실률 5% 이하에서는 CELT가 거의 그대로). 구간 경계는 패킷 TOC로 읽은 실측값이고, 51.9초를 약 8초로 줄여 그렸습니다." >}}
 
 ## Opus 프레임은 2.5–60ms이고 기본 20ms입니다 {#3-aac-vs-opus--깊이-비교}
 
@@ -68,21 +68,21 @@ AAC-LC는 48kHz에서 1,024표본(21.3ms) 프레임 하나로 고정입니다([A
 
 ### 기본 설정의 알고리즘 지연은 26.5ms입니다 {#지연-차이가-결정적}
 
-알고리즘 지연은 네트워크를 빼고 인코더와 디코더가 구조적으로 만드는 지연입니다. 프레임 하나를 다 모아야 부호화를 시작하므로 프레임 길이가 들어가고, 인코더가 미리 보는 구간이 더해집니다. RFC 6716은 SILK가 5ms를 미리 보고 표본률 변환에 최대 1.5ms가 더 들 수 있다고 적습니다. libopus 1.6.1이 Ogg 머리에 적은 앞 표본(pre-skip)은 312개, 48kHz에서 6.5ms로 이 합과 같았습니다. 그래서 기본 20ms 프레임이면 20 + 6.5 = 26.5ms입니다(계산값).
+알고리즘 지연은 네트워크를 빼고 인코더와 디코더가 구조적으로 만드는 지연입니다. 프레임 하나를 다 모아야 부호화를 시작하므로 프레임 길이가 들어가고, 인코더가 미리 보는 구간이 더해집니다. libopus 1.6.1은 미리 보는 구간을 Fs/400(2.5ms)에 지연 보정 Fs/250(4ms)을 더해 알려 주고([opus_encoder.c 313행](https://github.com/xiph/opus/blob/v1.6.1/src/opus_encoder.c#L313), [3082–3090행](https://github.com/xiph/opus/blob/v1.6.1/src/opus_encoder.c#L3082-L3090)), Ogg 머리의 앞 표본(pre-skip)도 312개, 48kHz에서 6.5ms였습니다. 그래서 기본 20ms 프레임이면 20 + 6.5 = 26.5ms입니다(계산값). RFC 6716이 적은 SILK의 미리 보기 5ms와 표본률 변환 최대 1.5ms의 합도 6.5ms이지만, libopus 코드가 이 합으로 정한 것은 아닙니다.
 
 `-application lowdelay`는 SILK와 하이브리드를 쓰지 않고 CELT만 씁니다. 이때 pre-skip은 120개(2.5ms)였고, 2.5ms 프레임과 더하면 5ms로 RFC가 적은 하한과 같습니다. 대가는 음성에서의 효율입니다. 낮은 비트레이트 음성은 SILK가 맡는 구간인데, lowdelay에서는 24kbps에서도 CELT만 나왔습니다.
 
 ## 인밴드 FEC는 중요한 음성만 다음 패킷에 다시 싣습니다 {#4-fec--opus의-손실-복구-비밀}
 
-RFC 6716 2.1.7절의 인밴드 FEC(Forward Error Correction)는 소리의 시작이나 급변처럼 지각상 중요한 음성 정보를 낮은 비트레이트로 다시 부호화해 다음 패킷에 덧붙입니다. 이 다시 부호화한 프레임은 LBRR(Low Bit-Rate Redundancy)이라 부르고, RFC 4.2절은 이를 「앞선 SILK 프레임을 낮은 비트레이트로 다시 부호화한 것」으로 정의합니다. 그래서 CELT만 쓰는 패킷에는 실을 자리가 없습니다. 앞 패킷이 사라지면 디코더는 다음 패킷의 LBRR로 그 구간을 대신 풉니다.
+RFC 6716 2.1.7절의 인밴드 FEC(Forward Error Correction)는 소리의 시작이나 급변처럼 지각상 중요한 음성 정보를 낮은 비트레이트로 다시 부호화해 다음 패킷에 덧붙입니다. 이 다시 부호화한 프레임은 LBRR(Low Bit-Rate Redundancy)이라 부르고, RFC 4.2.2절은 이를 「앞선 SILK 프레임을 낮은 비트레이트로 다시 부호화한 것」으로 정의합니다. 그래서 CELT만 쓰는 패킷에는 실을 자리가 없습니다. 앞 패킷이 사라지면 디코더는 다음 패킷의 LBRR로 그 구간을 대신 풉니다.
 
-[[fig-opus-mode-strip]]의 두 줄이 이 차이입니다. FFmpeg에서 `-fec 1`만 주면 출력 패킷이 FEC를 끈 파일과 바이트 단위로 같았습니다. `libopus` 옵션 설명대로 예상 손실률(`-packet_loss`)이 0이 아니어야 인코더가 FEC를 씁니다([libopusenc.c 562–563행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/libopusenc.c#L562-L563)). `-packet_loss 10`을 함께 주자 CELT 패킷이 사라지고, 같은 32kbps 목표에서 평균 비트레이트는 33.3에서 30.6kbps가 됐습니다. 음악 구간에서도 SILK가 낮은 대역을 맡는 하이브리드로 부호화하므로, 손실 복구를 얻는 대신 음악 음질이 달라질 수 있습니다. 그 차이는 재지 않았습니다. opus-tools의 `opusenc`에서 같은 손실률 힌트는 `--expect-loss`입니다([opusenc 설명서](https://opus-codec.org/docs/opus-tools/opusenc.html)).
+[[fig-opus-mode-strip]]의 두 줄이 이 차이입니다. FFmpeg에서 `-fec 1`만 주면 출력 패킷이 FEC를 끈 파일과 바이트 단위로 같았습니다. `libopus` 옵션 설명대로 예상 손실률(`-packet_loss`)이 0이 아니어야 인코더가 FEC를 씁니다([libopusenc.c 562–563행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/libopusenc.c#L562-L563)). FEC를 켜도 CELT를 바로 버리지는 않습니다. libopus 1.6.1은 FEC가 켜져 있고 예상 손실률이 `(128 − voice_est) >> 4`보다 클 때만 SILK 계열 모드로 바꿉니다([opus_encoder.c 1515–1518행](https://github.com/xiph/opus/blob/v1.6.1/src/opus_encoder.c#L1515-L1518)). `voice_est`는 인코더가 추정한 음성일 확률(Q7, 0–127)이라, 음악으로 판단한 구간(0에 가까움)에서는 문턱이 약 8%입니다. 손실률만 바꿔 같은 32kbps(voip)로 인코딩하자 CELT 패킷은 1%에서 2,155개, 3%에서 2,150개, 5%에서 2,132개로 FEC를 끈 2,158개와 거의 같았고, 8%에서 107개, 9%와 10%에서 0개였습니다. 10%에서 평균 비트레이트는 33.3에서 30.6kbps가 됐습니다. 음악 구간에서도 SILK가 낮은 대역을 맡는 하이브리드로 부호화하므로, 손실 복구를 얻는 대신 음악 음질이 달라질 수 있습니다. 그 차이는 재지 않았습니다. opus-tools의 `opusenc`에서 같은 손실률 힌트는 `--expect-loss`입니다([opusenc 설명서](https://opus-codec.org/docs/opus-tools/opusenc.html)).
 
-LBRR은 바로 앞 프레임 하나만 덮습니다. 연속 손실에는 libopus 1.5의 DRED가 최대 1초 분량의 중복 정보를 약 12–32kb/s로 싣는 방식을 제안했지만, 빌드 · 실행 양쪽에서 켜야 하고 FFmpeg 9.0.2의 `libopus` 래퍼에는 DRED 옵션이 없습니다.
+LBRR은 현재 프레임 바로 앞 구간만 덮습니다(RFC 6716 4.2.5절). 연속 손실에는 libopus 1.5의 DRED가 최대 1초 분량의 중복 정보를 약 12–32kb/s로 싣는 방식을 제안했지만, 빌드 · 실행 양쪽에서 켜야 하고 FFmpeg 9.0.2의 `libopus` 래퍼에는 DRED 옵션이 없습니다.
 
 ## DTX는 침묵 중 400ms마다 한 프레임만 보냅니다 {#5-dtx--침묵-시-대역폭-절약}
 
-DTX(Discontinuous Transmission)는 침묵이나 배경 잡음 구간에서 비트레이트를 줄입니다. RFC 6716 2.1.9절은 DTX가 켜지면 400ms마다 한 프레임만 부호화한다고 적습니다. 2초 소리, 4초 무음, 2초 소리로 된 시험 신호를 24kbps(voip)로 인코딩했습니다. DTX가 꺼져 있으면 무음 구간에서도 20ms마다 3바이트 패킷이 180개 나왔습니다. `-dtx 1`을 주자 그중 172개가 TOC 1바이트뿐인 패킷이 되고, 3바이트 패킷은 0.42초마다 하나씩 8개만 남았습니다. 1바이트 패킷은 RTP로 보낼 때 빼는 프레임이고, Ogg 파일에는 그대로 남습니다.
+DTX(Discontinuous Transmission)는 침묵이나 배경 잡음 구간에서 비트레이트를 줄입니다. RFC 6716 2.1.9절은 DTX가 켜지면 400ms마다 한 프레임만 부호화한다고 적습니다. 2초 소리, 4초 무음, 2초 소리로 된 시험 신호를 24kbps(voip)로 인코딩했습니다. DTX가 꺼져 있으면 무음 구간에서도 20ms마다 3바이트 패킷이 180개 나왔습니다. `-dtx 1`을 주자 그중 172개가 TOC 1바이트뿐인 패킷이 되고, 3바이트 패킷은 0.42초마다 하나씩 8개만 남았습니다. libopus 문서는 2바이트 이하 패킷을 보낼 필요가 없는 DTX 패킷으로 정하므로([opus.h 145행](https://github.com/xiph/opus/blob/v1.6.1/include/opus.h#L145)) RTP로 보낼 때는 빠지고, Ogg 파일에는 그대로 남습니다.
 
 DTX는 기본으로 꺼져 있습니다. FFmpeg `libopus`의 `-dtx` 기본값은 false이고([libopusenc.c 569행](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/libopusenc.c#L569)), RTP 규격에서도 받는 쪽이 `usedtx`를 적지 않으면 0입니다. RFC 7587은 대역이 모자라지 않으면 계속 보내는 쪽을 권합니다(3.1.3, RECOMMENDED, [RFC 7587](https://www.rfc-editor.org/rfc/rfc7587)).
 
@@ -134,7 +134,7 @@ RFC 7587에서 `maxaveragebitrate`는 받는 쪽의 한계를 알리는 값입�
 
 WebRTC 단말은 Opus를 반드시 구현해야 하므로(RFC 7874), 브라우저 음성 · 화상 통화는 Opus를 받습니다. 서비스가 직접 밝힌 예로 Discord 개발자 문서는 음성 데이터를 Opus, 2채널, 48kHz로 인코딩해 RTP 머리와 함께 보내라고 하고, 전송을 멈출 때는 다음 전송과 보간되지 않도록 침묵 프레임 `0xF8, 0xFF, 0xFE`를 다섯 번 보내라고 적습니다([Discord Voice Connections](https://docs.discord.com/developers/topics/voice-connections)). 첫 바이트 `0xF8`은 구성 번호 31(CELT FB 20ms), 모노, 한 프레임을 뜻합니다.
 
-브라우저 재생은 caniuse(2026-11-13 확인) 기준 Chrome 33, Firefox 15부터 Opus를 읽고, Safari는 18.4부터 macOS 15.4 이상에서, iOS Safari는 18.4부터 읽습니다([caniuse Opus](https://caniuse.com/opus)).
+브라우저 재생은 caniuse(2026-11-13 확인) 기준 Chrome 33, Firefox 15부터 Opus를 읽고, Safari는 11부터 CAF 그릇에서만, 17.4부터 WebM에서 부분 지원하고 18.4부터는 macOS 15.4 이상을 요구하는 부분 지원이며, iOS Safari는 18.4부터 지원합니다(11–18.3은 부분)([caniuse Opus](https://caniuse.com/opus)).
 
 ## FFmpeg 9.0.2 libopus는 FEC와 DTX를 기본으로 끕니다 {#9-opus-ffmpeg-명령}
 
@@ -196,7 +196,7 @@ const lossRate = lost / (lost + (b.recv - a.recv));
 ## Opus는 모드 · FEC · DTX를 받는 쪽과 함께 정합니다 {#정리하면}
 
 - 비트레이트와 신호가 모드를 정합니다. 음악 위주 소리는 32kbps에서도 대부분 CELT였습니다.
-- 인밴드 FEC는 SILK 계층의 기능입니다. 예상 손실률을 함께 주어야 켜지고, 켜면 CELT 대신 하이브리드로 부호화합니다.
+- 인밴드 FEC는 SILK 계층의 기능입니다. libopus는 예상 손실률이 문턱을 넘어야 CELT 대신 하이브리드로 부호화하고, 그 아래에서는 CELT 패킷이 FEC 없이 나갑니다.
 - DTX와 FEC는 FFmpeg와 RTP 규격 모두 기본값이 꺼짐입니다. 받는 쪽 SDP(`useinbandfec`, `usedtx`)와 함께 정합니다.
 - 짧은 프레임은 지연을 줄이는 대신 머리 비용을 키웁니다. 20ms에서 IPv4 · UDP · RTP 머리만 16kbps입니다.
 - 애플 기기용 HLS에는 AAC 변형이 필요합니다.
@@ -207,7 +207,7 @@ const lossRate = lost / (lost + (b.recv - a.recv));
 - 기종: MacBook Air(Mac17,3, Apple M5, 고성능 4 · 효율 6코어, 32GB, 팬 없음), macOS 27.0.1. 1분 load average는 측정 중 4.6–10.1이었습니다(다른 세션의 작업 포함).
 - 도구: FFmpeg 9.0.2(Homebrew 9.0.2_1), libopus 1.6.1, Google Chrome 157.0.8103.51(헤드리스, Playwright).
 - 입력: [Sintel 예고편](https://durian.blender.org/sharing/) 1080p의 소리(© copyright Blender Foundation | durian.blender.org, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)), https://download.blender.org/durian/trailer/sintel_trailer-1080p.mp4 (sha256 `34bbd52a4b89fdf63c8ace50b268da26653a59508288100cd3c23de276db7931`). 원본 소리는 AAC-LC 48kHz 스테레오 약 127kbps이고, 전체 51.9초를 PCM으로 풀어 썼습니다. 음악과 효과음이 대부분이라 음성 위주 소리에서는 모드 비율이 다를 수 있습니다.
-- 인코딩: `ffmpeg -i sintel.wav -c:a libopus -b:a <10k|16k|24k|32k|48k|64k>`(기본 `-application audio`), 영상의 두 줄은 `-b:a 32k -application voip`와 거기에 `-fec 1 -packet_loss 10`을 더한 것입니다. 모드는 `ffprobe -show_packets -show_data`로 각 패킷 첫 바이트의 위 5비트를 읽어 RFC 6716 표 2로 바꿨습니다. pre-skip은 `ffprobe`의 `initial_padding`입니다.
+- 인코딩: `ffmpeg -i sintel.wav -c:a libopus -b:a <10k|16k|24k|32k|48k|64k>`(기본 `-application audio`), 영상의 두 줄은 `-b:a 32k -application voip`와 거기에 `-fec 1 -packet_loss 10`을 더한 것입니다. FEC 문턱은 같은 32kbps voip에 `-fec 1 -packet_loss <0|1|3|5|8|9|10>`을 주어 다시 쟀습니다(2026-11-13 15:10–15:13 KST, 같은 기계, load average 약 3.1). 모드는 `ffprobe -show_packets -show_data`로 각 패킷 첫 바이트의 위 5비트를 읽어 RFC 6716 표 2로 바꿨습니다. pre-skip은 `ffprobe`의 `initial_padding`입니다.
 - DTX: `ffmpeg -f lavfi -i "aevalsrc='if(between(t,2,6),0,0.3*sin(2*PI*300*t)*(0.6+0.4*sin(2*PI*3*t)))':s=48000:d=8" -ac 1 burst.wav`를 `-c:a libopus -b:a 24k -application voip -dtx <0|1>`로 인코딩하고, 2.2–5.8초 구간의 패킷 크기를 셌습니다.
 - 브라우저: Chrome 157에서 `new RTCPeerConnection()`에 `addTransceiver('audio')`를 하고 `createOffer()`의 SDP를 읽었습니다. 통계는 같은 페이지의 두 연결 사이에 오실레이터 소리를 보내고 3초 · 5초 시점의 `getStats()` 차이로 계산했습니다.
 
@@ -216,6 +216,7 @@ const lossRate = lost / (lost + (b.recv - a.recv));
 - IETF: [RFC 6716](https://www.rfc-editor.org/rfc/rfc6716) (Opus, 2012-09) · [RFC 8251](https://www.rfc-editor.org/rfc/rfc8251) (2017-10) · [RFC 7587](https://www.rfc-editor.org/rfc/rfc7587) (RTP 페이로드, 2015-06) · [RFC 7845](https://www.rfc-editor.org/rfc/rfc7845) (Ogg Opus, 2016-04) · [RFC 7874](https://www.rfc-editor.org/rfc/rfc7874) (WebRTC 오디오, 2016-05) · [RFC 3389](https://www.rfc-editor.org/rfc/rfc3389) (CN) · [RFC 2198](https://www.rfc-editor.org/rfc/rfc2198) (RED) · [RFC 3550](https://www.rfc-editor.org/rfc/rfc3550) (RTP) · [RFC 768](https://www.rfc-editor.org/rfc/rfc768) (UDP) · [RFC 791](https://www.rfc-editor.org/rfc/rfc791) (IPv4)
 - Opus: [다운로드 · 릴리스](https://opus-codec.org/downloads/) · [Opus 1.5 소개](https://opus-codec.org/demo/opus-1.5/) · [License](https://opus-codec.org/license/) · [opusenc 설명서](https://opus-codec.org/docs/opus-tools/opusenc.html)
 - [Vectis IP, Vectis IP Launches Patent Pool for the Opus Codec](https://www.vectis.com/media/vectis-ip-launches-patent-pool-for-the-opus-codec) (2023-01-16)
+- libopus v1.6.1 소스: [opus_encoder.c](https://github.com/xiph/opus/blob/v1.6.1/src/opus_encoder.c#L1515-L1518) · [opus.h](https://github.com/xiph/opus/blob/v1.6.1/include/opus.h#L145)
 - FFmpeg n9.0.2 소스: [libopusenc.c](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/libopusenc.c#L562-L569) · [codecstring.c](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavformat/codecstring.c#L43)
 - [W3C, Identifiers for WebRTC's Statistics API](https://www.w3.org/TR/webrtc-stats/) (Candidate Recommendation Draft, 2025-09-25)
 - [Discord Developer Documentation, Voice Connections](https://docs.discord.com/developers/topics/voice-connections)

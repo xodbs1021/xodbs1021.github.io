@@ -1,0 +1,9 @@
+# 2026-11-13 15:13 KST, libopus 1.6.1, sintel.wav, -c:a libopus -b:a 32k -application voip -fec 1 -packet_loss N
+# libopus src/opus_encoder.c v1.6.1 L1515-1518: FEC && packetLossPercentage > (128-voice_est)>>4 -> SILK
+packet_loss=0 {'Hybrid-FB 20ms': 63, 'SILK-WB 20ms': 153, 'Hybrid-SWB 20ms': 223, 'CELT-SWB 20ms': 19, 'CELT-FB 20ms': 2139}
+packet_loss=1 {'Hybrid-FB 20ms': 65, 'SILK-WB 20ms': 153, 'Hybrid-SWB 20ms': 224, 'CELT-SWB 20ms': 18, 'CELT-FB 20ms': 2137}
+packet_loss=3 {'Hybrid-FB 20ms': 66, 'SILK-WB 20ms': 153, 'Hybrid-SWB 20ms': 228, 'CELT-SWB 20ms': 14, 'CELT-FB 20ms': 2136}
+packet_loss=5 {'Hybrid-FB 20ms': 83, 'SILK-WB 20ms': 153, 'Hybrid-SWB 20ms': 229, 'CELT-SWB 20ms': 13, 'CELT-FB 20ms': 2119}
+packet_loss=8 {'Hybrid-FB 20ms': 2069, 'SILK-WB 20ms': 153, 'Hybrid-SWB 20ms': 268, 'CELT-FB 20ms': 107}
+packet_loss=9 {'Hybrid-FB 20ms': 2176, 'SILK-WB 20ms': 153, 'Hybrid-SWB 20ms': 268}
+packet_loss=10 {'Hybrid-FB 20ms': 2176, 'SILK-WB 20ms': 153, 'Hybrid-SWB 20ms': 268}
