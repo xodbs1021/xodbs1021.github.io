@@ -1,0 +1,29 @@
+## B1 VOD maxBufferLength 30 2026-11-13 16:55:00 KST load 32.81 72.40 73.18
+vod-mbl30 hls.js 1.7.4 chrome 157.0.8103.51 samples 392 events 60
+## B2 VOD maxBufferLength 10 2026-11-13 16:56:45 KST load 97.06 86.52 78.77
+vod-mbl10 hls.js 1.7.4 chrome 157.0.8103.51 samples 392 events 60
+## 라이브 인코더 2026-11-13 16:58:27 KST
+$ ffmpeg -hide_banner -loglevel warning -stats -re -stream_loop -1 -i /tmp/tb6w-media/sintel_trailer-1080p.mp4 -an -filter_complex [0:v]split=3[a][b][c];[a]scale=1920:1080[v0];[b]scale=1280:720[v1];[c]scale=640:360[v2] -map [v0] -c:v:0 libx264 -b:v:0 4000k -maxrate:v:0 4000k -bufsize:v:0 4000k -map [v1] -c:v:1 libx264 -b:v:1 2000k -maxrate:v:1 2000k -bufsize:v:1 2000k -map [v2] -c:v:2 libx264 -b:v:2 600k -maxrate:v:2 600k -bufsize:v:2 600k -preset ultrafast -g 48 -keyint_min 48 -sc_threshold 0 -f hls -hls_time 2 -hls_list_size 6 -hls_flags delete_segments+independent_segments -hls_segment_filename www/live/v%v/s%05d.ts -master_pl_name master.m3u8 -var_stream_map v:0 v:1 v:2 www/live/v%v/index.m3u8
+#EXTM3U
+#EXT-X-VERSION:6
+#EXT-X-TARGETDURATION:2
+#EXT-X-MEDIA-SEQUENCE:0
+#EXT-X-INDEPENDENT-SEGMENTS
+#EXTINF:2.000000,
+s00000.ts
+#EXTINF:2.000000,
+s00001.ts
+#EXTINF:2.000000,
+s00002.ts
+#EXTINF:2.000000,
+s00003.ts
+#EXTINF:2.000000,
+s00004.ts
+## B3 라이브 maxBufferLength 30 2026-11-13 16:58:38 KST load 34.88 69.21 73.07
+live-mbl30 hls.js 1.7.4 chrome 157.0.8103.51 samples 392 events 61
+## B4 라이브 22초 끊김 2026-11-13 17:00:19 KST load 11.20 51.17 65.61
+live-outage hls.js 1.7.4 chrome 157.0.8103.51 samples 352 events 57
+frame= 4856 fps= 24 q=10.0 q=10.0 q=10.0 size=N/A time=00:03:22.54 bitrate=N/A speed=0.998x elapsed=0:03:22.94    
+frame= 4869 fps= 24 q=7.0 q=7.0 q=7.0 size=N/A time=00:03:23.04 bitrate=N/A speed=0.998x elapsed=0:03:23.44    
+frame= 4908 fps= 24 q=-1.0 Lq=-1.0 q=-1.0 size=N/A time=00:03:24.50 bitrate=N/A dup=3 drop=0 speed=   1x elapsed=0:03:23.86    
+## 끝 2026-11-13 17:01:51 KST

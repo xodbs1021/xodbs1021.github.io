@@ -1,0 +1,6 @@
+## B5/B6 VOD maxBufferSize 0 (maxBufferLength가 실제 목표가 되게) 2026-11-13 17:02:05 KST load 11.79 39.11 59.18
+$ MBS=0 node buf-run.mjs vod-mbs0-mbl30 /vod/master.m3u8 30 '[[0,8000],[45,1500],[75,8000]]' 100 out
+vod-mbs0-mbl30 hls.js 1.7.4 chrome 157.0.8103.51 samples 392 events 58
+$ MBS=0 node buf-run.mjs vod-mbs0-mbl10 /vod/master.m3u8 10 '[[0,8000],[45,1500],[75,8000]]' 100 out
+vod-mbs0-mbl10 hls.js 1.7.4 chrome 157.0.8103.51 samples 392 events 61
+## 끝 17:05:32 KST

@@ -1,0 +1,27 @@
+<!doctype html><meta charset="utf-8"><video id="v" muted autoplay playsinline width="640" height="360"></video>
+<script src="hls.js"></script>
+<script>
+const q = new URLSearchParams(location.search);
+const T0 = performance.now(); const t = () => +((performance.now() - T0) / 1000).toFixed(3);
+const log = window.__log = { samples: [], events: [], warns: [] };
+const v = document.getElementById('v');
+const logger = { log(){}, debug(){}, info(){}, trace(){},
+  warn: (...a) => log.warns.push([t(), a.join(' ').slice(0, 300)]),
+  error: (...a) => log.warns.push([t(), 'ERR ' + a.join(' ').slice(0, 300)]) };
+const cfg = { maxBufferLength: +q.get('mbl'), debug: logger };
+if (q.has('mbs')) cfg.maxBufferSize = +q.get('mbs');
+const hls = window.hls = new Hls(cfg);
+hls.on(Hls.Events.ERROR, (e, d) => log.events.push([t(), 'ERROR', d.details, d.fatal, d.buffer ?? null]));
+hls.on(Hls.Events.STALL_RESOLVED, () => log.events.push([t(), 'STALL_RESOLVED']));
+hls.on(Hls.Events.LEVEL_SWITCHED, (e, d) => log.events.push([t(), 'LEVEL_SWITCHED', d.level]));
+hls.on(Hls.Events.FRAG_LOADED, (e, d) => log.events.push([t(), 'FRAG_LOADED', d.frag.level, d.frag.sn, Math.round(d.frag.stats.loaded), Math.round(d.frag.stats.loading.end - d.frag.stats.loading.start)]));
+hls.on(Hls.Events.MANIFEST_PARSED, (e, d) => log.events.push([t(), 'MANIFEST_PARSED', d.levels.map(l => l.bitrate)]));
+['waiting', 'playing', 'seeking', 'seeked', 'stalled'].forEach(n => v.addEventListener(n, () => log.events.push([t(), 'video:' + n, +v.currentTime.toFixed(3)])));
+hls.loadSource(q.get('src')); hls.attachMedia(v);
+setInterval(() => {
+  const b = v.buffered; let ahead = 0;
+  for (let i = 0; i < b.length; i++) if (b.start(i) <= v.currentTime + 0.1 && b.end(i) > v.currentTime) ahead = b.end(i) - v.currentTime;
+  log.samples.push([t(), +v.currentTime.toFixed(3), +ahead.toFixed(3), hls.currentLevel, hls.loadLevel, Math.round(hls.bandwidthEstimate),
+    hls.latency != null ? +hls.latency.toFixed(3) : null, hls.liveSyncPosition != null ? +hls.liveSyncPosition.toFixed(3) : null, v.paused, v.readyState]);
+}, 250);
+</script>
