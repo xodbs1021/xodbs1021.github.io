@@ -14,7 +14,7 @@
   "description": "공통 DB 인증, nginx 요청 검증, DVR 발행과 복구, MediaMTX 기여를 만든 판단과 검증을 연결한 기술 글 모음.",
   "draft": false,
   "portfolio_edition": "2026-10-15-v2",
-  "lastmod": "2026-11-13T22:07:44+09:00"
+  "lastmod": "2026-11-13T22:07:56+09:00"
 }
 
 방송 파일을 만들었고 요청도 성공했는데, 브라우저가 인식한 재생 구간은 목록보다 **61.94초 짧았습니다.** 오류 수는 0이었습니다. 이 차이를 추적하며 성공 응답 다음에 무엇을 확인해야 하는지 배웠습니다. 파일의 시간축과 브라우저가 받아들인 구간을 대조해야 사용자가 놓친 장면을 찾을 수 있었습니다.
@@ -37,11 +37,11 @@
 
 | 확인한 결과 | 그 전에 바꾼 판단 | 상세 글 |
 |---|---|---|
-| 재포장 p50 **23.43→3.05ms** | 조각마다 init이 달라지는 FFmpeg 재포장 계획을 녹화기와 같은 라이브러리의 Go 재포장으로 변경. 같은 읽기·쓰기 범위·각 200회 대조 | [재포장 비교](https://xodbs1021.github.io/posts/0-to-1/pokeclip-go-remux-same-io-benchmark/) |
-| 원본 미디어 요청 **1,254→28건** | 캐시 키와 원본 인증 전달을 분리. 50 VU·25초·각 조건 1회 | [CDN 실험과 97.95%의 분모](https://xodbs1021.github.io/posts/0-to-1/pokeclip-cdn-cache-auth-measurement/) |
-| **276파일, 누락·중복 0** | 완료 알림에만 의존하지 않고 파일·DB를 복구 기준으로 사용. 정상·알림 유실 4조건 | [파일 회수 검증](https://xodbs1021.github.io/posts/0-to-1/pokeclip-indexer-recovery-without-events/) |
+| 재포장 p50 **23.43→3.05ms** | 조각마다 init이 달라지는 FFmpeg 재포장 계획을 녹화기와 같은 라이브러리의 Go 재포장으로 변경. 같은 읽기·쓰기 범위·각 200회 대조 | [재포장 비교](/posts/0-to-1/pokeclip-go-remux-same-io-benchmark/) |
+| 원본 미디어 요청 **1,254→28건** | 캐시 키와 원본 인증 전달을 분리. 50 VU·25초·각 조건 1회 | [CDN 실험과 97.95%의 분모](/posts/0-to-1/pokeclip-cdn-cache-auth-measurement/) |
+| **276파일, 누락·중복 0** | 완료 알림에만 의존하지 않고 파일·DB를 복구 기준으로 사용. 정상·알림 유실 4조건 | [파일 회수 검증](/posts/0-to-1/pokeclip-indexer-recovery-without-events/) |
 | **PR 4건 정식 릴리스 반영** | 설정 검증 시점, 명령 종료값, 소스 생명주기, 인증 기본값의 참조 경계 수정 | [MediaMTX 기여 모음](#opensource) |
-| **실제 EC2 재부팅 2회**로 복구·삭제 상태 확인 | 자동 시작과 삭제 기록을 함께 보존. 첫 재부팅은 데이터 2건·서비스 복구, 두 번째는 삭제 뒤 미부활 확인 | [Shakedown 재부팅 시험](https://xodbs1021.github.io/posts/0-to-1/shakedown-reboot-recovery-and-deletion/) |
+| **실제 EC2 재부팅 2회**로 복구·삭제 상태 확인 | 자동 시작과 삭제 기록을 함께 보존. 첫 재부팅은 데이터 2건·서비스 복구, 두 번째는 삭제 뒤 미부활 확인 | [Shakedown 재부팅 시험](/posts/0-to-1/shakedown-reboot-recovery-and-deletion/) |
 
 빠른 재포장이 전체 서비스 지연을 같은 비율로 줄여 주는 것은 아닙니다. 재포장 측정은 fsync·S3·네트워크를 제외했고, CDN은 원본 전송이 줄었어도 미디어 HTTP p95가 약 1.4초로 비슷했습니다. 각 글에서 수치의 조건과, 그 결과로 채택하거나 보류한 선택까지 함께 읽을 수 있습니다.
 
@@ -49,102 +49,102 @@
 
 방송을 받는 서버를 교체하거나 클립을 렌더링하는 일이 현재 송출까지 끊어서는 안 됐습니다. 수신·재생·렌더의 수명을 나누고, 직접 만들 기능과 기존 도구에 맡길 기능을 정한 과정입니다.
 
-- **CASE 01** · [방송 중 클립을 위해 라이브·되감기·편집 경로를 나눴습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-live-editing-boundaries/)
-- **CASE 02** · [Go로 다 짜려던 미디어 서버를 MediaMTX에 맡겼습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-mediamtx-build-or-adopt/)
-- **CASE 03** · [채팅 수집 언어는 리뷰할 사람이 바뀌어 Spring이 됐습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-language-ownership-boundaries/)
-- **CASE 04** · [방송 중인 미디어 서버는 API처럼 갈아 끼울 수 없었습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-stateful-media-deployment/)
-- **CASE 29** · [LL-HLS 라이브 창은 지연이 아니라 복귀 여유를 정했습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-live-window-without-fork/)
-- **CASE 30** · [클립은 완성 파일 대신 원본과 편집 레시피로 남겼습니다](https://xodbs1021.github.io/posts/0-to-1/clip-edit-recipe-render-boundary/)
+- **CASE 01** · [방송 중 클립을 위해 라이브·되감기·편집 경로를 나눴습니다](/posts/0-to-1/pokeclip-live-editing-boundaries/)
+- **CASE 02** · [Go로 다 짜려던 미디어 서버를 MediaMTX에 맡겼습니다](/posts/0-to-1/pokeclip-mediamtx-build-or-adopt/)
+- **CASE 03** · [채팅 수집 언어는 리뷰할 사람이 바뀌어 Spring이 됐습니다](/posts/0-to-1/pokeclip-language-ownership-boundaries/)
+- **CASE 04** · [방송 중인 미디어 서버는 API처럼 갈아 끼울 수 없었습니다](/posts/0-to-1/pokeclip-stateful-media-deployment/)
+- **CASE 29** · [LL-HLS 라이브 창은 지연이 아니라 복귀 여유를 정했습니다](/posts/0-to-1/pokeclip-live-window-without-fork/)
+- **CASE 30** · [클립은 완성 파일 대신 원본과 편집 레시피로 남겼습니다](/posts/0-to-1/clip-edit-recipe-render-boundary/)
 
 ## 파일 회수와 복구 기준 {#recovery}
 
 완료 알림을 놓쳤다고 디스크에 남은 방송 파일까지 사라진 것은 아닙니다. 파일·DB·객체 저장소가 어긋났을 때 어디서 사실을 확인하고 다시 처리할지 정했습니다.
 
-- **CASE 14** · [HTTP 200인데 검은 화면, 세 단계를 지나서야 재생됐습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-black-screen-three-causes/)
-- **CASE 15** · [완료 알림이 사라져도 녹화 파일은 디스크 재스캔으로 찾습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-indexer-recovery-without-events/)
-- **CASE 16** · [업로드가 끝났는지는 S3 응답이 아니라 DB 장부로 봤습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-upload-state-and-recovery/)
+- **CASE 14** · [HTTP 200인데 검은 화면, 세 단계를 지나서야 재생됐습니다](/posts/0-to-1/pokeclip-black-screen-three-causes/)
+- **CASE 15** · [완료 알림이 사라져도 녹화 파일은 디스크 재스캔으로 찾습니다](/posts/0-to-1/pokeclip-indexer-recovery-without-events/)
+- **CASE 16** · [업로드가 끝났는지는 S3 응답이 아니라 DB 장부로 봤습니다](/posts/0-to-1/pokeclip-upload-state-and-recovery/)
 
 ## 재생 누락·시간축·재포장 {#playback}
 
 오류 수가 0이어도 영상 구간은 빠질 수 있었습니다. 원인을 파일 안 시각(tfdt)으로 좁힌 뒤 되감기용 조각을 따로 만들었고, 조각마다 init이 달라지는 FFmpeg 대신 Go 재포장을 골라 속도와 출력 정합성을 서로 다른 시험으로 확인했습니다.
 
-- **CASE 21** · [되감기 재포장 조각의 생성과 업로드 완료를 따로 확정했습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-playback-producer-boundaries/)
-- **CASE 22** · [HLS 오류는 0건인데 녹화 142초 중 62초가 사라졌습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-zero-errors-missing-playback/)
-- **CASE 23** · [HLS 녹화 재생을 가른 것은 init이 아니라 tfdt였습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-cdn-timeline-normalization/)
-- **CASE 24** · [FFmpeg 재포장은 조각마다 init이 달라 Go로 바꿨습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-go-remux-same-io-benchmark/)
-- **CASE 25** · [같은 세션 재접속에 HLS 끊김 표시를 달지 않은 이유](https://xodbs1021.github.io/posts/0-to-1/pokeclip-reconnect-audio-gap/)
+- **CASE 21** · [되감기 재포장 조각의 생성과 업로드 완료를 따로 확정했습니다](/posts/0-to-1/pokeclip-playback-producer-boundaries/)
+- **CASE 22** · [HLS 오류는 0건인데 녹화 142초 중 62초가 사라졌습니다](/posts/0-to-1/pokeclip-zero-errors-missing-playback/)
+- **CASE 23** · [HLS 녹화 재생을 가른 것은 init이 아니라 tfdt였습니다](/posts/0-to-1/pokeclip-cdn-timeline-normalization/)
+- **CASE 24** · [FFmpeg 재포장은 조각마다 init이 달라 Go로 바꿨습니다](/posts/0-to-1/pokeclip-go-remux-same-io-benchmark/)
+- **CASE 25** · [같은 세션 재접속에 HLS 끊김 표시를 달지 않은 이유](/posts/0-to-1/pokeclip-reconnect-audio-gap/)
 
 ## 조회 계약과 식별자 전환 {#contracts}
 
 조회가 요청 시작 이후의 파일만 찾으면 앞에 걸친 첫 조각이 빠집니다. 시간 구간의 겹침 규칙을 바로잡고, 식별자 변경에서는 소비자의 준비 상태를 확인한 뒤 전환하도록 조율했습니다.
 
-- **CASE 28** · [3.9초부터 자르면 첫 조각이 빠진다: 조회 계약과 8,020개 경계 검증](https://xodbs1021.github.io/posts/0-to-1/pokeclip-segment-overlap-contract/)
-- **CASE 33** · [streamId의 의미를 바꾸기 전에 소비자의 조회부터 확인했다](https://xodbs1021.github.io/posts/0-to-1/stream-id-contract-compatible-migration/)
+- **CASE 28** · [3.9초부터 자르면 첫 조각이 빠진다: 조회 계약과 8,020개 경계 검증](/posts/0-to-1/pokeclip-segment-overlap-contract/)
+- **CASE 33** · [streamId의 의미를 바꾸기 전에 소비자의 조회부터 확인했다](/posts/0-to-1/stream-id-contract-compatible-migration/)
 
 ## 캐시·접근 통제·저장 계층 {#cdn}
 
 같은 URI를 캐시해도 되는지와 캐시된 파일을 누가 받을 수 있는지는 다른 질문이었습니다. 원본 요청·전송량·응답 시간을 나눠 측정하고, 저장 계층을 더 늘릴 필요가 있는지도 실측으로 검토했습니다.
 
-- **CASE 12** · [CDN 캐시 키와 원본 인증을 나누자 원본 요청이 줄었습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-cdn-cache-auth-measurement/)
-- **CASE 19** · [조각이 이미 4초 객체라 새 S3 저장 계층을 보류했습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-storage-before-new-layer/)
+- **CASE 12** · [CDN 캐시 키와 원본 인증을 나누자 원본 요청이 줄었습니다](/posts/0-to-1/pokeclip-cdn-cache-auth-measurement/)
+- **CASE 19** · [조각이 이미 4초 객체라 새 S3 저장 계층을 보류했습니다](/posts/0-to-1/pokeclip-storage-before-new-layer/)
 
 ## 입력·권한·재생목록 발행 {#input}
 
 트랙 6개를 받는 것만으로 음악 없는 클립이 완성되지는 않았습니다. 본방 믹스와 분리된 소리의 대응, 방송자의 기존 설정, 편집·게시 권한까지 이어서 봤습니다. 재생목록에서는 늦게 끝난 작업과 재접속이 기존 목록의 의미를 바꾸지 않도록 설계했습니다.
 
-- **CASE 05** · [소스 약 10개 대신 OBS 6트랙에 순서만 고정했습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-six-track-input-contract/)
-- **CASE 06** · [오디오 6트랙은 개수와 고르기와 소리 내용을 따로 검증했습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-multiaudio-end-to-end-verification/)
-- **CASE 07** · [본방 인코더를 SRT와 나눠 쓰자 GOP와 종료가 묶였습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-obs-shared-encoder-srt/)
-- **CASE 08** · [오디오 자동 배정은 끌 때 원래 OBS 체크로 돌아가야 했습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-audio-assignment-user-state/)
-- **CASE 09** · [SRT 암호를 PG 밖 Secrets Manager로 옮겼습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-secret-storage-migration-plan/)
-- **CASE 10** · [OBS 계정 연결을 OAuth 대신 8자 일회용 코드로 했습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-one-time-pairing-contract/)
-- **CASE 11** · [편집자와 방송자를 나누려던 업로드 권한은 하나로 합쳐졌습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-editing-upload-authorization/)
-- **CASE 20** · [늦게 끝난 writer가 새 재생목록을 덮는다면](https://xodbs1021.github.io/posts/0-to-1/pokeclip-database-authoritative-manifest-publishing/)
-- **CASE 26** · [끝난 재생목록은 다시 열지 않기로 했습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-session-url-and-endlist/)
-- **CASE 27** · [12번이 준비돼도 11번을 건너뛰면 안 됩니다: HLS 목록 경계 검증](https://xodbs1021.github.io/posts/0-to-1/pokeclip-manifest-window-boundaries/)
-- **CASE 31** · [게임 대사도 음성이라 자막 트랙 선택에서 상시 VAD를 뺐습니다](https://xodbs1021.github.io/posts/0-to-1/microphone-selection-without-always-on-vad/)
+- **CASE 05** · [소스 약 10개 대신 OBS 6트랙에 순서만 고정했습니다](/posts/0-to-1/pokeclip-six-track-input-contract/)
+- **CASE 06** · [오디오 6트랙은 개수와 고르기와 소리 내용을 따로 검증했습니다](/posts/0-to-1/pokeclip-multiaudio-end-to-end-verification/)
+- **CASE 07** · [본방 인코더를 SRT와 나눠 쓰자 GOP와 종료가 묶였습니다](/posts/0-to-1/pokeclip-obs-shared-encoder-srt/)
+- **CASE 08** · [오디오 자동 배정은 끌 때 원래 OBS 체크로 돌아가야 했습니다](/posts/0-to-1/pokeclip-audio-assignment-user-state/)
+- **CASE 09** · [SRT 암호를 PG 밖 Secrets Manager로 옮겼습니다](/posts/0-to-1/pokeclip-secret-storage-migration-plan/)
+- **CASE 10** · [OBS 계정 연결을 OAuth 대신 8자 일회용 코드로 했습니다](/posts/0-to-1/pokeclip-one-time-pairing-contract/)
+- **CASE 11** · [편집자와 방송자를 나누려던 업로드 권한은 하나로 합쳐졌습니다](/posts/0-to-1/pokeclip-editing-upload-authorization/)
+- **CASE 20** · [늦게 끝난 writer가 새 재생목록을 덮는다면](/posts/0-to-1/pokeclip-database-authoritative-manifest-publishing/)
+- **CASE 26** · [끝난 재생목록은 다시 열지 않기로 했습니다](/posts/0-to-1/pokeclip-session-url-and-endlist/)
+- **CASE 27** · [12번이 준비돼도 11번을 건너뛰면 안 됩니다: HLS 목록 경계 검증](/posts/0-to-1/pokeclip-manifest-window-boundaries/)
+- **CASE 31** · [게임 대사도 음성이라 자막 트랙 선택에서 상시 VAD를 뺐습니다](/posts/0-to-1/microphone-selection-without-always-on-vad/)
 
 ## 테스트·실행 권한·CI·의존성 {#quality}
 
 테스트가 개발 DB에 잔여 행을 남기거나, 테스트가 사라졌는데도 CI가 초록색이 되는 경우를 확인했습니다. 일부러 오류를 넣거나 테스트를 제거해 검사가 실제로 실패하는지 대조했습니다.
 
-- **CASE 17** · [통합 테스트 잔여 행을 전용 DB와 소유 표식으로 막았습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-test-database-ownership-marker/)
-- **CASE 18** · [비root 녹화를 위해 새 볼륨의 소유권을 이미지에 심었습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-scratch-volume-ownership/)
-- **CASE 34** · [미디어 CI를 경로 필터로 좁히자 필수 체크를 포기해야 했습니다](https://xodbs1021.github.io/posts/0-to-1/media-ci-path-filter-required-check-tradeoff/)
-- **CASE 35** · [테스트 파일을 빼도 통과하던 CI를 커버리지 게이트로 막았습니다](https://xodbs1021.github.io/posts/0-to-1/coverage-gate-that-fails-when-tests-disappear/)
-- **후속 기록** · [MediaMTX를 포크로 바꾸며 녹화 입력부터 다시 만들었습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-dependency-upgrade-contracts/)
+- **CASE 17** · [통합 테스트 잔여 행을 전용 DB와 소유 표식으로 막았습니다](/posts/0-to-1/pokeclip-test-database-ownership-marker/)
+- **CASE 18** · [비root 녹화를 위해 새 볼륨의 소유권을 이미지에 심었습니다](/posts/0-to-1/pokeclip-scratch-volume-ownership/)
+- **CASE 34** · [미디어 CI를 경로 필터로 좁히자 필수 체크를 포기해야 했습니다](/posts/0-to-1/media-ci-path-filter-required-check-tradeoff/)
+- **CASE 35** · [테스트 파일을 빼도 통과하던 CI를 커버리지 게이트로 막았습니다](/posts/0-to-1/coverage-gate-that-fails-when-tests-disappear/)
+- **후속 기록** · [MediaMTX를 포크로 바꾸며 녹화 입력부터 다시 만들었습니다](/posts/0-to-1/pokeclip-dependency-upgrade-contracts/)
 
 ## MediaMTX 기여와 리뷰에서 바뀐 판단 {#opensource}
 
 설정 오류가 반복 실행 뒤에야 드러나거나, 실패한 명령이 종료 코드 0으로 기록되는 문제를 공개 프로젝트의 수정으로 연결했습니다. 정식 릴리스 4건 외에도 열린 제안과 채택되지 않은 접근을 남겼습니다. 유지보수자의 리뷰 때문에 무엇을 바꿨는지도 각 글에서 확인할 수 있습니다.
 
-- **CASE 36** · [서버는 켜졌는데 방송을 재생할 수 없었다: HLS 설정 검증을 앞당기기](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-hls-segment-count-validation/)
-- **CASE 37** · [실패한 명령이 종료 코드 0으로 보인 이유: 빠진 return 하나의 영향](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-hook-exit-code-return/)
-- **CASE 38** · [대체 화면은 보여주되 녹화하지 않기: 기존 PR을 이어 완성한 상태 경계](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-offline-recording-source-lifecycle/)
-- **CASE 39** · [기본값을 복사했는데 왜 다른 설정까지 바뀔까: 인증 설정의 두 가지 회귀](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-auth-defaults-normalization-and-clone/)
+- **CASE 36** · [서버는 켜졌는데 방송을 재생할 수 없었다: HLS 설정 검증을 앞당기기](/posts/open-source-analysis/mediamtx-hls-segment-count-validation/)
+- **CASE 37** · [실패한 명령이 종료 코드 0으로 보인 이유: 빠진 return 하나의 영향](/posts/open-source-analysis/mediamtx-hook-exit-code-return/)
+- **CASE 38** · [대체 화면은 보여주되 녹화하지 않기: 기존 PR을 이어 완성한 상태 경계](/posts/open-source-analysis/mediamtx-offline-recording-source-lifecycle/)
+- **CASE 39** · [기본값을 복사했는데 왜 다른 설정까지 바뀔까: 인증 설정의 두 가지 회귀](/posts/open-source-analysis/mediamtx-auth-defaults-normalization-and-clone/)
 - **CASE 40** · [로그 재설정 중 훅을 기다리게 한 PR은 교착 반례로 닫혔습니다](/posts/open-source-analysis/mediamtx-logger-reload-rejected-lifecycle-fix/)
-- **CASE 41** · [MediaMTX 훅 7곳은 실행 실패를 로그에 남기지 않았습니다](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-seven-hooks-missing-exit-callback/)
+- **CASE 41** · [MediaMTX 훅 7곳은 실행 실패를 로그에 남기지 않았습니다](/posts/open-source-analysis/mediamtx-seven-hooks-missing-exit-callback/)
 - **CASE 42** · [MediaMTX 인증서 감시 작업은 Close 뒤에도 돌았습니다](/posts/open-source-analysis/mediamtx-certificate-watcher-close-join/)
-- **CASE 43** · [MediaMTX 훅 출력을 모으자 동시 종료에서 줄이 빠졌습니다](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-hook-output-backpressure-experiments/)
-- **후속 기록** · [MediaMTX가 SRT 암호를 사용자별로 받게 제안했습니다](https://xodbs1021.github.io/posts/open-source-analysis/mediamtx-user-srt-passphrase-boundaries/)
+- **CASE 43** · [MediaMTX 훅 출력을 모으자 동시 종료에서 줄이 빠졌습니다](/posts/open-source-analysis/mediamtx-hook-output-backpressure-experiments/)
+- **후속 기록** · [MediaMTX가 SRT 암호를 사용자별로 받게 제안했습니다](/posts/open-source-analysis/mediamtx-user-srt-passphrase-boundaries/)
 
 ## SoftBank Shakedown: 배포부터 복구까지 {#shakedown}
 
 선택한 계획이 AWS 자원에 반영되게 연결하고, 잘못된 Java 입력의 거부부터 DB 복원·호스트 재부팅까지 확인했습니다. AI가 생성할 수 있는 범위와 실행 전에 서버가 거부할 조건을 정한 과정도 담았습니다.
 
-- **후속 기록** · [AI에 맡기는 이미지 생성과 배포 판단의 범위부터 제한했습니다](https://xodbs1021.github.io/posts/0-to-1/shakedown-bounded-ai-image-generation/)
-- **후속 기록** · [선택한 배포 계획을 AWS에 적용하고 장애 뒤 복구를 쟀습니다](https://xodbs1021.github.io/posts/0-to-1/shakedown-plan-deployment-and-recovery/)
-- **후속 기록** · [잘못된 Java 구문이 검사를 통과해 구문 검사를 앞에 뒀습니다](https://xodbs1021.github.io/posts/0-to-1/shakedown-java-syntax-before-security-scan/)
-- **후속 기록** · [TLS 연결 성공과 잘못된 호스트 거부를 짝으로 시험했습니다](https://xodbs1021.github.io/posts/0-to-1/shakedown-database-tls-identity-and-failover/)
-- **후속 기록** · [백업이 있다는 말 대신 새 DB에 복원한 데이터로 확인했습니다](https://xodbs1021.github.io/posts/0-to-1/shakedown-database-restore-proves-backup/)
-- **후속 기록** · [재부팅 후에는 살아나고 삭제 후에는 살아나지 않아야 했습니다](https://xodbs1021.github.io/posts/0-to-1/shakedown-reboot-recovery-and-deletion/)
+- **후속 기록** · [AI에 맡기는 이미지 생성과 배포 판단의 범위부터 제한했습니다](/posts/0-to-1/shakedown-bounded-ai-image-generation/)
+- **후속 기록** · [선택한 배포 계획을 AWS에 적용하고 장애 뒤 복구를 쟀습니다](/posts/0-to-1/shakedown-plan-deployment-and-recovery/)
+- **후속 기록** · [잘못된 Java 구문이 검사를 통과해 구문 검사를 앞에 뒀습니다](/posts/0-to-1/shakedown-java-syntax-before-security-scan/)
+- **후속 기록** · [TLS 연결 성공과 잘못된 호스트 거부를 짝으로 시험했습니다](/posts/0-to-1/shakedown-database-tls-identity-and-failover/)
+- **후속 기록** · [백업이 있다는 말 대신 새 DB에 복원한 데이터로 확인했습니다](/posts/0-to-1/shakedown-database-restore-proves-backup/)
+- **후속 기록** · [재부팅 후에는 살아나고 삭제 후에는 살아나지 않아야 했습니다](/posts/0-to-1/shakedown-reboot-recovery-and-deletion/)
 
 ## 방향이 바뀌었어도 남길 판단 {#reference}
 
 현재 구현에 쓰지 않는 경로 조정 설계도 있고, 임시 기준값으로 11월 3일 출시본에 들어갔지만 정확도는 아직 재지 않은 채팅 하이라이트 판별도 있습니다. 부분 목록으로 방송을 삭제하지 않는 원칙과, 자동 탐지가 빗나가도 손으로 표시한 장면을 같은 카드 표에 남기는 선택은 다음 설계에도 참고할 수 있어 남겼습니다.
 
-- **CASE 13** · [부분 목록으로 방송을 지우지 않으려던 경로 조정자를 버렸습니다](https://xodbs1021.github.io/posts/0-to-1/pokeclip-path-reconciler-design-history/)
-- **CASE 32** · [채팅 급증 판별은 임시 기준이라 수동 표시 경로를 함께 뒀습니다](https://xodbs1021.github.io/posts/0-to-1/chat-highlight-research-and-fallback/)
+- **CASE 13** · [부분 목록으로 방송을 지우지 않으려던 경로 조정자를 버렸습니다](/posts/0-to-1/pokeclip-path-reconciler-design-history/)
+- **CASE 32** · [채팅 급증 판별은 임시 기준이라 수동 표시 경로를 함께 뒀습니다](/posts/0-to-1/chat-highlight-research-and-fallback/)
 
 ## 상태와 자료를 읽는 기준 {#source}
 
