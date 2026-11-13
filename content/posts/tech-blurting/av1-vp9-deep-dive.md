@@ -1,7 +1,7 @@
 ---
 title: "AV1의 로열티 프리는 특허 풀이 없다는 뜻이 아닙니다"
 date: 2026-06-20T22:54:28+09:00
-lastmod: "2026-11-13T07:55:32+09:00"
+lastmod: "2026-11-13T14:58:13+09:00"
 description: "AOMedia의 AV1 특허 허락은 회원이 아니어도 로열티 없이 받지만, 그 허락 밖의 특허권자는 따로 풀을 엽니다. On2 인수 · VP8 공개 · VP9 확정 · AOMedia 설립 · AV1 1.0과 정오표의 날짜, Sisvel AV1 풀의 기기 요율과 Access Advance의 스트리밍 풀, av01 코덱 문자열의 레벨 표기를 1차 문서로 확인하고, SVT-AV1 4.2.0 preset 4 · 6 · 8 · 10의 CPU 시간과 크기를 Sintel 예고편 10초로 직접 쟀습니다."
 categories: ["tech-blurting"]
 tags: ["AV1", "VP9", "SVT-AV1", "AOMedia", "특허 라이선스", "AVIF"]
@@ -219,4 +219,4 @@ AV1을 「로열티 프리」라고 할 때 확인할 것은 누구의 특허가
 - [ITU-T H.266](https://www.itu.int/rec/T-REC-H.266)
 - [Sintel](https://durian.blender.org/sharing/) — 시험 영상, © copyright Blender Foundation | durian.blender.org, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)
 
-다음 편: [코덱은 기술이 아니라 비즈니스 결정이다 — 시나리오/비용/디버깅 종합](/posts/tech-blurting/codec-decision-and-debugging/)
+다음 편: [HE-AAC는 절반 표본률로 부호화하고 고음은 SBR로 채웁니다](/posts/tech-blurting/aac-and-friends/)

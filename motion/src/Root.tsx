@@ -76,6 +76,9 @@ import { SPEED_BELOW_REALTIME_FRAMES, SpeedBelowRealtime } from "./scenes/live-t
 import { DECODE_ORDER_FRAMES, DecodeOrder } from "./scenes/h264-deep-dive/DecodeOrder";
 import { CTU_QUADTREE_FRAMES, CtuQuadtree } from "./scenes/h265-hdr-deep-dive/CtuQuadtree";
 import { AV1_REF_SLOTS_FRAMES, Av1RefSlots } from "./scenes/av1-vp9-deep-dive/Av1RefSlots";
+import { SBR_FILL_FRAMES, SbrFill } from "./scenes/aac-and-friends/SbrFill";
+import { OPUS_MODE_STRIP_FRAMES, OpusModeStrip } from "./scenes/opus-deep-dive/OpusModeStrip";
+import { PLAYER_START_CHAIN_FRAMES, PlayerStartChain } from "./scenes/codec-decision-and-debugging/PlayerStartChain";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
@@ -833,6 +836,36 @@ export const RemotionRoot: React.FC = () => (
       component={Av1RefSlots}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={AV1_REF_SLOTS_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="SbrFill" component={SbrFill} durationInFrames={SBR_FILL_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="SbrFillMobile"
+      component={SbrFill}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={SBR_FILL_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="OpusModeStrip" component={OpusModeStrip} durationInFrames={OPUS_MODE_STRIP_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="OpusModeStripMobile"
+      component={OpusModeStrip}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={OPUS_MODE_STRIP_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="PlayerStartChain" component={PlayerStartChain} durationInFrames={PLAYER_START_CHAIN_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="PlayerStartChainMobile"
+      component={PlayerStartChain}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={PLAYER_START_CHAIN_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}

@@ -26,6 +26,15 @@
       "bytes": 22494
     }
   },
+  "0e234863a7ac3c88": {
+    "source": "content/posts/tech-blurting/aac-and-friends.md",
+    "wide": {
+      "file": "0e234863a7ac3c88-wide.svg",
+      "width": 424,
+      "height": 311,
+      "bytes": 17139
+    }
+  },
   "12ec1e92c021bdff": {
     "source": "content/posts/projects/aws-gcp-bidirectional-cutover-experiment.md",
     "wide": {
@@ -53,21 +62,6 @@
       "bytes": 22349
     }
   },
-  "1cf72d3ce8553712": {
-    "source": "content/posts/tech-blurting/codec-decision-and-debugging.md",
-    "wide": {
-      "file": "1cf72d3ce8553712-wide.svg",
-      "width": 1016,
-      "height": 124,
-      "bytes": 19340
-    },
-    "narrow": {
-      "file": "1cf72d3ce8553712-narrow.svg",
-      "width": 184,
-      "height": 650,
-      "bytes": 19562
-    }
-  },
   "267970177e233596": {
     "source": "content/posts/tech-blurting/hls-just-files.md",
     "wide": {
@@ -86,21 +80,6 @@
       "bytes": 21839
     }
   },
-  "2f654ce58e7b04e9": {
-    "source": "content/posts/tech-blurting/codec-decision-and-debugging.md",
-    "wide": {
-      "file": "2f654ce58e7b04e9-wide.svg",
-      "width": 1332,
-      "height": 272,
-      "bytes": 23445
-    },
-    "narrow": {
-      "file": "2f654ce58e7b04e9-narrow.svg",
-      "width": 600,
-      "height": 733,
-      "bytes": 23192
-    }
-  },
   "2fd826ede2c54c66": {
     "source": "content/posts/0-to-1/pokeclip-secret-storage-migration-plan.md",
     "wide": {
@@ -117,6 +96,15 @@
       "width": 417,
       "height": 456,
       "bytes": 19462
+    }
+  },
+  "37ea4505730af004": {
+    "source": "content/posts/tech-blurting/codec-decision-and-debugging.md",
+    "wide": {
+      "file": "37ea4505730af004-wide.svg",
+      "width": 435,
+      "height": 843,
+      "bytes": 19453
     }
   },
   "4187c5e2b25d2254": {
@@ -173,21 +161,6 @@
       "bytes": 21906
     }
   },
-  "4c88e2feaffa223a": {
-    "source": "content/posts/tech-blurting/aac-and-friends.md",
-    "wide": {
-      "file": "4c88e2feaffa223a-wide.svg",
-      "width": 1264,
-      "height": 370,
-      "bytes": 25707
-    },
-    "narrow": {
-      "file": "4c88e2feaffa223a-narrow.svg",
-      "width": 808,
-      "height": 558,
-      "bytes": 26638
-    }
-  },
   "4ec6e740ac6563b4": {
     "source": "content/posts/0-to-1/shakedown-bounded-ai-image-generation.md",
     "wide": {
@@ -222,15 +195,6 @@
       "width": 335,
       "height": 791,
       "bytes": 22976
-    }
-  },
-  "5f5cc398acab1997": {
-    "source": "content/posts/tech-blurting/aac-and-friends.md",
-    "wide": {
-      "file": "5f5cc398acab1997-wide.svg",
-      "width": 1016,
-      "height": 210,
-      "bytes": 18334
     }
   },
   "60d06f1a008623c2": {
@@ -359,30 +323,6 @@
       "bytes": 22461
     }
   },
-  "915440bf74f7cace": {
-    "source": "content/posts/tech-blurting/opus-deep-dive.md",
-    "wide": {
-      "file": "915440bf74f7cace-wide.svg",
-      "width": 1016,
-      "height": 173,
-      "bytes": 18289
-    },
-    "narrow": {
-      "file": "915440bf74f7cace-narrow.svg",
-      "width": 392,
-      "height": 485,
-      "bytes": 18495
-    }
-  },
-  "9222112507bfd2be": {
-    "source": "content/posts/tech-blurting/opus-deep-dive.md",
-    "wide": {
-      "file": "9222112507bfd2be-wide.svg",
-      "width": 817,
-      "height": 471,
-      "bytes": 26908
-    }
-  },
   "9ee4a3f09e01e0e4": {
     "source": "content/posts/0-to-1/pokeclip-dependency-upgrade-contracts.md",
     "wide": {
@@ -408,15 +348,6 @@
       "width": 392,
       "height": 614,
       "bytes": 19161
-    }
-  },
-  "afcaf6b41b61ee7b": {
-    "source": "content/posts/tech-blurting/codec-decision-and-debugging.md",
-    "wide": {
-      "file": "afcaf6b41b61ee7b-wide.svg",
-      "width": 1640,
-      "height": 662,
-      "bytes": 44980
     }
   },
   "b444c2613e32344b": {
@@ -579,21 +510,6 @@
       "width": 392,
       "height": 595,
       "bytes": 24425
-    }
-  },
-  "ed88d5fe785fe73f": {
-    "source": "content/posts/tech-blurting/opus-deep-dive.md",
-    "wide": {
-      "file": "ed88d5fe785fe73f-wide.svg",
-      "width": 1110,
-      "height": 272,
-      "bytes": 22724
-    },
-    "narrow": {
-      "file": "ed88d5fe785fe73f-narrow.svg",
-      "width": 600,
-      "height": 634,
-      "bytes": 22549
     }
   },
   "f214404ff20a8c89": {

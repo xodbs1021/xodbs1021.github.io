@@ -1,4 +1,30 @@
 {
+  "aac-and-friends-sbr-fill": {
+    "scene": "SbrFill",
+    "alt": "가로축이 0에서 24kHz까지인 주파수 막대 그림이다. 먼저 청록색 AAC-LC 코어 막대가 0kHz부터 교차 점선(12kHz 눈금보다 조금 아래)까지 차오른다. 이어서 교차 바로 아래 대역의 막대 묶음이 점선 상자로 표시되고, 그 복사본이 위쪽 빈 대역으로 두 번 미끄러져 올라가 교차 위를 채운다. 그다음 높은 대역 위에 포락선 꺾은선이 그려지고 옮겨진 막대가 그 선 높이에 맞게 깎인다. 위에 프레임 1 · 2,048표본(42.7ms) 이름표가 있고, 끝에 다음 프레임으로 바뀌며 막대가 내려간다",
+    "sha256": "95d380b3ce8412f9f42cb9847ac84501d3c7f73db9dbb88776b0e0df708a648c",
+    "bytes": 371106,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/aac-and-friends-sbr-fill-poster.jpg",
+    "mobile": {
+      "sha256": "fee88e409d40ddf090177c40bf35afdaa3a9115954fb56efbec5e330ba0c96a0",
+      "bytes": 380467,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/aac-and-friends-sbr-fill-mobile-poster.jpg"
+    }
+  },
   "abr-ladder-design-convex-hull-climb": {
     "scene": "ConvexHullClimb",
     "alt": "VMAF 대 비트레이트(로그 눈금) 그래프에서 360p·540p·720p·1080p 네 곡선이 왼쪽부터 함께 그려지고, 각 지점에서 가장 높은 곡선을 잇는 강조색 굵은 선이 따라간다. 오른쪽 위 이름표가 윗선 540p에서 720p, 1080p로 바뀌고, 끝에서 곡선마다 해상도 이름이 붙는다",
@@ -153,6 +179,32 @@
       "audio": 0,
       "faststart": true,
       "poster": "/images/cmaf-deep-dive-chunked-segment-mobile-poster.jpg"
+    }
+  },
+  "codec-decision-and-debugging-player-start-chain": {
+    "scene": "PlayerStartChain",
+    "alt": "번호가 붙은 단계 상자 다섯 개가 차례로 놓여 있다: 1 다변형 목록 CODECS, 2 isTypeSupported(), 3 addSourceBuffer(), 4 init 조각(moov · ASC), 5 디코딩. 먼저 청록색 mp4a.40.2 이름표가 1부터 5까지 이동하며 지나간 상자가 청록색으로 바뀐다. 잠시 뒤 모두 원래대로 돌아가고, ec-3 이름표가 1을 지나 2에 닿자 2번 상자가 빨간 테두리로 바뀌고 Chrome 157: false 이름표가 뜨며, 3–5번 상자가 흐려진다",
+    "sha256": "89b1431890f599595c70aa41a9f465178b5764bacf4a9ea45541aa82c2acc12c",
+    "bytes": 188020,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/codec-decision-and-debugging-player-start-chain-poster.jpg",
+    "mobile": {
+      "sha256": "c44fe6817c741c3c3c3a37b06a767de6976b488d77cb31f59c3d69cc28fd8589",
+      "bytes": 196432,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/codec-decision-and-debugging-player-start-chain-mobile-poster.jpg"
     }
   },
   "coverage-gate-that-fails-when-tests-disappear-coverage-gate-runs": {
@@ -529,6 +581,32 @@
       "audio": 0,
       "faststart": true,
       "poster": "/images/nvenc-gpu-transcoding-gpu-memory-path-mobile-poster.jpg"
+    }
+  },
+  "opus-deep-dive-opus-mode-strip": {
+    "scene": "OpusModeStrip",
+    "alt": "위에 SILK(회색) · 하이브리드(짙은 남색) · CELT(청록) 범례와 0초부터 52초까지의 시간축이 있다. 재생점이 왼쪽에서 오른쪽으로 지나가며 두 줄을 칠한다. 위 줄 32kbps는 처음 약 3초가 SILK, 다음 약 4초가 하이브리드, 이후 대부분이 CELT이고 38초 부근에 짧은 하이브리드 구간이 끼어 있다. 아래 줄 32kbps + FEC(손실 10% 가정)는 처음 약 3초가 SILK이고 나머지가 모두 하이브리드다. 끝에 위 줄 CELT 2,158개, 아래 줄 CELT 0개 이름표가 뜬다",
+    "sha256": "15f6cb72854d70332db330334c3bad8100d9d9480be2ca30ef75448145c83d85",
+    "bytes": 112856,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/opus-deep-dive-opus-mode-strip-poster.jpg",
+    "mobile": {
+      "sha256": "25da35851d910363f91eb6acce041d98d59bc52b18ff9a59eeac20d875cbedb6",
+      "bytes": 108868,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/opus-deep-dive-opus-mode-strip-mobile-poster.jpg"
     }
   },
   "pokeclip-audio-assignment-user-state-auto-assign-restore": {
