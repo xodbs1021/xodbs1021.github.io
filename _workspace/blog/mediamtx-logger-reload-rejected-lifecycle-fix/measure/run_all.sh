@@ -15,6 +15,7 @@ for rev in v1.21.1 0151a87a 0b1fb9e1 ef80a852 v1.21.3; do
 done
 echo "end $(date '+%Y-%m-%dT%H:%M:%S%z') load: $(sysctl -n vm.loadavg)" >> "$OUT/timing.txt"
 # second pass (added after the first): PATCH logFile instead of logLevel
+echo "file pass start $(date '+%Y-%m-%dT%H:%M:%S%z') load: $(sysctl -n vm.loadavg)" >> "$OUT/timing.txt"
 for rev in v1.21.1 0151a87a v1.21.3; do
   python3 -I "$HERE/run_reload.py" gap "$BIN/mediamtx-$rev" "$OUT/file_${rev}_sigint3" sigint3 10 logFile
 done

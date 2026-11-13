@@ -1,7 +1,7 @@
 ---
 title: "인증서를 저장하지 못한 MediaMTX는 종료되지 않았습니다"
 date: "2026-10-28T18:38:23+09:00"
-lastmod: "2026-11-13T22:40:00+09:00"
+lastmod: "2026-11-13T22:07:44+09:00"
 draft: false
 author: "김태윤"
 description: "MediaMTX v1.21.3은 기본 설정에서 MoQ 서버를 켜고 TLS 인증서를 작업 디렉터리에 자동 생성합니다. 그 디렉터리에 쓸 수 없으면 실행은 되지만 SIGINT 뒤 [MoQ] closing에서 멈춥니다. 완료 채널 done을 닫을 watch()가 시작되지 않았기 때문이고, 그 분기에 close(cl.done) 한 줄을 더한 PR #6427이 2026년 10월 27일 main에 머지됐습니다(11월 13일 기준 미릴리스). 네 판을 AI가 다시 빌드해 쓰기 가능·불가 디렉터리에서 종료를 잰 기록입니다."
@@ -91,7 +91,7 @@ PR에 더한 `TestCloseAutoCert`는 `saved`와 `not saved` 두 경우를 하위 
 
 ## #6261의 WaitGroup 판에는 이 멈춤이 없었습니다 {#이전-종료-pr과-이번-수정은-구분한다}
 
-먼저 올린 [#6261](https://github.com/bluenviron/mediamtx/pull/6261)은 같은 기다림을 WaitGroup으로 넣었습니다. `watch()`를 시작하지 않으면 카운터가 0이라 `Wait()`가 바로 반환하므로 이 분기에서 멈추지 않습니다. 위 시험에서 `7d95a222`의 `not saved`가 통과한 이유입니다. #6261은 10월 25일 닫혔고, 유지보수자는 하나의 고루틴을 기다리는 데 WaitGroup은 과하다며 채널로 다시 구현한 #6417을 머지했습니다. 채널은 누군가 닫아야 하므로, 시작하지 않는 분기에서 그 일을 맡을 코드가 필요해졌습니다.
+먼저 올린 [#6261](https://github.com/bluenviron/mediamtx/pull/6261)은 같은 기다림을 WaitGroup으로 넣었습니다. `watch()`를 시작하지 않으면 카운터가 0이라 `Wait()`가 바로 반환하므로 이 분기에서 멈추지 않습니다. 위 시험에서 `7d95a222`의 `not saved`가 통과한 이유입니다. #6261은 10월 25일 닫혔고, 유지보수자는 하나의 고루틴을 기다리는 데 WaitGroup은 과하다며 채널로 다시 구현한 #6417을 머지했습니다.
 
 #6427은 한국 시각 10월 27일 05:03에 `065f94c2`로 머지됐습니다. 11월 13일 상류 main(`3b1c4e87`)에는 이 커밋이 있지만, 최신 릴리스는 10월 25일의 v1.21.3이라 아직 릴리스에는 없습니다.
 
@@ -102,7 +102,7 @@ PR에 더한 `TestCloseAutoCert`는 `saved`와 `not saved` 두 경우를 하위 
 ## 측정 조건
 
 - 수행: AI(Claude Code)가 2026년 11월 13일 KST 21:21–21:22에 `go test`를, 21:23–21:26에 서버 종료를 실행했습니다. load average(1분)는 시작 11.24, 끝 5.32였습니다. 같은 기계에서 다른 세션의 작업과 이 묶음의 로그 재설정 실측이 함께 돌았습니다.
-- 기종: MacBook Air(Apple M5, 고성능 4·효율 6코어, 32GB, 팬 없음), macOS 27.0.1, 일반 사용자(uid 501).
+- 기종: MacBook Air(Apple M5, 고성능 4·효율 6코어, 32GB, 팬 없음), macOS 27.0.1, 일반 사용자(uid 501). Linux에서는 돌리지 않았고, Linux의 읽기 전용 마운트도 재지 않았습니다.
 - 빌드: Go 1.27.2 darwin/arm64로 #6417 직전 `b5df4626`, #6417 머지 `989ea15a`, [v1.21.3](https://github.com/bluenviron/mediamtx/tree/v1.21.3)(`9540cb6c`), #6427 머지 `065f94c2`를 `go build`.
 - 서버 종료: 판마다 쓸 수 있는 디렉터리 · `chmod 555` 디렉터리 각 5번. 실행마다 새 작업 디렉터리에 위 `mediamtx.yml`만 두고 인자 없이 실행, `[MoQ] started with listeners` 줄 0.5초 뒤 SIGINT, 10초 안에 끝나지 않으면 SIGKILL. 시간은 SIGINT부터 프로세스 종료까지(파이썬 단조 시계). 기본 설정은 v1.21.3 저장소의 `mediamtx.yml` 그대로, 모든 주소를 `MTX_*` 환경 변수로 옮겨(:8554 → :28554 등) 디렉터리 조건마다 1번.
 - 시험: #6427의 `TestCloseAutoCert`를 그대로 떼어 낸 파일을 v1.21.1(`04825598`) · #6261 head `7d95a222` · `989ea15a` · v1.21.3의 `internal/certloader`에 넣고(`065f94c2`는 원래 파일), `go test -race -count=5 -v -run '^TestCloseAutoCert$' ./internal/certloader`.

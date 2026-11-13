@@ -1,7 +1,7 @@
 ---
 title: "로그 재설정 중 훅을 기다리게 한 PR은 교착 반례로 닫혔습니다"
 date: "2026-10-15T11:40:52+09:00"
-lastmod: "2026-11-13T22:40:00+09:00"
+lastmod: "2026-11-13T22:07:44+09:00"
 draft: false
 author: "김태윤"
 description: "MediaMTX v1.21.1은 로그 설정을 바꾸면 서버와 로거를 모두 다시 만들어, 그 사이 끝난 훅의 OnExit가 교체 중인 로거를 읽을 수 있었습니다. 재설정이 훅을 기다리게 한 PR #6206은 3초 훅에서 RTSP 리스너 공백을 0.36ms에서 3,035ms로 늘렸고, 재설정을 일으킨 외부 명령을 기다리면 교착이 된다는 리뷰로 2026년 10월 11일 닫혔습니다. 대체 수정 #6326(v1.21.3)과 함께 AI가 다시 잰 기록입니다."
@@ -57,9 +57,9 @@ PR 본문의 실행 기록에서 고치기 전 순서는 `start → start → ex
 
 #6206 head의 10번은 3,020.8–3,168.2ms였고, 늘어난 만큼이 훅이 SIGINT 뒤 버틴 3초입니다. PR 본문에 적은 값(0.25ms 대 3.01초)과 같은 크기입니다. SIGINT를 무시하는 훅이라면 이 공백에는 상한이 없습니다.
 
-FFmpeg로 붙인 RTSP 송출자는 다섯 판 모두 재설정마다 끊겼습니다. `logLevel`은 경로 관리자를 다시 만드는 조건에 직접 들어 있어서([v1.21.3 `core.go` 1132–1133행](https://github.com/bluenviron/mediamtx/blob/9540cb6c1d9f1e9351fcc4ded3afc249ffff22bc/internal/core/core.go#L1132-L1133)), 리스너 공백의 길이와 상관없이 기존 연결은 끊깁니다.
+FFmpeg로 붙인 RTSP 송출자는 다섯 판 모두 재설정마다 끊겼습니다. `logLevel`은 v1.21.1([`core.go` 1046–1047행](https://github.com/bluenviron/mediamtx/blob/048255986f7e04b859b4c4efe651448ec785ecd4/internal/core/core.go#L1046-L1047))과 v1.21.3([1132–1133행](https://github.com/bluenviron/mediamtx/blob/9540cb6c1d9f1e9351fcc4ded3afc249ffff22bc/internal/core/core.go#L1132-L1133)) 모두 경로 관리자를 다시 만드는 조건에 직접 들어 있어서, 리스너 공백의 길이와 상관없이 기존 연결은 끊깁니다.
 
-## 재설정을 일으킨 훅을 기다리면 끝나지 않습니다 {#기다리는-대상이-재설정을-일으키면-순환이-된다}
+## 재설정 뒤의 API를 기다리는 훅을 만들자 재설정이 끝나지 않았습니다 {#기다리는-대상이-재설정을-일으키면-순환이-된다}
 
 aler9는 10월 11일 다시 검토하고 다음과 같이 적었습니다([#6206 댓글](https://github.com/bluenviron/mediamtx/pull/6206#issuecomment-6109821272)).
 
@@ -97,7 +97,7 @@ PR의 순서 시험은 해제 파일을 시험이 직접 만들었기 때문에,
 ## 측정 조건
 
 - 수행: AI(Claude Code)가 2026년 11월 13일 KST 21:09–21:21에 `logLevel` 공백과 순환 재현을, 21:22–21:26에 `logFile` 변경을 실행했습니다. load average(1분)는 시작 29.11, 21:18 15.53, 21:20 41.51, 끝 5.35였습니다. 같은 기계에서 다른 세션의 작업과 이 묶음의 `go test`가 함께 돌았습니다.
-- 기종: MacBook Air(Apple M5, 고성능 4·효율 6코어, 32GB, 팬 없음), macOS 27.0.1.
+- 기종: MacBook Air(Apple M5, 고성능 4·효율 6코어, 32GB, 팬 없음), macOS 27.0.1. Linux에서는 돌리지 않았습니다.
 - 빌드: Go 1.27.2 darwin/arm64로 [v1.21.1](https://github.com/bluenviron/mediamtx/tree/v1.21.1)(`04825598`), #6206 head `0151a87a`(기준 v1.21.1 + 커밋 1개), #6326 직전 main `0b1fb9e1`, #6326 머지 `ef80a852`, [v1.21.3](https://github.com/bluenviron/mediamtx/tree/v1.21.3)(`9540cb6c`)을 `go build`(-race 없음).
 - 도구: FFmpeg 9.0.2(RTSP 송출, TCP), curl 8.7.1, macOS `nc`, Python 3.14 표준 라이브러리.
 - 공통 설정: RTSP(TCP, :18554)와 API(127.0.0.1:19997)만 켬, `logStructured: true`(시각은 마이크로초 단위로 찍힘). 3초 훅은 경로 `test`의 `runOnInit`(`runOnInitRestart: false`)으로, SIGINT를 잡고 3초 뒤 끝납니다.
@@ -119,3 +119,5 @@ PR의 순서 시험은 해제 파일을 시험이 직접 만들었기 때문에,
 ---
 
 [전체 기술 기록으로 돌아가기](/posts/0-to-1/portfolio-engineering-notes/) · [이 글의 포트폴리오 요약 PDF 44쪽](/portfolio/2026-10-15-v2/full.pdf#page=44)
+
+포트폴리오 요약(2026-10-15판) 44쪽의 수치는 이 글의 11월 13일 재측정과 다릅니다.

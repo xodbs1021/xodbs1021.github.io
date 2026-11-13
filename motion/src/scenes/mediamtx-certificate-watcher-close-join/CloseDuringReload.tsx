@@ -1,7 +1,7 @@
 // 콘티: _workspace/blog/mediamtx-certificate-watcher-close-join/storyboard.md 「CloseDuringReload」
 // 두 줄 모두 watch() 가 인증서를 바꾼 뒤 Parent.Log 안에서 멈춰 있을 때 Close() 를 부른다.
 // 위 줄 v1.21.1: Close() 는 종료 신호 · 정리(cert = nil) 뒤 먼저 반환하고, 로그가 풀리면 watch() 가
-// select 로 돌아가 cert 를 다시 채운다. 아래 줄(고친 뒤): Close() 가 watch() 의 반환을 기다린 뒤 정리한다.
+// select 로 돌아가 감시자 경우를 고르면 cert 를 다시 채운다(select 는 무작위라 「채울 수 있음」으로 그린다). 아래 줄(고친 뒤): Close() 가 watch() 의 반환을 기다린 뒤 정리한다.
 // layout="mobile" 은 1080×1350 휴대폰판(CloseDuringReloadMobile) — 인증서 상자를 아래에 둔다.
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { Node } from "../../components/Flow";
@@ -61,7 +61,7 @@ const mobileRow = (y: number): Row => ({
   closeLabel: [60, y + 220],
   watchChip: [280, y + 90],
   closeChip: [280, y + 210],
-  cert: { x: 60, y: y + 330, w: 960, h: 130 },
+  cert: { x: 60, y: y + 330, w: 960, h: 160 },
 });
 const MOBILE: Layout = {
   rows: [mobileRow(40), mobileRow(720)],
@@ -95,7 +95,7 @@ const CertBox: React.FC<{ readonly box: Box; readonly value: string; readonly to
 }) => (
   <Node x={box.x} y={box.y} width={box.w} height={box.h} tone={tone} size={size}>
     {`cl.cert: ${value}`}
-    {note ? <div style={{ fontSize: size * 0.85, fontWeight: 650, marginTop: 6 }}>{note}</div> : null}
+    {note ? <div style={{ fontSize: size, fontWeight: 650, marginTop: 6 }}>{note}</div> : null}
   </Node>
 );
 
@@ -111,7 +111,7 @@ const RowView: React.FC<{ readonly row: Row; readonly l: Layout; readonly fixed:
     : [
         { at: T.blocked, text: "Parent.Log에서 멈춤", tone: "muted" },
         { at: T.release, text: "select로 돌아감", tone: "ink" },
-        { at: T.refill, text: "Close 뒤 cert 다시 채움", tone: "danger" },
+        { at: T.refill, text: "cert 다시 채울 수 있음", tone: "danger" },
       ];
   const closeSteps: readonly Step[] = fixed
     ? [
@@ -129,7 +129,7 @@ const RowView: React.FC<{ readonly row: Row; readonly l: Layout; readonly fixed:
       ? { value: "nil", tone: "accent" as const, note: "정리 뒤 그대로" }
       : { value: "인증서", tone: "ink" as const, note: "" }
     : frame >= T.refill
-      ? { value: "인증서", tone: "danger" as const, note: "nil 뒤 다시 채워짐" }
+      ? { value: "nil", tone: "danger" as const, note: "다시 채워질 수 있음" }
       : frame >= T.cleanup
         ? { value: "nil", tone: "ink" as const, note: "" }
         : { value: "인증서", tone: "ink" as const, note: "" };

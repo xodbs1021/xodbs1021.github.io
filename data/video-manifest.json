@@ -599,9 +599,9 @@
   },
   "mediamtx-certificate-watcher-close-join-close-during-reload": {
     "scene": "CloseDuringReload",
-    "alt": "두 줄에 watch()와 Close() 이름표, cl.cert 상자가 있다. 두 줄 모두 watch()가 Parent.Log에서 멈춤 상태다. 위 줄 v1.21.1에서는 Close()가 종료 신호, 정리 · cert = nil을 거쳐 빨간 먼저 반환이 되고 cl.cert가 nil이 된다. 로그 풀림 이름표가 뜬 뒤 watch()가 select로 돌아가 Close 뒤 cert 다시 채움이 되고 cl.cert 상자가 빨갛게 인증서, nil 뒤 다시 채워짐으로 바뀐다. 아래 줄 고친 뒤에서는 Close()가 종료 신호 뒤 watch() 반환을 기다림에 머물다가, 로그가 풀려 watch()가 로그 끝나고 반환이 된 뒤 청록 정리한 뒤 반환이 되고 cl.cert가 nil, 정리 뒤 그대로로 남는다",
-    "sha256": "3d3e1a3f2a695573f8e1bf5af91e64d9515dd8317a6889b26e766f02c8a717ec",
-    "bytes": 234259,
+    "alt": "두 줄에 watch()와 Close() 이름표, cl.cert 상자가 있다. 두 줄 모두 watch()가 Parent.Log에서 멈춤 상태다. 위 줄 v1.21.1에서는 Close()가 종료 신호, 정리 · cert = nil을 거쳐 빨간 먼저 반환이 되고 cl.cert가 nil이 된다. 로그 풀림 이름표가 뜬 뒤 watch()가 select로 돌아가 cert 다시 채울 수 있음이 되고 cl.cert 상자가 빨갛게 nil, 다시 채워질 수 있음으로 바뀐다. 아래 줄 고친 뒤에서는 Close()가 종료 신호 뒤 watch() 반환을 기다림에 머물다가, 로그가 풀려 watch()가 로그 끝나고 반환이 된 뒤 청록 정리한 뒤 반환이 되고 cl.cert가 nil, 정리 뒤 그대로로 남는다",
+    "sha256": "f3b662f0ed013eec325fe2e53931eb60ad8b8dc97d24ad119085724f72d72697",
+    "bytes": 234788,
     "codec": "h264",
     "pixFmt": "yuv420p",
     "width": 1920,
@@ -611,8 +611,8 @@
     "faststart": true,
     "poster": "/images/mediamtx-certificate-watcher-close-join-close-during-reload-poster.jpg",
     "mobile": {
-      "sha256": "83fd3864b2a85f595d5e25656307f8c909c4e9dc8c5966f103f0b63ba313da54",
-      "bytes": 266612,
+      "sha256": "e3536b56c497836dbbbb0b6586ab2f77d14d2b713f584842413d8692de55fd05",
+      "bytes": 264641,
       "codec": "h264",
       "pixFmt": "yuv420p",
       "width": 1080,

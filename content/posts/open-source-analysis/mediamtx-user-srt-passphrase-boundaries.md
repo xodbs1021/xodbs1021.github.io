@@ -1,7 +1,7 @@
 ---
 title: "MediaMTX가 SRT 암호를 사용자별로 받게 제안했습니다"
 date: "2026-10-15T11:33:48+09:00"
-lastmod: "2026-11-13T22:30:00+09:00"
+lastmod: "2026-11-13T22:07:44+09:00"
 author: "김태윤"
 categories: ["open-source-analysis"]
 draft: false
@@ -106,7 +106,7 @@ HTTP 인증 서버가 200을 보냈다고 끝나는 것이 아닙니다. 사용�
 
 PokeClip의 제품 이미지는 상류 v1.21.1 위에 우리 수정을 얹은 포크 빌드 `v1.21.1-pokeclip.2`이고, #6306도 그 안에 실려 있습니다([Go로 다 짜려던 미디어 서버를 MediaMTX에 맡겼습니다](/posts/0-to-1/pokeclip-mediamtx-build-or-adopt/#직접-만들지-않은-코드는-검토하지-않아도-되는-코드가-아니었습니다)). 다만 포크에 실린 것은 10월 8일 판([`b9735847`](https://github.com/xodbs1021/mediamtx/commit/b973584717b5646845ccbd288162584609a0b41b))이라 지금 head와 경계가 다릅니다. 그 판은 SRT 요청일 때만 2xx 본문을 읽고, 본문의 `srtPassphrase`가 문자열이 아니거나 길이 규칙(10–79자)을 벗어나면 경로 암호로 돌아가지 않고 인증을 실패시킵니다. #6391이 없는 v1.21.1 바탕이라, 포크에서는 본문 대기를 이 패치가 들여온 것도 맞습니다. 포크에 넣어 쓸 수 있는 것과 유지보수자가 상류 변경으로 받아들이는 것은 다른 단계입니다. #6306은 11월 13일 확인 기준 리뷰 없이 열려 있습니다.
 
-상류에 올린 수정은 릴리스 기준과 머지 기준을 나눠 셉니다. 정식 릴리스에 들어간 것은 [#6154](https://github.com/bluenviron/mediamtx/pull/6154) · [#6155](https://github.com/bluenviron/mediamtx/pull/6155) · [#6182](https://github.com/bluenviron/mediamtx/pull/6182)(v1.21.0)와 [#6205](https://github.com/bluenviron/mediamtx/pull/6205)(v1.21.1)의 4건입니다. [#6427](https://github.com/bluenviron/mediamtx/pull/6427)(10월 27일)과 [#6379](https://github.com/bluenviron/mediamtx/pull/6379)(11월 1일)는 머지됐지만 아직 릴리스에 없습니다. #6306과 [#6259](https://github.com/bluenviron/mediamtx/pull/6259) · [#6380](https://github.com/bluenviron/mediamtx/pull/6380)은 열려 있습니다. [#6206](https://github.com/bluenviron/mediamtx/pull/6206)은 [#6326](https://github.com/bluenviron/mediamtx/pull/6326)이, [#6261](https://github.com/bluenviron/mediamtx/pull/6261)은 [#6417](https://github.com/bluenviron/mediamtx/pull/6417)이 다시 구현하면서 닫혔습니다.
+상류에 올린 수정은 릴리스 기준과 머지 기준을 나눠 셉니다. 정식 릴리스에 들어간 것은 [#6154](https://github.com/bluenviron/mediamtx/pull/6154) · [#6155](https://github.com/bluenviron/mediamtx/pull/6155) · [#6182](https://github.com/bluenviron/mediamtx/pull/6182)(v1.21.0)와 [#6205](https://github.com/bluenviron/mediamtx/pull/6205)(v1.21.1)의 4건입니다. [#6427](https://github.com/bluenviron/mediamtx/pull/6427)(10월 27일)과 [#6379](https://github.com/bluenviron/mediamtx/pull/6379)(11월 1일)는 머지됐지만 11월 13일 기준 어느 릴리스에도 없습니다. #6306과 [#6259](https://github.com/bluenviron/mediamtx/pull/6259) · [#6380](https://github.com/bluenviron/mediamtx/pull/6380)은 열려 있습니다. [#6206](https://github.com/bluenviron/mediamtx/pull/6206)은 [#6326](https://github.com/bluenviron/mediamtx/pull/6326)이, [#6261](https://github.com/bluenviron/mediamtx/pull/6261)은 [#6417](https://github.com/bluenviron/mediamtx/pull/6417)이 다시 구현하면서 닫혔습니다.
 
 ## 개발 서버에서 계정별 송출과 차단을 확인했습니다 {#10월-19일-후속-개발-서버에서-계정별-송출과-차단을-연결했습니다}
 

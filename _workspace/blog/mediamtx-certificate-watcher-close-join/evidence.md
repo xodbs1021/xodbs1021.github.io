@@ -18,7 +18,7 @@
 | 상류 main 3b1c4e87 시험 = TestCertReload · TestCloseAutoCert | `git grep '^func Test' origin/main -- internal/certloader` | 2026-11-13 | 코드 |
 | 포크 pokeclip.2 = #6261 판 42e8a20d(wg) | 태그 → ff1f75bb, compare ahead, fork certloader.go에 wg.Wait | 2026-11-13 | 코드 |
 
-삭제: 「10/4 macOS/arm64 · Go 1.26.5」, 원 로그 40행, 머리 상태 갱신 상자(본문 흡수), 「10/15 OPEN」(틀림 — 10/25 닫힘).
+삭제: 옛 비공개 실행 기록과 로그 발췌, 머리 상태 갱신 상자(본문 흡수), 「10/15 OPEN」(틀림 — 10/25 닫힘).
 
 역할: 범위 · 검증 기준 · 제출 결정 = 사용자, 구현 · 실측 = AI(Claude Code · Codex), 재측정 = AI(Claude Code).
 
