@@ -1,0 +1,5 @@
+internal server exited: ERR: json: unknown field "authInternalUsers[0].srtPassphrase"
+http,carol,carolpass123,rejected,invalid passphrase
+http,carol,pathpass1234,accepted,EOF
+http,dave,pathpass1234,accepted,EOF
+http,dave,carolpass123,rejected,invalid passphrase

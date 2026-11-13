@@ -1,0 +1,23 @@
+2026/11/13 19:11:41 INF MediaMTX v1.21.3-2-g99ea6c00
+, darwin, arm64
+2026/11/13 19:11:41 INF configuration loaded from ./functional_internal/cfg.yml
+2026/11/13 19:11:41 INF [SRT] started with listener on :18890 (UDP/SRT)
+2026/11/13 19:11:43 INF [SRT] [conn 127.0.0.1:53562] opened
+2026/11/13 19:11:43 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 19:11:43 INF [SRT] [conn 127.0.0.1:53562] is publishing to path 'test'
+2026/11/13 19:11:44 WAR [SRT] [conn 127.0.0.1:53562] 108 decode errors, last was: skipped 92 bytes
+2026/11/13 19:11:45 WAR [SRT] [conn 127.0.0.1:53562] 106 decode errors, last was: skipped 188 bytes
+2026/11/13 19:11:46 INF [SRT] [conn 127.0.0.1:53562] closed: EOF
+2026/11/13 19:11:47 INF [SRT] [conn 127.0.0.1:55891] opened
+2026/11/13 19:11:47 INF [SRT] [conn 127.0.0.1:55891] closed: invalid passphrase
+2026/11/13 19:11:51 INF [SRT] [conn 127.0.0.1:52049] opened
+2026/11/13 19:11:51 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 19:11:51 INF [SRT] [conn 127.0.0.1:52049] is publishing to path 'test'
+2026/11/13 19:11:52 WAR [SRT] [conn 127.0.0.1:52049] 108 decode errors, last was: skipped 92 bytes
+2026/11/13 19:11:53 WAR [SRT] [conn 127.0.0.1:52049] 106 decode errors, last was: skipped 188 bytes
+2026/11/13 19:11:53 INF [SRT] [conn 127.0.0.1:52049] closed: EOF
+2026/11/13 19:11:55 INF [SRT] [conn 127.0.0.1:56379] opened
+2026/11/13 19:11:55 INF [SRT] [conn 127.0.0.1:56379] closed: invalid passphrase
+2026/11/13 19:11:58 INF shutting down gracefully
+2026/11/13 19:11:58 INF [SRT] closing
+2026/11/13 19:11:58 INF waiting for running hooks

@@ -1,0 +1,49 @@
+2026/11/13 18:59:55 INF MediaMTX v1.21.2
+, darwin, arm64
+2026/11/13 18:59:55 INF configuration loaded from ./v1212_delay1/cfg.yml
+2026/11/13 18:59:55 INF [SRT] started with listener on :18890 (UDP/SRT)
+2026/11/13 18:59:55 INF [API] started with listener on 127.0.0.1:19997 (TCP/HTTP)
+2026/11/13 18:59:57 INF [SRT] [conn 127.0.0.1:52214] opened
+2026/11/13 18:59:57 INF [SRT] [conn 127.0.0.1:52214] closed: invalid passphrase
+2026/11/13 18:59:59 INF [SRT] [conn 127.0.0.1:49998] opened
+2026/11/13 18:59:59 INF [SRT] [conn 127.0.0.1:49998] closed: invalid passphrase
+2026/11/13 19:00:02 INF [SRT] [conn 127.0.0.1:60587] opened
+2026/11/13 19:00:02 INF [SRT] [conn 127.0.0.1:60587] closed: invalid passphrase
+2026/11/13 19:00:04 INF [SRT] [conn 127.0.0.1:60362] opened
+2026/11/13 19:00:04 INF [SRT] [conn 127.0.0.1:60362] closed: invalid passphrase
+2026/11/13 19:00:07 INF [SRT] [conn 127.0.0.1:52095] opened
+2026/11/13 19:00:07 INF [SRT] [conn 127.0.0.1:52095] closed: invalid passphrase
+2026/11/13 19:00:10 INF [SRT] [conn 127.0.0.1:62428] opened
+2026/11/13 19:00:10 INF [SRT] [conn 127.0.0.1:62428] closed: invalid passphrase
+2026/11/13 19:00:12 INF [SRT] [conn 127.0.0.1:54632] opened
+2026/11/13 19:00:12 INF [SRT] [conn 127.0.0.1:54632] closed: invalid passphrase
+2026/11/13 19:00:14 INF [SRT] [conn 127.0.0.1:59471] opened
+2026/11/13 19:00:14 INF [SRT] [conn 127.0.0.1:59471] closed: invalid passphrase
+2026/11/13 19:00:17 INF [SRT] [conn 127.0.0.1:51109] opened
+2026/11/13 19:00:17 INF [SRT] [conn 127.0.0.1:51109] closed: invalid passphrase
+2026/11/13 19:00:20 INF [SRT] [conn 127.0.0.1:62972] opened
+2026/11/13 19:00:20 INF [SRT] [conn 127.0.0.1:62972] closed: invalid passphrase
+2026/11/13 19:00:23 INF [SRT] [conn 127.0.0.1:64268] opened
+2026/11/13 19:00:23 INF [SRT] [conn 127.0.0.1:64268] closed: invalid passphrase
+2026/11/13 19:00:25 INF [SRT] [conn 127.0.0.1:54442] opened
+2026/11/13 19:00:25 INF [SRT] [conn 127.0.0.1:54442] closed: invalid passphrase
+2026/11/13 19:00:28 INF [SRT] [conn 127.0.0.1:59028] opened
+2026/11/13 19:00:28 INF [SRT] [conn 127.0.0.1:59028] closed: invalid passphrase
+2026/11/13 19:00:30 INF [SRT] [conn 127.0.0.1:61779] opened
+2026/11/13 19:00:30 INF [SRT] [conn 127.0.0.1:61779] closed: invalid passphrase
+2026/11/13 19:00:33 INF [SRT] [conn 127.0.0.1:56213] opened
+2026/11/13 19:00:33 INF [SRT] [conn 127.0.0.1:56213] closed: invalid passphrase
+2026/11/13 19:00:35 INF [SRT] [conn 127.0.0.1:60501] opened
+2026/11/13 19:00:35 INF [SRT] [conn 127.0.0.1:60501] closed: invalid passphrase
+2026/11/13 19:00:38 INF [SRT] [conn 127.0.0.1:59402] opened
+2026/11/13 19:00:38 INF [SRT] [conn 127.0.0.1:59402] closed: invalid passphrase
+2026/11/13 19:00:40 INF [SRT] [conn 127.0.0.1:59300] opened
+2026/11/13 19:00:40 INF [SRT] [conn 127.0.0.1:59300] closed: invalid passphrase
+2026/11/13 19:00:43 INF [SRT] [conn 127.0.0.1:50263] opened
+2026/11/13 19:00:43 INF [SRT] [conn 127.0.0.1:50263] closed: invalid passphrase
+2026/11/13 19:00:45 INF [SRT] [conn 127.0.0.1:54205] opened
+2026/11/13 19:00:45 INF [SRT] [conn 127.0.0.1:54205] closed: invalid passphrase
+2026/11/13 19:00:47 INF shutting down gracefully
+2026/11/13 19:00:47 INF [API] closing
+2026/11/13 19:00:47 INF [SRT] closing
+2026/11/13 19:00:47 INF waiting for running hooks
