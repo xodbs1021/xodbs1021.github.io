@@ -118,7 +118,7 @@ flowchart TB
 - [bluenviron/mediamtx#6306](https://github.com/bluenviron/mediamtx/pull/6306) — 사용자별 SRT 암호(작성자 본인, 열림)
 - [bluenviron/mediamtx#5613](https://github.com/bluenviron/mediamtx/issues/5613) — 같은 기능 요청
 - [MediaMTX 문서 「Authentication」](https://mediamtx.org/docs/features/authentication) · [「Control API」](https://mediamtx.org/docs/features/control-api)
-- [사용자별 SRT 암호를 제안하며 인증 범위와 대기 비용을 함께 살펴봤습니다](/posts/open-source-analysis/mediamtx-user-srt-passphrase-boundaries/) — 10월 19일 dev 서버 실측
+- [MediaMTX가 SRT 암호를 사용자별로 받게 제안했습니다](/posts/open-source-analysis/mediamtx-user-srt-passphrase-boundaries/) — 10월 19일 dev 서버 실측
 - 팀 내부 결정 · 설계 · 실측 기록(비공개) — 10월 1–7일 결정, 10월 5일 설계 최종판과 실측
 
 ---

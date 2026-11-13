@@ -84,6 +84,9 @@ import { VMAF_PER_FRAME_FRAMES, VmafPerFrame } from "./scenes/video-quality-bitr
 import { BUFFER_DRAIN_DOWNSWITCH_FRAMES, BufferDrainDownswitch } from "./scenes/buffering-deep-dive/BufferDrainDownswitch";
 import { COALESCE_TIERS_FRAMES, CoalesceTiers } from "./scenes/cdn-for-live-streaming/CoalesceTiers";
 import { ACKS_ISR_COMMIT_FRAMES, AcksIsrCommit } from "./scenes/kafka-core-concepts-technical-review/AcksIsrCommit";
+import { SILENT_EXEC_FAILURE_FRAMES, SilentExecFailure } from "./scenes/mediamtx-seven-hooks-missing-exit-callback/SilentExecFailure";
+import { HOOK_OUTPUT_DRAIN_FRAMES, HookOutputDrain } from "./scenes/mediamtx-hook-output-backpressure-experiments/HookOutputDrain";
+import { AUTH_BODY_WAIT_FRAMES, AuthBodyWait } from "./scenes/mediamtx-user-srt-passphrase-boundaries/AuthBodyWait";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
@@ -921,6 +924,36 @@ export const RemotionRoot: React.FC = () => (
       component={AcksIsrCommit}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={ACKS_ISR_COMMIT_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="SilentExecFailure" component={SilentExecFailure} durationInFrames={SILENT_EXEC_FAILURE_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="SilentExecFailureMobile"
+      component={SilentExecFailure}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={SILENT_EXEC_FAILURE_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="HookOutputDrain" component={HookOutputDrain} durationInFrames={HOOK_OUTPUT_DRAIN_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="HookOutputDrainMobile"
+      component={HookOutputDrain}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={HOOK_OUTPUT_DRAIN_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="AuthBodyWait" component={AuthBodyWait} durationInFrames={AUTH_BODY_WAIT_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="AuthBodyWaitMobile"
+      component={AuthBodyWait}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={AUTH_BODY_WAIT_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}

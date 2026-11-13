@@ -668,5 +668,29 @@
     "posterFrame": 330,
     "alt": "왼쪽 acks=1, 오른쪽 acks=all 두 판에 B1 리더 · B2 팔로워 · B3 팔로워가 각각 1,000건 막대를 갖고 있다. B2 · B3가 회색으로 멈춘 사이 B1 막대 끝에 100건 칸이 붙는데, acks=1은 청록 칸과 확인 응답 100건 이름표, acks=all은 점선 칸과 확인 응답 0건(시간 초과) 이름표다. B1이 빨간 장애로 바뀌고 acks=1은 B2, acks=all은 B3가 새 리더가 된다. 끝에 100건 칸이 사라지며 acks=1에는 확인 받은 100건 사라짐, acks=all에는 확인 받은 기록 손실 0 이름표가 뜬다",
     "mobile": true
+  },
+  {
+    "id": "SilentExecFailure",
+    "post": "mediamtx-seven-hooks-missing-exit-callback",
+    "kind": "video",
+    "posterFrame": 290,
+    "alt": "두 줄이 있다. 위 줄은 v1.21.3 · OnExit 없음, 아래 줄은 #6259 · OnExit 있음. 각 줄에 자식 프로세스 자리(점선), MediaMTX 상자, 로그 상자가 있다. 두 줄 모두 로그에 launched가 찍히고 MediaMTX에서 자식 자리로 exec 화살표가 간다. 자식 자리는 빨갛게 바뀌며 자식 프로세스 생기지 않음, stderr 없음이 뜬다. 실패가 되돌아올 때 위 줄은 회색 점선 받을 곳 없음으로 끝나고 로그에 (더 없음)이 뜬다. 아래 줄은 청록 OnExit 화살표로 MediaMTX에 닿고 로그에 청록 exited: no such file이 찍힌다",
+    "mobile": true
+  },
+  {
+    "id": "HookOutputDrain",
+    "post": "mediamtx-hook-output-backpressure-experiments",
+    "kind": "video",
+    "posterFrame": 320,
+    "alt": "왼쪽에 청록으로 가득 찬 파이프 6개, 가운데 로거 잠금 1개 상자, 오른쪽 파일 상자가 있다. 훅 16개가 함께 끝났다는 제목이 종료 후 0.0초 시계로 바뀌고, 파이프가 서로 다른 속도로 줄며 로거에서 파일로 점이 흐른다. 종료 후 1.0초에 파이프에 남은 부분이 빨갛게 바뀌고 1초: 파이프 닫고 남은 줄 버림, 유실 41% 이름표가 뜬다. 파일 아래 exited 개수가 0 / 6에서 6 / 6으로 늘고, 2.7초에 마지막 exited 2.7초 이름표가 뜬다",
+    "mobile": true
+  },
+  {
+    "id": "AuthBodyWait",
+    "post": "mediamtx-user-srt-passphrase-boundaries",
+    "kind": "video",
+    "posterFrame": 320,
+    "alt": "송출자, MediaMTX 경로 관리자, 인증 응답기 상자가 있다. 송출자에서 MediaMTX로 SRT 접속, MediaMTX에서 응답기로 인증 요청 화살표가 간다. 응답기에서 200 헤더만 회색 점선으로 돌아오고, 본문 대기 시계가 0.0초에서 1.0초로 오르는 동안 아래 GET /v3/paths/list 상자가 대기 중으로 막대를 채운다. 1.0초에 본문 도착 화살표가 청록으로 바뀌고 사용자 암호로 수락 이름표가 송출자 쪽에 뜨며 목록 상자가 응답 · 1.0초 뒤로 바뀐다. 아래에 v1.21.3 · #6306 모두 같음, v1.21.2는 본문을 읽지 않음이라고 적혀 있다",
+    "mobile": true
   }
 ]
