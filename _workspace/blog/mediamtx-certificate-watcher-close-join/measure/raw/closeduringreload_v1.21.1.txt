@@ -1,0 +1,69 @@
+# tree 04825598 (v1.21.1), go version go1.27.2 darwin/arm64
+# test copied: internal/certloader/zz_closeduringreload_test.go
+# started 2026-11-13T21:18:57+0900
+go: downloading github.com/stretchr/testify v1.12.1
+go: downloading go.yaml.in/yaml/v3 v3.0.5
+=== RUN   TestCloseDuringReload
+    zz_closeduringreload_test.go:84: Close() returned while a reload was in progress
+--- FAIL: TestCloseDuringReload (0.02s)
+=== RUN   TestCloseDuringReload
+    zz_closeduringreload_test.go:84: Close() returned while a reload was in progress
+--- FAIL: TestCloseDuringReload (0.02s)
+=== RUN   TestCloseDuringReload
+    zz_closeduringreload_test.go:84: Close() returned while a reload was in progress
+--- FAIL: TestCloseDuringReload (0.02s)
+=== RUN   TestCloseDuringReload
+    zz_closeduringreload_test.go:84: Close() returned while a reload was in progress
+--- FAIL: TestCloseDuringReload (0.02s)
+=== RUN   TestCloseDuringReload
+    zz_closeduringreload_test.go:84: Close() returned while a reload was in progress
+--- FAIL: TestCloseDuringReload (0.02s)
+=== RUN   TestCloseDuringReload
+    zz_closeduringreload_test.go:84: Close() returned while a reload was in progress
+--- FAIL: TestCloseDuringReload (0.02s)
+=== RUN   TestCloseDuringReload
+    zz_closeduringreload_test.go:84: Close() returned while a reload was in progress
+--- FAIL: TestCloseDuringReload (0.02s)
+=== RUN   TestCloseDuringReload
+    zz_closeduringreload_test.go:84: Close() returned while a reload was in progress
+--- FAIL: TestCloseDuringReload (0.02s)
+=== RUN   TestCloseDuringReload
+    zz_closeduringreload_test.go:84: Close() returned while a reload was in progress
+--- FAIL: TestCloseDuringReload (0.02s)
+=== RUN   TestCloseDuringReload
+    zz_closeduringreload_test.go:84: Close() returned while a reload was in progress
+--- FAIL: TestCloseDuringReload (0.02s)
+=== RUN   TestCloseDuringReload
+    zz_closeduringreload_test.go:84: Close() returned while a reload was in progress
+--- FAIL: TestCloseDuringReload (0.02s)
+=== RUN   TestCloseDuringReload
+    zz_closeduringreload_test.go:84: Close() returned while a reload was in progress
+--- FAIL: TestCloseDuringReload (0.02s)
+=== RUN   TestCloseDuringReload
+    zz_closeduringreload_test.go:84: Close() returned while a reload was in progress
+--- FAIL: TestCloseDuringReload (0.02s)
+=== RUN   TestCloseDuringReload
+    zz_closeduringreload_test.go:84: Close() returned while a reload was in progress
+--- FAIL: TestCloseDuringReload (0.02s)
+=== RUN   TestCloseDuringReload
+    zz_closeduringreload_test.go:84: Close() returned while a reload was in progress
+--- FAIL: TestCloseDuringReload (0.02s)
+=== RUN   TestCloseDuringReload
+    zz_closeduringreload_test.go:84: Close() returned while a reload was in progress
+--- FAIL: TestCloseDuringReload (0.03s)
+=== RUN   TestCloseDuringReload
+    zz_closeduringreload_test.go:84: Close() returned while a reload was in progress
+--- FAIL: TestCloseDuringReload (0.03s)
+=== RUN   TestCloseDuringReload
+    zz_closeduringreload_test.go:84: Close() returned while a reload was in progress
+--- FAIL: TestCloseDuringReload (0.02s)
+=== RUN   TestCloseDuringReload
+    zz_closeduringreload_test.go:84: Close() returned while a reload was in progress
+--- FAIL: TestCloseDuringReload (0.02s)
+=== RUN   TestCloseDuringReload
+    zz_closeduringreload_test.go:84: Close() returned while a reload was in progress
+--- FAIL: TestCloseDuringReload (0.02s)
+FAIL
+FAIL	github.com/bluenviron/mediamtx/internal/certloader	0.728s
+FAIL
+# exit 1 at 2026-11-13T21:19:20+0900

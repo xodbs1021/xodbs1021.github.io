@@ -1,0 +1,46 @@
+# tree 7d95a222 (v1.21.1-1-g7d95a222), go version go1.27.2 darwin/arm64
+# test copied: no (already in tree)
+# started 2026-11-13T21:19:20+0900
+=== RUN   TestCloseDuringReload
+--- PASS: TestCloseDuringReload (0.52s)
+=== RUN   TestCloseDuringReload
+--- PASS: TestCloseDuringReload (0.52s)
+=== RUN   TestCloseDuringReload
+--- PASS: TestCloseDuringReload (0.52s)
+=== RUN   TestCloseDuringReload
+--- PASS: TestCloseDuringReload (0.52s)
+=== RUN   TestCloseDuringReload
+--- PASS: TestCloseDuringReload (0.52s)
+=== RUN   TestCloseDuringReload
+--- PASS: TestCloseDuringReload (0.52s)
+=== RUN   TestCloseDuringReload
+--- PASS: TestCloseDuringReload (0.52s)
+=== RUN   TestCloseDuringReload
+--- PASS: TestCloseDuringReload (0.52s)
+=== RUN   TestCloseDuringReload
+--- PASS: TestCloseDuringReload (0.52s)
+=== RUN   TestCloseDuringReload
+--- PASS: TestCloseDuringReload (0.52s)
+=== RUN   TestCloseDuringReload
+--- PASS: TestCloseDuringReload (0.52s)
+=== RUN   TestCloseDuringReload
+--- PASS: TestCloseDuringReload (0.52s)
+=== RUN   TestCloseDuringReload
+--- PASS: TestCloseDuringReload (0.52s)
+=== RUN   TestCloseDuringReload
+--- PASS: TestCloseDuringReload (0.52s)
+=== RUN   TestCloseDuringReload
+--- PASS: TestCloseDuringReload (0.52s)
+=== RUN   TestCloseDuringReload
+--- PASS: TestCloseDuringReload (0.52s)
+=== RUN   TestCloseDuringReload
+--- PASS: TestCloseDuringReload (0.52s)
+=== RUN   TestCloseDuringReload
+--- PASS: TestCloseDuringReload (0.53s)
+=== RUN   TestCloseDuringReload
+--- PASS: TestCloseDuringReload (0.52s)
+=== RUN   TestCloseDuringReload
+--- PASS: TestCloseDuringReload (0.52s)
+PASS
+ok  	github.com/bluenviron/mediamtx/internal/certloader	11.773s
+# exit 0 at 2026-11-13T21:19:34+0900
