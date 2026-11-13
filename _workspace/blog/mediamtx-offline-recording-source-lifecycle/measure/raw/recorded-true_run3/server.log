@@ -1,0 +1,15 @@
+2026/11/13 23:14:04 INF MediaMTX v1.21.0, darwin, arm64
+2026/11/13 23:14:04 INF configuration loaded from <OUT>/recorded-true_run3/mediamtx.yml
+2026/11/13 23:14:04 INF [RTSP] started with listeners on :28554 (TCP/RTSP)
+2026/11/13 23:14:04 INF [path test] [recorder] recording 1 track (H264)
+2026/11/13 23:14:04 INF [path test] stream is available, 1 track (H264)
+2026/11/13 23:14:12 INF [RTSP] [conn 127.0.0.1:60285] opened
+2026/11/13 23:14:12 INF [RTSP] [session 0e59a5dc] created by 127.0.0.1:60285
+2026/11/13 23:14:12 INF [path test] stream is online
+2026/11/13 23:14:12 INF [RTSP] [session 0e59a5dc] is publishing to path 'test'
+2026/11/13 23:14:19 INF [RTSP] [session 0e59a5dc] destroyed: torn down by 127.0.0.1:60285
+2026/11/13 23:14:19 INF [RTSP] [conn 127.0.0.1:60285] closed: EOF
+2026/11/13 23:14:28 INF shutting down gracefully
+2026/11/13 23:14:28 INF [RTSP] closing
+2026/11/13 23:14:28 INF [path test] [recorder] recording stopped
+2026/11/13 23:14:28 INF waiting for running hooks

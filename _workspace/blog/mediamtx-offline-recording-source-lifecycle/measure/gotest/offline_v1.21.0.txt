@@ -1,0 +1,297 @@
+# tree 2c672790 (v1.21.0); local changes:
+# go version go1.27.2 darwin/arm64; go test -count=1 -v -run '^TestPathRecordAlwaysAvailableRecorded'  ./internal/core; runs=3
+## run 1 start 2026-11-13T23:14:00+0900 load: { 55.09 27.38 37.11 }
+=== RUN   TestPathRecordAlwaysAvailableRecorded
+2026/11/13 23:14:06 WAR parameter 'record' is deprecated and has been replaced with 'pathDefaults.record'
+2026/11/13 23:14:06 WAR parameter 'recordPath' is deprecated and has been replaced with 'pathDefaults.recordPath'
+2026/11/13 23:14:06 INF MediaMTX v1.21.0, darwin, arm64
+2026/11/13 23:14:06 INF configuration loaded from <TMPDIR>
+2026/11/13 23:14:06 INF [RTSP] started with listeners on :8554 (TCP/RTSP), :8000 (UDP/RTP), :8001 (UDP/RTCP)
+2026/11/13 23:14:06 INF [path mystream] stream is available, 1 track (H264)
+2026/11/13 23:14:06 INF [RTMP] started with listener on :1935 (TCP/RTMP)
+2026/11/13 23:14:06 INF [HLS] started with listener on :8888 (TCP/HTTP)
+2026/11/13 23:14:06 INF [WebRTC] started with listeners on :8889 (TCP/HTTP), :8189 (UDP/ICE)
+2026/11/13 23:14:06 INF [SRT] started with listener on :8890 (UDP/SRT)
+2026/11/13 23:14:06 WAR [MoQ] certificate auto.key not found, generating it from scratch
+2026/11/13 23:14:06 INF [MoQ] started with listeners on :8892 (TCP/HTTP2), :8892 (UDP/HTTP3), :8893 (UDP/QUIC)
+2026/11/13 23:14:07 INF [RTSP] [conn [::1]:60277] opened
+2026/11/13 23:14:07 INF [RTSP] [session 6ab56a69] created by [::1]:60277
+2026/11/13 23:14:07 INF [path mystream] stream is online
+2026/11/13 23:14:07 INF [RTSP] [session 6ab56a69] is publishing to path 'mystream'
+2026/11/13 23:14:07 INF [path mystream] [recorder] recording 1 track (H264)
+2026/11/13 23:14:07 INF [path mystream] [recorder] recording stopped
+2026/11/13 23:14:07 INF [RTSP] [conn [::1]:60277] closed: EOF
+2026/11/13 23:14:07 INF [RTSP] [session 6ab56a69] destroyed: torn down by [::1]:60277
+2026/11/13 23:14:10 INF [SRT] closing
+2026/11/13 23:14:10 INF [MoQ] closing
+2026/11/13 23:14:10 INF [WebRTC] closing
+2026/11/13 23:14:10 INF [HLS] closing
+2026/11/13 23:14:10 INF [RTMP] closing
+2026/11/13 23:14:10 INF [RTSP] closing
+2026/11/13 23:14:10 INF waiting for running hooks
+--- PASS: TestPathRecordAlwaysAvailableRecorded (4.15s)
+=== RUN   TestPathRecordAlwaysAvailableRecordedStaticSource
+2026/11/13 23:14:10 WAR parameter 'recordPath' is deprecated and has been replaced with 'pathDefaults.recordPath'
+2026/11/13 23:14:10 INF MediaMTX v1.21.0, darwin, arm64
+2026/11/13 23:14:10 INF configuration loaded from <TMPDIR>
+2026/11/13 23:14:10 INF [path mystream] stream is available, 1 track (H264)
+2026/11/13 23:14:10 INF [RTSP] started with listeners on :8554 (TCP/RTSP), :8000 (UDP/RTP), :8001 (UDP/RTCP)
+2026/11/13 23:14:10 INF [path mystream] [RTSP source] started
+2026/11/13 23:14:10 INF [RTMP] started with listener on :1935 (TCP/RTMP)
+2026/11/13 23:14:10 INF [HLS] started with listener on :8888 (TCP/HTTP)
+2026/11/13 23:14:10 INF [WebRTC] started with listeners on :8889 (TCP/HTTP), :8189 (UDP/ICE)
+2026/11/13 23:14:10 INF [SRT] started with listener on :8890 (UDP/SRT)
+2026/11/13 23:14:10 INF [RTSP] [conn [::1]:60283] opened
+2026/11/13 23:14:10 INF [RTSP] [conn [::1]:60283] closed: no stream is available on path 'feeder'
+2026/11/13 23:14:10 ERR [path mystream] [RTSP source] bad status code: 404 (Not Found)
+2026/11/13 23:14:10 INF [MoQ] started with listeners on :8892 (TCP/HTTP2), :8892 (UDP/HTTP3), :8893 (UDP/QUIC)
+2026/11/13 23:14:10 INF [RTSP] [conn [::1]:60284] opened
+2026/11/13 23:14:10 INF [RTSP] [session f2c8775c] created by [::1]:60284
+2026/11/13 23:14:10 INF [path feeder] stream is available and online, 1 track (H264)
+2026/11/13 23:14:10 INF [RTSP] [session f2c8775c] is publishing to path 'feeder'
+2026/11/13 23:14:15 INF [RTSP] [conn [::1]:60287] opened
+2026/11/13 23:14:15 INF [RTSP] [session 9fda9e4b] created by [::1]:60287
+2026/11/13 23:14:15 INF [path mystream] stream is online
+2026/11/13 23:14:15 INF [path mystream] [recorder] recording 1 track (H264)
+2026/11/13 23:14:15 INF [RTSP] [session 9fda9e4b] is reading from path 'feeder', with UDP, 1 track (H264)
+2026/11/13 23:14:17 INF [RTSP] [session f2c8775c] destroyed: torn down by [::1]:60284
+2026/11/13 23:14:17 INF [RTSP] [conn [::1]:60284] closed: EOF
+2026/11/13 23:14:17 INF [RTSP] [conn [::1]:60287] closed: terminated
+2026/11/13 23:14:17 INF [RTSP] [session 9fda9e4b] destroyed: terminated
+2026/11/13 23:14:17 INF [path mystream] [recorder] recording stopped
+2026/11/13 23:14:17 ERR [path mystream] [RTSP source] EOF
+2026/11/13 23:14:20 INF [SRT] closing
+2026/11/13 23:14:20 INF [MoQ] closing
+2026/11/13 23:14:20 INF [WebRTC] closing
+2026/11/13 23:14:20 INF [HLS] closing
+2026/11/13 23:14:20 INF [RTMP] closing
+2026/11/13 23:14:20 INF [RTSP] closing
+2026/11/13 23:14:20 INF [path mystream] [RTSP source] stopped: path is closing
+2026/11/13 23:14:20 INF waiting for running hooks
+--- PASS: TestPathRecordAlwaysAvailableRecordedStaticSource (9.21s)
+=== RUN   TestPathRecordAlwaysAvailableRecordedReloadWhileOffline
+2026/11/13 23:14:20 WAR parameter 'recordPath' is deprecated and has been replaced with 'pathDefaults.recordPath'
+2026/11/13 23:14:20 INF MediaMTX v1.21.0, darwin, arm64
+2026/11/13 23:14:20 INF configuration loaded from <TMPDIR>
+2026/11/13 23:14:20 INF [path mystream] stream is available, 1 track (H264)
+2026/11/13 23:14:20 INF [path mystream] [RTSP source] started
+2026/11/13 23:14:20 INF [RTSP] started with listeners on :8554 (TCP/RTSP), :8000 (UDP/RTP), :8001 (UDP/RTCP)
+2026/11/13 23:14:20 INF [RTMP] started with listener on :1935 (TCP/RTMP)
+2026/11/13 23:14:20 INF [HLS] started with listener on :8888 (TCP/HTTP)
+2026/11/13 23:14:20 INF [WebRTC] started with listeners on :8889 (TCP/HTTP), :8189 (UDP/ICE)
+2026/11/13 23:14:20 INF [SRT] started with listener on :8890 (UDP/SRT)
+2026/11/13 23:14:20 INF [RTSP] [conn [::1]:60290] opened
+2026/11/13 23:14:20 INF [RTSP] [conn [::1]:60290] closed: no stream is available on path 'feeder'
+2026/11/13 23:14:20 ERR [path mystream] [RTSP source] bad status code: 404 (Not Found)
+2026/11/13 23:14:20 INF [MoQ] started with listeners on :8892 (TCP/HTTP2), :8892 (UDP/HTTP3), :8893 (UDP/QUIC)
+2026/11/13 23:14:20 INF [API] started with listener on :9997 (TCP/HTTP)
+2026/11/13 23:14:20 INF reloading configuration (API request)
+2026/11/13 23:14:22 INF [API] closing
+2026/11/13 23:14:22 INF [SRT] closing
+2026/11/13 23:14:22 INF [MoQ] closing
+2026/11/13 23:14:22 INF [WebRTC] closing
+2026/11/13 23:14:22 INF [HLS] closing
+2026/11/13 23:14:22 INF [RTMP] closing
+2026/11/13 23:14:22 INF [RTSP] closing
+2026/11/13 23:14:22 INF [path mystream] [RTSP source] stopped: path is closing
+2026/11/13 23:14:22 INF waiting for running hooks
+--- PASS: TestPathRecordAlwaysAvailableRecordedReloadWhileOffline (2.52s)
+PASS
+ok  	github.com/bluenviron/mediamtx/internal/core	16.666s
+## run 1 exit 0
+## run 2 start 2026-11-13T23:14:22+0900 load: { 58.64 29.91 37.79 }
+=== RUN   TestPathRecordAlwaysAvailableRecorded
+2026/11/13 23:14:27 WAR parameter 'record' is deprecated and has been replaced with 'pathDefaults.record'
+2026/11/13 23:14:27 WAR parameter 'recordPath' is deprecated and has been replaced with 'pathDefaults.recordPath'
+2026/11/13 23:14:27 INF MediaMTX v1.21.0, darwin, arm64
+2026/11/13 23:14:27 INF configuration loaded from <TMPDIR>
+2026/11/13 23:14:27 INF [RTSP] started with listeners on :8554 (TCP/RTSP), :8000 (UDP/RTP), :8001 (UDP/RTCP)
+2026/11/13 23:14:27 INF [RTMP] started with listener on :1935 (TCP/RTMP)
+2026/11/13 23:14:27 INF [HLS] started with listener on :8888 (TCP/HTTP)
+2026/11/13 23:14:27 INF [WebRTC] started with listeners on :8889 (TCP/HTTP), :8189 (UDP/ICE)
+2026/11/13 23:14:27 INF [path mystream] stream is available, 1 track (H264)
+2026/11/13 23:14:27 INF [SRT] started with listener on :8890 (UDP/SRT)
+2026/11/13 23:14:27 INF [MoQ] started with listeners on :8892 (TCP/HTTP2), :8892 (UDP/HTTP3), :8893 (UDP/QUIC)
+2026/11/13 23:14:28 INF [RTSP] [conn [::1]:60295] opened
+2026/11/13 23:14:28 INF [RTSP] [session e28b0d18] created by [::1]:60295
+2026/11/13 23:14:28 INF [path mystream] stream is online
+2026/11/13 23:14:28 INF [RTSP] [session e28b0d18] is publishing to path 'mystream'
+2026/11/13 23:14:28 INF [path mystream] [recorder] recording 1 track (H264)
+2026/11/13 23:14:28 INF [path mystream] [recorder] recording stopped
+2026/11/13 23:14:28 INF [RTSP] [conn [::1]:60295] closed: EOF
+2026/11/13 23:14:28 INF [RTSP] [session e28b0d18] destroyed: torn down by [::1]:60295
+2026/11/13 23:14:31 INF [SRT] closing
+2026/11/13 23:14:31 INF [MoQ] closing
+2026/11/13 23:14:31 INF [WebRTC] closing
+2026/11/13 23:14:31 INF [HLS] closing
+2026/11/13 23:14:31 INF [RTMP] closing
+2026/11/13 23:14:31 INF [RTSP] closing
+2026/11/13 23:14:31 INF waiting for running hooks
+--- PASS: TestPathRecordAlwaysAvailableRecorded (4.18s)
+=== RUN   TestPathRecordAlwaysAvailableRecordedStaticSource
+2026/11/13 23:14:31 WAR parameter 'recordPath' is deprecated and has been replaced with 'pathDefaults.recordPath'
+2026/11/13 23:14:31 INF MediaMTX v1.21.0, darwin, arm64
+2026/11/13 23:14:31 INF configuration loaded from <TMPDIR>
+2026/11/13 23:14:31 INF [path mystream] stream is available, 1 track (H264)
+2026/11/13 23:14:31 INF [RTSP] started with listeners on :8554 (TCP/RTSP), :8000 (UDP/RTP), :8001 (UDP/RTCP)
+2026/11/13 23:14:31 INF [path mystream] [RTSP source] started
+2026/11/13 23:14:31 INF [RTMP] started with listener on :1935 (TCP/RTMP)
+2026/11/13 23:14:31 INF [HLS] started with listener on :8888 (TCP/HTTP)
+2026/11/13 23:14:31 INF [WebRTC] started with listeners on :8889 (TCP/HTTP), :8189 (UDP/ICE)
+2026/11/13 23:14:31 INF [SRT] started with listener on :8890 (UDP/SRT)
+2026/11/13 23:14:31 INF [RTSP] [conn [::1]:60300] opened
+2026/11/13 23:14:31 INF [RTSP] [conn [::1]:60300] closed: no stream is available on path 'feeder'
+2026/11/13 23:14:31 ERR [path mystream] [RTSP source] bad status code: 404 (Not Found)
+2026/11/13 23:14:31 INF [MoQ] started with listeners on :8892 (TCP/HTTP2), :8892 (UDP/HTTP3), :8893 (UDP/QUIC)
+2026/11/13 23:14:31 INF [RTSP] [conn [::1]:60301] opened
+2026/11/13 23:14:31 INF [RTSP] [session 7a6fc50f] created by [::1]:60301
+2026/11/13 23:14:31 INF [path feeder] stream is available and online, 1 track (H264)
+2026/11/13 23:14:31 INF [RTSP] [session 7a6fc50f] is publishing to path 'feeder'
+2026/11/13 23:14:36 INF [RTSP] [conn [::1]:60307] opened
+2026/11/13 23:14:36 INF [RTSP] [session a0b491d3] created by [::1]:60307
+2026/11/13 23:14:36 INF [path mystream] stream is online
+2026/11/13 23:14:36 INF [path mystream] [recorder] recording 1 track (H264)
+2026/11/13 23:14:36 INF [RTSP] [session a0b491d3] is reading from path 'feeder', with UDP, 1 track (H264)
+2026/11/13 23:14:37 INF [RTSP] [session 7a6fc50f] destroyed: torn down by [::1]:60301
+2026/11/13 23:14:37 INF [RTSP] [conn [::1]:60307] closed: terminated
+2026/11/13 23:14:37 INF [RTSP] [conn [::1]:60301] closed: EOF
+2026/11/13 23:14:37 INF [RTSP] [session a0b491d3] destroyed: terminated
+2026/11/13 23:14:37 INF [path mystream] [recorder] recording stopped
+2026/11/13 23:14:37 ERR [path mystream] [RTSP source] EOF
+2026/11/13 23:14:40 INF [SRT] closing
+2026/11/13 23:14:40 INF [MoQ] closing
+2026/11/13 23:14:40 INF [WebRTC] closing
+2026/11/13 23:14:40 INF [HLS] closing
+2026/11/13 23:14:40 INF [RTMP] closing
+2026/11/13 23:14:40 INF [RTSP] closing
+2026/11/13 23:14:40 INF [path mystream] [RTSP source] stopped: path is closing
+2026/11/13 23:14:40 INF waiting for running hooks
+--- PASS: TestPathRecordAlwaysAvailableRecordedStaticSource (9.21s)
+=== RUN   TestPathRecordAlwaysAvailableRecordedReloadWhileOffline
+2026/11/13 23:14:40 WAR parameter 'recordPath' is deprecated and has been replaced with 'pathDefaults.recordPath'
+2026/11/13 23:14:40 INF MediaMTX v1.21.0, darwin, arm64
+2026/11/13 23:14:40 INF configuration loaded from <TMPDIR>
+2026/11/13 23:14:40 INF [path mystream] stream is available, 1 track (H264)
+2026/11/13 23:14:40 INF [path mystream] [RTSP source] started
+2026/11/13 23:14:40 INF [RTSP] started with listeners on :8554 (TCP/RTSP), :8000 (UDP/RTP), :8001 (UDP/RTCP)
+2026/11/13 23:14:40 INF [RTMP] started with listener on :1935 (TCP/RTMP)
+2026/11/13 23:14:40 INF [HLS] started with listener on :8888 (TCP/HTTP)
+2026/11/13 23:14:40 INF [WebRTC] started with listeners on :8889 (TCP/HTTP), :8189 (UDP/ICE)
+2026/11/13 23:14:40 INF [SRT] started with listener on :8890 (UDP/SRT)
+2026/11/13 23:14:40 INF [RTSP] [conn [::1]:60309] opened
+2026/11/13 23:14:40 INF [RTSP] [conn [::1]:60309] closed: no stream is available on path 'feeder'
+2026/11/13 23:14:40 ERR [path mystream] [RTSP source] bad status code: 404 (Not Found)
+2026/11/13 23:14:40 INF [MoQ] started with listeners on :8892 (TCP/HTTP2), :8892 (UDP/HTTP3), :8893 (UDP/QUIC)
+2026/11/13 23:14:40 INF [API] started with listener on :9997 (TCP/HTTP)
+2026/11/13 23:14:41 INF reloading configuration (API request)
+2026/11/13 23:14:43 INF [API] closing
+2026/11/13 23:14:43 INF [SRT] closing
+2026/11/13 23:14:43 INF [MoQ] closing
+2026/11/13 23:14:43 INF [WebRTC] closing
+2026/11/13 23:14:43 INF [HLS] closing
+2026/11/13 23:14:43 INF [RTMP] closing
+2026/11/13 23:14:43 INF [RTSP] closing
+2026/11/13 23:14:43 INF [path mystream] [RTSP source] stopped: path is closing
+2026/11/13 23:14:43 INF waiting for running hooks
+--- PASS: TestPathRecordAlwaysAvailableRecordedReloadWhileOffline (2.51s)
+PASS
+ok  	github.com/bluenviron/mediamtx/internal/core	16.544s
+## run 2 exit 0
+## run 3 start 2026-11-13T23:14:43+0900 load: { 46.51 29.06 37.31 }
+=== RUN   TestPathRecordAlwaysAvailableRecorded
+2026/11/13 23:14:45 WAR parameter 'record' is deprecated and has been replaced with 'pathDefaults.record'
+2026/11/13 23:14:45 WAR parameter 'recordPath' is deprecated and has been replaced with 'pathDefaults.recordPath'
+2026/11/13 23:14:45 INF MediaMTX v1.21.0, darwin, arm64
+2026/11/13 23:14:45 INF configuration loaded from <TMPDIR>
+2026/11/13 23:14:45 INF [RTSP] started with listeners on :8554 (TCP/RTSP), :8000 (UDP/RTP), :8001 (UDP/RTCP)
+2026/11/13 23:14:45 INF [path mystream] stream is available, 1 track (H264)
+2026/11/13 23:14:45 INF [RTMP] started with listener on :1935 (TCP/RTMP)
+2026/11/13 23:14:45 INF [HLS] started with listener on :8888 (TCP/HTTP)
+2026/11/13 23:14:45 INF [WebRTC] started with listeners on :8889 (TCP/HTTP), :8189 (UDP/ICE)
+2026/11/13 23:14:45 INF [SRT] started with listener on :8890 (UDP/SRT)
+2026/11/13 23:14:45 INF [MoQ] started with listeners on :8892 (TCP/HTTP2), :8892 (UDP/HTTP3), :8893 (UDP/QUIC)
+2026/11/13 23:14:46 INF [RTSP] [conn [::1]:60318] opened
+2026/11/13 23:14:46 INF [RTSP] [session 433c5ae5] created by [::1]:60318
+2026/11/13 23:14:46 INF [path mystream] stream is online
+2026/11/13 23:14:46 INF [RTSP] [session 433c5ae5] is publishing to path 'mystream'
+2026/11/13 23:14:46 INF [path mystream] [recorder] recording 1 track (H264)
+2026/11/13 23:14:46 INF [path mystream] [recorder] recording stopped
+2026/11/13 23:14:46 INF [RTSP] [conn [::1]:60318] closed: EOF
+2026/11/13 23:14:46 INF [RTSP] [session 433c5ae5] destroyed: torn down by [::1]:60318
+2026/11/13 23:14:49 INF [SRT] closing
+2026/11/13 23:14:49 INF [MoQ] closing
+2026/11/13 23:14:49 INF [WebRTC] closing
+2026/11/13 23:14:49 INF [HLS] closing
+2026/11/13 23:14:49 INF [RTMP] closing
+2026/11/13 23:14:49 INF [RTSP] closing
+2026/11/13 23:14:49 INF waiting for running hooks
+--- PASS: TestPathRecordAlwaysAvailableRecorded (4.15s)
+=== RUN   TestPathRecordAlwaysAvailableRecordedStaticSource
+2026/11/13 23:14:49 WAR parameter 'recordPath' is deprecated and has been replaced with 'pathDefaults.recordPath'
+2026/11/13 23:14:49 INF MediaMTX v1.21.0, darwin, arm64
+2026/11/13 23:14:49 INF configuration loaded from <TMPDIR>
+2026/11/13 23:14:49 INF [path mystream] stream is available, 1 track (H264)
+2026/11/13 23:14:49 INF [RTSP] started with listeners on :8554 (TCP/RTSP), :8000 (UDP/RTP), :8001 (UDP/RTCP)
+2026/11/13 23:14:49 INF [path mystream] [RTSP source] started
+2026/11/13 23:14:49 INF [RTMP] started with listener on :1935 (TCP/RTMP)
+2026/11/13 23:14:49 INF [HLS] started with listener on :8888 (TCP/HTTP)
+2026/11/13 23:14:49 INF [WebRTC] started with listeners on :8889 (TCP/HTTP), :8189 (UDP/ICE)
+2026/11/13 23:14:49 INF [SRT] started with listener on :8890 (UDP/SRT)
+2026/11/13 23:14:49 INF [RTSP] [conn [::1]:60322] opened
+2026/11/13 23:14:49 INF [RTSP] [conn [::1]:60322] closed: no stream is available on path 'feeder'
+2026/11/13 23:14:49 ERR [path mystream] [RTSP source] bad status code: 404 (Not Found)
+2026/11/13 23:14:49 INF [MoQ] started with listeners on :8892 (TCP/HTTP2), :8892 (UDP/HTTP3), :8893 (UDP/QUIC)
+2026/11/13 23:14:49 INF [RTSP] [conn [::1]:60323] opened
+2026/11/13 23:14:49 INF [RTSP] [session 281de142] created by [::1]:60323
+2026/11/13 23:14:49 INF [path feeder] stream is available and online, 1 track (H264)
+2026/11/13 23:14:49 INF [RTSP] [session 281de142] is publishing to path 'feeder'
+2026/11/13 23:14:54 INF [RTSP] [conn [::1]:60326] opened
+2026/11/13 23:14:54 INF [RTSP] [session aab05eb2] created by [::1]:60326
+2026/11/13 23:14:54 INF [path mystream] stream is online
+2026/11/13 23:14:54 INF [path mystream] [recorder] recording 1 track (H264)
+2026/11/13 23:14:54 INF [RTSP] [session aab05eb2] is reading from path 'feeder', with UDP, 1 track (H264)
+2026/11/13 23:14:55 INF [RTSP] [session 281de142] destroyed: torn down by [::1]:60323
+2026/11/13 23:14:55 INF [RTSP] [conn [::1]:60323] closed: EOF
+2026/11/13 23:14:55 INF [RTSP] [conn [::1]:60326] closed: terminated
+2026/11/13 23:14:55 INF [RTSP] [session aab05eb2] destroyed: terminated
+2026/11/13 23:14:55 INF [path mystream] [recorder] recording stopped
+2026/11/13 23:14:55 ERR [path mystream] [RTSP source] EOF
+2026/11/13 23:14:58 INF [SRT] closing
+2026/11/13 23:14:58 INF [MoQ] closing
+2026/11/13 23:14:58 INF [WebRTC] closing
+2026/11/13 23:14:58 INF [HLS] closing
+2026/11/13 23:14:58 INF [RTMP] closing
+2026/11/13 23:14:58 INF [RTSP] closing
+2026/11/13 23:14:58 INF [path mystream] [RTSP source] stopped: path is closing
+2026/11/13 23:14:58 INF waiting for running hooks
+--- PASS: TestPathRecordAlwaysAvailableRecordedStaticSource (9.21s)
+=== RUN   TestPathRecordAlwaysAvailableRecordedReloadWhileOffline
+2026/11/13 23:14:58 WAR parameter 'recordPath' is deprecated and has been replaced with 'pathDefaults.recordPath'
+2026/11/13 23:14:58 INF MediaMTX v1.21.0, darwin, arm64
+2026/11/13 23:14:58 INF configuration loaded from <TMPDIR>
+2026/11/13 23:14:58 INF [path mystream] stream is available, 1 track (H264)
+2026/11/13 23:14:58 INF [path mystream] [RTSP source] started
+2026/11/13 23:14:58 INF [RTSP] started with listeners on :8554 (TCP/RTSP), :8000 (UDP/RTP), :8001 (UDP/RTCP)
+2026/11/13 23:14:58 INF [RTMP] started with listener on :1935 (TCP/RTMP)
+2026/11/13 23:14:58 INF [HLS] started with listener on :8888 (TCP/HTTP)
+2026/11/13 23:14:58 INF [WebRTC] started with listeners on :8889 (TCP/HTTP), :8189 (UDP/ICE)
+2026/11/13 23:14:58 INF [SRT] started with listener on :8890 (UDP/SRT)
+2026/11/13 23:14:58 INF [RTSP] [conn [::1]:60329] opened
+2026/11/13 23:14:58 INF [RTSP] [conn [::1]:60329] closed: no stream is available on path 'feeder'
+2026/11/13 23:14:58 ERR [path mystream] [RTSP source] bad status code: 404 (Not Found)
+2026/11/13 23:14:58 INF [MoQ] started with listeners on :8892 (TCP/HTTP2), :8892 (UDP/HTTP3), :8893 (UDP/QUIC)
+2026/11/13 23:14:58 INF [API] started with listener on :9997 (TCP/HTTP)
+2026/11/13 23:14:59 INF reloading configuration (API request)
+2026/11/13 23:15:01 INF [API] closing
+2026/11/13 23:15:01 INF [SRT] closing
+2026/11/13 23:15:01 INF [MoQ] closing
+2026/11/13 23:15:01 INF [WebRTC] closing
+2026/11/13 23:15:01 INF [HLS] closing
+2026/11/13 23:15:01 INF [RTMP] closing
+2026/11/13 23:15:01 INF [RTSP] closing
+2026/11/13 23:15:01 INF [path mystream] [RTSP source] stopped: path is closing
+2026/11/13 23:15:01 INF waiting for running hooks
+--- PASS: TestPathRecordAlwaysAvailableRecordedReloadWhileOffline (2.51s)
+PASS
+ok  	github.com/bluenviron/mediamtx/internal/core	16.197s
+## run 3 exit 0
