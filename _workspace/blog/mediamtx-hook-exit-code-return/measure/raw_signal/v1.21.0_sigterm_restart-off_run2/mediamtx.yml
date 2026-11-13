@@ -1,0 +1,13 @@
+logLevel: info
+logDestinations: [stdout]
+api: false
+rtsp: false
+rtmp: false
+hls: false
+webrtc: false
+srt: false
+moq: false
+paths:
+  test:
+    runOnInit: sh -c 'exec sleep 7.123'
+    runOnInitRestart: false

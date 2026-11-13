@@ -1,0 +1,196 @@
+{
+ "start": [
+  "2026-11-13T23:15:39+0900",
+  [
+   23.81787109375,
+   25.7470703125,
+   35.505859375
+  ]
+ ],
+ "cases": {
+  "v1.20.1_sigterm_restart-on": [
+   {
+    "restart": true,
+    "launched_lines": 2,
+    "exited_lines": 3,
+    "codes": [
+     "0",
+     "0",
+     "0"
+    ],
+    "exited_times_s": [
+     1.042,
+     6.233,
+     11.413
+    ],
+    "first_exited_line": "2026/11/13 23:15:40 INF [path test] runOnInit command exited: command exited with code 0",
+    "server_exit": 0
+   },
+   {
+    "restart": true,
+    "launched_lines": 2,
+    "exited_lines": 3,
+    "codes": [
+     "0",
+     "0",
+     "0"
+    ],
+    "exited_times_s": [
+     1.025,
+     6.253,
+     11.426
+    ],
+    "first_exited_line": "2026/11/13 23:15:52 INF [path test] runOnInit command exited: command exited with code 0",
+    "server_exit": 0
+   },
+   {
+    "restart": true,
+    "launched_lines": 2,
+    "exited_lines": 3,
+    "codes": [
+     "0",
+     "0",
+     "0"
+    ],
+    "exited_times_s": [
+     1.039,
+     6.659,
+     11.887
+    ],
+    "first_exited_line": "2026/11/13 23:16:04 INF [path test] runOnInit command exited: command exited with code 0",
+    "server_exit": 0
+   }
+  ],
+  "v1.20.1_sigterm_restart-off": [
+   {
+    "restart": false,
+    "launched_lines": 2,
+    "exited_lines": 0,
+    "codes": [],
+    "exited_times_s": [],
+    "first_exited_line": "",
+    "server_exit": 0
+   },
+   {
+    "restart": false,
+    "launched_lines": 2,
+    "exited_lines": 0,
+    "codes": [],
+    "exited_times_s": [],
+    "first_exited_line": "",
+    "server_exit": 0
+   },
+   {
+    "restart": false,
+    "launched_lines": 2,
+    "exited_lines": 0,
+    "codes": [],
+    "exited_times_s": [],
+    "first_exited_line": "",
+    "server_exit": 0
+   }
+  ],
+  "v1.21.0_sigterm_restart-on": [
+   {
+    "restart": true,
+    "launched_lines": 2,
+    "exited_lines": 3,
+    "codes": [
+     "-1",
+     "-1",
+     "-1"
+    ],
+    "exited_times_s": [
+     1.052,
+     6.258,
+     11.487
+    ],
+    "first_exited_line": "2026/11/13 23:16:52 INF [path test] runOnInit command exited: command exited with code -1",
+    "server_exit": 0
+   },
+   {
+    "restart": true,
+    "launched_lines": 2,
+    "exited_lines": 3,
+    "codes": [
+     "-1",
+     "-1",
+     "-1"
+    ],
+    "exited_times_s": [
+     1.06,
+     6.338,
+     11.644
+    ],
+    "first_exited_line": "2026/11/13 23:17:04 INF [path test] runOnInit command exited: command exited with code -1",
+    "server_exit": 0
+   },
+   {
+    "restart": true,
+    "launched_lines": 2,
+    "exited_lines": 3,
+    "codes": [
+     "-1",
+     "-1",
+     "-1"
+    ],
+    "exited_times_s": [
+     1.062,
+     6.284,
+     11.565
+    ],
+    "first_exited_line": "2026/11/13 23:17:16 INF [path test] runOnInit command exited: command exited with code -1",
+    "server_exit": 0
+   }
+  ],
+  "v1.21.0_sigterm_restart-off": [
+   {
+    "restart": false,
+    "launched_lines": 2,
+    "exited_lines": 1,
+    "codes": [
+     "-1"
+    ],
+    "exited_times_s": [
+     1.046
+    ],
+    "first_exited_line": "2026/11/13 23:17:28 INF [path test] runOnInit command exited: command exited with code -1",
+    "server_exit": 0
+   },
+   {
+    "restart": false,
+    "launched_lines": 2,
+    "exited_lines": 1,
+    "codes": [
+     "-1"
+    ],
+    "exited_times_s": [
+     1.083
+    ],
+    "first_exited_line": "2026/11/13 23:17:40 INF [path test] runOnInit command exited: command exited with code -1",
+    "server_exit": 0
+   },
+   {
+    "restart": false,
+    "launched_lines": 2,
+    "exited_lines": 1,
+    "codes": [
+     "-1"
+    ],
+    "exited_times_s": [
+     1.036
+    ],
+    "first_exited_line": "2026/11/13 23:17:52 INF [path test] runOnInit command exited: command exited with code -1",
+    "server_exit": 0
+   }
+  ]
+ },
+ "end": [
+  "2026-11-13T23:18:03+0900",
+  [
+   26.80224609375,
+   26.52783203125,
+   34.35302734375
+  ]
+ ]
+}
