@@ -90,6 +90,10 @@ import { AUTH_BODY_WAIT_FRAMES, AuthBodyWait } from "./scenes/mediamtx-user-srt-
 import { RELOAD_WAIT_CYCLE_FRAMES, ReloadWaitCycle } from "./scenes/mediamtx-logger-reload-rejected-lifecycle-fix/ReloadWaitCycle";
 import { CLOSE_DURING_RELOAD_FRAMES, CloseDuringReload } from "./scenes/mediamtx-certificate-watcher-close-join/CloseDuringReload";
 import { NO_WATCHER_SHUTDOWN_FRAMES, NoWatcherShutdown } from "./scenes/mediamtx-certloader-no-watcher-shutdown/NoWatcherShutdown";
+import { SEGMENT_COUNT_GATE_FRAMES, SegmentCountGate } from "./scenes/mediamtx-hls-segment-count-validation/SegmentCountGate";
+import { EXIT_CODE_DISCARDED_FRAMES, ExitCodeDiscarded } from "./scenes/mediamtx-hook-exit-code-return/ExitCodeDiscarded";
+import { OFFLINE_RECORDING_GATE_FRAMES, OfflineRecordingGate } from "./scenes/mediamtx-offline-recording-source-lifecycle/OfflineRecordingGate";
+import { SHARED_DEFAULT_ALIAS_FRAMES, SharedDefaultAlias } from "./scenes/mediamtx-auth-defaults-normalization-and-clone/SharedDefaultAlias";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
@@ -967,6 +971,12 @@ export const RemotionRoot: React.FC = () => (
       component={ReloadWaitCycle}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={RELOAD_WAIT_CYCLE_FRAMES}
+    <Composition id="SegmentCountGate" component={SegmentCountGate} durationInFrames={SEGMENT_COUNT_GATE_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="SegmentCountGateMobile"
+      component={SegmentCountGate}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={SEGMENT_COUNT_GATE_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}
@@ -977,6 +987,12 @@ export const RemotionRoot: React.FC = () => (
       component={CloseDuringReload}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={CLOSE_DURING_RELOAD_FRAMES}
+    <Composition id="ExitCodeDiscarded" component={ExitCodeDiscarded} durationInFrames={EXIT_CODE_DISCARDED_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="ExitCodeDiscardedMobile"
+      component={ExitCodeDiscarded}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={EXIT_CODE_DISCARDED_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}
@@ -987,6 +1003,22 @@ export const RemotionRoot: React.FC = () => (
       component={NoWatcherShutdown}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={NO_WATCHER_SHUTDOWN_FRAMES}
+    <Composition id="OfflineRecordingGate" component={OfflineRecordingGate} durationInFrames={OFFLINE_RECORDING_GATE_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="OfflineRecordingGateMobile"
+      component={OfflineRecordingGate}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={OFFLINE_RECORDING_GATE_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="SharedDefaultAlias" component={SharedDefaultAlias} durationInFrames={SHARED_DEFAULT_ALIAS_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="SharedDefaultAliasMobile"
+      component={SharedDefaultAlias}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={SHARED_DEFAULT_ALIAS_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}

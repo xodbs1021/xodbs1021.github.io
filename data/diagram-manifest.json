@@ -53,6 +53,15 @@
       "bytes": 110493
     }
   },
+  "1b464c057dafa3a0": {
+    "source": "content/posts/open-source-analysis/mediamtx-auth-defaults-normalization-and-clone.md",
+    "wide": {
+      "file": "1b464c057dafa3a0-wide.svg",
+      "width": 392,
+      "height": 749,
+      "bytes": 21497
+    }
+  },
   "1ccb6784f322c968": {
     "source": "content/posts/0-to-1/chat-highlight-research-and-fallback.md",
     "wide": {
@@ -116,6 +125,15 @@
       "bytes": 19453
     }
   },
+  "3fc6d10d80fba457": {
+    "source": "content/posts/open-source-analysis/mediamtx-offline-recording-source-lifecycle.md",
+    "wide": {
+      "file": "3fc6d10d80fba457-wide.svg",
+      "width": 380,
+      "height": 273,
+      "bytes": 14582
+    }
+  },
   "4187c5e2b25d2254": {
     "source": "content/posts/0-to-1/stream-id-contract-compatible-migration.md",
     "wide": {
@@ -168,6 +186,15 @@
       "width": 432,
       "height": 528,
       "bytes": 21906
+    }
+  },
+  "4d2a244642d0a5af": {
+    "source": "content/posts/open-source-analysis/mediamtx-hook-exit-code-return.md",
+    "wide": {
+      "file": "4d2a244642d0a5af-wide.svg",
+      "width": 380,
+      "height": 498,
+      "bytes": 19551
     }
   },
   "4ec6e740ac6563b4": {
@@ -591,6 +618,15 @@
       "width": 392,
       "height": 486,
       "bytes": 20949
+    }
+  },
+  "f434d073617d2c4c": {
+    "source": "content/posts/open-source-analysis/mediamtx-hls-segment-count-validation.md",
+    "wide": {
+      "file": "f434d073617d2c4c-wide.svg",
+      "width": 392,
+      "height": 465,
+      "bytes": 21003
     }
   },
   "f8da79bff278d16e": {
