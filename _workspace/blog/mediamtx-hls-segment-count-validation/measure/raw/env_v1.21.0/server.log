@@ -1,0 +1,1 @@
+    0.030 ERR: 'hlsSegmentCount' must be at least 7 when 'hlsVariant' is 'lowLatency'

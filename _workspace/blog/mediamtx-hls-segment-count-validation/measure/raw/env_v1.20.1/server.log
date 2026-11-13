@@ -1,0 +1,8 @@
+    0.128 2026/11/13 23:17:06 INF MediaMTX v1.20.1, darwin, arm64
+    0.128 2026/11/13 23:17:06 INF configuration loaded from <OUT>/env_v1.20.1/mediamtx.yml
+    0.130 2026/11/13 23:17:06 INF [RTSP] started with listeners on :18554 (TCP/RTSP)
+    0.131 2026/11/13 23:17:06 INF [HLS] started with listener on 127.0.0.1:18888 (TCP/HTTP)
+    4.025 2026/11/13 23:17:10 INF shutting down gracefully
+    4.025 2026/11/13 23:17:10 INF [HLS] closing
+    4.028 2026/11/13 23:17:10 INF [RTSP] closing
+    4.028 2026/11/13 23:17:10 INF waiting for running hooks

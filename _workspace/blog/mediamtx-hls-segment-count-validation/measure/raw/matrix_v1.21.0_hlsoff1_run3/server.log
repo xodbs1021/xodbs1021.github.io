@@ -1,0 +1,13 @@
+    0.021 2026/11/13 23:16:46 INF MediaMTX v1.21.0, darwin, arm64
+    0.021 2026/11/13 23:16:46 INF configuration loaded from <OUT>/matrix_v1.21.0_hlsoff1_run3/mediamtx.yml
+    0.021 2026/11/13 23:16:46 INF [RTSP] started with listeners on :18554 (TCP/RTSP)
+    4.085 2026/11/13 23:16:50 INF [RTSP] [conn 127.0.0.1:60462] opened
+    4.085 2026/11/13 23:16:50 INF [RTSP] [session 2d18a720] created by 127.0.0.1:60462
+    4.088 2026/11/13 23:16:50 INF [path test] stream is available and online, 1 track (H264)
+    4.088 2026/11/13 23:16:50 INF [RTSP] [session 2d18a720] is publishing to path 'test'
+    4.090 2026/11/13 23:16:50 INF [path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones
+   19.621 2026/11/13 23:17:06 INF [RTSP] [session 2d18a720] destroyed: torn down by 127.0.0.1:60462
+   19.621 2026/11/13 23:17:06 INF [RTSP] [conn 127.0.0.1:60462] closed: read tcp 127.0.0.1:18554->127.0.0.1:60462: read: connection reset by peer
+   19.627 2026/11/13 23:17:06 INF shutting down gracefully
+   19.627 2026/11/13 23:17:06 INF [RTSP] closing
+   19.627 2026/11/13 23:17:06 INF waiting for running hooks

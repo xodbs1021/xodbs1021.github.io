@@ -1,0 +1,15 @@
+    0.031 2026/11/13 23:17:10 INF MediaMTX v1.20.1, darwin, arm64
+    0.031 2026/11/13 23:17:10 INF configuration loaded from <OUT>/api_v1.20.1/mediamtx.yml
+    0.031 2026/11/13 23:17:10 INF [RTSP] started with listeners on :18554 (TCP/RTSP)
+    0.031 2026/11/13 23:17:10 INF [HLS] started with listener on 127.0.0.1:18888 (TCP/HTTP)
+    0.031 2026/11/13 23:17:10 INF [API] started with listener on 127.0.0.1:19997 (TCP/HTTP)
+    4.017 2026/11/13 23:17:14 INF reloading configuration (API request)
+    4.017 2026/11/13 23:17:14 INF [API] closing
+    4.021 2026/11/13 23:17:14 INF [HLS] closing
+    4.021 2026/11/13 23:17:14 INF [HLS] started with listener on 127.0.0.1:18888 (TCP/HTTP)
+    4.021 2026/11/13 23:17:14 INF [API] started with listener on 127.0.0.1:19997 (TCP/HTTP)
+    5.035 2026/11/13 23:17:15 INF shutting down gracefully
+    5.035 2026/11/13 23:17:15 INF [API] closing
+    5.035 2026/11/13 23:17:15 INF [HLS] closing
+    5.035 2026/11/13 23:17:15 INF [RTSP] closing
+    5.035 2026/11/13 23:17:15 INF waiting for running hooks

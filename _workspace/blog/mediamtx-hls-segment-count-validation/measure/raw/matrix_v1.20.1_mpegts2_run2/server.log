@@ -1,0 +1,20 @@
+    0.017 2026/11/13 23:09:34 INF MediaMTX v1.20.1, darwin, arm64
+    0.017 2026/11/13 23:09:34 INF configuration loaded from <OUT>/matrix_v1.20.1_mpegts2_run2/mediamtx.yml
+    0.017 2026/11/13 23:09:34 INF [RTSP] started with listeners on :18554 (TCP/RTSP)
+    0.017 2026/11/13 23:09:34 INF [HLS] started with listener on 127.0.0.1:18888 (TCP/HTTP)
+    4.056 2026/11/13 23:09:38 INF [RTSP] [conn 127.0.0.1:59841] opened
+    4.057 2026/11/13 23:09:38 INF [RTSP] [session c7768dc0] created by 127.0.0.1:59841
+    4.057 2026/11/13 23:09:38 INF [path test] stream is available and online, 1 track (H264)
+    4.057 2026/11/13 23:09:38 INF [RTSP] [session c7768dc0] is publishing to path 'test'
+    4.057 2026/11/13 23:09:38 INF [HLS] [muxer test] created automatically
+    4.057 2026/11/13 23:09:38 ERR [HLS] [muxer test] muxer instance crashed: the minimum number of HLS segments is 3
+    4.058 2026/11/13 23:09:38 INF [path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones
+   14.025 2026/11/13 23:09:48 INF [HLS] [session af9479b9] created by 127.0.0.1:59858
+   14.059 2026/11/13 23:09:48 ERR [HLS] [muxer test] muxer instance crashed: the minimum number of HLS segments is 3
+   19.592 2026/11/13 23:09:53 INF [RTSP] [session c7768dc0] destroyed: torn down by 127.0.0.1:59841
+   19.592 2026/11/13 23:09:53 INF [HLS] [muxer test] destroyed: terminated
+   19.592 2026/11/13 23:09:53 INF [RTSP] [conn 127.0.0.1:59841] closed: EOF
+   19.594 2026/11/13 23:09:53 INF shutting down gracefully
+   19.594 2026/11/13 23:09:53 INF [HLS] closing
+   19.594 2026/11/13 23:09:53 INF [RTSP] closing
+   19.594 2026/11/13 23:09:53 INF waiting for running hooks

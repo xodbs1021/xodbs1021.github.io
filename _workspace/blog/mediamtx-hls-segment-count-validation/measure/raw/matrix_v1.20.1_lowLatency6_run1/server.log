@@ -1,0 +1,20 @@
+    0.012 2026/11/13 23:05:18 INF MediaMTX v1.20.1, darwin, arm64
+    0.012 2026/11/13 23:05:18 INF configuration loaded from <OUT>/matrix_v1.20.1_lowLatency6_run1/mediamtx.yml
+    0.012 2026/11/13 23:05:18 INF [RTSP] started with listeners on :18554 (TCP/RTSP)
+    0.012 2026/11/13 23:05:18 INF [HLS] started with listener on 127.0.0.1:18888 (TCP/HTTP)
+    4.115 2026/11/13 23:05:22 INF [RTSP] [conn 127.0.0.1:59537] opened
+    4.115 2026/11/13 23:05:22 INF [RTSP] [session 770ec5c8] created by 127.0.0.1:59537
+    4.116 2026/11/13 23:05:22 INF [path test] stream is available and online, 1 track (H264)
+    4.116 2026/11/13 23:05:22 INF [RTSP] [session 770ec5c8] is publishing to path 'test'
+    4.116 2026/11/13 23:05:22 INF [HLS] [muxer test] created automatically
+    4.116 2026/11/13 23:05:22 ERR [HLS] [muxer test] muxer instance crashed: Low-Latency HLS requires at least 7 segments
+    4.117 2026/11/13 23:05:22 INF [path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones
+   14.038 2026/11/13 23:05:32 INF [HLS] [session c196834e] created by 127.0.0.1:59541
+   14.116 2026/11/13 23:05:32 ERR [HLS] [muxer test] muxer instance crashed: Low-Latency HLS requires at least 7 segments
+   19.641 2026/11/13 23:05:38 INF [RTSP] [session 770ec5c8] destroyed: torn down by 127.0.0.1:59537
+   19.641 2026/11/13 23:05:38 INF [RTSP] [conn 127.0.0.1:59537] closed: EOF
+   19.641 2026/11/13 23:05:38 INF [HLS] [muxer test] destroyed: terminated
+   19.643 2026/11/13 23:05:38 INF shutting down gracefully
+   19.643 2026/11/13 23:05:38 INF [HLS] closing
+   19.643 2026/11/13 23:05:38 INF [RTSP] closing
+   19.643 2026/11/13 23:05:38 INF waiting for running hooks

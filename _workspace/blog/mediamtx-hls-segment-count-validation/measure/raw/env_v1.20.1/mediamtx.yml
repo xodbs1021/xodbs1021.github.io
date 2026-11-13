@@ -1,0 +1,18 @@
+logLevel: info
+logDestinations: [stdout]
+api: false
+apiAddress: 127.0.0.1:19997
+rtsp: true
+rtspTransports: [tcp]
+rtspAddress: :18554
+rtmp: false
+webrtc: false
+srt: false
+moq: false
+hls: true
+hlsAddress: 127.0.0.1:18888
+hlsAlwaysRemux: true
+hlsVariant: lowLatency
+hlsSegmentCount: 7
+paths:
+  all_others:

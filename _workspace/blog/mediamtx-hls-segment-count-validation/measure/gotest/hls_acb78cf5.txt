@@ -1,0 +1,56 @@
+# tree acb78cf5 (v1.20.1-27-gacb78cf5); local changes:
+# go version go1.27.2 darwin/arm64; go test -count=1 -v -run '^TestConfErrors$/hlsSegmentCount'  ./internal/conf; runs=3
+## run 1 start 2026-11-13T23:03:39+0900 load: { 22.13 54.50 57.67 }
+=== RUN   TestConfErrors
+=== RUN   TestConfErrors/hlsSegmentCount_below_lowLatency_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_at_lowLatency_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_below_fmp4_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_at_fmp4_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_zero_with_lowLatency_variant
+=== RUN   TestConfErrors/hlsSegmentCount_not_validated_when_HLS_is_disabled
+--- PASS: TestConfErrors (0.01s)
+    --- PASS: TestConfErrors/hlsSegmentCount_below_lowLatency_variant_minimum (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_at_lowLatency_variant_minimum (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_below_fmp4_variant_minimum (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_at_fmp4_variant_minimum (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_zero_with_lowLatency_variant (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_not_validated_when_HLS_is_disabled (0.00s)
+PASS
+ok  	github.com/bluenviron/mediamtx/internal/conf	0.318s
+## run 1 exit 0
+## run 2 start 2026-11-13T23:03:40+0900 load: { 22.13 54.50 57.67 }
+=== RUN   TestConfErrors
+=== RUN   TestConfErrors/hlsSegmentCount_below_lowLatency_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_at_lowLatency_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_below_fmp4_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_at_fmp4_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_zero_with_lowLatency_variant
+=== RUN   TestConfErrors/hlsSegmentCount_not_validated_when_HLS_is_disabled
+--- PASS: TestConfErrors (0.01s)
+    --- PASS: TestConfErrors/hlsSegmentCount_below_lowLatency_variant_minimum (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_at_lowLatency_variant_minimum (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_below_fmp4_variant_minimum (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_at_fmp4_variant_minimum (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_zero_with_lowLatency_variant (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_not_validated_when_HLS_is_disabled (0.00s)
+PASS
+ok  	github.com/bluenviron/mediamtx/internal/conf	0.146s
+## run 2 exit 0
+## run 3 start 2026-11-13T23:03:41+0900 load: { 22.13 54.50 57.67 }
+=== RUN   TestConfErrors
+=== RUN   TestConfErrors/hlsSegmentCount_below_lowLatency_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_at_lowLatency_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_below_fmp4_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_at_fmp4_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_zero_with_lowLatency_variant
+=== RUN   TestConfErrors/hlsSegmentCount_not_validated_when_HLS_is_disabled
+--- PASS: TestConfErrors (0.01s)
+    --- PASS: TestConfErrors/hlsSegmentCount_below_lowLatency_variant_minimum (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_at_lowLatency_variant_minimum (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_below_fmp4_variant_minimum (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_at_fmp4_variant_minimum (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_zero_with_lowLatency_variant (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_not_validated_when_HLS_is_disabled (0.00s)
+PASS
+ok  	github.com/bluenviron/mediamtx/internal/conf	0.136s
+## run 3 exit 0
