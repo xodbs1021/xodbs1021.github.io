@@ -1,0 +1,415 @@
+# tree 7bdbc965 (v1.21.0-23-g7bdbc965); local changes:
+#    M internal/conf/conf_test.go
+#   ?? internal/conf/race_measure_test.go
+# go version go1.27.2 darwin/arm64; go test -count=1 -v -run '^TestMeasureLoadWhileAuthenticate$' -race ./internal/conf; runs=3
+## run 1 start 2026-11-13T23:07:13+0900 load: { 11.24 31.17 46.71 }
+=== RUN   TestMeasureLoadWhileAuthenticate
+==================
+WARNING: DATA RACE
+Write at 0x000101aeb9c0 by goroutine 9:
+  reflect.typedmemmove()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/runtime/mbarrier.go:213 +0x0
+  reflect.Value.Set()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/reflect/value.go:2176 +0x144
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:265 +0x201c
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:28 +0x16d8
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:168 +0x225c
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:28 +0x16d8
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:259 +0x1f40
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:28 +0x16d8
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:168 +0x225c
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:28 +0x16d8
+  github.com/bluenviron/mediamtx/internal/conf/env.loadWithEnv()
+      <SRC>/internal/conf/env/env.go:282 +0x70
+  github.com/bluenviron/mediamtx/internal/conf/env.Load()
+      <SRC>/internal/conf/env/env.go:296 +0x44
+  github.com/bluenviron/mediamtx/internal/conf.Load()
+      <SRC>/internal/conf/conf.go:551 +0xe0
+  github.com/bluenviron/mediamtx/internal/conf_test.TestMeasureLoadWhileAuthenticate.func1()
+      <SRC>/internal/conf/race_measure_test.go:35 +0xb4
+
+Previous read at 0x000101aeb9c0 by goroutine 8:
+  github.com/bluenviron/mediamtx/internal/auth.matchesPermission()
+      <SRC>/internal/auth/manager.go:38 +0x74
+  github.com/bluenviron/mediamtx/internal/auth.(*Manager).authenticateWithUser()
+      <SRC>/internal/auth/manager.go:173 +0xc4
+  github.com/bluenviron/mediamtx/internal/auth.(*Manager).authenticateInternal()
+      <SRC>/internal/auth/manager.go:157 +0x15c
+  github.com/bluenviron/mediamtx/internal/auth.(*Manager).Authenticate()
+      <SRC>/internal/auth/manager.go:133 +0x2f4
+  github.com/bluenviron/mediamtx/internal/conf_test.TestMeasureLoadWhileAuthenticate()
+      <SRC>/internal/conf/race_measure_test.go:44 +0x2e8
+  testing.tRunner()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2195 +0x164
+  testing.(*T).Run.gowrap1()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2260 +0x34
+
+Goroutine 9 (running) created at:
+  github.com/bluenviron/mediamtx/internal/conf_test.TestMeasureLoadWhileAuthenticate()
+      <SRC>/internal/conf/race_measure_test.go:32 +0x288
+  testing.tRunner()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2195 +0x164
+  testing.(*T).Run.gowrap1()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2260 +0x34
+
+Goroutine 8 (running) created at:
+  testing.(*T).Run()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2260 +0x7bc
+  testing.runTests.func1()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2744 +0x74
+  testing.tRunner()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2195 +0x164
+  testing.runTests()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2742 +0x7a0
+  testing.(*M).Run()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2602 +0xb38
+  main.main()
+      _testmain.go:90 +0x100
+==================
+==================
+WARNING: DATA RACE
+Write at 0x000101aebfb0 by goroutine 9:
+  reflect.typedmemmove()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/runtime/mbarrier.go:213 +0x0
+  reflect.Value.Set()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/reflect/value.go:2176 +0x144
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:265 +0x201c
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:28 +0x16d8
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:168 +0x225c
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:28 +0x16d8
+  github.com/bluenviron/mediamtx/internal/conf/env.loadWithEnv()
+      <SRC>/internal/conf/env/env.go:282 +0x70
+  github.com/bluenviron/mediamtx/internal/conf/env.Load()
+      <SRC>/internal/conf/env/env.go:296 +0x44
+  github.com/bluenviron/mediamtx/internal/conf.Load()
+      <SRC>/internal/conf/conf.go:551 +0xe0
+  github.com/bluenviron/mediamtx/internal/conf_test.TestMeasureLoadWhileAuthenticate.func1()
+      <SRC>/internal/conf/race_measure_test.go:35 +0xb4
+
+Previous read at 0x000101aebfb0 by goroutine 8:
+  github.com/bluenviron/mediamtx/internal/auth.(*Manager).authenticateInternal()
+      <SRC>/internal/auth/manager.go:156 +0x114
+  github.com/bluenviron/mediamtx/internal/auth.(*Manager).Authenticate()
+      <SRC>/internal/auth/manager.go:133 +0x2f4
+  github.com/bluenviron/mediamtx/internal/conf_test.TestMeasureLoadWhileAuthenticate()
+      <SRC>/internal/conf/race_measure_test.go:44 +0x2e8
+  testing.tRunner()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2195 +0x164
+  testing.(*T).Run.gowrap1()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2260 +0x34
+
+Goroutine 9 (running) created at:
+  github.com/bluenviron/mediamtx/internal/conf_test.TestMeasureLoadWhileAuthenticate()
+      <SRC>/internal/conf/race_measure_test.go:32 +0x288
+  testing.tRunner()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2195 +0x164
+  testing.(*T).Run.gowrap1()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2260 +0x34
+
+Goroutine 8 (running) created at:
+  testing.(*T).Run()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2260 +0x7bc
+  testing.runTests.func1()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2744 +0x74
+  testing.tRunner()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2195 +0x164
+  testing.runTests()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2742 +0x7a0
+  testing.(*M).Run()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2602 +0xb38
+  main.main()
+      _testmain.go:90 +0x100
+==================
+    race_measure_test.go:55: authentications=2000 denied=0 loads=200
+    testing.go:1867: race detected during execution of test
+--- FAIL: TestMeasureLoadWhileAuthenticate (0.29s)
+FAIL
+FAIL	github.com/bluenviron/mediamtx/internal/conf	0.666s
+FAIL
+## run 1 exit 1
+## run 2 start 2026-11-13T23:07:41+0900 load: { 16.95 30.95 46.18 }
+=== RUN   TestMeasureLoadWhileAuthenticate
+==================
+WARNING: DATA RACE
+Write at 0x00010555f9c0 by goroutine 9:
+  reflect.typedmemmove()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/runtime/mbarrier.go:213 +0x0
+  reflect.Value.Set()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/reflect/value.go:2176 +0x144
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:265 +0x201c
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:28 +0x16d8
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:168 +0x225c
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:28 +0x16d8
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:259 +0x1f40
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:28 +0x16d8
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:168 +0x225c
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:28 +0x16d8
+  github.com/bluenviron/mediamtx/internal/conf/env.loadWithEnv()
+      <SRC>/internal/conf/env/env.go:282 +0x70
+  github.com/bluenviron/mediamtx/internal/conf/env.Load()
+      <SRC>/internal/conf/env/env.go:296 +0x44
+  github.com/bluenviron/mediamtx/internal/conf.Load()
+      <SRC>/internal/conf/conf.go:551 +0xe0
+  github.com/bluenviron/mediamtx/internal/conf_test.TestMeasureLoadWhileAuthenticate.func1()
+      <SRC>/internal/conf/race_measure_test.go:35 +0xb4
+
+Previous read at 0x00010555f9c0 by goroutine 8:
+  github.com/bluenviron/mediamtx/internal/auth.matchesPermission()
+      <SRC>/internal/auth/manager.go:38 +0x74
+  github.com/bluenviron/mediamtx/internal/auth.(*Manager).authenticateWithUser()
+      <SRC>/internal/auth/manager.go:173 +0xc4
+  github.com/bluenviron/mediamtx/internal/auth.(*Manager).authenticateInternal()
+      <SRC>/internal/auth/manager.go:157 +0x15c
+  github.com/bluenviron/mediamtx/internal/auth.(*Manager).Authenticate()
+      <SRC>/internal/auth/manager.go:133 +0x2f4
+  github.com/bluenviron/mediamtx/internal/conf_test.TestMeasureLoadWhileAuthenticate()
+      <SRC>/internal/conf/race_measure_test.go:44 +0x2e8
+  testing.tRunner()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2195 +0x164
+  testing.(*T).Run.gowrap1()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2260 +0x34
+
+Goroutine 9 (running) created at:
+  github.com/bluenviron/mediamtx/internal/conf_test.TestMeasureLoadWhileAuthenticate()
+      <SRC>/internal/conf/race_measure_test.go:32 +0x288
+  testing.tRunner()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2195 +0x164
+  testing.(*T).Run.gowrap1()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2260 +0x34
+
+Goroutine 8 (running) created at:
+  testing.(*T).Run()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2260 +0x7bc
+  testing.runTests.func1()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2744 +0x74
+  testing.tRunner()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2195 +0x164
+  testing.runTests()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2742 +0x7a0
+  testing.(*M).Run()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2602 +0xb38
+  main.main()
+      _testmain.go:90 +0x100
+==================
+==================
+WARNING: DATA RACE
+Write at 0x00010555ffb0 by goroutine 9:
+  reflect.typedmemmove()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/runtime/mbarrier.go:213 +0x0
+  reflect.Value.Set()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/reflect/value.go:2176 +0x144
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:265 +0x201c
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:28 +0x16d8
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:168 +0x225c
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:28 +0x16d8
+  github.com/bluenviron/mediamtx/internal/conf/env.loadWithEnv()
+      <SRC>/internal/conf/env/env.go:282 +0x70
+  github.com/bluenviron/mediamtx/internal/conf/env.Load()
+      <SRC>/internal/conf/env/env.go:296 +0x44
+  github.com/bluenviron/mediamtx/internal/conf.Load()
+      <SRC>/internal/conf/conf.go:551 +0xe0
+  github.com/bluenviron/mediamtx/internal/conf_test.TestMeasureLoadWhileAuthenticate.func1()
+      <SRC>/internal/conf/race_measure_test.go:35 +0xb4
+
+Previous read at 0x00010555ffb0 by goroutine 8:
+  github.com/bluenviron/mediamtx/internal/auth.(*Manager).authenticateInternal()
+      <SRC>/internal/auth/manager.go:156 +0x114
+  github.com/bluenviron/mediamtx/internal/auth.(*Manager).Authenticate()
+      <SRC>/internal/auth/manager.go:133 +0x2f4
+  github.com/bluenviron/mediamtx/internal/conf_test.TestMeasureLoadWhileAuthenticate()
+      <SRC>/internal/conf/race_measure_test.go:44 +0x2e8
+  testing.tRunner()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2195 +0x164
+  testing.(*T).Run.gowrap1()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2260 +0x34
+
+Goroutine 9 (running) created at:
+  github.com/bluenviron/mediamtx/internal/conf_test.TestMeasureLoadWhileAuthenticate()
+      <SRC>/internal/conf/race_measure_test.go:32 +0x288
+  testing.tRunner()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2195 +0x164
+  testing.(*T).Run.gowrap1()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2260 +0x34
+
+Goroutine 8 (running) created at:
+  testing.(*T).Run()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2260 +0x7bc
+  testing.runTests.func1()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2744 +0x74
+  testing.tRunner()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2195 +0x164
+  testing.runTests()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2742 +0x7a0
+  testing.(*M).Run()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2602 +0xb38
+  main.main()
+      _testmain.go:90 +0x100
+==================
+    race_measure_test.go:55: authentications=2000 denied=0 loads=200
+    testing.go:1867: race detected during execution of test
+--- FAIL: TestMeasureLoadWhileAuthenticate (0.34s)
+FAIL
+FAIL	github.com/bluenviron/mediamtx/internal/conf	0.586s
+FAIL
+## run 2 exit 1
+## run 3 start 2026-11-13T23:07:43+0900 load: { 16.23 30.57 45.96 }
+=== RUN   TestMeasureLoadWhileAuthenticate
+==================
+WARNING: DATA RACE
+Write at 0x00010166b9c0 by goroutine 9:
+  reflect.typedmemmove()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/runtime/mbarrier.go:213 +0x0
+  reflect.Value.Set()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/reflect/value.go:2176 +0x144
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:265 +0x201c
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:28 +0x16d8
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:168 +0x225c
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:28 +0x16d8
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:259 +0x1f40
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:28 +0x16d8
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:168 +0x225c
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:28 +0x16d8
+  github.com/bluenviron/mediamtx/internal/conf/env.loadWithEnv()
+      <SRC>/internal/conf/env/env.go:282 +0x70
+  github.com/bluenviron/mediamtx/internal/conf/env.Load()
+      <SRC>/internal/conf/env/env.go:296 +0x44
+  github.com/bluenviron/mediamtx/internal/conf.Load()
+      <SRC>/internal/conf/conf.go:551 +0xe0
+  github.com/bluenviron/mediamtx/internal/conf_test.TestMeasureLoadWhileAuthenticate.func1()
+      <SRC>/internal/conf/race_measure_test.go:35 +0xb4
+
+Previous read at 0x00010166b9c0 by goroutine 8:
+  github.com/bluenviron/mediamtx/internal/auth.matchesPermission()
+      <SRC>/internal/auth/manager.go:38 +0x74
+  github.com/bluenviron/mediamtx/internal/auth.(*Manager).authenticateWithUser()
+      <SRC>/internal/auth/manager.go:173 +0xc4
+  github.com/bluenviron/mediamtx/internal/auth.(*Manager).authenticateInternal()
+      <SRC>/internal/auth/manager.go:157 +0x15c
+  github.com/bluenviron/mediamtx/internal/auth.(*Manager).Authenticate()
+      <SRC>/internal/auth/manager.go:133 +0x2f4
+  github.com/bluenviron/mediamtx/internal/conf_test.TestMeasureLoadWhileAuthenticate()
+      <SRC>/internal/conf/race_measure_test.go:44 +0x2e8
+  testing.tRunner()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2195 +0x164
+  testing.(*T).Run.gowrap1()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2260 +0x34
+
+Goroutine 9 (running) created at:
+  github.com/bluenviron/mediamtx/internal/conf_test.TestMeasureLoadWhileAuthenticate()
+      <SRC>/internal/conf/race_measure_test.go:32 +0x288
+  testing.tRunner()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2195 +0x164
+  testing.(*T).Run.gowrap1()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2260 +0x34
+
+Goroutine 8 (running) created at:
+  testing.(*T).Run()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2260 +0x7bc
+  testing.runTests.func1()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2744 +0x74
+  testing.tRunner()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2195 +0x164
+  testing.runTests()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2742 +0x7a0
+  testing.(*M).Run()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2602 +0xb38
+  main.main()
+      _testmain.go:90 +0x100
+==================
+==================
+WARNING: DATA RACE
+Write at 0x00010166bfb0 by goroutine 9:
+  reflect.typedmemmove()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/runtime/mbarrier.go:213 +0x0
+  reflect.Value.Set()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/reflect/value.go:2176 +0x144
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:265 +0x201c
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:28 +0x16d8
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:168 +0x225c
+  github.com/bluenviron/mediamtx/internal/conf/env.loadEnvInternal()
+      <SRC>/internal/conf/env/env.go:28 +0x16d8
+  github.com/bluenviron/mediamtx/internal/conf/env.loadWithEnv()
+      <SRC>/internal/conf/env/env.go:282 +0x70
+  github.com/bluenviron/mediamtx/internal/conf/env.Load()
+      <SRC>/internal/conf/env/env.go:296 +0x44
+  github.com/bluenviron/mediamtx/internal/conf.Load()
+      <SRC>/internal/conf/conf.go:551 +0xe0
+  github.com/bluenviron/mediamtx/internal/conf_test.TestMeasureLoadWhileAuthenticate.func1()
+      <SRC>/internal/conf/race_measure_test.go:35 +0xb4
+
+Previous read at 0x00010166bfb0 by goroutine 8:
+  github.com/bluenviron/mediamtx/internal/auth.(*Manager).authenticateInternal()
+      <SRC>/internal/auth/manager.go:156 +0x114
+  github.com/bluenviron/mediamtx/internal/auth.(*Manager).Authenticate()
+      <SRC>/internal/auth/manager.go:133 +0x2f4
+  github.com/bluenviron/mediamtx/internal/conf_test.TestMeasureLoadWhileAuthenticate()
+      <SRC>/internal/conf/race_measure_test.go:44 +0x2e8
+  testing.tRunner()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2195 +0x164
+  testing.(*T).Run.gowrap1()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2260 +0x34
+
+Goroutine 9 (running) created at:
+  github.com/bluenviron/mediamtx/internal/conf_test.TestMeasureLoadWhileAuthenticate()
+      <SRC>/internal/conf/race_measure_test.go:32 +0x288
+  testing.tRunner()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2195 +0x164
+  testing.(*T).Run.gowrap1()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2260 +0x34
+
+Goroutine 8 (running) created at:
+  testing.(*T).Run()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2260 +0x7bc
+  testing.runTests.func1()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2744 +0x74
+  testing.tRunner()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2195 +0x164
+  testing.runTests()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2742 +0x7a0
+  testing.(*M).Run()
+      /opt/homebrew/Cellar/go/1.27.2/libexec/src/testing/testing.go:2602 +0xb38
+  main.main()
+      _testmain.go:90 +0x100
+==================
+    race_measure_test.go:55: authentications=2000 denied=0 loads=200
+    testing.go:1867: race detected during execution of test
+--- FAIL: TestMeasureLoadWhileAuthenticate (0.34s)
+FAIL
+FAIL	github.com/bluenviron/mediamtx/internal/conf	0.550s
+FAIL
+## run 3 exit 1

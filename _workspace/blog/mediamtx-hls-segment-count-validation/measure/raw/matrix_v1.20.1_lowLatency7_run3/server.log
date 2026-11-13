@@ -1,0 +1,21 @@
+    0.014 2026/11/13 23:10:52 INF MediaMTX v1.20.1, darwin, arm64
+    0.014 2026/11/13 23:10:52 INF configuration loaded from <OUT>/matrix_v1.20.1_lowLatency7_run3/mediamtx.yml
+    0.014 2026/11/13 23:10:52 INF [RTSP] started with listeners on :18554 (TCP/RTSP)
+    0.014 2026/11/13 23:10:52 INF [HLS] started with listener on 127.0.0.1:18888 (TCP/HTTP)
+    4.088 2026/11/13 23:10:56 INF [RTSP] [conn 127.0.0.1:59964] opened
+    4.089 2026/11/13 23:10:56 INF [RTSP] [session 01e670c9] created by 127.0.0.1:59964
+    4.090 2026/11/13 23:10:56 INF [path test] stream is available and online, 1 track (H264)
+    4.090 2026/11/13 23:10:56 INF [RTSP] [session 01e670c9] is publishing to path 'test'
+    4.090 2026/11/13 23:10:56 INF [HLS] [muxer test] created automatically
+    4.090 2026/11/13 23:10:56 INF [HLS] [muxer test] is converting into HLS, 1 track (H264)
+    4.091 2026/11/13 23:10:56 INF [path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones
+   14.024 2026/11/13 23:11:06 INF [HLS] [session cb1fa019] created by 127.0.0.1:59975
+   14.025 2026/11/13 23:11:06 INF [HLS] [session cb1fa019] is reading from muxer 'test'
+   19.623 2026/11/13 23:11:12 INF [RTSP] [session 01e670c9] destroyed: torn down by 127.0.0.1:59964
+   19.623 2026/11/13 23:11:12 INF [RTSP] [conn 127.0.0.1:59964] closed: EOF
+   19.623 2026/11/13 23:11:12 INF [HLS] [session cb1fa019] closed: muxer destroyed
+   19.623 2026/11/13 23:11:12 INF [HLS] [muxer test] destroyed: terminated
+   19.631 2026/11/13 23:11:12 INF shutting down gracefully
+   19.631 2026/11/13 23:11:12 INF [HLS] closing
+   19.631 2026/11/13 23:11:12 INF [RTSP] closing
+   19.631 2026/11/13 23:11:12 INF waiting for running hooks

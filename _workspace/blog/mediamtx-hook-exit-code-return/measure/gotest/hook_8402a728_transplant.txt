@@ -1,0 +1,57 @@
+# tree 8402a728 (v1.20.1-25-g8402a728); local changes:
+#    M internal/externalcmd/cmd_test.go
+# go version go1.27.2 darwin/arm64; go test -count=1 -v -run '^TestCmdExitCode$'  ./internal/externalcmd; runs=3
+## run 1 start 2026-11-13T23:03:53+0900 load: { 17.96 51.99 56.72 }
+=== RUN   TestCmdExitCode
+=== RUN   TestCmdExitCode/standard
+    cmd_test.go:81: timeout
+=== RUN   TestCmdExitCode/restart
+    cmd_test.go:79: 
+        	Error Trace:	<SRC>/internal/externalcmd/cmd_test.go:79
+        	Error:      	Error message not equal:
+        	            	expected: "command exited with code 5"
+        	            	actual  : "command exited with code 0"
+        	Test:       	TestCmdExitCode/restart
+--- FAIL: TestCmdExitCode (10.01s)
+    --- FAIL: TestCmdExitCode/standard (10.00s)
+    --- FAIL: TestCmdExitCode/restart (0.01s)
+FAIL
+FAIL	github.com/bluenviron/mediamtx/internal/externalcmd	10.303s
+FAIL
+## run 1 exit 1
+## run 2 start 2026-11-13T23:04:04+0900 load: { 15.80 50.41 56.10 }
+=== RUN   TestCmdExitCode
+=== RUN   TestCmdExitCode/standard
+    cmd_test.go:81: timeout
+=== RUN   TestCmdExitCode/restart
+    cmd_test.go:79: 
+        	Error Trace:	<SRC>/internal/externalcmd/cmd_test.go:79
+        	Error:      	Error message not equal:
+        	            	expected: "command exited with code 5"
+        	            	actual  : "command exited with code 0"
+        	Test:       	TestCmdExitCode/restart
+--- FAIL: TestCmdExitCode (10.01s)
+    --- FAIL: TestCmdExitCode/standard (10.00s)
+    --- FAIL: TestCmdExitCode/restart (0.01s)
+FAIL
+FAIL	github.com/bluenviron/mediamtx/internal/externalcmd	10.139s
+FAIL
+## run 2 exit 1
+## run 3 start 2026-11-13T23:04:15+0900 load: { 14.20 48.93 55.51 }
+=== RUN   TestCmdExitCode
+=== RUN   TestCmdExitCode/standard
+    cmd_test.go:81: timeout
+=== RUN   TestCmdExitCode/restart
+    cmd_test.go:79: 
+        	Error Trace:	<SRC>/internal/externalcmd/cmd_test.go:79
+        	Error:      	Error message not equal:
+        	            	expected: "command exited with code 5"
+        	            	actual  : "command exited with code 0"
+        	Test:       	TestCmdExitCode/restart
+--- FAIL: TestCmdExitCode (10.01s)
+    --- FAIL: TestCmdExitCode/standard (10.00s)
+    --- FAIL: TestCmdExitCode/restart (0.01s)
+FAIL
+FAIL	github.com/bluenviron/mediamtx/internal/externalcmd	10.203s
+FAIL
+## run 3 exit 1

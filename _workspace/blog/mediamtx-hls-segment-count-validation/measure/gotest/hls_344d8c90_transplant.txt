@@ -1,0 +1,98 @@
+# tree 344d8c90 (v1.20.1-26-g344d8c90); local changes:
+#    M internal/conf/conf_test.go
+# go version go1.27.2 darwin/arm64; go test -count=1 -v -run '^TestConfErrors$/hlsSegmentCount'  ./internal/conf; runs=3
+## run 1 start 2026-11-13T23:03:33+0900 load: { 23.36 55.28 57.96 }
+go: downloading github.com/stretchr/testify v1.12.1
+go: downloading go.yaml.in/yaml/v3 v3.0.5
+=== RUN   TestConfErrors
+=== RUN   TestConfErrors/hlsSegmentCount_below_lowLatency_variant_minimum
+    conf_test.go:986: 
+        	Error Trace:	<SRC>/internal/conf/conf_test.go:986
+        	Error:      	An error is expected but got nil.
+        	Test:       	TestConfErrors/hlsSegmentCount_below_lowLatency_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_at_lowLatency_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_below_fmp4_variant_minimum
+    conf_test.go:986: 
+        	Error Trace:	<SRC>/internal/conf/conf_test.go:986
+        	Error:      	An error is expected but got nil.
+        	Test:       	TestConfErrors/hlsSegmentCount_below_fmp4_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_at_fmp4_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_zero_with_lowLatency_variant
+    conf_test.go:986: 
+        	Error Trace:	<SRC>/internal/conf/conf_test.go:986
+        	Error:      	An error is expected but got nil.
+        	Test:       	TestConfErrors/hlsSegmentCount_zero_with_lowLatency_variant
+=== RUN   TestConfErrors/hlsSegmentCount_not_validated_when_HLS_is_disabled
+--- FAIL: TestConfErrors (0.01s)
+    --- FAIL: TestConfErrors/hlsSegmentCount_below_lowLatency_variant_minimum (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_at_lowLatency_variant_minimum (0.00s)
+    --- FAIL: TestConfErrors/hlsSegmentCount_below_fmp4_variant_minimum (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_at_fmp4_variant_minimum (0.00s)
+    --- FAIL: TestConfErrors/hlsSegmentCount_zero_with_lowLatency_variant (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_not_validated_when_HLS_is_disabled (0.00s)
+FAIL
+FAIL	github.com/bluenviron/mediamtx/internal/conf	0.311s
+FAIL
+## run 1 exit 1
+## run 2 start 2026-11-13T23:03:38+0900 load: { 22.13 54.50 57.67 }
+=== RUN   TestConfErrors
+=== RUN   TestConfErrors/hlsSegmentCount_below_lowLatency_variant_minimum
+    conf_test.go:986: 
+        	Error Trace:	<SRC>/internal/conf/conf_test.go:986
+        	Error:      	An error is expected but got nil.
+        	Test:       	TestConfErrors/hlsSegmentCount_below_lowLatency_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_at_lowLatency_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_below_fmp4_variant_minimum
+    conf_test.go:986: 
+        	Error Trace:	<SRC>/internal/conf/conf_test.go:986
+        	Error:      	An error is expected but got nil.
+        	Test:       	TestConfErrors/hlsSegmentCount_below_fmp4_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_at_fmp4_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_zero_with_lowLatency_variant
+    conf_test.go:986: 
+        	Error Trace:	<SRC>/internal/conf/conf_test.go:986
+        	Error:      	An error is expected but got nil.
+        	Test:       	TestConfErrors/hlsSegmentCount_zero_with_lowLatency_variant
+=== RUN   TestConfErrors/hlsSegmentCount_not_validated_when_HLS_is_disabled
+--- FAIL: TestConfErrors (0.01s)
+    --- FAIL: TestConfErrors/hlsSegmentCount_below_lowLatency_variant_minimum (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_at_lowLatency_variant_minimum (0.00s)
+    --- FAIL: TestConfErrors/hlsSegmentCount_below_fmp4_variant_minimum (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_at_fmp4_variant_minimum (0.00s)
+    --- FAIL: TestConfErrors/hlsSegmentCount_zero_with_lowLatency_variant (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_not_validated_when_HLS_is_disabled (0.00s)
+FAIL
+FAIL	github.com/bluenviron/mediamtx/internal/conf	0.133s
+FAIL
+## run 2 exit 1
+## run 3 start 2026-11-13T23:03:38+0900 load: { 22.13 54.50 57.67 }
+=== RUN   TestConfErrors
+=== RUN   TestConfErrors/hlsSegmentCount_below_lowLatency_variant_minimum
+    conf_test.go:986: 
+        	Error Trace:	<SRC>/internal/conf/conf_test.go:986
+        	Error:      	An error is expected but got nil.
+        	Test:       	TestConfErrors/hlsSegmentCount_below_lowLatency_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_at_lowLatency_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_below_fmp4_variant_minimum
+    conf_test.go:986: 
+        	Error Trace:	<SRC>/internal/conf/conf_test.go:986
+        	Error:      	An error is expected but got nil.
+        	Test:       	TestConfErrors/hlsSegmentCount_below_fmp4_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_at_fmp4_variant_minimum
+=== RUN   TestConfErrors/hlsSegmentCount_zero_with_lowLatency_variant
+    conf_test.go:986: 
+        	Error Trace:	<SRC>/internal/conf/conf_test.go:986
+        	Error:      	An error is expected but got nil.
+        	Test:       	TestConfErrors/hlsSegmentCount_zero_with_lowLatency_variant
+=== RUN   TestConfErrors/hlsSegmentCount_not_validated_when_HLS_is_disabled
+--- FAIL: TestConfErrors (0.01s)
+    --- FAIL: TestConfErrors/hlsSegmentCount_below_lowLatency_variant_minimum (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_at_lowLatency_variant_minimum (0.00s)
+    --- FAIL: TestConfErrors/hlsSegmentCount_below_fmp4_variant_minimum (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_at_fmp4_variant_minimum (0.00s)
+    --- FAIL: TestConfErrors/hlsSegmentCount_zero_with_lowLatency_variant (0.00s)
+    --- PASS: TestConfErrors/hlsSegmentCount_not_validated_when_HLS_is_disabled (0.00s)
+FAIL
+FAIL	github.com/bluenviron/mediamtx/internal/conf	0.135s
+FAIL
+## run 3 exit 1

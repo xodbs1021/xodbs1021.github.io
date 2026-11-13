@@ -1,0 +1,261 @@
+{
+ "start": [
+  "2026-11-13T23:11:07+0900",
+  [
+   5.57373046875,
+   18.1220703125,
+   37.39013671875
+  ]
+ ],
+ "cases": {
+  "v1.20.1_exit5_restart-on": [
+   {
+    "restart": true,
+    "launched_lines": 2,
+    "exited_lines": 3,
+    "codes": [
+     "0",
+     "0",
+     "0"
+    ],
+    "exited_times_s": [
+     0.02,
+     5.028,
+     10.106
+    ],
+    "first_exited_line": "2026/11/13 23:11:07 INF [path test] runOnInit command exited: command exited with code 0",
+    "server_exit": 0
+   },
+   {
+    "restart": true,
+    "launched_lines": 2,
+    "exited_lines": 3,
+    "codes": [
+     "0",
+     "0",
+     "0"
+    ],
+    "exited_times_s": [
+     0.024,
+     5.051,
+     10.059
+    ],
+    "first_exited_line": "2026/11/13 23:11:19 INF [path test] runOnInit command exited: command exited with code 0",
+    "server_exit": 0
+   },
+   {
+    "restart": true,
+    "launched_lines": 2,
+    "exited_lines": 3,
+    "codes": [
+     "0",
+     "0",
+     "0"
+    ],
+    "exited_times_s": [
+     0.016,
+     5.027,
+     10.037
+    ],
+    "first_exited_line": "2026/11/13 23:11:31 INF [path test] runOnInit command exited: command exited with code 0",
+    "server_exit": 0
+   }
+  ],
+  "v1.20.1_exit5_restart-off": [
+   {
+    "restart": false,
+    "launched_lines": 2,
+    "exited_lines": 0,
+    "codes": [],
+    "exited_times_s": [],
+    "first_exited_line": "",
+    "server_exit": 0
+   },
+   {
+    "restart": false,
+    "launched_lines": 2,
+    "exited_lines": 0,
+    "codes": [],
+    "exited_times_s": [],
+    "first_exited_line": "",
+    "server_exit": 0
+   },
+   {
+    "restart": false,
+    "launched_lines": 2,
+    "exited_lines": 0,
+    "codes": [],
+    "exited_times_s": [],
+    "first_exited_line": "",
+    "server_exit": 0
+   }
+  ],
+  "v1.20.1_exit1_restart-on": [
+   {
+    "restart": true,
+    "launched_lines": 2,
+    "exited_lines": 3,
+    "codes": [
+     "0",
+     "0",
+     "0"
+    ],
+    "exited_times_s": [
+     0.025,
+     5.03,
+     10.04
+    ],
+    "first_exited_line": "2026/11/13 23:12:19 INF [path test] runOnInit command exited: command exited with code 0",
+    "server_exit": 0
+   }
+  ],
+  "v1.20.1_exit1_restart-off": [
+   {
+    "restart": false,
+    "launched_lines": 2,
+    "exited_lines": 0,
+    "codes": [],
+    "exited_times_s": [],
+    "first_exited_line": "",
+    "server_exit": 0
+   }
+  ],
+  "v1.21.0_exit5_restart-on": [
+   {
+    "restart": true,
+    "launched_lines": 2,
+    "exited_lines": 3,
+    "codes": [
+     "5",
+     "5",
+     "5"
+    ],
+    "exited_times_s": [
+     0.054,
+     5.066,
+     10.127
+    ],
+    "first_exited_line": "2026/11/13 23:13:07 INF [path test] runOnInit command exited: command exited with code 5",
+    "server_exit": 0
+   },
+   {
+    "restart": true,
+    "launched_lines": 2,
+    "exited_lines": 3,
+    "codes": [
+     "5",
+     "5",
+     "5"
+    ],
+    "exited_times_s": [
+     0.102,
+     5.113,
+     10.125
+    ],
+    "first_exited_line": "2026/11/13 23:13:19 INF [path test] runOnInit command exited: command exited with code 5",
+    "server_exit": 0
+   },
+   {
+    "restart": true,
+    "launched_lines": 2,
+    "exited_lines": 3,
+    "codes": [
+     "5",
+     "5",
+     "5"
+    ],
+    "exited_times_s": [
+     0.036,
+     5.062,
+     10.077
+    ],
+    "first_exited_line": "2026/11/13 23:13:31 INF [path test] runOnInit command exited: command exited with code 5",
+    "server_exit": 0
+   }
+  ],
+  "v1.21.0_exit5_restart-off": [
+   {
+    "restart": false,
+    "launched_lines": 2,
+    "exited_lines": 1,
+    "codes": [
+     "5"
+    ],
+    "exited_times_s": [
+     0.036
+    ],
+    "first_exited_line": "2026/11/13 23:13:43 INF [path test] runOnInit command exited: command exited with code 5",
+    "server_exit": 0
+   },
+   {
+    "restart": false,
+    "launched_lines": 2,
+    "exited_lines": 1,
+    "codes": [
+     "5"
+    ],
+    "exited_times_s": [
+     0.101
+    ],
+    "first_exited_line": "2026/11/13 23:13:55 INF [path test] runOnInit command exited: command exited with code 5",
+    "server_exit": 0
+   },
+   {
+    "restart": false,
+    "launched_lines": 2,
+    "exited_lines": 1,
+    "codes": [
+     "5"
+    ],
+    "exited_times_s": [
+     0.052
+    ],
+    "first_exited_line": "2026/11/13 23:14:07 INF [path test] runOnInit command exited: command exited with code 5",
+    "server_exit": 0
+   }
+  ],
+  "v1.21.0_exit1_restart-on": [
+   {
+    "restart": true,
+    "launched_lines": 2,
+    "exited_lines": 3,
+    "codes": [
+     "1",
+     "1",
+     "1"
+    ],
+    "exited_times_s": [
+     0.046,
+     5.061,
+     10.069
+    ],
+    "first_exited_line": "2026/11/13 23:14:19 INF [path test] runOnInit command exited: command exited with code 1",
+    "server_exit": 0
+   }
+  ],
+  "v1.21.0_exit1_restart-off": [
+   {
+    "restart": false,
+    "launched_lines": 2,
+    "exited_lines": 1,
+    "codes": [
+     "1"
+    ],
+    "exited_times_s": [
+     0.016
+    ],
+    "first_exited_line": "2026/11/13 23:14:31 INF [path test] runOnInit command exited: command exited with code 1",
+    "server_exit": 0
+   }
+  ]
+ },
+ "end": [
+  "2026-11-13T23:15:07+0900",
+  [
+   37.134765625,
+   28.1220703125,
+   36.72119140625
+  ]
+ ],
+ "note": "sigterm cases of this first run removed: MediaMTX expanded $$ in the hook command, so kill got no pid; see raw_signal/"
+}

@@ -1,0 +1,7 @@
+   0.022 2026/11/13 23:17:39 INF MediaMTX v1.21.0, darwin, arm64
+   0.022 2026/11/13 23:17:39 INF configuration loaded from <OUT>/v1.21.0_sigterm_restart-off_run2/mediamtx.yml
+   0.023 2026/11/13 23:17:39 INF [path test] runOnInit command started
+   1.083 2026/11/13 23:17:40 INF [path test] runOnInit command exited: command exited with code -1
+  12.011 2026/11/13 23:17:51 INF shutting down gracefully
+  12.011 2026/11/13 23:17:51 INF [path test] runOnInit command stopped
+  12.011 2026/11/13 23:17:51 INF waiting for running hooks

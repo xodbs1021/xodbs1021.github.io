@@ -1,0 +1,13 @@
+diff --git a/internal/conf/conf.go b/internal/conf/conf.go
+index d9d71e93..4b5c4031 100644
+--- a/internal/conf/conf.go
++++ b/internal/conf/conf.go
+@@ -438,7 +441,7 @@ func (conf *Conf) setDefaults() {
+ 
+ 	// Authentication
+ 	conf.AuthMethod = AuthMethodInternal
+-	conf.AuthInternalUsers = defaultAuthInternalUsers
++	conf.AuthInternalUsers = deepClone(reflect.ValueOf(defaultAuthInternalUsers)).Interface().([]AuthInternalUser)
+ 	conf.AuthJWTClaimKey = "mediamtx_permissions"
+ 
+ 	// Control API

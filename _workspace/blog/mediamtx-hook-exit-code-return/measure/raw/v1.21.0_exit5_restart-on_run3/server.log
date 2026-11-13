@@ -1,0 +1,9 @@
+   0.024 2026/11/13 23:13:31 INF MediaMTX v1.21.0, darwin, arm64
+   0.024 2026/11/13 23:13:31 INF configuration loaded from <OUT>/v1.21.0_exit5_restart-on_run3/mediamtx.yml
+   0.025 2026/11/13 23:13:31 INF [path test] runOnInit command started
+   0.036 2026/11/13 23:13:31 INF [path test] runOnInit command exited: command exited with code 5
+   5.062 2026/11/13 23:13:36 INF [path test] runOnInit command exited: command exited with code 5
+  10.077 2026/11/13 23:13:41 INF [path test] runOnInit command exited: command exited with code 5
+  12.012 2026/11/13 23:13:43 INF shutting down gracefully
+  12.012 2026/11/13 23:13:43 INF [path test] runOnInit command stopped
+  12.012 2026/11/13 23:13:43 INF waiting for running hooks

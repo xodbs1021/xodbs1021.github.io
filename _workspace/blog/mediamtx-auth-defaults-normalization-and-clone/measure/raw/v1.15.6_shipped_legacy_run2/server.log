@@ -1,0 +1,7 @@
+2026/11/13 23:09:00 WAR you are using one or more authentication-related deprecated parameters (publishUser, publishPass, publishIPs, readUser, readPass, readIPs). These have been replaced by 'authInternalUsers'
+2026/11/13 23:09:00 INF MediaMTX v1.15.6
+2026/11/13 23:09:00 INF configuration loaded from <OUT>/v1.15.6_shipped_legacy_run2/mediamtx.yml
+2026/11/13 23:09:00 INF [API] listener opened on 127.0.0.1:29997
+2026/11/13 23:09:04 INF shutting down gracefully
+2026/11/13 23:09:04 INF [API] listener is closing
+2026/11/13 23:09:04 INF waiting for running hooks

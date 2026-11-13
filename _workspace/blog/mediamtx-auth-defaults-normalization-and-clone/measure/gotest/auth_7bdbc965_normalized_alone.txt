@@ -1,0 +1,21 @@
+# tree 7bdbc965 (v1.21.0-23-g7bdbc965); local changes:
+#    M internal/conf/conf_test.go
+# go version go1.27.2 darwin/arm64; go test -count=1 -v -run '^TestDefaultAuthInternalUsersIsNormalized$'  ./internal/conf; runs=3
+## run 1 start 2026-11-13T23:04:37+0900 load: { 10.74 45.33 54.02 }
+=== RUN   TestDefaultAuthInternalUsersIsNormalized
+--- PASS: TestDefaultAuthInternalUsersIsNormalized (0.00s)
+PASS
+ok  	github.com/bluenviron/mediamtx/internal/conf	0.212s
+## run 1 exit 0
+## run 2 start 2026-11-13T23:04:38+0900 load: { 10.74 45.33 54.02 }
+=== RUN   TestDefaultAuthInternalUsersIsNormalized
+--- PASS: TestDefaultAuthInternalUsersIsNormalized (0.00s)
+PASS
+ok  	github.com/bluenviron/mediamtx/internal/conf	0.235s
+## run 2 exit 0
+## run 3 start 2026-11-13T23:04:39+0900 load: { 10.74 45.33 54.02 }
+=== RUN   TestDefaultAuthInternalUsersIsNormalized
+--- PASS: TestDefaultAuthInternalUsersIsNormalized (0.00s)
+PASS
+ok  	github.com/bluenviron/mediamtx/internal/conf	0.205s
+## run 3 exit 0

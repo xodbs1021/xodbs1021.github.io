@@ -1,0 +1,11 @@
+    0.041 2026/11/13 23:17:15 INF MediaMTX v1.21.0, darwin, arm64
+    0.041 2026/11/13 23:17:15 INF configuration loaded from <OUT>/api_v1.21.0/mediamtx.yml
+    0.041 2026/11/13 23:17:15 INF [RTSP] started with listeners on :18554 (TCP/RTSP)
+    0.041 2026/11/13 23:17:15 INF [HLS] started with listener on 127.0.0.1:18888 (TCP/HTTP)
+    0.041 2026/11/13 23:17:15 INF [API] started with listener on 127.0.0.1:19997 (TCP/HTTP)
+    4.034 2026/11/13 23:17:19 ERR [API] 'hlsSegmentCount' must be at least 7 when 'hlsVariant' is 'lowLatency'
+    5.053 2026/11/13 23:17:20 INF shutting down gracefully
+    5.053 2026/11/13 23:17:20 INF [API] closing
+    5.053 2026/11/13 23:17:20 INF [HLS] closing
+    5.053 2026/11/13 23:17:20 INF [RTSP] closing
+    5.053 2026/11/13 23:17:20 INF waiting for running hooks

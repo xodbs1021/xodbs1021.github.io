@@ -1,7 +1,7 @@
 ---
 title: "MediaMTX 훅 7곳은 실행 실패를 로그에 남기지 않았습니다"
 date: "2026-10-15T11:40:52+09:00"
-lastmod: "2026-11-13T22:30:00+09:00"
+lastmod: "2026-11-13T23:47:38+09:00"
 draft: false
 author: "김태윤"
 description: "MediaMTX가 외부 명령을 띄우는 13곳 중 7곳은 종료 콜백(OnExit)이 없어, 실행 파일이 없을 때 로그에 command launched만 남았습니다. 7곳에 기존 6곳과 같은 보고를 붙인 PR #6259(2026-11-13 확인 기준 열림)와, v1.21.3과 PR head 69280137을 빌드해 7종 훅 22번 실행의 실패 이유가 0줄에서 22줄로 바뀐 것을 확인한 AI 재측정."
@@ -110,7 +110,7 @@ v1.21.3과 #6259 head [`69280137`](https://github.com/bluenviron/mediamtx/pull/6
 - [이슈 #3372 「Hooks not working」](https://github.com/bluenviron/mediamtx/issues/3372)
 - [PR #6155 「fix external command exit code reporting on non-Windows platforms」](https://github.com/bluenviron/mediamtx/pull/6155) — v1.21.0
 - [MediaMTX v1.21.3](https://github.com/bluenviron/mediamtx/releases/tag/v1.21.3)
-- [실패한 명령이 종료 코드 0으로 보인 이유](/posts/open-source-analysis/mediamtx-hook-exit-code-return/) — #6155 기록
+- [MediaMTX는 실패한 훅의 종료 코드를 0으로 받았습니다](/posts/open-source-analysis/mediamtx-hook-exit-code-return/) — #6155 기록
 
 ---
 

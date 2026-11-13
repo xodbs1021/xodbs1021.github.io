@@ -1,0 +1,22 @@
+    0.092 2026/11/13 23:02:50 INF MediaMTX v1.20.1, darwin, arm64
+    0.092 2026/11/13 23:02:50 INF configuration loaded from <OUT>/restart_v1.20.1_run1/mediamtx.yml
+    0.094 2026/11/13 23:02:50 INF [RTSP] started with listeners on :18554 (TCP/RTSP)
+    0.095 2026/11/13 23:02:50 INF [HLS] started with listener on 127.0.0.1:18888 (TCP/HTTP)
+    4.107 2026/11/13 23:02:54 INF [RTSP] [conn 127.0.0.1:59317] opened
+    4.109 2026/11/13 23:02:54 INF [RTSP] [session b1c00401] created by 127.0.0.1:59317
+    4.112 2026/11/13 23:02:54 INF [path test] stream is available and online, 1 track (H264)
+    4.112 2026/11/13 23:02:54 INF [HLS] [muxer test] created automatically
+    4.112 2026/11/13 23:02:54 INF [RTSP] [session b1c00401] is publishing to path 'test'
+    4.113 2026/11/13 23:02:54 ERR [HLS] [muxer test] muxer instance crashed: Low-Latency HLS requires at least 7 segments
+    4.115 2026/11/13 23:02:54 INF [path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones
+   14.113 2026/11/13 23:03:04 ERR [HLS] [muxer test] muxer instance crashed: Low-Latency HLS requires at least 7 segments
+   24.114 2026/11/13 23:03:14 ERR [HLS] [muxer test] muxer instance crashed: Low-Latency HLS requires at least 7 segments
+   34.114 2026/11/13 23:03:24 ERR [HLS] [muxer test] muxer instance crashed: Low-Latency HLS requires at least 7 segments
+   44.118 2026/11/13 23:03:34 ERR [HLS] [muxer test] muxer instance crashed: Low-Latency HLS requires at least 7 segments
+   48.636 2026/11/13 23:03:39 INF [RTSP] [session b1c00401] destroyed: torn down by 127.0.0.1:59317
+   48.636 2026/11/13 23:03:39 INF [HLS] [muxer test] destroyed: terminated
+   48.636 2026/11/13 23:03:39 INF [RTSP] [conn 127.0.0.1:59317] closed: read tcp 127.0.0.1:18554->127.0.0.1:59317: read: connection reset by peer
+   48.638 2026/11/13 23:03:39 INF shutting down gracefully
+   48.638 2026/11/13 23:03:39 INF [HLS] closing
+   48.639 2026/11/13 23:03:39 INF [RTSP] closing
+   48.639 2026/11/13 23:03:39 INF waiting for running hooks

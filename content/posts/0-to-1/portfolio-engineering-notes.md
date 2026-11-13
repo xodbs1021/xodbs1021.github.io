@@ -14,7 +14,7 @@
   "description": "공통 DB 인증, nginx 요청 검증, DVR 발행과 복구, MediaMTX 기여를 만든 판단과 검증을 연결한 기술 글 모음.",
   "draft": false,
   "portfolio_edition": "2026-10-15-v2",
-  "lastmod": "2026-11-13T22:07:56+09:00"
+  "lastmod": "2026-11-13T23:47:38+09:00"
 }
 
 방송 파일을 만들었고 요청도 성공했는데, 브라우저가 인식한 재생 구간은 목록보다 **61.94초 짧았습니다.** 오류 수는 0이었습니다. 이 차이를 추적하며 성공 응답 다음에 무엇을 확인해야 하는지 배웠습니다. 파일의 시간축과 브라우저가 받아들인 구간을 대조해야 사용자가 놓친 장면을 찾을 수 있었습니다.
@@ -118,10 +118,10 @@
 
 설정 오류가 반복 실행 뒤에야 드러나거나, 실패한 명령이 종료 코드 0으로 기록되는 문제를 공개 프로젝트의 수정으로 연결했습니다. 정식 릴리스 4건 외에도 열린 제안과 채택되지 않은 접근을 남겼습니다. 유지보수자의 리뷰 때문에 무엇을 바꿨는지도 각 글에서 확인할 수 있습니다.
 
-- **CASE 36** · [서버는 켜졌는데 방송을 재생할 수 없었다: HLS 설정 검증을 앞당기기](/posts/open-source-analysis/mediamtx-hls-segment-count-validation/)
-- **CASE 37** · [실패한 명령이 종료 코드 0으로 보인 이유: 빠진 return 하나의 영향](/posts/open-source-analysis/mediamtx-hook-exit-code-return/)
-- **CASE 38** · [대체 화면은 보여주되 녹화하지 않기: 기존 PR을 이어 완성한 상태 경계](/posts/open-source-analysis/mediamtx-offline-recording-source-lifecycle/)
-- **CASE 39** · [기본값을 복사했는데 왜 다른 설정까지 바뀔까: 인증 설정의 두 가지 회귀](/posts/open-source-analysis/mediamtx-auth-defaults-normalization-and-clone/)
+- **CASE 36** · [MediaMTX는 LL-HLS 조각 6개 설정으로도 기동했습니다](/posts/open-source-analysis/mediamtx-hls-segment-count-validation/)
+- **CASE 37** · [MediaMTX는 실패한 훅의 종료 코드를 0으로 받았습니다](/posts/open-source-analysis/mediamtx-hook-exit-code-return/)
+- **CASE 38** · [MediaMTX 대체 화면은 보여 주되 녹화하지 않게 했습니다](/posts/open-source-analysis/mediamtx-offline-recording-source-lifecycle/)
+- **CASE 39** · [MediaMTX 인증 기본값은 환경변수 하나에 함께 바뀌었습니다](/posts/open-source-analysis/mediamtx-auth-defaults-normalization-and-clone/)
 - **CASE 40** · [로그 재설정 중 훅을 기다리게 한 PR은 교착 반례로 닫혔습니다](/posts/open-source-analysis/mediamtx-logger-reload-rejected-lifecycle-fix/)
 - **CASE 41** · [MediaMTX 훅 7곳은 실행 실패를 로그에 남기지 않았습니다](/posts/open-source-analysis/mediamtx-seven-hooks-missing-exit-callback/)
 - **CASE 42** · [MediaMTX 인증서 감시 작업은 Close 뒤에도 돌았습니다](/posts/open-source-analysis/mediamtx-certificate-watcher-close-join/)

@@ -1,0 +1,33 @@
+# tree 344d8c90 (v1.20.1-26-g344d8c90); local changes:
+#    M internal/conf/conf_test.go
+# go version go1.27.2 darwin/arm64; go test -count=1 -v -run '^TestCmdExitCode$'  ./internal/externalcmd; runs=3
+## run 1 start 2026-11-13T23:04:26+0900 load: { 12.84 47.50 54.92 }
+=== RUN   TestCmdExitCode
+=== RUN   TestCmdExitCode/standard
+=== RUN   TestCmdExitCode/restart
+--- PASS: TestCmdExitCode (0.01s)
+    --- PASS: TestCmdExitCode/standard (0.01s)
+    --- PASS: TestCmdExitCode/restart (0.01s)
+PASS
+ok  	github.com/bluenviron/mediamtx/internal/externalcmd	0.296s
+## run 1 exit 0
+## run 2 start 2026-11-13T23:04:27+0900 load: { 12.84 47.50 54.92 }
+=== RUN   TestCmdExitCode
+=== RUN   TestCmdExitCode/standard
+=== RUN   TestCmdExitCode/restart
+--- PASS: TestCmdExitCode (0.01s)
+    --- PASS: TestCmdExitCode/standard (0.00s)
+    --- PASS: TestCmdExitCode/restart (0.00s)
+PASS
+ok  	github.com/bluenviron/mediamtx/internal/externalcmd	0.119s
+## run 2 exit 0
+## run 3 start 2026-11-13T23:04:27+0900 load: { 12.84 47.50 54.92 }
+=== RUN   TestCmdExitCode
+=== RUN   TestCmdExitCode/standard
+=== RUN   TestCmdExitCode/restart
+--- PASS: TestCmdExitCode (0.01s)
+    --- PASS: TestCmdExitCode/standard (0.00s)
+    --- PASS: TestCmdExitCode/restart (0.00s)
+PASS
+ok  	github.com/bluenviron/mediamtx/internal/externalcmd	0.121s
+## run 3 exit 0

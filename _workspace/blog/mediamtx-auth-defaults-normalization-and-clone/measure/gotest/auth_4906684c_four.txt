@@ -1,0 +1,44 @@
+# tree 4906684c (v1.21.0-24-g4906684c); local changes:
+# go version go1.27.2 darwin/arm64; go test -count=1 -v -run '^(TestDefaultAuthInternalUsersIsNormalized|TestConfDeprecatedAuthWithExplicitDefaults|TestConfDefaultsAreNotShared|TestConfDeprecatedAuthWithEnvUser|TestConfDeprecatedAuth)$'  ./internal/conf; runs=3
+## run 1 start 2026-11-13T23:04:39+0900 load: { 10.74 45.33 54.02 }
+=== RUN   TestConfDeprecatedAuth
+--- PASS: TestConfDeprecatedAuth (0.00s)
+=== RUN   TestConfDeprecatedAuthWithEnvUser
+--- PASS: TestConfDeprecatedAuthWithEnvUser (0.00s)
+=== RUN   TestConfDeprecatedAuthWithExplicitDefaults
+--- PASS: TestConfDeprecatedAuthWithExplicitDefaults (0.00s)
+=== RUN   TestDefaultAuthInternalUsersIsNormalized
+--- PASS: TestDefaultAuthInternalUsersIsNormalized (0.00s)
+=== RUN   TestConfDefaultsAreNotShared
+--- PASS: TestConfDefaultsAreNotShared (0.00s)
+PASS
+ok  	github.com/bluenviron/mediamtx/internal/conf	0.402s
+## run 1 exit 0
+## run 2 start 2026-11-13T23:04:40+0900 load: { 10.74 45.33 54.02 }
+=== RUN   TestConfDeprecatedAuth
+--- PASS: TestConfDeprecatedAuth (0.00s)
+=== RUN   TestConfDeprecatedAuthWithEnvUser
+--- PASS: TestConfDeprecatedAuthWithEnvUser (0.00s)
+=== RUN   TestConfDeprecatedAuthWithExplicitDefaults
+--- PASS: TestConfDeprecatedAuthWithExplicitDefaults (0.00s)
+=== RUN   TestDefaultAuthInternalUsersIsNormalized
+--- PASS: TestDefaultAuthInternalUsersIsNormalized (0.00s)
+=== RUN   TestConfDefaultsAreNotShared
+--- PASS: TestConfDefaultsAreNotShared (0.00s)
+PASS
+ok  	github.com/bluenviron/mediamtx/internal/conf	0.206s
+## run 2 exit 0
+## run 3 start 2026-11-13T23:04:41+0900 load: { 10.74 45.33 54.02 }
+=== RUN   TestConfDeprecatedAuth
+--- PASS: TestConfDeprecatedAuth (0.00s)
+=== RUN   TestConfDeprecatedAuthWithEnvUser
+--- PASS: TestConfDeprecatedAuthWithEnvUser (0.00s)
+=== RUN   TestConfDeprecatedAuthWithExplicitDefaults
+--- PASS: TestConfDeprecatedAuthWithExplicitDefaults (0.00s)
+=== RUN   TestDefaultAuthInternalUsersIsNormalized
+--- PASS: TestDefaultAuthInternalUsersIsNormalized (0.00s)
+=== RUN   TestConfDefaultsAreNotShared
+--- PASS: TestConfDefaultsAreNotShared (0.00s)
+PASS
+ok  	github.com/bluenviron/mediamtx/internal/conf	0.229s
+## run 3 exit 0

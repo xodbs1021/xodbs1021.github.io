@@ -1,0 +1,7 @@
+2026/11/13 23:09:04 INF MediaMTX v1.15.6
+2026/11/13 23:09:04 INF configuration loaded from <OUT>/v1.15.6_api_add_legacy_run2/mediamtx.yml
+2026/11/13 23:09:04 INF [API] listener opened on 127.0.0.1:29997
+2026/11/13 23:09:08 INF reloading configuration (API request)
+2026/11/13 23:09:08 INF shutting down gracefully
+2026/11/13 23:09:08 INF [API] listener is closing
+2026/11/13 23:09:08 INF waiting for running hooks

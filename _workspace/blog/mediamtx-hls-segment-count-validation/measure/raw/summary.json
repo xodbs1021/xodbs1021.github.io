@@ -1,0 +1,770 @@
+{
+ "restart": {
+  "v1.20.1": [
+   {
+    "started": true,
+    "publish_start_s": 4.013,
+    "publish_s": 45,
+    "exit_code": 0,
+    "crash_count": 5,
+    "crash_times_s": [
+     4.113,
+     14.113,
+     24.114,
+     34.114,
+     44.118
+    ],
+    "crash_intervals_s": [
+     10.0,
+     10.001,
+     10.0,
+     10.004
+    ],
+    "error_lines": [
+     "2026/11/13 23:02:54 ERR [HLS] [muxer test] muxer instance crashed: Low-Latency HLS requires at least 7 segments",
+     "2026/11/13 23:03:04 ERR [HLS] [muxer test] muxer instance crashed: Low-Latency HLS requires at least 7 segments",
+     "2026/11/13 23:03:14 ERR [HLS] [muxer test] muxer instance crashed: Low-Latency HLS requires at least 7 segments"
+    ]
+   },
+   {
+    "started": true,
+    "publish_start_s": 4.013,
+    "publish_s": 45,
+    "exit_code": 0,
+    "crash_count": 5,
+    "crash_times_s": [
+     4.121,
+     14.121,
+     24.121,
+     34.121,
+     44.121
+    ],
+    "crash_intervals_s": [
+     10.0,
+     10.0,
+     10.0,
+     10.0
+    ],
+    "error_lines": [
+     "2026/11/13 23:03:43 ERR [HLS] [muxer test] muxer instance crashed: Low-Latency HLS requires at least 7 segments",
+     "2026/11/13 23:03:53 ERR [HLS] [muxer test] muxer instance crashed: Low-Latency HLS requires at least 7 segments",
+     "2026/11/13 23:04:03 ERR [HLS] [muxer test] muxer instance crashed: Low-Latency HLS requires at least 7 segments"
+    ]
+   },
+   {
+    "started": true,
+    "publish_start_s": 4.008,
+    "publish_s": 45,
+    "exit_code": 0,
+    "crash_count": 5,
+    "crash_times_s": [
+     4.052,
+     14.052,
+     24.052,
+     34.052,
+     44.052
+    ],
+    "crash_intervals_s": [
+     10.0,
+     10.0,
+     10.0,
+     10.0
+    ],
+    "error_lines": [
+     "2026/11/13 23:04:32 ERR [HLS] [muxer test] muxer instance crashed: Low-Latency HLS requires at least 7 segments",
+     "2026/11/13 23:04:42 ERR [HLS] [muxer test] muxer instance crashed: Low-Latency HLS requires at least 7 segments",
+     "2026/11/13 23:04:52 ERR [HLS] [muxer test] muxer instance crashed: Low-Latency HLS requires at least 7 segments"
+    ]
+   }
+  ],
+  "v1.21.0": [
+   {
+    "started": false,
+    "exit_code": 1,
+    "crash_count": 0,
+    "crash_times_s": [],
+    "crash_intervals_s": [],
+    "error_lines": [
+     "ERR: 'hlsSegmentCount' must be at least 7 when 'hlsVariant' is 'lowLatency'"
+    ]
+   },
+   {
+    "started": false,
+    "exit_code": 1,
+    "crash_count": 0,
+    "crash_times_s": [],
+    "crash_intervals_s": [],
+    "error_lines": [
+     "ERR: 'hlsSegmentCount' must be at least 7 when 'hlsVariant' is 'lowLatency'"
+    ]
+   },
+   {
+    "started": false,
+    "exit_code": 1,
+    "crash_count": 0,
+    "crash_times_s": [],
+    "crash_intervals_s": [],
+    "error_lines": [
+     "ERR: 'hlsSegmentCount' must be at least 7 when 'hlsVariant' is 'lowLatency'"
+    ]
+   }
+  ],
+  "v1.21.3": [
+   {
+    "started": false,
+    "exit_code": 1,
+    "crash_count": 0,
+    "crash_times_s": [],
+    "crash_intervals_s": [],
+    "error_lines": [
+     "ERR: 'hlsSegmentCount' must be at least 7 when 'hlsVariant' is 'lowLatency'"
+    ]
+   },
+   {
+    "started": false,
+    "exit_code": 1,
+    "crash_count": 0,
+    "crash_times_s": [],
+    "crash_intervals_s": [],
+    "error_lines": [
+     "ERR: 'hlsSegmentCount' must be at least 7 when 'hlsVariant' is 'lowLatency'"
+    ]
+   },
+   {
+    "started": false,
+    "exit_code": 1,
+    "crash_count": 0,
+    "crash_times_s": [],
+    "crash_intervals_s": [],
+    "error_lines": [
+     "ERR: 'hlsSegmentCount' must be at least 7 when 'hlsVariant' is 'lowLatency'"
+    ]
+   }
+  ]
+ },
+ "matrix": {
+  "v1.20.1": [
+   {
+    "variant": "lowLatency",
+    "count": 6,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 500,
+    "m3u8_head": "{\"status\":\"error\",\"error\":\"muxer instance not available\"}",
+    "exit_code": 0,
+    "crash_count": 2,
+    "error_lines": [
+     "2026/11/13 23:05:22 ERR [HLS] [muxer test] muxer instance crashed: Low-Latency HLS requires at least 7 segments",
+     "2026/11/13 23:05:32 ERR [HLS] [muxer test] muxer instance crashed: Low-Latency HLS requires at least 7 segments"
+    ]
+   },
+   {
+    "variant": "lowLatency",
+    "count": 7,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 200,
+    "m3u8_head": "#EXTM3U\n#EXT-X-VERSION:10\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=951824,AVERAGE-BANDWIDTH=879968,CODEC",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "lowLatency",
+    "count": 0,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 200,
+    "m3u8_head": "#EXTM3U\n#EXT-X-VERSION:10\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=951824,AVERAGE-BANDWIDTH=879968,CODEC",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "fmp4",
+    "count": 2,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 500,
+    "m3u8_head": "{\"status\":\"error\",\"error\":\"muxer instance not available\"}",
+    "exit_code": 0,
+    "crash_count": 2,
+    "error_lines": [
+     "2026/11/13 23:06:21 ERR [HLS] [muxer test] muxer instance crashed: the minimum number of HLS segments is 3",
+     "2026/11/13 23:06:31 ERR [HLS] [muxer test] muxer instance crashed: the minimum number of HLS segments is 3"
+    ]
+   },
+   {
+    "variant": "fmp4",
+    "count": 3,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 200,
+    "m3u8_head": "#EXTM3U\n#EXT-X-VERSION:10\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=948752,AVERAGE-BANDWIDTH=865405,CODEC",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "mpegts",
+    "count": 2,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 500,
+    "m3u8_head": "{\"status\":\"error\",\"error\":\"muxer instance not available\"}",
+    "exit_code": 0,
+    "crash_count": 2,
+    "error_lines": [
+     "2026/11/13 23:07:00 ERR [HLS] [muxer test] muxer instance crashed: the minimum number of HLS segments is 3",
+     "2026/11/13 23:07:10 ERR [HLS] [muxer test] muxer instance crashed: the minimum number of HLS segments is 3"
+    ]
+   },
+   {
+    "variant": "mpegts",
+    "count": 3,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 200,
+    "m3u8_head": "#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=995648,AVERAGE-BANDWIDTH=912928,CODECS",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "lowLatency",
+    "count": 1,
+    "hls": false,
+    "started": true,
+    "m3u8_status": 0,
+    "m3u8_head": "URLError",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "lowLatency",
+    "count": 6,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 500,
+    "m3u8_head": "{\"status\":\"error\",\"error\":\"muxer instance not available\"}",
+    "exit_code": 0,
+    "crash_count": 2,
+    "error_lines": [
+     "2026/11/13 23:08:00 ERR [HLS] [muxer test] muxer instance crashed: Low-Latency HLS requires at least 7 segments",
+     "2026/11/13 23:08:10 ERR [HLS] [muxer test] muxer instance crashed: Low-Latency HLS requires at least 7 segments"
+    ]
+   },
+   {
+    "variant": "lowLatency",
+    "count": 7,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 200,
+    "m3u8_head": "#EXTM3U\n#EXT-X-VERSION:10\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=951824,AVERAGE-BANDWIDTH=879968,CODEC",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "lowLatency",
+    "count": 0,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 200,
+    "m3u8_head": "#EXTM3U\n#EXT-X-VERSION:10\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=951824,AVERAGE-BANDWIDTH=879968,CODEC",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "fmp4",
+    "count": 2,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 500,
+    "m3u8_head": "{\"status\":\"error\",\"error\":\"muxer instance not available\"}",
+    "exit_code": 0,
+    "crash_count": 2,
+    "error_lines": [
+     "2026/11/13 23:08:59 ERR [HLS] [muxer test] muxer instance crashed: the minimum number of HLS segments is 3",
+     "2026/11/13 23:09:09 ERR [HLS] [muxer test] muxer instance crashed: the minimum number of HLS segments is 3"
+    ]
+   },
+   {
+    "variant": "fmp4",
+    "count": 3,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 200,
+    "m3u8_head": "#EXTM3U\n#EXT-X-VERSION:10\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=948752,AVERAGE-BANDWIDTH=865405,CODEC",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "mpegts",
+    "count": 2,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 500,
+    "m3u8_head": "{\"status\":\"error\",\"error\":\"muxer instance not available\"}",
+    "exit_code": 0,
+    "crash_count": 2,
+    "error_lines": [
+     "2026/11/13 23:09:38 ERR [HLS] [muxer test] muxer instance crashed: the minimum number of HLS segments is 3",
+     "2026/11/13 23:09:48 ERR [HLS] [muxer test] muxer instance crashed: the minimum number of HLS segments is 3"
+    ]
+   },
+   {
+    "variant": "mpegts",
+    "count": 3,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 200,
+    "m3u8_head": "#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=995648,AVERAGE-BANDWIDTH=912928,CODECS",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "lowLatency",
+    "count": 1,
+    "hls": false,
+    "started": true,
+    "m3u8_status": 0,
+    "m3u8_head": "URLError",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "lowLatency",
+    "count": 6,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 500,
+    "m3u8_head": "{\"status\":\"error\",\"error\":\"muxer instance not available\"}",
+    "exit_code": 0,
+    "crash_count": 2,
+    "error_lines": [
+     "2026/11/13 23:10:37 ERR [HLS] [muxer test] muxer instance crashed: Low-Latency HLS requires at least 7 segments",
+     "2026/11/13 23:10:47 ERR [HLS] [muxer test] muxer instance crashed: Low-Latency HLS requires at least 7 segments"
+    ]
+   },
+   {
+    "variant": "lowLatency",
+    "count": 7,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 200,
+    "m3u8_head": "#EXTM3U\n#EXT-X-VERSION:10\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=951824,AVERAGE-BANDWIDTH=879968,CODEC",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "lowLatency",
+    "count": 0,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 200,
+    "m3u8_head": "#EXTM3U\n#EXT-X-VERSION:10\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=951824,AVERAGE-BANDWIDTH=879968,CODEC",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "fmp4",
+    "count": 2,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 500,
+    "m3u8_head": "{\"status\":\"error\",\"error\":\"muxer instance not available\"}",
+    "exit_code": 0,
+    "crash_count": 2,
+    "error_lines": [
+     "2026/11/13 23:11:35 ERR [HLS] [muxer test] muxer instance crashed: the minimum number of HLS segments is 3",
+     "2026/11/13 23:11:45 ERR [HLS] [muxer test] muxer instance crashed: the minimum number of HLS segments is 3"
+    ]
+   },
+   {
+    "variant": "fmp4",
+    "count": 3,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 200,
+    "m3u8_head": "#EXTM3U\n#EXT-X-VERSION:10\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=948752,AVERAGE-BANDWIDTH=865405,CODEC",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "mpegts",
+    "count": 2,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 500,
+    "m3u8_head": "{\"status\":\"error\",\"error\":\"muxer instance not available\"}",
+    "exit_code": 0,
+    "crash_count": 2,
+    "error_lines": [
+     "2026/11/13 23:12:15 ERR [HLS] [muxer test] muxer instance crashed: the minimum number of HLS segments is 3",
+     "2026/11/13 23:12:25 ERR [HLS] [muxer test] muxer instance crashed: the minimum number of HLS segments is 3"
+    ]
+   },
+   {
+    "variant": "mpegts",
+    "count": 3,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 200,
+    "m3u8_head": "#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=995648,AVERAGE-BANDWIDTH=912928,CODECS",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "lowLatency",
+    "count": 1,
+    "hls": false,
+    "started": true,
+    "m3u8_status": 0,
+    "m3u8_head": "URLError",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   }
+  ],
+  "v1.21.0": [
+   {
+    "variant": "lowLatency",
+    "count": 6,
+    "hls": true,
+    "started": false,
+    "exit_code": 1,
+    "crash_count": 0,
+    "error_lines": [
+     "ERR: 'hlsSegmentCount' must be at least 7 when 'hlsVariant' is 'lowLatency'"
+    ]
+   },
+   {
+    "variant": "lowLatency",
+    "count": 7,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 200,
+    "m3u8_head": "#EXTM3U\n#EXT-X-VERSION:10\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=951824,AVERAGE-BANDWIDTH=879968,CODEC",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "lowLatency",
+    "count": 0,
+    "hls": true,
+    "started": false,
+    "exit_code": 1,
+    "crash_count": 0,
+    "error_lines": [
+     "ERR: 'hlsSegmentCount' must be at least 7 when 'hlsVariant' is 'lowLatency'"
+    ]
+   },
+   {
+    "variant": "fmp4",
+    "count": 2,
+    "hls": true,
+    "started": false,
+    "exit_code": 1,
+    "crash_count": 0,
+    "error_lines": [
+     "ERR: 'hlsSegmentCount' must be at least 3"
+    ]
+   },
+   {
+    "variant": "fmp4",
+    "count": 3,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 200,
+    "m3u8_head": "#EXTM3U\n#EXT-X-VERSION:10\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=948752,AVERAGE-BANDWIDTH=865405,CODEC",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "mpegts",
+    "count": 2,
+    "hls": true,
+    "started": false,
+    "exit_code": 1,
+    "crash_count": 0,
+    "error_lines": [
+     "ERR: 'hlsSegmentCount' must be at least 3"
+    ]
+   },
+   {
+    "variant": "mpegts",
+    "count": 3,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 200,
+    "m3u8_head": "#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=995648,AVERAGE-BANDWIDTH=912928,CODECS",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "lowLatency",
+    "count": 1,
+    "hls": false,
+    "started": true,
+    "m3u8_status": 0,
+    "m3u8_head": "URLError",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "lowLatency",
+    "count": 6,
+    "hls": true,
+    "started": false,
+    "exit_code": 1,
+    "crash_count": 0,
+    "error_lines": [
+     "ERR: 'hlsSegmentCount' must be at least 7 when 'hlsVariant' is 'lowLatency'"
+    ]
+   },
+   {
+    "variant": "lowLatency",
+    "count": 7,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 200,
+    "m3u8_head": "#EXTM3U\n#EXT-X-VERSION:10\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=951824,AVERAGE-BANDWIDTH=879968,CODEC",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "lowLatency",
+    "count": 0,
+    "hls": true,
+    "started": false,
+    "exit_code": 1,
+    "crash_count": 0,
+    "error_lines": [
+     "ERR: 'hlsSegmentCount' must be at least 7 when 'hlsVariant' is 'lowLatency'"
+    ]
+   },
+   {
+    "variant": "fmp4",
+    "count": 2,
+    "hls": true,
+    "started": false,
+    "exit_code": 1,
+    "crash_count": 0,
+    "error_lines": [
+     "ERR: 'hlsSegmentCount' must be at least 3"
+    ]
+   },
+   {
+    "variant": "fmp4",
+    "count": 3,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 200,
+    "m3u8_head": "#EXTM3U\n#EXT-X-VERSION:10\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=948752,AVERAGE-BANDWIDTH=865405,CODEC",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "mpegts",
+    "count": 2,
+    "hls": true,
+    "started": false,
+    "exit_code": 1,
+    "crash_count": 0,
+    "error_lines": [
+     "ERR: 'hlsSegmentCount' must be at least 3"
+    ]
+   },
+   {
+    "variant": "mpegts",
+    "count": 3,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 200,
+    "m3u8_head": "#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=995648,AVERAGE-BANDWIDTH=912928,CODECS",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "lowLatency",
+    "count": 1,
+    "hls": false,
+    "started": true,
+    "m3u8_status": 0,
+    "m3u8_head": "URLError",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "lowLatency",
+    "count": 6,
+    "hls": true,
+    "started": false,
+    "exit_code": 1,
+    "crash_count": 0,
+    "error_lines": [
+     "ERR: 'hlsSegmentCount' must be at least 7 when 'hlsVariant' is 'lowLatency'"
+    ]
+   },
+   {
+    "variant": "lowLatency",
+    "count": 7,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 200,
+    "m3u8_head": "#EXTM3U\n#EXT-X-VERSION:10\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=951824,AVERAGE-BANDWIDTH=879968,CODEC",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "lowLatency",
+    "count": 0,
+    "hls": true,
+    "started": false,
+    "exit_code": 1,
+    "crash_count": 0,
+    "error_lines": [
+     "ERR: 'hlsSegmentCount' must be at least 7 when 'hlsVariant' is 'lowLatency'"
+    ]
+   },
+   {
+    "variant": "fmp4",
+    "count": 2,
+    "hls": true,
+    "started": false,
+    "exit_code": 1,
+    "crash_count": 0,
+    "error_lines": [
+     "ERR: 'hlsSegmentCount' must be at least 3"
+    ]
+   },
+   {
+    "variant": "fmp4",
+    "count": 3,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 200,
+    "m3u8_head": "#EXTM3U\n#EXT-X-VERSION:10\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=948752,AVERAGE-BANDWIDTH=865405,CODEC",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "mpegts",
+    "count": 2,
+    "hls": true,
+    "started": false,
+    "exit_code": 1,
+    "crash_count": 0,
+    "error_lines": [
+     "ERR: 'hlsSegmentCount' must be at least 3"
+    ]
+   },
+   {
+    "variant": "mpegts",
+    "count": 3,
+    "hls": true,
+    "started": true,
+    "m3u8_status": 200,
+    "m3u8_head": "#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-INDEPENDENT-SEGMENTS\n\n#EXT-X-STREAM-INF:BANDWIDTH=995648,AVERAGE-BANDWIDTH=912928,CODECS",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   },
+   {
+    "variant": "lowLatency",
+    "count": 1,
+    "hls": false,
+    "started": true,
+    "m3u8_status": 0,
+    "m3u8_head": "URLError",
+    "exit_code": 0,
+    "crash_count": 0,
+    "error_lines": []
+   }
+  ]
+ },
+ "env": {
+  "v1.20.1": {
+   "started": true,
+   "exit_code": 0,
+   "error_lines": []
+  },
+  "v1.21.0": {
+   "started": false,
+   "exit_code": 1,
+   "error_lines": [
+    "ERR: 'hlsSegmentCount' must be at least 7 when 'hlsVariant' is 'lowLatency'"
+   ]
+  }
+ },
+ "api": {
+  "v1.20.1": {
+   "started": true,
+   "patch_status": 200,
+   "patch_body": "{\"status\":\"ok\"}",
+   "get_status": 200,
+   "hlsSegmentCount_after": 6,
+   "exit_code": 0
+  },
+  "v1.21.0": {
+   "started": true,
+   "patch_status": 400,
+   "patch_body": "{\"status\":\"error\",\"error\":\"'hlsSegmentCount' must be at least 7 when 'hlsVariant' is 'lowLatency'\"}",
+   "get_status": 200,
+   "hlsSegmentCount_after": 7,
+   "exit_code": 0
+  }
+ },
+ "start": [
+  "2026-11-13T23:02:50+0900",
+  [
+   41.01904296875,
+   62.9541015625,
+   60.66455078125
+  ]
+ ],
+ "after_restart": [
+  "2026-11-13T23:05:18+0900",
+  [
+   8.56298828125,
+   40.4326171875,
+   51.82373046875
+  ]
+ ],
+ "after_matrix": [
+  "2026-11-13T23:17:06+0900",
+  [
+   23.4814453125,
+   25.68017578125,
+   34.5810546875
+  ]
+ ],
+ "end": [
+  "2026-11-13T23:17:20+0900",
+  [
+   26.0400390625,
+   26.1103515625,
+   34.5771484375
+  ]
+ ]
+}

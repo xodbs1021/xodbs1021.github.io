@@ -597,6 +597,32 @@
       "poster": "/images/media-ci-path-filter-required-check-tradeoff-protection-first-order-mobile-poster.jpg"
     }
   },
+  "mediamtx-auth-defaults-normalization-and-clone-shared-default-alias": {
+    "scene": "SharedDefaultAlias",
+    "alt": "두 줄이 있다. 위 줄 v1.21.0 · 같은 저장 공간에서는 전역 기본값 상자와 conf 상자가 모두 user: any 저장 공간 하나를 가리킨다. 환경변수 user=alice 이름표에서 화살표가 그 저장 공간으로 들어가 빨간 user: alice가 되고, 비교: 같음과 이전 인증이 덮어씀 → alice 없음이 빨갛게 뜬다. 아래 줄 v1.21.1 · deepClone에서는 저장 공간이 둘이라 conf 쪽만 청록 user: alice로 바뀌고 기본값 쪽은 user: any로 남으며, 비교: 다름과 충돌 → 기동 거부가 청록으로 뜬다",
+    "sha256": "dda1ea599458bc675ebf3524e16fb9a17dea74e3f9410754b7de8f02e9b7c3b1",
+    "bytes": 205041,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/mediamtx-auth-defaults-normalization-and-clone-shared-default-alias-poster.jpg",
+    "mobile": {
+      "sha256": "4141e6d64ba8fb389ba21b4ff2c887c87fda741f6ec42617347c55107bc78f18",
+      "bytes": 220815,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/mediamtx-auth-defaults-normalization-and-clone-shared-default-alias-mobile-poster.jpg"
+    }
+  },
   "mediamtx-certificate-watcher-close-join-close-during-reload": {
     "scene": "CloseDuringReload",
     "alt": "두 줄에 watch()와 Close() 이름표, cl.cert 상자가 있다. 두 줄 모두 watch()가 Parent.Log에서 멈춤 상태다. 위 줄 v1.21.1에서는 Close()가 종료 신호, 정리 · cert = nil을 거쳐 빨간 먼저 반환이 되고 cl.cert가 nil이 된다. 로그 풀림 이름표가 뜬 뒤 watch()가 select로 돌아가 cert 다시 채울 수 있음이 되고 cl.cert 상자가 빨갛게 nil, 다시 채워질 수 있음으로 바뀐다. 아래 줄 고친 뒤에서는 Close()가 종료 신호 뒤 watch() 반환을 기다림에 머물다가, 로그가 풀려 watch()가 로그 끝나고 반환이 된 뒤 청록 정리한 뒤 반환이 되고 cl.cert가 nil, 정리 뒤 그대로로 남는다",
@@ -649,6 +675,58 @@
       "poster": "/images/mediamtx-certloader-no-watcher-shutdown-no-watcher-shutdown-mobile-poster.jpg"
     }
   },
+  "mediamtx-hls-segment-count-validation-segment-count-gate": {
+    "scene": "SegmentCountGate",
+    "alt": "두 줄의 시간축이 있다. 위 줄은 v1.20.1 · 조각 6개로, 기동함 이름표가 뜨고 재생점이 0초에서 45초까지 지나가는 동안 0, 10, 20, 30, 40초 자리에 빨간 실패 이름표가 하나씩 붙는다. 아래 줄은 v1.21.0 · 조각 6개로, 시작하자마자 빨간 기동 거부 · 종료 코드 1 이름표가 뜨고 시간축은 점선으로 비어 있으며 송출을 받기 전에 끝남이라고 적혀 있다",
+    "sha256": "a7c5b490d909de5607e59e78fdd18874f5394d3c70abc23c1ed6764de56e79c8",
+    "bytes": 160090,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 10,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/mediamtx-hls-segment-count-validation-segment-count-gate-poster.jpg",
+    "mobile": {
+      "sha256": "9e7b49ab04868aa44429028d0ad03572550f5c733ef70280fdd483d5b8ec7cef",
+      "bytes": 173146,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 10,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/mediamtx-hls-segment-count-validation-segment-count-gate-mobile-poster.jpg"
+    }
+  },
+  "mediamtx-hook-exit-code-return-exit-code-discarded": {
+    "scene": "ExitCodeDiscarded",
+    "alt": "두 줄이 있다. 각 줄은 자식 프로세스 exit 5 상자에서 ExitCode() = 5 상자로 화살표가 가고, 다시 반환값 상자로 이어진다. 위 줄 v1.20.1 · return 빠짐에서는 빨간 점선 화살표 옆에 5는 버림이 뜨고 반환값이 빨간 return 0이 되며, 결과로 재시작 켬: code 0과 회색 재시작 끔: 줄 없음이 뜬다. 아래 줄 v1.21.0 · return 추가에서는 청록 return 5가 되고 재시작 켬: code 5, 재시작 끔: code 5가 뜬다",
+    "sha256": "48d84e50cf9398a68bae67b19ad0b6c90af23aa68400aaaeba89311bee1b6258",
+    "bytes": 157038,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 10,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/mediamtx-hook-exit-code-return-exit-code-discarded-poster.jpg",
+    "mobile": {
+      "sha256": "a14850b1728b348d7a104fc6eba7d9931f6d324f8cc31b10b9ee6b41191b7e26",
+      "bytes": 202723,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 10,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/mediamtx-hook-exit-code-return-exit-code-discarded-mobile-poster.jpg"
+    }
+  },
   "mediamtx-hook-output-backpressure-experiments-hook-output-drain": {
     "scene": "HookOutputDrain",
     "alt": "왼쪽에 청록으로 가득 찬 파이프 6개, 가운데 로거 잠금 1개 상자, 오른쪽 파일 상자가 있다. 훅 16개가 함께 끝났다는 제목이 종료 후 0.0초 시계로 바뀌고, 파이프가 서로 다른 속도로 줄며 로거에서 파일로 점이 흐른다. 종료 후 1.0초에 파이프에 남은 부분이 빨갛게 바뀌고 1초: 파이프 닫고 남은 줄 버림, 전체 줄의 41% 유실 이름표가 뜬다. 파일 아래 exited 개수가 0 / 6에서 6 / 6으로 늘고, 2.7초에 마지막 exited 2.7초 이름표가 뜬다",
@@ -699,6 +777,32 @@
       "audio": 0,
       "faststart": true,
       "poster": "/images/mediamtx-logger-reload-rejected-lifecycle-fix-reload-wait-cycle-mobile-poster.jpg"
+    }
+  },
+  "mediamtx-offline-recording-source-lifecycle-offline-recording-gate": {
+    "scene": "OfflineRecordingGate",
+    "alt": "네 줄이 같은 시간축을 쓴다. 위에 오프라인, 온라인, 오프라인 구간 이름이 있고 각 줄의 상태 띠는 가운데 온라인 구간만 청록이다. 재생점이 왼쪽에서 오른쪽으로 지나가며 녹화 막대가 자란다. true (기본값) 줄은 처음부터 끝까지 검은 막대가 찬다. false · publisher, false · static source 줄은 온라인 구간에서만 청록 막대가 찬다. false · 오프라인 중 reload 줄은 온라인 구간에 막대 대신 회색 점선 시험 안 함이 뜬다. static source 줄에는 온라인이 시작될 때 빨간 원 PR: 녹화 없음, reload 줄에는 앞쪽 오프라인 구간의 reload 이름표와 함께 빨간 원 PR: 녹화 시작이 뜬다",
+    "sha256": "7156b458ec06d61b098c364ee1fdfc79223350e8f6a10ec1b74c77efe4a1ebb9",
+    "bytes": 256792,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 12,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/mediamtx-offline-recording-source-lifecycle-offline-recording-gate-poster.jpg",
+    "mobile": {
+      "sha256": "bc63bdcded5308bdd09edacfe2c402a0e0c30d72622c35bbe747fe2e7fe597a9",
+      "bytes": 255217,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 12,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/mediamtx-offline-recording-source-lifecycle-offline-recording-gate-mobile-poster.jpg"
     }
   },
   "mediamtx-seven-hooks-missing-exit-callback-silent-exec-failure": {

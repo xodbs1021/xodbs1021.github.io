@@ -1,0 +1,11 @@
+api: true
+apiAddress: 127.0.0.1:29997
+rtsp: false
+rtmp: false
+hls: false
+webrtc: false
+srt: false
+paths:
+  cam:
+    readUser: myuser
+    readPass: mypass

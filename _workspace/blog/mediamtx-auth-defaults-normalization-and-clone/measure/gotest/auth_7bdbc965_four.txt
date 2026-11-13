@@ -1,0 +1,117 @@
+# tree 7bdbc965 (v1.21.0-23-g7bdbc965); local changes:
+#    M internal/conf/conf_test.go
+# go version go1.27.2 darwin/arm64; go test -count=1 -v -run '^(TestDefaultAuthInternalUsersIsNormalized|TestConfDeprecatedAuthWithExplicitDefaults|TestConfDefaultsAreNotShared|TestConfDeprecatedAuthWithEnvUser|TestConfDeprecatedAuth)$'  ./internal/conf; runs=3
+## run 1 start 2026-11-13T23:04:34+0900 load: { 11.41 46.05 54.32 }
+=== RUN   TestConfDeprecatedAuth
+--- PASS: TestConfDeprecatedAuth (0.00s)
+=== RUN   TestConfDeprecatedAuthWithEnvUser
+    conf_test.go:381: 
+        	Error Trace:	<SRC>/internal/conf/conf_test.go:381
+        	Error:      	An error is expected but got nil.
+        	Test:       	TestConfDeprecatedAuthWithEnvUser
+--- FAIL: TestConfDeprecatedAuthWithEnvUser (0.00s)
+=== RUN   TestConfDeprecatedAuthWithExplicitDefaults
+    conf_test.go:409: 
+        	Error Trace:	<SRC>/internal/conf/conf_test.go:409
+        	Error:      	Received unexpected error:
+        	            	authInternalUsers and legacy credentials (publishUser, publishPass, publishIPs, readUser, readPass, readIPs) cannot be used together
+        	Test:       	TestConfDeprecatedAuthWithExplicitDefaults
+--- FAIL: TestConfDeprecatedAuthWithExplicitDefaults (0.00s)
+=== RUN   TestDefaultAuthInternalUsersIsNormalized
+--- PASS: TestDefaultAuthInternalUsersIsNormalized (0.00s)
+=== RUN   TestConfDefaultsAreNotShared
+    conf_test.go:1178: 
+        	Error Trace:	<SRC>/internal/conf/conf_test.go:1178
+        	Error:      	Not equal: 
+        	            	expected: "any"
+        	            	actual  : "modified"
+        	            	
+        	            	Diff:
+        	            	--- Expected
+        	            	+++ Actual
+        	            	@@ -1,2 +1,2 @@
+        	            	-(conf.Credential) (len=3) "any"
+        	            	+(conf.Credential) (len=8) "modified"
+        	            	 
+        	Test:       	TestConfDefaultsAreNotShared
+--- FAIL: TestConfDefaultsAreNotShared (0.00s)
+FAIL
+FAIL	github.com/bluenviron/mediamtx/internal/conf	0.445s
+FAIL
+## run 1 exit 1
+## run 2 start 2026-11-13T23:04:36+0900 load: { 11.41 46.05 54.32 }
+=== RUN   TestConfDeprecatedAuth
+--- PASS: TestConfDeprecatedAuth (0.00s)
+=== RUN   TestConfDeprecatedAuthWithEnvUser
+    conf_test.go:381: 
+        	Error Trace:	<SRC>/internal/conf/conf_test.go:381
+        	Error:      	An error is expected but got nil.
+        	Test:       	TestConfDeprecatedAuthWithEnvUser
+--- FAIL: TestConfDeprecatedAuthWithEnvUser (0.00s)
+=== RUN   TestConfDeprecatedAuthWithExplicitDefaults
+    conf_test.go:409: 
+        	Error Trace:	<SRC>/internal/conf/conf_test.go:409
+        	Error:      	Received unexpected error:
+        	            	authInternalUsers and legacy credentials (publishUser, publishPass, publishIPs, readUser, readPass, readIPs) cannot be used together
+        	Test:       	TestConfDeprecatedAuthWithExplicitDefaults
+--- FAIL: TestConfDeprecatedAuthWithExplicitDefaults (0.00s)
+=== RUN   TestDefaultAuthInternalUsersIsNormalized
+--- PASS: TestDefaultAuthInternalUsersIsNormalized (0.00s)
+=== RUN   TestConfDefaultsAreNotShared
+    conf_test.go:1178: 
+        	Error Trace:	<SRC>/internal/conf/conf_test.go:1178
+        	Error:      	Not equal: 
+        	            	expected: "any"
+        	            	actual  : "modified"
+        	            	
+        	            	Diff:
+        	            	--- Expected
+        	            	+++ Actual
+        	            	@@ -1,2 +1,2 @@
+        	            	-(conf.Credential) (len=3) "any"
+        	            	+(conf.Credential) (len=8) "modified"
+        	            	 
+        	Test:       	TestConfDefaultsAreNotShared
+--- FAIL: TestConfDefaultsAreNotShared (0.00s)
+FAIL
+FAIL	github.com/bluenviron/mediamtx/internal/conf	0.186s
+FAIL
+## run 2 exit 1
+## run 3 start 2026-11-13T23:04:37+0900 load: { 11.41 46.05 54.32 }
+=== RUN   TestConfDeprecatedAuth
+--- PASS: TestConfDeprecatedAuth (0.00s)
+=== RUN   TestConfDeprecatedAuthWithEnvUser
+    conf_test.go:381: 
+        	Error Trace:	<SRC>/internal/conf/conf_test.go:381
+        	Error:      	An error is expected but got nil.
+        	Test:       	TestConfDeprecatedAuthWithEnvUser
+--- FAIL: TestConfDeprecatedAuthWithEnvUser (0.00s)
+=== RUN   TestConfDeprecatedAuthWithExplicitDefaults
+    conf_test.go:409: 
+        	Error Trace:	<SRC>/internal/conf/conf_test.go:409
+        	Error:      	Received unexpected error:
+        	            	authInternalUsers and legacy credentials (publishUser, publishPass, publishIPs, readUser, readPass, readIPs) cannot be used together
+        	Test:       	TestConfDeprecatedAuthWithExplicitDefaults
+--- FAIL: TestConfDeprecatedAuthWithExplicitDefaults (0.00s)
+=== RUN   TestDefaultAuthInternalUsersIsNormalized
+--- PASS: TestDefaultAuthInternalUsersIsNormalized (0.00s)
+=== RUN   TestConfDefaultsAreNotShared
+    conf_test.go:1178: 
+        	Error Trace:	<SRC>/internal/conf/conf_test.go:1178
+        	Error:      	Not equal: 
+        	            	expected: "any"
+        	            	actual  : "modified"
+        	            	
+        	            	Diff:
+        	            	--- Expected
+        	            	+++ Actual
+        	            	@@ -1,2 +1,2 @@
+        	            	-(conf.Credential) (len=3) "any"
+        	            	+(conf.Credential) (len=8) "modified"
+        	            	 
+        	Test:       	TestConfDefaultsAreNotShared
+--- FAIL: TestConfDefaultsAreNotShared (0.00s)
+FAIL
+FAIL	github.com/bluenviron/mediamtx/internal/conf	0.274s
+FAIL
+## run 3 exit 1

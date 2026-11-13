@@ -1,0 +1,21 @@
+logLevel: info
+logDestinations: [stdout]
+api: false
+rtmp: false
+hls: false
+webrtc: false
+srt: false
+moq: false
+rtsp: true
+rtspTransports: [tcp]
+rtspAddress: :28554
+paths:
+  test:
+    alwaysAvailable: true
+    alwaysAvailableTracks:
+      - codec: H264
+    alwaysAvailableRecorded: false
+    record: true
+    recordPath: <OUT>/recorded-false_run2/rec/%path/%Y-%m-%d_%H-%M-%S-%f
+    recordSegmentDuration: 2s
+    recordPartDuration: 1s

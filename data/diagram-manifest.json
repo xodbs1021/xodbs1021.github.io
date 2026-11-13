@@ -53,6 +53,15 @@
       "bytes": 110493
     }
   },
+  "1b464c057dafa3a0": {
+    "source": "content/posts/open-source-analysis/mediamtx-auth-defaults-normalization-and-clone.md",
+    "wide": {
+      "file": "1b464c057dafa3a0-wide.svg",
+      "width": 392,
+      "height": 749,
+      "bytes": 21497
+    }
+  },
   "1ccb6784f322c968": {
     "source": "content/posts/0-to-1/chat-highlight-research-and-fallback.md",
     "wide": {
@@ -114,6 +123,15 @@
       "width": 435,
       "height": 843,
       "bytes": 19453
+    }
+  },
+  "3f2bc4017d33b3f4": {
+    "source": "content/posts/open-source-analysis/mediamtx-hook-exit-code-return.md",
+    "wide": {
+      "file": "3f2bc4017d33b3f4-wide.svg",
+      "width": 370,
+      "height": 514,
+      "bytes": 19730
     }
   },
   "4187c5e2b25d2254": {
@@ -395,6 +413,15 @@
       "bytes": 20797
     }
   },
+  "b57eaac59c30e6c7": {
+    "source": "content/posts/open-source-analysis/mediamtx-offline-recording-source-lifecycle.md",
+    "wide": {
+      "file": "b57eaac59c30e6c7-wide.svg",
+      "width": 380,
+      "height": 273,
+      "bytes": 14919
+    }
+  },
   "b7bdf786e51db073": {
     "source": "content/posts/tech-blurting/streaming-basics-from-scratch.md",
     "wide": {
@@ -591,6 +618,15 @@
       "width": 392,
       "height": 486,
       "bytes": 20949
+    }
+  },
+  "f434d073617d2c4c": {
+    "source": "content/posts/open-source-analysis/mediamtx-hls-segment-count-validation.md",
+    "wide": {
+      "file": "f434d073617d2c4c-wide.svg",
+      "width": 392,
+      "height": 465,
+      "bytes": 21003
     }
   },
   "f8da79bff278d16e": {

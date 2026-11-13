@@ -1,0 +1,2 @@
+2026/11/13 23:08:52 WAR you are using one or more authentication-related deprecated parameters (publishUser, publishPass, publishIPs, readUser, readPass, readIPs). These have been replaced by 'authInternalUsers'
+ERR: authInternalUsers and legacy credentials (publishUser, publishPass, publishIPs, readUser, readPass, readIPs) cannot be used together
