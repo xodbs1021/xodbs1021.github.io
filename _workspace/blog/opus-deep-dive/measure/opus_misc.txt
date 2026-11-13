@@ -1,0 +1,10 @@
+libopus 64k [-application audio] initial_padding=312 packet_duration(count)= 249 960
+libopus 64k [-application voip] initial_padding=312 packet_duration(count)= 249 960
+libopus 64k [-application lowdelay] initial_padding=120 packet_duration(count)= 249 960
+libopus 64k [-application lowdelay -frame_duration 2.5] initial_padding=120 packet_duration(count)=2000 120
+libopus 64k [-application audio -frame_duration 10] initial_padding=312 packet_duration(count)= 499 480
+libopus 64k [-application audio -frame_duration 60] initial_padding=312 packet_duration(count)=  82 2880
+op32v (32k voip) 33.3 kbps
+op32v_fec (-fec 1 -packet_loss 10) 30.6 kbps
+op32v_fec0 (-fec 1, packet_loss 0) 33.3 kbps
+hls fmp4 libopus master: CODECS="opus"

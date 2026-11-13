@@ -1,0 +1,56 @@
+op_10.ogg packets 2597 {'SILK-WB 20ms': 2597}
+op_16.ogg packets 2597 {'Hybrid-FB 20ms': 80, 'SILK-WB 20ms': 153, 'Hybrid-SWB 20ms': 235, 'CELT-SWB 20ms': 7, 'CELT-FB 20ms': 2122}
+op_24.ogg packets 2597 {'Hybrid-FB 20ms': 63, 'SILK-WB 20ms': 153, 'Hybrid-SWB 20ms': 223, 'CELT-SWB 20ms': 19, 'CELT-FB 20ms': 2139}
+op_32.ogg packets 2597 {'Hybrid-FB 20ms': 30, 'SILK-WB 20ms': 153, 'Hybrid-SWB 20ms': 200, 'CELT-SWB 20ms': 42, 'CELT-FB 20ms': 2172}
+op_48.ogg packets 2597 {'Hybrid-FB 20ms': 9, 'SILK-WB 20ms': 118, 'CELT-WB 20ms': 25, 'CELT-SWB 20ms': 252, 'CELT-FB 20ms': 2193}
+op_64.ogg packets 2597 {'CELT-FB 20ms': 2202, 'CELT-SWB 20ms': 395}
+op32v.ogg packets 2597 {'Hybrid-FB 20ms': 63, 'SILK-WB 20ms': 153, 'Hybrid-SWB 20ms': 223, 'CELT-SWB 20ms': 19, 'CELT-FB 20ms': 2139}
+runs 11
+    -0.01-   0.15s Hybrid-FB 20ms
+     0.17-   3.21s SILK-WB 20ms
+     3.23-   7.25s Hybrid-SWB 20ms
+     7.27-   7.63s CELT-SWB 20ms
+     7.65-   8.85s CELT-FB 20ms
+     8.87-   8.91s Hybrid-FB 20ms
+     8.93-   9.33s Hybrid-SWB 20ms
+     9.35-   9.75s Hybrid-FB 20ms
+     9.77-  38.11s CELT-FB 20ms
+    38.13-  38.71s Hybrid-FB 20ms
+    38.73-  51.91s CELT-FB 20ms
+op32v_fec.ogg packets 2597 {'Hybrid-FB 20ms': 2176, 'SILK-WB 20ms': 153, 'Hybrid-SWB 20ms': 268}
+runs 6
+    -0.01-   0.15s Hybrid-FB 20ms
+     0.17-   3.21s SILK-WB 20ms
+     3.23-   8.15s Hybrid-SWB 20ms
+     8.17-   8.91s Hybrid-FB 20ms
+     8.93-   9.33s Hybrid-SWB 20ms
+     9.35-  51.91s Hybrid-FB 20ms
+op32v_fec0.ogg packets 2597 {'Hybrid-FB 20ms': 63, 'SILK-WB 20ms': 153, 'Hybrid-SWB 20ms': 223, 'CELT-SWB 20ms': 19, 'CELT-FB 20ms': 2139}
+runs 11
+    -0.01-   0.15s Hybrid-FB 20ms
+     0.17-   3.21s SILK-WB 20ms
+     3.23-   7.25s Hybrid-SWB 20ms
+     7.27-   7.63s CELT-SWB 20ms
+     7.65-   8.85s CELT-FB 20ms
+     8.87-   8.91s Hybrid-FB 20ms
+     8.93-   9.33s Hybrid-SWB 20ms
+     9.35-   9.75s Hybrid-FB 20ms
+     9.77-  38.11s CELT-FB 20ms
+    38.13-  38.71s Hybrid-FB 20ms
+    38.73-  51.91s CELT-FB 20ms
+op_24_lowdelay.ogg packets 2597 {'CELT-FB 20ms': 2202, 'CELT-NB 20ms': 66, 'CELT-WB 20ms': 77, 'CELT-SWB 20ms': 252}
+runs 7
+    -0.00-   0.16s CELT-FB 20ms
+     0.18-   1.48s CELT-NB 20ms
+     1.50-   3.02s CELT-WB 20ms
+     3.04-   7.64s CELT-SWB 20ms
+     7.66-   8.92s CELT-FB 20ms
+     8.94-   9.34s CELT-SWB 20ms
+     9.36-  51.92s CELT-FB 20ms
+op_64_ld.ogg packets 2597 {'CELT-FB 20ms': 2202, 'CELT-SWB 20ms': 395}
+runs 5
+    -0.00-   0.16s CELT-FB 20ms
+     0.18-   7.64s CELT-SWB 20ms
+     7.66-   8.92s CELT-FB 20ms
+     8.94-   9.34s CELT-SWB 20ms
+     9.36-  51.92s CELT-FB 20ms

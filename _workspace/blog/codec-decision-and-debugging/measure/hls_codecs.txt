@@ -1,0 +1,10 @@
+hls/he_fmp4: CODECS="avc1.42c01e,mp4a.40.2"
+hls/hev2_fmp4: CODECS="avc1.42c01e,mp4a.40.2"
+hls/lc_fmp4: CODECS="avc1.42c01e,mp4a.40.2"
+hls/native_fmp4: CODECS="avc1.42c01e,mp4a.40.2"
+hls/he_mpegts: CODECS="avc1.42c01e,mp4a.40.2"
+hls/hev2_mpegts: CODECS="avc1.42c01e,mp4a.40.2"
+hls/lc_mpegts: CODECS="avc1.42c01e,mp4a.40.2"
+hls/native_mpegts: CODECS="avc1.42c01e,mp4a.40.2"
+hls/he_audio: CODECS="mp4a.40.2"
+ffprobe he_v0.mp4 (init+v0.m4s): h264,Constrained Baseline aac,HE-AAC,48000,2 

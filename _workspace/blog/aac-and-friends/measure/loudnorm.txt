@@ -1,0 +1,14 @@
+# synth (220/440/880Hz, 4s loud / 4s x0.32), target I=-14 TP=-1
+src synth.wav: I=-19.6 LRA=9.9 TP=-14.4 sr=48000
+1pass: I=-14.3 LRA=9.0 TP=-8.6 sr=192000
+	"normalization_type" : "linear",
+2pass: I=-14.2 LRA=9.9 TP=-9.0 sr=48000
+src synth.wav: I=-19.6 LRA=9.9 TP=-14.4 sr=48000
+1pass: I=-14.1 LRA=7.7 TP=-8.5 sr=192000
+	"normalization_type" : "dynamic",
+2pass: I=-14.0 LRA=7.7 TP=-8.4 sr=192000
+# sintel
+src sintel.wav: I=-12.8 LRA=14.6 TP=0.5 sr=48000
+1pass: I=-13.4 LRA=13.5 TP=-1.0 sr=192000
+	"normalization_type" : "dynamic",
+2pass: I=-14.1 LRA=14.6 TP=-1.0 sr=192000

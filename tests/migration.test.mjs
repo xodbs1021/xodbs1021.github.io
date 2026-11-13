@@ -4,8 +4,8 @@ const legacyPaths=JSON.parse(fs.readFileSync('data/legacy-paths.json'));
 const files=dir=>fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.isDirectory()?files(path.join(dir,e.name)):[path.join(dir,e.name)]);
 test('all published articles and old listing routes remain available',()=>{
  const baseline=Object.keys(JSON.parse(fs.readFileSync('data/legacy-heading-ids.json')));
- // Chart floor: 58 at migration; 2026-11-13 the encoding series dropped its unsupported illustrative charts (41 remain). Lower only on deliberate removal.
- assert.ok(posts.length>=90);assert.ok(posts.flatMap(p=>p.figures).filter(f=>f.type==='chart').length>=41);
+ // Chart floor: 58 at migration; 2026-11-13 the encoding series dropped its unsupported illustrative charts (41 remain), then the audio/codec-decision rewrite dropped 8 unsupported ones (PEAQ estimates, illustrative cost/GPU models) and added 3 measured ones and 1 calculated one (37 remain). Lower only on deliberate removal.
+ assert.ok(posts.length>=90);assert.ok(posts.flatMap(p=>p.figures).filter(f=>f.type==='chart').length>=37);
  for(const slug of baseline)assert.ok(posts.some(p=>p.slug===slug),`missing original article: ${slug}`);
  for(const url of legacyPaths)assert.ok(fs.existsSync(`dist${decodeURI(url)}index.html`),url);
  for(const p of posts){const $=load(fs.readFileSync(`dist${p.url}index.html`,'utf8'));assert.equal($('link[rel=canonical]').attr('href'),`https://taeyun.blog${p.url}`);assert.equal($('[data-pagefind-meta=title]').text(),p.title);assert.equal($('.chart-figure').length,(p.raw.match(/\{\{<\s*chart\s/g)||[]).length);assert.ok(!$('.article-content').text().includes('{{<'));}
