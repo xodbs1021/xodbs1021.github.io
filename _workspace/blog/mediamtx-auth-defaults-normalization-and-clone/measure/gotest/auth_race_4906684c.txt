@@ -1,0 +1,24 @@
+# tree 4906684c (v1.21.0-24-g4906684c); local changes:
+#   ?? internal/conf/race_measure_test.go
+# go version go1.27.2 darwin/arm64; go test -count=1 -v -run '^TestMeasureLoadWhileAuthenticate$' -race ./internal/conf; runs=3
+## run 1 start 2026-11-13T23:07:45+0900 load: { 16.23 30.57 45.96 }
+=== RUN   TestMeasureLoadWhileAuthenticate
+    race_measure_test.go:55: authentications=2000 denied=0 loads=200
+--- PASS: TestMeasureLoadWhileAuthenticate (0.35s)
+PASS
+ok  	github.com/bluenviron/mediamtx/internal/conf	1.751s
+## run 1 exit 0
+## run 2 start 2026-11-13T23:07:48+0900 load: { 16.23 30.57 45.96 }
+=== RUN   TestMeasureLoadWhileAuthenticate
+    race_measure_test.go:55: authentications=2000 denied=0 loads=200
+--- PASS: TestMeasureLoadWhileAuthenticate (0.20s)
+PASS
+ok  	github.com/bluenviron/mediamtx/internal/conf	1.383s
+## run 2 exit 0
+## run 3 start 2026-11-13T23:07:49+0900 load: { 15.81 30.25 45.75 }
+=== RUN   TestMeasureLoadWhileAuthenticate
+    race_measure_test.go:55: authentications=2000 denied=0 loads=200
+--- PASS: TestMeasureLoadWhileAuthenticate (0.16s)
+PASS
+ok  	github.com/bluenviron/mediamtx/internal/conf	1.353s
+## run 3 exit 0

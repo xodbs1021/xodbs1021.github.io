@@ -1,0 +1,26 @@
+# go version go1.27.2 darwin/arm64; start 2026-11-13T23:05:57+0900 load: { 9.63 37.14 50.16 }
+# parent = 7bdbc965 +  M internal/conf/conf_test.go 
+parent TestConfDeprecatedAuth PASS PASS PASS
+parent TestDefaultAuthInternalUsersIsNormalized PASS PASS PASS
+parent TestConfDeprecatedAuthWithExplicitDefaults PASS PASS PASS
+parent TestConfDefaultsAreNotShared FAIL FAIL FAIL
+parent TestConfDeprecatedAuthWithEnvUser FAIL FAIL FAIL
+# only_ips = 7bdbc965 +  M internal/conf/conf.go  M internal/conf/conf_test.go 
+only_ips TestConfDeprecatedAuth PASS PASS PASS
+only_ips TestDefaultAuthInternalUsersIsNormalized PASS PASS PASS
+only_ips TestConfDeprecatedAuthWithExplicitDefaults PASS PASS PASS
+only_ips TestConfDefaultsAreNotShared FAIL FAIL FAIL
+only_ips TestConfDeprecatedAuthWithEnvUser FAIL FAIL FAIL
+# only_clone = 7bdbc965 +  M internal/conf/conf.go  M internal/conf/conf_test.go 
+only_clone TestConfDeprecatedAuth FAIL FAIL FAIL
+only_clone TestDefaultAuthInternalUsersIsNormalized FAIL FAIL FAIL
+only_clone TestConfDeprecatedAuthWithExplicitDefaults FAIL FAIL FAIL
+only_clone TestConfDefaultsAreNotShared PASS PASS PASS
+only_clone TestConfDeprecatedAuthWithEnvUser PASS PASS PASS
+# merge = 4906684c + 
+merge TestConfDeprecatedAuth PASS PASS PASS
+merge TestDefaultAuthInternalUsersIsNormalized PASS PASS PASS
+merge TestConfDeprecatedAuthWithExplicitDefaults PASS PASS PASS
+merge TestConfDefaultsAreNotShared PASS PASS PASS
+merge TestConfDeprecatedAuthWithEnvUser PASS PASS PASS
+# end 2026-11-13T23:06:54+0900 load: { 10.39 32.42 47.51 }

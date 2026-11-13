@@ -1,0 +1,281 @@
+{
+ "start": [
+  "2026-11-13T23:08:44+0900",
+  [
+   9.2587890625,
+   26.0068359375,
+   43.20556640625
+  ]
+ ],
+ "cases": {
+  "v1.15.6": {
+   "shipped": [
+    {
+     "started": true,
+     "exit_code": 0,
+     "errors": []
+    },
+    {
+     "started": true,
+     "exit_code": 0,
+     "errors": []
+    },
+    {
+     "started": true,
+     "exit_code": 0,
+     "errors": []
+    }
+   ],
+   "shipped_legacy": [
+    {
+     "started": true,
+     "exit_code": 0,
+     "errors": []
+    },
+    {
+     "started": true,
+     "exit_code": 0,
+     "errors": []
+    },
+    {
+     "started": true,
+     "exit_code": 0,
+     "errors": []
+    }
+   ],
+   "env_legacy": [
+    {
+     "started": false,
+     "exit_code": 1,
+     "errors": [
+      "ERR: authInternalUsers and legacy credentials (publishUser, publishPass, publishIPs, readUser, readPass, readIPs) cannot be used together"
+     ]
+    },
+    {
+     "started": false,
+     "exit_code": 1,
+     "errors": [
+      "ERR: authInternalUsers and legacy credentials (publishUser, publishPass, publishIPs, readUser, readPass, readIPs) cannot be used together"
+     ]
+    },
+    {
+     "started": false,
+     "exit_code": 1,
+     "errors": [
+      "ERR: authInternalUsers and legacy credentials (publishUser, publishPass, publishIPs, readUser, readPass, readIPs) cannot be used together"
+     ]
+    }
+   ],
+   "api_add_legacy": [
+    {
+     "started": true,
+     "add_status": 200,
+     "add_body": "{\"status\":\"ok\"}",
+     "exit_code": 0
+    },
+    {
+     "started": true,
+     "add_status": 200,
+     "add_body": "{\"status\":\"ok\"}",
+     "exit_code": 0
+    },
+    {
+     "started": true,
+     "add_status": 200,
+     "add_body": "{\"status\":\"ok\"}",
+     "exit_code": 0
+    }
+   ]
+  },
+  "v1.21.0": {
+   "shipped": [
+    {
+     "started": true,
+     "exit_code": 0,
+     "errors": []
+    },
+    {
+     "started": true,
+     "exit_code": 0,
+     "errors": []
+    },
+    {
+     "started": true,
+     "exit_code": 0,
+     "errors": []
+    }
+   ],
+   "shipped_legacy": [
+    {
+     "started": false,
+     "exit_code": 1,
+     "errors": [
+      "ERR: authInternalUsers and legacy credentials (publishUser, publishPass, publishIPs, readUser, readPass, readIPs) cannot be used together"
+     ]
+    },
+    {
+     "started": false,
+     "exit_code": 1,
+     "errors": [
+      "ERR: authInternalUsers and legacy credentials (publishUser, publishPass, publishIPs, readUser, readPass, readIPs) cannot be used together"
+     ]
+    },
+    {
+     "started": false,
+     "exit_code": 1,
+     "errors": [
+      "ERR: authInternalUsers and legacy credentials (publishUser, publishPass, publishIPs, readUser, readPass, readIPs) cannot be used together"
+     ]
+    }
+   ],
+   "env_legacy": [
+    {
+     "started": true,
+     "get_status": 200,
+     "users": [
+      "any",
+      "any",
+      "any",
+      "myuser"
+     ],
+     "alice_kept": false,
+     "exit_code": 0,
+     "errors": []
+    },
+    {
+     "started": true,
+     "get_status": 200,
+     "users": [
+      "any",
+      "any",
+      "any",
+      "myuser"
+     ],
+     "alice_kept": false,
+     "exit_code": 0,
+     "errors": []
+    },
+    {
+     "started": true,
+     "get_status": 200,
+     "users": [
+      "any",
+      "any",
+      "any",
+      "myuser"
+     ],
+     "alice_kept": false,
+     "exit_code": 0,
+     "errors": []
+    }
+   ],
+   "api_add_legacy": [
+    {
+     "started": true,
+     "add_status": 400,
+     "add_body": "{\"status\":\"error\",\"error\":\"authInternalUsers and legacy credentials (publishUser, publishPass, publishIPs, readUser, readPass, readIPs) cannot be used together\"}",
+     "exit_code": 0
+    },
+    {
+     "started": true,
+     "add_status": 400,
+     "add_body": "{\"status\":\"error\",\"error\":\"authInternalUsers and legacy credentials (publishUser, publishPass, publishIPs, readUser, readPass, readIPs) cannot be used together\"}",
+     "exit_code": 0
+    },
+    {
+     "started": true,
+     "add_status": 400,
+     "add_body": "{\"status\":\"error\",\"error\":\"authInternalUsers and legacy credentials (publishUser, publishPass, publishIPs, readUser, readPass, readIPs) cannot be used together\"}",
+     "exit_code": 0
+    }
+   ]
+  },
+  "v1.21.1": {
+   "shipped": [
+    {
+     "started": true,
+     "exit_code": 0,
+     "errors": []
+    },
+    {
+     "started": true,
+     "exit_code": 0,
+     "errors": []
+    },
+    {
+     "started": true,
+     "exit_code": 0,
+     "errors": []
+    }
+   ],
+   "shipped_legacy": [
+    {
+     "started": true,
+     "exit_code": 0,
+     "errors": []
+    },
+    {
+     "started": true,
+     "exit_code": 0,
+     "errors": []
+    },
+    {
+     "started": true,
+     "exit_code": 0,
+     "errors": []
+    }
+   ],
+   "env_legacy": [
+    {
+     "started": false,
+     "exit_code": 1,
+     "errors": [
+      "ERR: authInternalUsers and legacy credentials (publishUser, publishPass, publishIPs, readUser, readPass, readIPs) cannot be used together"
+     ]
+    },
+    {
+     "started": false,
+     "exit_code": 1,
+     "errors": [
+      "ERR: authInternalUsers and legacy credentials (publishUser, publishPass, publishIPs, readUser, readPass, readIPs) cannot be used together"
+     ]
+    },
+    {
+     "started": false,
+     "exit_code": 1,
+     "errors": [
+      "ERR: authInternalUsers and legacy credentials (publishUser, publishPass, publishIPs, readUser, readPass, readIPs) cannot be used together"
+     ]
+    }
+   ],
+   "api_add_legacy": [
+    {
+     "started": true,
+     "add_status": 200,
+     "add_body": "{\"status\":\"ok\"}",
+     "exit_code": 0
+    },
+    {
+     "started": true,
+     "add_status": 200,
+     "add_body": "{\"status\":\"ok\"}",
+     "exit_code": 0
+    },
+    {
+     "started": true,
+     "add_status": 200,
+     "add_body": "{\"status\":\"ok\"}",
+     "exit_code": 0
+    }
+   ]
+  }
+ },
+ "end": [
+  "2026-11-13T23:10:33+0900",
+  [
+   5.07470703125,
+   19.36962890625,
+   38.505859375
+  ]
+ ]
+}
