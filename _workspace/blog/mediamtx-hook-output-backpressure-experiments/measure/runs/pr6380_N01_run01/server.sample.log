@@ -1,0 +1,46 @@
+{"timestamp":"2026-11-13T18:49:26.179629+09:00","level":"INF","message":"MediaMTX v1.21.3-2-g7bd58e10, darwin, arm64"}
+{"timestamp":"2026-11-13T18:49:26.179775+09:00","level":"INF","message":"configuration loaded from ./pr6380_N01_run01/cfg.yml"}
+{"timestamp":"2026-11-13T18:49:26.180688+09:00","level":"INF","message":"[path p01] runOnInit command started"}
+{"timestamp":"2026-11-13T18:49:26.194034+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.194107+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.194119+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.194128+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.194145+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.194155+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.194165+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.194174+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.194183+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.194191+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.1942+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.194215+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.194223+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.194231+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.194239+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.194248+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.194256+09:00","level":"INF","message":"[path p01] a"}
+...
+{"timestamp":"2026-11-13T18:49:26.179629+09:00","level":"INF","message":"MediaMTX v1.21.3-2-g7bd58e10, darwin, arm64"}
+{"timestamp":"2026-11-13T18:49:26.180688+09:00","level":"INF","message":"[path p01] runOnInit command started"}
+{"timestamp":"2026-11-13T18:49:26.435169+09:00","level":"INF","message":"[path p01] runOnInit command exited: command exited with code 1"}
+{"timestamp":"2026-11-13T18:49:27.035882+09:00","level":"INF","message":"[path p01] runOnInit command stopped"}
+...
+{"timestamp":"2026-11-13T18:49:26.435029+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.435033+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.435037+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.435042+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.435047+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.435051+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.435056+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.43506+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.435064+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.435068+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.435072+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.435077+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.435083+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.435087+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.435091+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.435095+09:00","level":"INF","message":"[path p01] a"}
+{"timestamp":"2026-11-13T18:49:26.435169+09:00","level":"INF","message":"[path p01] runOnInit command exited: command exited with code 1"}
+{"timestamp":"2026-11-13T18:49:27.035653+09:00","level":"INF","message":"shutting down gracefully"}
+{"timestamp":"2026-11-13T18:49:27.035882+09:00","level":"INF","message":"[path p01] runOnInit command stopped"}
+{"timestamp":"2026-11-13T18:49:27.035918+09:00","level":"INF","message":"waiting for running hooks"}

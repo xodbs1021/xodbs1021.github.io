@@ -1,0 +1,11 @@
+label,run,in_first_log,in_second_log,distinct,duplicates,missing,on_console,reloaded
+pr6380,1,273,727,1000,0,0,0,True
+pr6380,2,400,600,1000,0,0,0,True
+pr6380,3,376,624,1000,0,0,0,True
+pr6380,4,389,611,1000,0,0,0,True
+pr6380,5,396,604,1000,0,0,0,True
+pr6380,6,395,605,1000,0,0,0,True
+pr6380,7,395,605,1000,0,0,0,True
+pr6380,8,366,634,1000,0,0,0,True
+pr6380,9,396,604,1000,0,0,0,True
+pr6380,10,405,595,1000,0,0,0,True

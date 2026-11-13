@@ -1,0 +1,48 @@
+logLevel: info
+logDestinations: [file]
+logStructured: yes
+logFile: ./pr6380_N16_run01/server.log
+logHookOutput: yes
+rtsp: no
+rtmp: no
+hls: no
+webrtc: no
+srt: no
+moq: no
+api: no
+metrics: no
+pprof: no
+playback: no
+paths:
+  p01:
+    runOnInit: ./hook.sh 50000 ./pr6380_N16_run01/exit_p01.ts
+  p02:
+    runOnInit: ./hook.sh 50000 ./pr6380_N16_run01/exit_p02.ts
+  p03:
+    runOnInit: ./hook.sh 50000 ./pr6380_N16_run01/exit_p03.ts
+  p04:
+    runOnInit: ./hook.sh 50000 ./pr6380_N16_run01/exit_p04.ts
+  p05:
+    runOnInit: ./hook.sh 50000 ./pr6380_N16_run01/exit_p05.ts
+  p06:
+    runOnInit: ./hook.sh 50000 ./pr6380_N16_run01/exit_p06.ts
+  p07:
+    runOnInit: ./hook.sh 50000 ./pr6380_N16_run01/exit_p07.ts
+  p08:
+    runOnInit: ./hook.sh 50000 ./pr6380_N16_run01/exit_p08.ts
+  p09:
+    runOnInit: ./hook.sh 50000 ./pr6380_N16_run01/exit_p09.ts
+  p10:
+    runOnInit: ./hook.sh 50000 ./pr6380_N16_run01/exit_p10.ts
+  p11:
+    runOnInit: ./hook.sh 50000 ./pr6380_N16_run01/exit_p11.ts
+  p12:
+    runOnInit: ./hook.sh 50000 ./pr6380_N16_run01/exit_p12.ts
+  p13:
+    runOnInit: ./hook.sh 50000 ./pr6380_N16_run01/exit_p13.ts
+  p14:
+    runOnInit: ./hook.sh 50000 ./pr6380_N16_run01/exit_p14.ts
+  p15:
+    runOnInit: ./hook.sh 50000 ./pr6380_N16_run01/exit_p15.ts
+  p16:
+    runOnInit: ./hook.sh 50000 ./pr6380_N16_run01/exit_p16.ts
