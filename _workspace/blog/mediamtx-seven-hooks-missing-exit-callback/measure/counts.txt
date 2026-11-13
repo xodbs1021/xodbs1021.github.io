@@ -1,0 +1,56 @@
+v1213_run1/server.log launched 22 exited 0 race 0 panic 0
+  runOnDisconnect              6 0
+  runOnUnread                  3 0
+  runOnUnDemand                1 0
+  runOnUnavailable             2 0
+  runOnOffline                 2 0
+  runOnRecordSegmentCreate     4 0
+  runOnRecordSegmentComplete   4 0
+v1213_run2/server.log launched 22 exited 0 race 0 panic 0
+  runOnDisconnect              6 0
+  runOnUnread                  3 0
+  runOnUnDemand                1 0
+  runOnUnavailable             2 0
+  runOnOffline                 2 0
+  runOnRecordSegmentCreate     4 0
+  runOnRecordSegmentComplete   4 0
+v1213_run3/server.log launched 22 exited 0 race 0 panic 0
+  runOnDisconnect              6 0
+  runOnUnread                  3 0
+  runOnUnDemand                1 0
+  runOnUnavailable             2 0
+  runOnOffline                 2 0
+  runOnRecordSegmentCreate     4 0
+  runOnRecordSegmentComplete   4 0
+pr6259_run1/server.log launched 22 exited 22 race 0 panic 0
+  runOnDisconnect              6 6
+  runOnUnread                  3 3
+  runOnUnDemand                1 1
+  runOnUnavailable             2 2
+  runOnOffline                 2 2
+  runOnRecordSegmentCreate     4 4
+  runOnRecordSegmentComplete   4 4
+pr6259_run2/server.log launched 22 exited 22 race 0 panic 0
+  runOnDisconnect              6 6
+  runOnUnread                  3 3
+  runOnUnDemand                1 1
+  runOnUnavailable             2 2
+  runOnOffline                 2 2
+  runOnRecordSegmentCreate     4 4
+  runOnRecordSegmentComplete   4 4
+pr6259_run3/server.log launched 22 exited 22 race 0 panic 0
+  runOnDisconnect              6 6
+  runOnUnread                  3 3
+  runOnUnDemand                1 1
+  runOnUnavailable             2 2
+  runOnOffline                 2 2
+  runOnRecordSegmentCreate     4 4
+  runOnRecordSegmentComplete   4 4
+pr6259race_run1/server.log launched 22 exited 22 race 0 panic 0
+  runOnDisconnect              6 6
+  runOnUnread                  3 3
+  runOnUnDemand                1 1
+  runOnUnavailable             2 2
+  runOnOffline                 2 2
+  runOnRecordSegmentCreate     4 4
+  runOnRecordSegmentComplete   4 4

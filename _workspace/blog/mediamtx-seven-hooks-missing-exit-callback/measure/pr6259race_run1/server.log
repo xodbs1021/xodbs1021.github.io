@@ -1,0 +1,86 @@
+2026/11/13 18:47:09 INF MediaMTX v1.21.3-2-g69280137
+, darwin, arm64
+2026/11/13 18:47:09 INF configuration loaded from ./pr6259race_run1/probe.yml
+2026/11/13 18:47:09 INF [RTSP] started with listeners on :18554 (TCP/RTSP)
+2026/11/13 18:47:09 INF [SRT] started with listener on :18890 (UDP/SRT)
+2026/11/13 18:47:19 INF [RTSP] [conn 127.0.0.1:50145] opened
+2026/11/13 18:47:19 INF [RTSP] [session 9d8615f8] created by 127.0.0.1:50145
+2026/11/13 18:47:19 INF [path test] [recorder] recording 1 track (H264)
+2026/11/13 18:47:19 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 18:47:19 INF [RTSP] [session 9d8615f8] is publishing to path 'test'
+2026/11/13 18:47:19 INF [path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones
+2026/11/13 18:47:20 INF [path test] runOnRecordSegmentCreate command launched
+2026/11/13 18:47:20 INF [path test] runOnRecordSegmentCreate command exited: fork/exec /nonexistent/on-segment-create: no such file or directory
+2026/11/13 18:47:21 INF [path test] runOnRecordSegmentComplete command launched
+2026/11/13 18:47:21 INF [path test] runOnRecordSegmentComplete command exited: fork/exec /nonexistent/on-segment-complete: no such file or directory
+2026/11/13 18:47:22 INF [path test] runOnRecordSegmentCreate command launched
+2026/11/13 18:47:22 INF [path test] runOnRecordSegmentCreate command exited: fork/exec /nonexistent/on-segment-create: no such file or directory
+2026/11/13 18:47:22 INF [RTSP] [conn 127.0.0.1:50146] opened
+2026/11/13 18:47:22 INF [SRT] [conn 127.0.0.1:61821] opened
+2026/11/13 18:47:22 INF [SRT] [conn 127.0.0.1:61821] is reading from path 'test', 1 track (H264)
+2026/11/13 18:47:22 INF [RTSP] [conn 127.0.0.1:50146] closed: EOF
+2026/11/13 18:47:22 INF [RTSP] [conn 127.0.0.1:50146] runOnDisconnect command launched
+2026/11/13 18:47:22 INF [RTSP] [conn 127.0.0.1:50146] runOnDisconnect command exited: fork/exec /nonexistent/on-disconnect: no such file or directory
+2026/11/13 18:47:22 INF [RTSP] [conn 127.0.0.1:50147] opened
+2026/11/13 18:47:22 INF [RTSP] [conn 127.0.0.1:50148] opened
+2026/11/13 18:47:22 INF [path ondemand] runOnDemand command started
+2026/11/13 18:47:22 INF [RTSP] [session 350d5bcd] created by 127.0.0.1:50147
+2026/11/13 18:47:22 INF [RTSP] [session 350d5bcd] is reading from path 'test', with TCP, 1 track (H264)
+2026/11/13 18:47:22 INF [RTSP] [conn 127.0.0.1:50149] opened
+2026/11/13 18:47:22 INF [RTSP] [session b0eaea61] created by 127.0.0.1:50149
+2026/11/13 18:47:22 INF [path ondemand] stream is available and online, 1 track (H264)
+2026/11/13 18:47:22 INF [RTSP] [session b0eaea61] is publishing to path 'ondemand'
+2026/11/13 18:47:22 INF [RTSP] [session 38adc3d5] created by 127.0.0.1:50148
+2026/11/13 18:47:22 INF [path ondemand] RTP packets are too big (1460 > 1440), remuxing them into smaller ones
+2026/11/13 18:47:22 INF [RTSP] [session 38adc3d5] is reading from path 'ondemand', with TCP, 1 track (H264)
+2026/11/13 18:47:23 INF [path test] runOnRecordSegmentComplete command launched
+2026/11/13 18:47:23 INF [path test] runOnRecordSegmentComplete command exited: fork/exec /nonexistent/on-segment-complete: no such file or directory
+2026/11/13 18:47:24 INF [path test] runOnRecordSegmentCreate command launched
+2026/11/13 18:47:24 INF [path test] runOnRecordSegmentCreate command exited: fork/exec /nonexistent/on-segment-create: no such file or directory
+2026/11/13 18:47:24 INF [SRT] [conn 127.0.0.1:61821] runOnUnread command launched
+2026/11/13 18:47:24 INF [SRT] [conn 127.0.0.1:61821] closed: EOF
+2026/11/13 18:47:24 INF [SRT] [conn 127.0.0.1:61821] runOnDisconnect command launched
+2026/11/13 18:47:24 INF [SRT] [conn 127.0.0.1:61821] runOnUnread command exited: fork/exec /nonexistent/on-unread: no such file or directory
+2026/11/13 18:47:24 INF [SRT] [conn 127.0.0.1:61821] runOnDisconnect command exited: fork/exec /nonexistent/on-disconnect: no such file or directory
+2026/11/13 18:47:25 INF [path test] runOnRecordSegmentComplete command launched
+2026/11/13 18:47:25 INF [path test] runOnRecordSegmentComplete command exited: fork/exec /nonexistent/on-segment-complete: no such file or directory
+2026/11/13 18:47:25 INF [RTSP] [session 350d5bcd] runOnUnread command launched
+2026/11/13 18:47:25 INF [RTSP] [conn 127.0.0.1:50147] closed: read tcp 127.0.0.1:18554->127.0.0.1:50147: read: connection reset by peer
+2026/11/13 18:47:25 INF [RTSP] [conn 127.0.0.1:50147] runOnDisconnect command launched
+2026/11/13 18:47:25 INF [RTSP] [session 350d5bcd] destroyed: torn down by 127.0.0.1:50147
+2026/11/13 18:47:25 INF [RTSP] [session 350d5bcd] runOnUnread command exited: fork/exec /nonexistent/on-unread: no such file or directory
+2026/11/13 18:47:25 INF [RTSP] [conn 127.0.0.1:50147] runOnDisconnect command exited: fork/exec /nonexistent/on-disconnect: no such file or directory
+2026/11/13 18:47:25 INF [RTSP] [session 38adc3d5] runOnUnread command launched
+2026/11/13 18:47:25 INF [RTSP] [conn 127.0.0.1:50148] closed: read tcp 127.0.0.1:18554->127.0.0.1:50148: read: connection reset by peer
+2026/11/13 18:47:25 INF [RTSP] [conn 127.0.0.1:50148] runOnDisconnect command launched
+2026/11/13 18:47:25 INF [RTSP] [session 38adc3d5] destroyed: torn down by 127.0.0.1:50148
+2026/11/13 18:47:25 INF [RTSP] [session 38adc3d5] runOnUnread command exited: fork/exec /nonexistent/on-unread: no such file or directory
+2026/11/13 18:47:25 INF [RTSP] [conn 127.0.0.1:50148] runOnDisconnect command exited: fork/exec /nonexistent/on-disconnect: no such file or directory
+2026/11/13 18:47:26 INF [RTSP] [conn 127.0.0.1:50145] closed: EOF
+2026/11/13 18:47:26 INF [RTSP] [conn 127.0.0.1:50145] runOnDisconnect command launched
+2026/11/13 18:47:26 INF [path test] runOnOffline command launched
+2026/11/13 18:47:26 INF [path test] runOnUnavailable command launched
+2026/11/13 18:47:26 INF [path test] [recorder] recording stopped
+2026/11/13 18:47:26 INF [path test] runOnRecordSegmentCreate command launched
+2026/11/13 18:47:26 INF [RTSP] [conn 127.0.0.1:50145] runOnDisconnect command exited: fork/exec /nonexistent/on-disconnect: no such file or directory
+2026/11/13 18:47:26 INF [path test] runOnUnavailable command exited: fork/exec /nonexistent/on-unavailable: no such file or directory
+2026/11/13 18:47:26 INF [path test] runOnOffline command exited: fork/exec /nonexistent/on-offline: no such file or directory
+2026/11/13 18:47:26 INF [path test] runOnRecordSegmentCreate command exited: fork/exec /nonexistent/on-segment-create: no such file or directory
+2026/11/13 18:47:26 INF [path test] runOnRecordSegmentComplete command launched
+2026/11/13 18:47:26 INF [RTSP] [session 9d8615f8] destroyed: torn down by 127.0.0.1:50145
+2026/11/13 18:47:26 INF [path test] runOnRecordSegmentComplete command exited: fork/exec /nonexistent/on-segment-complete: no such file or directory
+2026/11/13 18:47:26 INF [path ondemand] runOnDemand command stopped: not needed by anyone
+2026/11/13 18:47:26 INF [path ondemand] runOnUnDemand command launched
+2026/11/13 18:47:26 INF [path ondemand] runOnUnDemand command exited: fork/exec /nonexistent/on-undemand: no such file or directory
+2026/11/13 18:47:26 INF [path ondemand] runOnOffline command launched
+2026/11/13 18:47:26 INF [RTSP] [conn 127.0.0.1:50149] closed: EOF
+2026/11/13 18:47:26 INF [RTSP] [conn 127.0.0.1:50149] runOnDisconnect command launched
+2026/11/13 18:47:26 INF [path ondemand] runOnUnavailable command launched
+2026/11/13 18:47:26 INF [RTSP] [session b0eaea61] destroyed: torn down by 127.0.0.1:50149
+2026/11/13 18:47:26 INF [RTSP] [conn 127.0.0.1:50149] runOnDisconnect command exited: fork/exec /nonexistent/on-disconnect: no such file or directory
+2026/11/13 18:47:26 INF [path ondemand] runOnUnavailable command exited: fork/exec /nonexistent/on-unavailable: no such file or directory
+2026/11/13 18:47:26 INF [path ondemand] runOnOffline command exited: fork/exec /nonexistent/on-offline: no such file or directory
+2026/11/13 18:47:30 INF shutting down gracefully
+2026/11/13 18:47:30 INF [SRT] closing
+2026/11/13 18:47:30 INF [RTSP] closing
+2026/11/13 18:47:30 INF waiting for running hooks

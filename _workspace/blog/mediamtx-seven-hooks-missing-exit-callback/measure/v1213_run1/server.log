@@ -1,0 +1,64 @@
+2026/11/13 18:43:30 INF MediaMTX v1.21.3
+, darwin, arm64
+2026/11/13 18:43:30 INF configuration loaded from ./v1213_run1/probe.yml
+2026/11/13 18:43:30 INF [RTSP] started with listeners on :18554 (TCP/RTSP)
+2026/11/13 18:43:30 INF [SRT] started with listener on :18890 (UDP/SRT)
+2026/11/13 18:43:43 INF [RTSP] [conn 127.0.0.1:65241] opened
+2026/11/13 18:43:43 INF [RTSP] [session c8e9a8b5] created by 127.0.0.1:65241
+2026/11/13 18:43:43 INF [path test] [recorder] recording 1 track (H264)
+2026/11/13 18:43:43 INF [path test] stream is available and online, 1 track (H264)
+2026/11/13 18:43:43 INF [RTSP] [session c8e9a8b5] is publishing to path 'test'
+2026/11/13 18:43:43 INF [path test] RTP packets are too big (1460 > 1440), remuxing them into smaller ones
+2026/11/13 18:43:43 INF [path test] runOnRecordSegmentCreate command launched
+2026/11/13 18:43:44 INF [path test] runOnRecordSegmentComplete command launched
+2026/11/13 18:43:45 INF [path test] runOnRecordSegmentCreate command launched
+2026/11/13 18:43:45 INF [RTSP] [conn 127.0.0.1:65256] opened
+2026/11/13 18:43:45 INF [SRT] [conn 127.0.0.1:58719] opened
+2026/11/13 18:43:45 INF [RTSP] [conn 127.0.0.1:65256] closed: EOF
+2026/11/13 18:43:45 INF [RTSP] [conn 127.0.0.1:65256] runOnDisconnect command launched
+2026/11/13 18:43:45 INF [SRT] [conn 127.0.0.1:58719] is reading from path 'test', 1 track (H264)
+2026/11/13 18:43:45 INF [RTSP] [conn 127.0.0.1:65257] opened
+2026/11/13 18:43:45 INF [RTSP] [conn 127.0.0.1:65258] opened
+2026/11/13 18:43:45 INF [path ondemand] runOnDemand command started
+2026/11/13 18:43:45 INF [RTSP] [session f752660a] created by 127.0.0.1:65257
+2026/11/13 18:43:45 INF [RTSP] [session f752660a] is reading from path 'test', with TCP, 1 track (H264)
+2026/11/13 18:43:46 INF [RTSP] [conn 127.0.0.1:65259] opened
+2026/11/13 18:43:46 INF [RTSP] [session e3ec0059] created by 127.0.0.1:65259
+2026/11/13 18:43:46 INF [path ondemand] stream is available and online, 1 track (H264)
+2026/11/13 18:43:46 INF [RTSP] [session e3ec0059] is publishing to path 'ondemand'
+2026/11/13 18:43:46 INF [RTSP] [session 31925666] created by 127.0.0.1:65258
+2026/11/13 18:43:46 INF [RTSP] [session 31925666] is reading from path 'ondemand', with TCP, 1 track (H264)
+2026/11/13 18:43:46 INF [path ondemand] RTP packets are too big (1460 > 1440), remuxing them into smaller ones
+2026/11/13 18:43:46 INF [path test] runOnRecordSegmentComplete command launched
+2026/11/13 18:43:47 INF [path test] runOnRecordSegmentCreate command launched
+2026/11/13 18:43:47 INF [SRT] [conn 127.0.0.1:58719] runOnUnread command launched
+2026/11/13 18:43:47 INF [SRT] [conn 127.0.0.1:58719] closed: EOF
+2026/11/13 18:43:47 INF [SRT] [conn 127.0.0.1:58719] runOnDisconnect command launched
+2026/11/13 18:43:48 INF [path test] runOnRecordSegmentComplete command launched
+2026/11/13 18:43:48 INF [RTSP] [session f752660a] runOnUnread command launched
+2026/11/13 18:43:48 INF [RTSP] [session f752660a] destroyed: torn down by 127.0.0.1:65257
+2026/11/13 18:43:48 INF [RTSP] [conn 127.0.0.1:65257] closed: read tcp 127.0.0.1:18554->127.0.0.1:65257: read: connection reset by peer
+2026/11/13 18:43:48 INF [RTSP] [conn 127.0.0.1:65257] runOnDisconnect command launched
+2026/11/13 18:43:49 INF [RTSP] [session 31925666] runOnUnread command launched
+2026/11/13 18:43:49 INF [RTSP] [session 31925666] destroyed: torn down by 127.0.0.1:65258
+2026/11/13 18:43:49 INF [RTSP] [conn 127.0.0.1:65258] closed: read tcp 127.0.0.1:18554->127.0.0.1:65258: read: connection reset by peer
+2026/11/13 18:43:49 INF [RTSP] [conn 127.0.0.1:65258] runOnDisconnect command launched
+2026/11/13 18:43:49 INF [path test] runOnOffline command launched
+2026/11/13 18:43:49 INF [path test] runOnUnavailable command launched
+2026/11/13 18:43:49 INF [path test] [recorder] recording stopped
+2026/11/13 18:43:49 INF [RTSP] [conn 127.0.0.1:65241] closed: EOF
+2026/11/13 18:43:49 INF [RTSP] [conn 127.0.0.1:65241] runOnDisconnect command launched
+2026/11/13 18:43:49 INF [path test] runOnRecordSegmentCreate command launched
+2026/11/13 18:43:49 INF [path test] runOnRecordSegmentComplete command launched
+2026/11/13 18:43:49 INF [RTSP] [session c8e9a8b5] destroyed: torn down by 127.0.0.1:65241
+2026/11/13 18:43:50 INF [path ondemand] runOnDemand command stopped: not needed by anyone
+2026/11/13 18:43:50 INF [path ondemand] runOnUnDemand command launched
+2026/11/13 18:43:50 INF [path ondemand] runOnOffline command launched
+2026/11/13 18:43:50 INF [path ondemand] runOnUnavailable command launched
+2026/11/13 18:43:50 INF [RTSP] [session e3ec0059] destroyed: torn down by 127.0.0.1:65259
+2026/11/13 18:43:50 INF [RTSP] [conn 127.0.0.1:65259] closed: read tcp 127.0.0.1:18554->127.0.0.1:65259: read: connection reset by peer
+2026/11/13 18:43:50 INF [RTSP] [conn 127.0.0.1:65259] runOnDisconnect command launched
+2026/11/13 18:43:53 INF shutting down gracefully
+2026/11/13 18:43:53 INF [SRT] closing
+2026/11/13 18:43:53 INF [RTSP] closing
+2026/11/13 18:43:53 INF waiting for running hooks

@@ -1,0 +1,34 @@
+# Seven teardown hooks pointed at commands that do not exist.
+logLevel: info
+logDestinations: [file]
+logFile: __OUT__/server.log
+rtspAddress: :18554
+rtspTransports: [tcp]
+rtmp: no
+hls: no
+webrtc: no
+moq: no
+srtAddress: :18890
+api: no
+metrics: no
+pprof: no
+playback: no
+
+runOnDisconnect: /nonexistent/on-disconnect
+
+pathDefaults:
+  runOnUnavailable: /nonexistent/on-unavailable
+  runOnOffline: /nonexistent/on-offline
+  runOnUnread: /nonexistent/on-unread
+
+paths:
+  test:
+    record: yes
+    recordPath: __OUT__/rec/%path/%Y-%m-%d_%H-%M-%S-%f
+    recordSegmentDuration: 2s
+    runOnRecordSegmentCreate: /nonexistent/on-segment-create
+    runOnRecordSegmentComplete: /nonexistent/on-segment-complete
+  ondemand:
+    runOnDemand: ffmpeg -loglevel error -re -f lavfi -i testsrc2=size=320x240:rate=25 -c:v libx264 -preset ultrafast -tune zerolatency -g 25 -f rtsp -rtsp_transport tcp rtsp://127.0.0.1:18554/ondemand
+    runOnDemandCloseAfter: 1s
+    runOnUnDemand: /nonexistent/on-undemand

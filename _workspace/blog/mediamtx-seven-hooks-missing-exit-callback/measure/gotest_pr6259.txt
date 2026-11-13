@@ -1,0 +1,4 @@
+=== RUN   TestHookCommandExited
+--- PASS: TestHookCommandExited (0.01s)
+PASS
+ok  	github.com/bluenviron/mediamtx/internal/hooks	1.422s
