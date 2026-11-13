@@ -19,3 +19,5 @@
 조사 단계 메모와 다른 점: hls.js 1.7.4의 Level에는 `codecs` getter(목록 CODECS 원문)가 있다(level.ts 190–192, API.md 예시에도 있음). 「level.codecs 없음」은 이 판에서 맞지 않아 본문은 네 필드를 모두 적었다.
 
 정정(옛 글 대비): 60% 못 봄 · CDN 두 배 · GPU 배수 · MediaConvert · L40 · ROI · 치지직 가상 분석 · AV1 무료 · Twitch 404 · hvc1 강제 · zscale 명령 · -vsync · csv 순서 · flags=K · level.codecs 코드 · FFmpeg 로그 키워드 · 브라우저 매트릭스 · Twitch AV1 · 면접 절 · illustrativeMetrics.
+
+독립 리뷰 반영(2026-11-13): Apple 2.24는 SBR 명시 신호만 MUST이고 aac_at ASC(0x2b7 동기 확장)는 이를 충족함. .2/.5를 정한 규칙은 Apple 본문에 없고 부록 표만 .5, RFC 6381 3.3은 Audio Object Type만 정함 → FFmpeg 표기를 「틀림」으로 단정하지 않고 「규격 표와 다르게 적음」으로 씀. .2 선언의 영향(LC 변형과 구별 불가)은 추론으로 표시. Chrome 157 재생 시험은 SBR까지 풀었는지 재지 않음.

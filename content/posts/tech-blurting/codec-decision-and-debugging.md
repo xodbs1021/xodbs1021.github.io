@@ -1,26 +1,26 @@
 ---
 title: "재생 실패는 CODECS 선언과 실제 트랙을 대조해 좁힙니다"
 date: 2026-06-21T12:33:24+09:00
-lastmod: "2026-11-13T14:58:13+09:00"
+lastmod: "2026-11-13T15:18:40+09:00"
 description: "재생이 안 될 때는 다변형 목록의 CODECS 선언, init 조각에 든 실제 트랙, 브라우저 디코더의 응답을 따로 확인해야 원인이 좁혀집니다. FFmpeg 9.0.2 HLS 먹서가 HE-AAC에 mp4a.40.2를 적는 이유(codecstring.c), ffprobe csv 필드 순서, Chrome 157의 isTypeSupported 결과, hls.js 1.7.4의 INCOMPATIBLE_CODECS 오류와 Level 필드, FFmpeg 로그 문자열의 소스 위치, CDN 바이트 산식을 1차 문서와 실측으로 확인했습니다."
 categories: ["tech-blurting"]
 tags: ["코덱", "HLS", "ffprobe", "MSE", "hls.js", "디버깅", "FFmpeg"]
 draft: false
 ---
 
-같은 HE-AAC 파일인데 다변형 목록의 `CODECS`에는 AAC-LC를 뜻하는 `mp4a.40.2`가 적혔습니다. macOS `aac_at`으로 만든 HE-AAC를 FFmpeg 9.0.2의 HLS 먹서로 내보내자 fMP4든 TS든 그랬고, 같은 조각을 `ffprobe`로 열면 `HE-AAC`였습니다. 먹서가 디코더 설정 정보(ASC)의 첫 객체 유형만 읽기 때문입니다. Chrome 157은 `.2`로 선언해도 `.5`로 선언해도 같은 조각을 붙여 재생했지만, 애플 HLS 저작 규격의 코덱 표는 HE-AAC를 `mp4a.40.5`로 적습니다. 이렇게 선언과 실제 트랙, 디코더의 응답은 서로 어긋날 수 있어서, 재생 실패는 셋을 따로 확인해 좁힙니다. 실측은 모두 이 글을 쓰며 AI(Claude Code)가 FFmpeg 9.0.2와 Chrome 157로 잰 값입니다(아래 「측정 조건」).
+같은 HE-AAC 파일인데 다변형 목록의 `CODECS`에는 AAC-LC를 뜻하는 `mp4a.40.2`가 적혔습니다. macOS `aac_at`으로 만든 HE-AAC를 FFmpeg 9.0.2의 HLS 먹서로 내보내자 fMP4든 TS든 그랬고, 같은 조각을 `ffprobe`로 열면 `HE-AAC`였습니다. 먹서가 디코더 설정 정보(ASC)의 첫 객체 유형만 읽기 때문입니다. 애플 HLS 저작 규격의 코덱 표는 HE-AAC를 `mp4a.40.5`로 적고, Chrome 157은 `.2`로 선언해도 `.5`로 선언해도 같은 조각을 버퍼에 붙여 재생 위치를 움직였습니다. 이렇게 선언과 실제 트랙, 디코더의 응답은 서로 다르게 보일 수 있어서, 재생 실패는 셋을 따로 확인해 좁힙니다. 실측은 모두 이 글을 쓰며 AI(Claude Code)가 FFmpeg 9.0.2와 Chrome 157로 잰 값입니다(아래 「측정 조건」).
 
-## 코덱은 시청 기기의 디코더부터 거꾸로 고릅니다 {#1-코덱-결정의-6가지-요인}
+## 코덱 선택의 첫 질문은 시청 기기가 하드웨어로 푸는가입니다 {#1-코덱-결정의-6가지-요인}
 
 어떤 코덱으로 보낼지는 시청 기기가 그 코덱을 하드웨어로 푸는지부터 정합니다. 그다음 송출 경로가 그 코덱을 실어 나르는지, 서버에서 다시 인코딩할 예산이 있는지, 기기 판매와 스트리밍 배포 가운데 어느 쪽 특허 창구에 걸리는지를 봅니다([AV1 글](/posts/tech-blurting/av1-vp9-deep-dive/#13-실무-결정-가이드)). 코덱별 사정은 앞 글들에 있습니다. H.264의 프로파일 · 레벨은 [H.264 글](/posts/tech-blurting/h264-deep-dive/), HEVC의 `hvc1` 태그와 HDR은 [H.265 글](/posts/tech-blurting/h265-hdr-deep-dive/), AV1의 특허 풀과 하드웨어 디코더는 [AV1 글](/posts/tech-blurting/av1-vp9-deep-dive/), 오디오는 [AAC 글](/posts/tech-blurting/aac-and-friends/)과 [Opus 글](/posts/tech-blurting/opus-deep-dive/)입니다.
 
 ### 압축 이득은 시험 조건과 함께만 비용으로 옮깁니다 {#5-cdn-비용--진짜-큰-항목}
 
-CDN이 내보내는 바이트는 비트레이트 × 시청 시간이므로, [H.265 글의 측정](/posts/tech-blurting/h265-hdr-deep-dive/#4-인코딩-비용--h264-대비-큰-부담)(Sintel 예고편 10초 1080p24, 인코더 기본값에 preset과 CRF만 지정, 같은 VMAF 93 목표, 각 1회)을 그대로 옮기면 한 시간 시청에 x264 medium 1,799kbps는 약 810MB, x265 medium 1,184kbps는 약 533MB, SVT-AV1 preset 8 1,201kbps는 약 540MB, preset 4 867kbps는 약 390MB입니다(계산값, 1MB = 10⁶바이트). 영상 하나 10초의 값이라 다른 영상에서는 비율이 달라지고, 그 대신 드는 인코딩 CPU 시간은 같은 글에, GPU 인코딩과 서버 수용량은 [NVENC 글](/posts/tech-blurting/nvenc-gpu-transcoding/)과 [라이브 트랜스코딩 서버 글](/posts/tech-blurting/live-transcoding-infrastructure/)에, 해상도별 사다리는 [ABR 사다리 글](/posts/tech-blurting/abr-ladder-design/)에 있습니다.
+CDN이 내보내는 바이트는 비트레이트 × 시청 시간입니다. [H.265 글의 측정](/posts/tech-blurting/h265-hdr-deep-dive/#4-인코딩-비용--h264-대비-큰-부담)(Sintel 예고편 10초 1080p24, 인코더 기본값, 같은 VMAF 93 목표, 각 1회)을 옮기면 한 시간 시청에 x264 medium 1,799kbps는 약 810MB, x265 medium 1,184kbps는 약 533MB, SVT-AV1 preset 8 1,201kbps는 약 540MB, preset 4 867kbps는 약 390MB입니다(계산값, 1MB = 10⁶바이트). 영상 하나 10초의 값이라 다른 영상에서는 비율이 달라지고, 인코딩 비용은 같은 글과 [NVENC 글](/posts/tech-blurting/nvenc-gpu-transcoding/), [라이브 트랜스코딩 서버 글](/posts/tech-blurting/live-transcoding-infrastructure/), [ABR 사다리 글](/posts/tech-blurting/abr-ladder-design/)에 있습니다.
 
 ## 재생 실패는 선언·그릇·디코더 세 층으로 나눠 봅니다 {#9-코덱-트러블슈팅--흔한-8가지-문제}
 
-브라우저 플레이어가 HLS를 재생하기 시작할 때 코덱 정보는 여러 단계를 지납니다. 아래 영상은 그 순서입니다. 위 단계에서 막히면 아래 단계는 시작하지 않으므로, 어디서 멈췄는지가 원인을 가릅니다. 두 번째 토큰 `ec-3`은 Chrome 157에서 둘째 단계 `isTypeSupported()`가 false를 돌려준 실측 결과입니다.
+브라우저 플레이어가 HLS를 재생하기 시작할 때 코덱 정보는 여러 단계를 지납니다. [[fig-player-start-chain]]은 그 순서입니다. 위 단계에서 막히면 아래 단계는 시작하지 않으므로, 어디서 멈췄는지가 원인을 가릅니다. 두 번째 토큰 `ec-3`은 Chrome 157에서 둘째 단계 `isTypeSupported()`가 false를 돌려준 실측 결과입니다.
 
 {{< motion scene="PlayerStartChain" id="fig-player-start-chain" kind="개념도" caption="플레이어는 다변형 목록의 CODECS를 읽고, isTypeSupported()로 브라우저에 묻고, addSourceBuffer()로 버퍼를 만들고, init 조각(moov의 표본 항목 · ASC)을 붙인 뒤 디코딩합니다. mp4a.40.2는 다섯 단계를 모두 지나고, ec-3은 Chrome 157에서 둘째 단계가 false라 멈춥니다." >}}
 
@@ -51,7 +51,7 @@ flowchart TB
 | 증상 | 먼저 볼 출력 | 이 글에서 확인한 예 |
 |---|---|---|
 | 목록을 읽자마자 재생 불가 | 목록 `CODECS`, `isTypeSupported()` | Chrome 157은 `ac-3` · `ec-3`에 false |
-| 버퍼를 만들다 실패 | init 조각의 `ffprobe` | 선언 `mp4a.40.2`, 실제 HE-AAC |
+| 선언과 트랙이 다름 | init 조각의 `ffprobe` | 선언 `mp4a.40.2`, 실제 HE-AAC(Chrome 157은 실패하지 않음) |
 | 애플 기기에서만 HEVC 실패 | `ffprobe`의 `codec_tag_string` | FFmpeg 기본 `hev1`, 애플은 `hvc1` 권고([H.265 글](/posts/tech-blurting/h265-hdr-deep-dive/#5-hvc1-vs-hev1--ios-호환의-함정)) |
 | 소리가 수십 ms 어긋남 | `initial_padding`, 그릇 종류 | ADTS로 옮기면 앞 1,024표본이 재생됨([AAC 글](/posts/tech-blurting/aac-and-friends/#2-같은-aac라도-인코더가-다르면-음질이-다르다)) |
 | MP4를 만들다 멈춤 | FFmpeg 오류 문자열 | `Malformed AAC bitstream detected` |
@@ -111,7 +111,7 @@ hls.on(Hls.Events.ERROR, (_, data) => {
 });
 ```
 
-hls.js는 기본 설정(`useMediaCapabilities: true`)에서 `decodingInfo()`로 화질을 거르고, 트랙 코덱은 mp4의 표본 설명(`stsd`)이나 TS 안 ADTS의 객체 유형에서 읽고 목록 값은 그 값이 실패할 때만 씁니다. HE-AAC와 AAC-LC 문제를 다루던 `hls.swapAudioCodec()`와 `defaultAudioCodec`은 문서가 「더 이상 필요하지 않고 권하지 않는다」고 적습니다.
+hls.js가 버퍼를 만들 때 쓰는 코덱은 트랙(mp4의 표본 설명 `stsd`, TS 안 ADTS의 객체 유형)에서 읽고, 그 값으로 실패하면 목록 값이나 `defaultAudioCodec`으로 물러섭니다. 목록 `CODECS`는 화질을 거를 때 처음부터 씁니다. 기본 설정(`useMediaCapabilities: true`)에서 `decodingInfo()`로 화질을 거르고, 맞는 화질이 하나도 없으면 `MANIFEST_INCOMPATIBLE_CODECS_ERROR`가 납니다. HE-AAC와 AAC-LC 문제를 다루던 `hls.swapAudioCodec()`와 `defaultAudioCodec`은 문서가 「더 이상 필요하지 않고 권하지 않는다」고 적습니다.
 
 ### WebRTC는 협상 결과를 getStats와 webrtc-internals에서 봅니다 {#chromewebrtc-internals--webrtc-디버깅의-최고}
 
@@ -141,9 +141,9 @@ FFmpeg 9.0.2의 코덱 문자열 함수는 AAC일 때 ASC의 첫 5비트를 오�
 | `aac_at` HE-AAC 64kbps | `mp4a.40.2` | `mp4a.40.2` | HE-AAC |
 | `aac_at` HE-AAC v2 32kbps | `mp4a.40.2` | `mp4a.40.2` | HE-AACv2 |
 
-애플 규격 부록은 HE-AAC를 `mp4a.40.5`, HE-AAC v2를 `mp4a.40.29`로 적고, fMP4의 HE-AAC는 SBR을 명시적으로 신호하라고 합니다(2.24, MUST, [Apple HLS Authoring Specification](https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html)). `aac_at`의 ASC는 동기 확장으로 SBR을 알리므로 트랙 쪽 신호는 있고, 어긋난 것은 목록의 문자열입니다. LC만 아는 디코더가 이 트랙을 받으면 SBR 없이 24kHz 코어만 풉니다.
+애플 규격 부록은 HE-AAC를 `mp4a.40.5`, HE-AAC v2를 `mp4a.40.29`로 적고, fMP4의 HE-AAC는 SBR을 명시적으로 신호하라고 합니다(2.24, MUST, [Apple HLS Authoring Specification](https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html)). `aac_at`의 ASC는 동기 확장(0x2b7)으로 SBR을 명시하므로 2.24를 충족합니다. 애플 규격 본문에 `.2`와 `.5` 가운데 무엇을 쓰라는 규칙은 없고 부록 표만 HE-AAC를 `.5`로 적으며, RFC 6381 3.3은 셋째 칸이 오디오 객체 유형이라고만 정합니다. 그래서 FFmpeg의 표기가 규격 위반이라고 단정할 근거는 없습니다. 다만 선언이 `.2`이면 플레이어는 이 변형과 LC 변형을 문자열로 구별할 수 없습니다(추론). 목록 CODECS로 고르는 플레이어에서는 HE-AAC를 못 푸는 기기도 이 변형을 고를 수 있고, 그 기기는 SBR 없이 24kHz 코어만 재생합니다. 코어만 풀리는 것은 하위 호환 신호의 성질이고, `.2` 선언은 그런 기기가 이 변형을 고르게 할 수 있다는 점에서만 관련됩니다.
 
-Chrome 157에서는 증상이 나지 않았습니다. 오디오만 담은 HE-AAC fMP4의 init 조각과 첫 조각을 `audio/mp4; codecs="mp4a.40.2"`와 `"mp4a.40.5"` 두 가지로 선언한 버퍼에 각각 붙이자, 둘 다 오류 없이 0–4.01초가 버퍼에 들어가고 1.5초 동안 재생 위치가 약 1.46초까지 움직였습니다. 브라우저 하나에서 재생된다고 목록이 맞는 것은 아닙니다. FFmpeg 9.0.2의 HLS 먹서에는 이 문자열을 바꾸는 옵션이 없으므로, HE-AAC 변형을 내보낼 때는 `ffprobe`로 본 프로파일에 맞춰 목록의 `mp4a.40.2`를 `.5`(HE-AAC) 또는 `.29`(HE-AAC v2)로 고쳐 씁니다. 같은 오디오 그룹 안에서 LC와 HE를 섞지 않는 것도 방법입니다. 애플 규격은 불연속 지점에서 코덱을 바꾸지 말라고 권합니다(8.16).
+Chrome 157에서는 오류가 나지 않았습니다. 오디오만 담은 HE-AAC fMP4의 init 조각과 첫 조각을 `audio/mp4; codecs="mp4a.40.2"`와 `"mp4a.40.5"` 두 가지로 선언한 버퍼에 각각 붙이자, 둘 다 오류 없이 0–4.01초가 버퍼에 들어가고 재생 위치가 1.46초까지 움직였습니다. SBR까지 풀었는지는 재지 않았습니다. FFmpeg 9.0.2의 HLS 먹서에는 이 문자열을 바꾸는 옵션이 없으므로, 애플 표에 맞추려면 HE-AAC 변형을 내보낼 때 `ffprobe`로 본 프로파일에 맞춰 목록의 `mp4a.40.2`를 `.5`(HE-AAC) 또는 `.29`(HE-AAC v2)로 고쳐 씁니다. 같은 오디오 그룹 안에서 LC와 HE를 섞지 않는 것도 방법입니다. 애플 규격은 불연속 지점에서 코덱을 바꾸지 말라고 권합니다(8.16).
 
 ## 브라우저 지원은 날짜와 조건을 붙여 확인합니다 {#11-브라우저별-코덱-호환성-매트릭스-2024년}
 
@@ -152,7 +152,7 @@ Chrome 157에서는 증상이 나지 않았습니다. 오디오만 담은 HE-AAC
 | 코덱 | Chrome | Firefox | Safari(macOS) | iOS Safari |
 |---|---|---|---|---|
 | AAC | 지원 | 부분(MP4 안, 운영체제 코덱이 있을 때) | 지원 | 지원 |
-| Opus | 33부터 | 15부터 | 18.4부터 부분(macOS 15.4 이상) | 18.4부터 |
+| Opus | 33부터 | 15부터 | 11부터 부분(CAF), 17.4부터 WebM, 18.4부터 macOS 15.4 이상 | 18.4부터(11–18.3 부분) |
 | FLAC | 56부터 | 51부터 | 13부터 | 11부터 |
 | AC-3 · E-AC-3 | 안 함 | 안 함 | 안 함 | 부분(「probably」 응답, 재생은 미검증) |
 
@@ -160,13 +160,13 @@ Chrome 157에서는 증상이 나지 않았습니다. 오디오만 담은 HE-AAC
 
 ## 새 코덱은 폴백 변형을 둔 채 들입니다 {#12-코덱-마이그레이션--5단계-점진-도입}
 
-새 코덱 변형은 기존 H.264 · AAC 변형을 지우지 않고 더합니다. HLS 규격은 `CODECS`가 그 변형의 모든 조각에 든 형식을 빠짐없이 적으라고 하므로(MUST, [RFC 8216 6.2.4](https://www.rfc-editor.org/rfc/rfc8216#section-6.2.4)), 목록을 만든 뒤에는 위처럼 `ffprobe` 결과와 대조합니다. 플레이어는 `isTypeSupported()`나 `decodingInfo()`로 못 푸는 변형을 거르고, hls.js는 이를 기본으로 합니다. 배포 뒤에는 코덱별 오류(위 hls.js 오류 이름, `SourceBuffer` 오류)를 따로 셉니다. 문제가 생기면 다변형 목록에서 새 변형 줄만 빼서 되돌릴 수 있습니다. 같은 변형 안에서 코덱을 바꾸는 대신 변형을 나누는 것은 애플 규격의 불연속 권고(8.16)와도 맞습니다.
+새 코덱 변형은 기존 H.264 · AAC 변형을 지우지 않고 더합니다. HLS 규격은 `CODECS`를 넣으라고 권하고(SHOULD, 4.3.4.2), 넣었다면 그 변형의 모든 조각에 든 형식을 빠짐없이 적으라고 하며(MUST, [RFC 8216 6.2.4](https://www.rfc-editor.org/rfc/rfc8216#section-6.2.4)), 애플 규격은 `CODECS`를 늘 넣으라고 합니다(9.1, MUST). 그러므로 목록을 만든 뒤에는 위처럼 `ffprobe` 결과와 대조합니다. 플레이어는 `isTypeSupported()`나 `decodingInfo()`로 못 푸는 변형을 거르고, hls.js는 이를 기본으로 합니다. 배포 뒤에는 코덱별 오류(위 hls.js 오류 이름, `SourceBuffer` 오류)를 따로 셉니다. 문제가 생기면 다변형 목록에서 새 변형 줄만 빼서 되돌릴 수 있습니다. 같은 변형 안에서 코덱을 바꾸는 대신 변형을 나누는 것은 애플 규격의 불연속 권고(8.16)와도 맞습니다.
 
 ## 목록의 문자열을 믿기 전에 실제 트랙과 브라우저 응답을 함께 봅니다 {#정리하면}
 
 - 재생 실패는 선언(목록 `CODECS`) · 그릇(init 조각의 트랙) · 디코더(브라우저 응답) 순서로 대조합니다.
-- 선언은 도구가 틀리게 적을 수 있습니다. FFmpeg 9.0.2는 HE-AAC에도 `mp4a.40.2`를 적었습니다.
-- 한 브라우저에서 재생된다는 것은 그 브라우저의 관대함일 수 있습니다. 규격 표와 `ffprobe` 결과로 확인합니다.
+- 선언은 도구가 규격 표와 다르게 적을 수 있습니다. FFmpeg 9.0.2는 ASC의 첫 객체 유형만 읽어 HE-AAC에도 `mp4a.40.2`를 적었고, 애플 표는 `.5`입니다.
+- 한 브라우저에서 재생된다고 다른 기기에서도 같다는 보장은 없습니다. 규격 표와 `ffprobe` 결과로 확인합니다.
 - 로그 검색어와 옵션은 쓰는 판의 소스와 도움말에서 확인합니다. 9.0.2에는 `-vsync`가 없습니다.
 
 ## 측정 조건
@@ -182,7 +182,7 @@ Chrome 157에서는 증상이 나지 않았습니다. 오디오만 담은 HE-AAC
 ## 출처
 
 - FFmpeg n9.0.2 소스: [codecstring.c](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavformat/codecstring.c#L213-L222) · [ffmpeg_filter.c](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/fftools/ffmpeg_filter.c#L2599) · [movenc.c](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavformat/movenc.c#L7082) · [flvenc.c](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavformat/flvenc.c#L1331) · [ffmpeg_mux.c](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/fftools/ffmpeg_mux.c#L180) · [audio_frame_queue.c](https://github.com/FFmpeg/FFmpeg/blob/n9.0.2/libavcodec/audio_frame_queue.c#L61)
-- [Apple, HLS Authoring Specification for Apple Devices](https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html) (개정 2025-06-26) — 2.24, 8.16, 부록 코덱 문자열
+- [Apple, HLS Authoring Specification for Apple Devices](https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html) (개정 2025-06-26) — 2.24, 8.16, 9.1, 부록 코덱 문자열
 - [RFC 8216, HTTP Live Streaming](https://www.rfc-editor.org/rfc/rfc8216) — 4.3.4.2 CODECS 속성, 6.2.4 변형의 CODECS
 - [hls.js v1.7.4 API.md](https://github.com/video-dev/hls.js/blob/v1.7.4/docs/API.md) · [src/types/level.ts](https://github.com/video-dev/hls.js/blob/v1.7.4/src/types/level.ts#L190-L192) (2026-10-28 릴리스)
 - MDN: [MediaSource.isTypeSupported()](https://developer.mozilla.org/en-US/docs/Web/API/MediaSource/isTypeSupported_static) · [MediaCapabilities.decodingInfo()](https://developer.mozilla.org/en-US/docs/Web/API/MediaCapabilities/decodingInfo)
