@@ -1,7 +1,7 @@
 ---
 title: "라이브 CDN은 캐시 키와 실드 층으로 원본 요청을 줄입니다"
 date: 2026-06-20T02:36:58+09:00
-lastmod: "2026-11-15T03:41:49+09:00"
+lastmod: "2026-11-15T04:06:44+09:00"
 description: "라이브 조각은 새로 오르는 순간 같은 요청이 몰립니다. CDN은 캐시 키로 같은 파일을 알아보고, 엣지 위에 지역 캐시와 Origin Shield를 쌓고, 같은 순간의 요청을 하나로 합쳐 원본 요청을 줄입니다. nginx 1.31.3 엣지 4대 · 실드 1대로 새 조각에 동시 요청 200건을 보내 원본 요청 수(합치기 켬 1건, 끔 1–200건), 아직 없는 조각의 404 캐시, 목록 stale-while-revalidate의 낡은 응답을 쟀고, CloudFront 캐시 키 · 요청 병합 · 오류 캐시 · 가격 · 무효화, Content Steering, Open Connect를 1차 문서로 확인했습니다."
 categories: ["tech-blurting"]
 tags: ["CDN", "CloudFront", "nginx", "HLS", "캐시", "Origin Shield", "PokeClip"]
@@ -53,9 +53,9 @@ CloudFront에서 캐시 키에 넣은 쿼리 · 헤더 · 쿠키는 원본 요�
 
 같은 객체가 캐시에 없을 때 동시에 들어온 요청을 모두 위로 올리면, 새 조각이 오를 때마다 원본에 요청이 몰립니다. CloudFront는 이를 요청 병합(request collapsing)으로 막습니다. 캐시에 없거나 만료된 객체를 원본에 요청한 사이에 같은 캐시 키의 요청이 더 오면, 그 요청들을 잠시 멈췄다가 첫 응답으로 함께 답합니다. 로그에는 첫 요청이 `Miss`, 합쳐진 요청이 `Hit`로 남습니다([Simultaneous requests for the same object](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/RequestAndResponseBehaviorCustomOrigin.html#request-custom-traffic-spikes)). 여기서 줄어드는 것은 엣지가 원본으로 올리는 요청입니다. 시청자가 엣지에 보내는 요청 수는 그대로입니다.
 
-nginx에서는 `proxy_cache_lock`이 같은 일을 합니다. 엣지 4대 · 실드 1대에서 이 설정을 끄고 켜며 새 조각에 동시 요청 200건을 보내, 원본이 받은 요청을 셌습니다. [[fig-origin-requests]]에서 끈 구성의 점이 회차마다 크게 흩어진다는 점을 보십시오.
+nginx에서는 `proxy_cache_lock`이 같은 일을 합니다. 엣지 4대 · 실드 1대에서 이 설정을 끄고 켜며 새 조각에 동시 요청 200건을 보내, 원본이 받은 요청을 셌습니다. [[fig-origin-requests]]에서 끈 구성의 값이 회차마다 크게 흩어지는 것을 보십시오.
 
-{{< chart id="fig-origin-requests" kind="실측" caption="새 조각 하나에 동시 요청 200건을 보냈을 때 원본이 받은 요청 수. 점 하나가 한 회이고 구성마다 6회씩 쟀습니다. 합치기(proxy_cache_lock)를 켜면 6회 모두 엣지 수(4건) 또는 1건이었고, 끄면 요청이 몰린 정도에 따라 1–200건으로 갈렸습니다. 회차별 값은 아래 표에 있습니다. nginx 1.31.3, 한 Docker VM 안의 엣지 4대 · 실드 1대 · 0.3초 늦게 답하는 원본." source="아래 「측정 조건」" height="300px" >}}
+{{< chart id="fig-origin-requests" kind="실측" caption="새 조각 하나에 동시 요청 200건을 보냈을 때 원본이 받은 요청 수. 점 하나가 한 회이고 구성마다 6회씩 쟀습니다. 합치기(proxy_cache_lock)를 켜면 6회 모두 엣지 수(4건) 또는 1건이었고, 끄면 요청이 몰린 정도에 따라 1–200건으로 갈렸습니다. nginx 1.31.3, 한 Docker VM 안의 엣지 4대 · 실드 1대 · 0.3초 늦게 답하는 원본." source="아래 「측정 조건」" height="300px" >}}
 {"grid":{"left":8,"right":24,"top":40,"bottom":28,"containLabel":true},"legend":{"top":0,"left":0,"data":["합치기 끔","합치기 켬"]},"xAxis":{"type":"value","name":"원본 요청(건)","min":0,"max":220,"interval":50},"yAxis":{"type":"category","inverse":true,"data":["엣지만 · 합치기 끔","엣지만 · 합치기 켬","엣지+실드 · 합치기 끔","엣지+실드 · 합치기 켬"]},"series":[{"name":"합치기 끔","type":"scatter","symbolSize":12,"itemStyle":{"color":"#7a8a9b","opacity":0.75},"data":[[44,"엣지만 · 합치기 끔"],[5,"엣지만 · 합치기 끔"],[75,"엣지만 · 합치기 끔"],[6,"엣지만 · 합치기 끔"],[9,"엣지만 · 합치기 끔"],[6,"엣지만 · 합치기 끔"],[42,"엣지+실드 · 합치기 끔"],[60,"엣지+실드 · 합치기 끔"],[200,"엣지+실드 · 합치기 끔"],[92,"엣지+실드 · 합치기 끔"],[6,"엣지+실드 · 합치기 끔"],[1,"엣지+실드 · 합치기 끔"]]},{"name":"합치기 켬","type":"scatter","symbolSize":12,"itemStyle":{"color":"#087f8b"},"label":{"show":true,"position":"right","formatter":"6회 모두 {@[0]}건"},"data":[{"value":[4,"엣지만 · 합치기 켬"],"label":{"show":true}},{"value":[4,"엣지만 · 합치기 켬"],"label":{"show":false}},{"value":[4,"엣지만 · 합치기 켬"],"label":{"show":false}},{"value":[4,"엣지만 · 합치기 켬"],"label":{"show":false}},{"value":[4,"엣지만 · 합치기 켬"],"label":{"show":false}},{"value":[4,"엣지만 · 합치기 켬"],"label":{"show":false}},{"value":[1,"엣지+실드 · 합치기 켬"],"label":{"show":true}},{"value":[1,"엣지+실드 · 합치기 켬"],"label":{"show":false}},{"value":[1,"엣지+실드 · 합치기 켬"],"label":{"show":false}},{"value":[1,"엣지+실드 · 합치기 켬"],"label":{"show":false}},{"value":[1,"엣지+실드 · 합치기 켬"],"label":{"show":false}},{"value":[1,"엣지+실드 · 합치기 켬"],"label":{"show":false}}]}]}
 {{< /chart >}}
 
