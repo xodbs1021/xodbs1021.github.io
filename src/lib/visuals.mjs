@@ -89,7 +89,7 @@ function chartFigure(item, figures, slug) {
   if (interactive) {
     const id = createHash('sha256').update(item.source).digest('hex').slice(0, 16);
     interactiveCharts.set(id, JSON.stringify(roleColors(option)));
-    live = `<div class="echart" data-chart="${id}" data-height="${height}" role="img" aria-labelledby="${esc(fig.id)}-w-title" aria-describedby="${esc(fig.id)}-w-desc" hidden></div>`;
+    live = `<div class="echart" data-chart="${id}" data-height="${height}" role="img" tabindex="0" aria-labelledby="${esc(fig.id)}-w-title" aria-describedby="${esc(fig.id)}-w-desc" hidden></div>`;
   }
   // Axis names sit under the phone layout (static or live); outside the variants so a live chart keeps them.
   const axes = chart.axisNames.length ? `<p class="chart-axes">${chart.axisNames.map(([axis, name]) => `${axis}: ${esc(name)}`).join(' · ')}</p>` : '';

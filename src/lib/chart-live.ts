@@ -9,6 +9,7 @@ import {SVGRenderer} from 'echarts/renderers';
 import {readableChartOption, narrowChartOption, NARROW_CHART_WIDTH} from './chart-layout.mjs';
 import {chartTheme} from './chart-colors.mjs';
 import {withDefaultTooltip} from './chart-tooltip.mjs';
+import {chartDefaults} from './chart-defaults.mjs';
 
 use([BarChart, LineChart, PieChart, ScatterChart, FunnelChart, GridComponent, TooltipComponent, LegendComponent, TitleComponent, MarkLineComponent, MarkPointComponent, MarkAreaComponent, SVGRenderer]);
 
@@ -47,7 +48,7 @@ function staticHeight(figure: HTMLElement, narrow: boolean, width: number, fallb
 }
 
 function liveOption(source: object, narrow: boolean, fontFamily: string) {
-  const option = recolor(source) as Record<string, unknown>;
+  const option = chartDefaults(recolor(source)) as Record<string, unknown>;
   const layout = narrow ? narrowChartOption(option, fontFamily).option : readableChartOption(option, fontFamily);
   const reduce = reducedMotion.matches;
   const tooltipStyle = {

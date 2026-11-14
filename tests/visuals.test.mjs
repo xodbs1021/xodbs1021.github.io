@@ -7,6 +7,7 @@ import {createFigures, parseArgs, FIGURE_KINDS} from '../src/lib/figures.mjs';
 import {collectDiagrams, loadManifest, narrowSource, DIAGRAM_DIR} from '../src/lib/diagrams.mjs';
 import {narrowChartOption} from '../src/lib/chart-layout.mjs';
 import {withDefaultTooltip} from '../src/lib/chart-tooltip.mjs';
+import {chartDefaults} from '../src/lib/chart-defaults.mjs';
 import {posts, renderBody, charts} from '../src/lib/posts.mjs';
 
 test('token colors keep text at 4.5:1 and graphics at 3:1 on both backgrounds in both themes', () => {
@@ -109,18 +110,45 @@ test('live charts get a default tooltip by series type; an authored tooltip wins
   assert.equal(authored.tooltip.trigger, 'item');
   assert.equal(authored.tooltip.show, false);
   assert.equal(authored.tooltip.confine, true, 'style still applies under the authored tooltip');
-  // JSON cannot carry functions: a unit-suffix formatter becomes a real one, other function text is dropped.
-  const suffix = withDefaultTooltip({tooltip: {valueFormatter: "function(v){return v===null?'-':v+'건'}"}, series: [{type: 'bar', data: [1]}]}).tooltip.valueFormatter;
-  assert.equal(suffix(3), '3건');
-  assert.equal(suffix(null), '-');
-  assert.equal(withDefaultTooltip({tooltip: {valueFormatter: "function(v){return v + '%'}"}, series: []}).tooltip.valueFormatter(5), '5%');
-  const dropped = withDefaultTooltip({tooltip: {formatter: 'function(p){return p.name}', valueFormatter: 'v => v * 2'}, series: []}).tooltip;
-  assert.equal(dropped.formatter, undefined);
-  assert.equal(dropped.valueFormatter, undefined);
-  assert.equal(withDefaultTooltip({tooltip: {formatter: '{b}: {c}'}, series: []}).tooltip.formatter, '{b}: {c}');
   const source = {series: [{type: 'bar', data: [1]}]};
   withDefaultTooltip(source);
   assert.equal(source.tooltip, undefined, 'source option is not mutated');
+});
+
+test('chart defaults: formatter function text is made safe anywhere in the option', () => {
+  // JSON cannot carry functions: a unit-suffix formatter becomes a real one, other function text is dropped.
+  const {tooltip, xAxis, series} = chartDefaults({
+    tooltip: {valueFormatter: "function(v){return v===null?'-':v+'건'}"},
+    xAxis: {axisLabel: {formatter: "v => v + 'ms'"}},
+    series: [{type: 'bar', label: {formatter: "function(p){return p.value + '%'}"}, data: [1]},
+      {type: 'line', label: {formatter: '(a, b) => a + b'}, data: [2]},
+      {type: 'line', label: {formatter: 'function(p){return p.name}'}, data: [3]}],
+  });
+  assert.equal(tooltip.valueFormatter(12685), '12,685건');
+  assert.equal(tooltip.valueFormatter(null), '-');
+  assert.equal(xAxis.axisLabel.formatter(250), '250ms');
+  assert.equal(series[0].label.formatter({value: 22.5}), '22.5%');
+  assert.equal(series[1].label.formatter, undefined, 'multi-parameter arrow function text is dropped');
+  assert.equal(series[2].label.formatter, undefined);
+  assert.equal(chartDefaults({tooltip: {valueFormatter: 'v => v * 2'}, series: []}).tooltip.valueFormatter, undefined);
+  assert.equal(chartDefaults({tooltip: {formatter: '{b}: {c}'}, series: []}).tooltip.formatter, '{b}: {c}', 'templates stay');
+});
+
+test('chart defaults: thousands separators in "{c}" labels, opaque scatter points, post values win', () => {
+  const source = {series: [
+    {type: 'bar', label: {show: true, formatter: '{c}'}, data: [12685, {value: 5498, label: {formatter: '{c}초'}}, 0.067]},
+    {type: 'scatter', data: [[1, 2]], label: {formatter: '{c}'}},
+    {type: 'scatter', itemStyle: {opacity: 0.5, color: '#087f8b'}, data: [[1, 2]]},
+  ]};
+  const snapshot = structuredClone(source);
+  const {series} = chartDefaults(source);
+  assert.deepEqual(source, snapshot, 'source option is not mutated');
+  assert.equal(series[0].label.formatter({value: 12685}), '12,685');
+  assert.equal(series[0].label.formatter({value: 0.067}), '0.067');
+  assert.equal(series[0].data[1].label.formatter({value: 5498}), '5,498초');
+  assert.equal(series[1].label.formatter, '{c}', 'pairs keep the template');
+  assert.equal(series[1].itemStyle.opacity, 1);
+  assert.equal(series[2].itemStyle.opacity, 0.5);
 });
 
 test('every Mermaid block has a committed render whose colors are theme variables', () => {

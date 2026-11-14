@@ -1,6 +1,7 @@
 // Below this column width charts use the phone layout (static 360px SVG, live narrowChartOption);
 // article-visuals.css switches at the same point with @container (max-width: 599px).
 export const NARROW_CHART_WIDTH = 600;
+const NARROW_LABEL_ROOM = 48;
 
 // Preserve data/units while reserving room for axes, outer values and legends.
 export function readableChartOption(option, fontFamily) {
@@ -54,7 +55,10 @@ export function narrowChartOption(option, fontFamily) {
   } else if (xs.length || ys.length) {
     next = {...next, xAxis: Array.isArray(base.xAxis) ? xs.map(strip) : base.xAxis && strip(base.xAxis), yAxis: Array.isArray(base.yAxis) ? ys.map(strip) : base.yAxis && strip(base.yAxis)};
   }
-  if (xs.length || ys.length) next.grid = {left: 8, right: 16, top: next.legend ? 52 : 24, bottom: 12, containLabel: true};
+  // containLabel keeps axis labels in, not value labels; the build measures text narrower than the
+  // browser draws it, so labels at the right end ("12,685", "100,000") need room past the plot.
+  const valueLabels = series.some(s => s.label?.show || (s.data || []).some(d => d?.label?.show));
+  if (xs.length || ys.length) next.grid = {left: 8, right: valueLabels ? NARROW_LABEL_ROOM : 24, top: next.legend ? 52 : 24, bottom: 12, containLabel: true};
   const pie = series.find(s => s.type === 'pie' || s.type === 'funnel');
   if (pie) {
     next.legend = {...base.legend, orient: 'horizontal', left: 'center', top: 'bottom', itemGap: 10, textStyle: {fontSize: 12}};

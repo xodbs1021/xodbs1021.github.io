@@ -2,6 +2,7 @@ import * as echarts from 'echarts';
 import {readableChartOption, narrowChartOption} from './chart-layout.mjs';
 import {tokens, cssVar} from './tokens.mjs';
 import {LEGACY_COLORS as LEGACY, chartTheme} from './chart-colors.mjs';
+import {chartDefaults} from './chart-defaults.mjs';
 
 const LEGACY_COLORS = {...LEGACY};
 
@@ -158,7 +159,7 @@ export function logBarProblem(option) {
 
 export function renderChart(source, {height = 360, title, idPrefix}) {
   const unknownColors = new Set();
-  const option = themeColors(source, unknownColors);
+  const option = chartDefaults(themeColors(source, unknownColors));
   const desc = summarize(source);
   const narrow = narrowLayout(option);
   const wide = finishSvg(renderWidth(wideLayout(option), CHART_WIDTHS.wide, height), {title, desc, idPrefix: idPrefix + '-w'});
