@@ -15,12 +15,12 @@ author: "김태윤"
 
 x264의 preset은 움직임 탐색 범위, 참조 프레임 수, B 프레임 수, lookahead 길이 같은 내부 설정을 한 번에 고르는 묶음입니다. FFmpeg H.264 위키는 느린 preset일수록 압축 효율이 좋아서, 같은 CRF에서는 비트레이트가 줄고 같은 비트레이트에서는 화질이 오른다고 설명합니다([FFmpeg 위키 H.264](https://trac.ffmpeg.org/wiki/Encode/H.264)). CRF(Constant Rate Factor)는 화질 목표를 정하는 값으로 0–51 범위에 기본 23이고, 위키는 17–18을 「시각적으로 거의 무손실」로 봅니다.
 
-Sintel 예고편 10초(1080p 24fps)를 CRF 23으로 고정하고 preset만 10가지로 바꿔 인코딩했습니다. 막대는 인코딩에 쓴 CPU 시간(user + sys)이고, 가로축은 로그 눈금입니다.
+Sintel 예고편 10초(1080p 24fps)를 CRF 23으로 고정하고 preset만 10가지로 바꿔 인코딩했습니다. 막대는 인코딩에 쓴 CPU 시간(user + sys)입니다. 선형 눈금이라 placebo 하나가 나머지 아홉을 합친 것보다 깁니다.
 
-{{< chart id="fig-preset-cpu" kind="실측" caption="preset별 CPU 시간(초, 로그 눈금). 같은 10초 1080p24 입력을 CRF 23으로 인코딩. ultrafast 6.8초에서 placebo 956초까지 약 140배 차이. 2026-11-13, MacBook Air(M5), FFmpeg 9.0.2, x264 core 165, 1회." source="아래 「측정 조건」" height="420px" >}}
+{{< chart id="fig-preset-cpu" kind="실측" caption="preset별 CPU 시간(초). 같은 10초 1080p24 입력을 CRF 23으로 인코딩. ultrafast 6.8초에서 placebo 956초까지 약 140배 차이. 2026-11-13, MacBook Air(M5), FFmpeg 9.0.2, x264 core 165, 1회." source="아래 「측정 조건」" height="420px" >}}
 {
   "grid": {"left": 8, "right": 64, "top": 16, "bottom": 28, "containLabel": true},
-  "xAxis": {"type": "log", "name": "CPU 초(로그 눈금)", "min": 1, "max": 10000, "logBase": 10, "axisLabel": {"showMaxLabel": false}},
+  "xAxis": {"type": "value", "name": "CPU 초", "min": 0, "max": 1000, "interval": 250},
   "yAxis": {"type": "category", "inverse": true, "data": ["ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow", "placebo"]},
   "series": [
     {"type": "bar", "barWidth": 16, "itemStyle": {"color": "#7a8a9b"}, "label": {"show": true, "position": "right", "formatter": "{c}"},

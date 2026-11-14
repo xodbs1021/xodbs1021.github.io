@@ -107,7 +107,7 @@ HEVC 레벨은 한 장의 휘도 표본 수(MaxLumaPs)와 초당 휘도 표본 �
 {
   "grid": {"left": 8, "right": 24, "top": 44, "bottom": 28, "containLabel": true},
   "legend": {"top": 0, "data": ["PQ", "HLG(1,000cd/m² 화면)", "SDR(100cd/m² 화면)"]},
-  "xAxis": {"type": "value", "name": "부호값", "min": 0, "max": 1, "interval": 0.25},
+  "xAxis": {"type": "value", "name": "부호값", "min": 0, "max": 1, "interval": 0.25, "axisPointer": {"label": {"precision": 2}}},
   "yAxis": {"type": "log", "name": "cd/m²(로그 눈금)", "min": 0.01, "max": 10000, "logBase": 10},
   "series": [
     {"name": "PQ", "type": "line", "showSymbol": false, "itemStyle": {"color": "#087f8b"}, "lineStyle": {"width": 3},

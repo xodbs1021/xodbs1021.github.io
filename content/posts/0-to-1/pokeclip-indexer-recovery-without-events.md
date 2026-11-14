@@ -53,10 +53,10 @@ PokeClip의 편집기는 DB 장부에서 방송 시각에 해당하는 녹화 �
 
 ## 감시만 남기면 각 실행의 마지막 파일이 13.5초 기다렸습니다
 
-[[fig-indexer-recovery-latency]]는 같은 시험의 등록 지연입니다. 로그 눈금이라 막대 길이가 아니라 자릿수를 보십시오. 「훅 끊음, 감시만」의 p95와 최대가 두 자릿수 넘게 벌어집니다.
+[[fig-indexer-recovery-latency]]는 같은 시험의 등록 지연입니다. 가로축이 로그 눈금이라 눈금 한 칸이 열 배입니다. 「훅 끊음, 감시만」의 p95와 최대가 두 자릿수 넘게 벌어집니다.
 
 {{< chart id="fig-indexer-recovery-latency" kind="실측" caption="10월 6일 네 조건의 등록 지연 p95와 최대(초, 로그 눈금). 훅을 끊고 감시만 남기면 p95는 0.073초였지만 각 실행의 마지막 파일이 유휴 판정을 기다려 최대 13.526초였습니다. 훅과 감시를 모두 끊으면 재스캔 주기가 지연을 정했습니다. Apple M5, Go 1.26.5, PostgreSQL 17, 앞의 세 조건 3회·마지막 조건 1회." source="팀 내부 실측(비공개 원시 묶음), 포트폴리오 요약 2026-10-15판 8쪽" height="340px" >}}
-{"grid":{"left":8,"right":40,"top":40,"bottom":8,"containLabel":true},"legend":{"top":0,"data":["p95","최대"]},"xAxis":{"type":"log","name":"초(로그 눈금)","min":0.01,"max":10000,"logBase":10,"axisLabel":{"showMaxLabel":false}},"yAxis":{"type":"category","inverse":true,"data":["훅 + 감시","감시만","재스캔 5초","재스캔 300초"]},"series":[{"name":"p95","type":"bar","barWidth":14,"itemStyle":{"color":"#7a8a9b"},"label":{"show":true,"position":"right","formatter":"{c}"},"data":[0.067,0.073,4.973,300.014]},{"name":"최대","type":"bar","barWidth":14,"itemStyle":{"color":"#087f8b"},"label":{"show":true,"position":"right","formatter":"{c}"},"data":[0.123,{"value":13.526,"itemStyle":{"color":"#b42318"}},5.019,300.024]}]}
+{"grid":{"left":8,"right":40,"top":40,"bottom":8,"containLabel":true},"legend":{"top":0,"data":["p95","최대"]},"xAxis":{"type":"log","name":"초(로그 눈금)","min":0.01,"max":10000,"logBase":10,"axisLabel":{"showMaxLabel":false}},"yAxis":{"type":"category","inverse":true,"data":["훅 + 감시","감시만","재스캔 5초","재스캔 300초"]},"series":[{"name":"p95","type":"scatter","symbolSize":11,"itemStyle":{"color":"#7a8a9b"},"label":{"show":true,"position":"top","formatter":"{@[0]}"},"data":[[0.067,"훅 + 감시"],[0.073,"감시만"],[4.973,"재스캔 5초"],[300.014,"재스캔 300초"]]},{"name":"최대","type":"scatter","symbolSize":11,"itemStyle":{"color":"#087f8b"},"label":{"show":true,"position":"right","formatter":"{@[0]}"},"data":[[0.123,"훅 + 감시"],{"value":[13.526,"감시만"],"itemStyle":{"color":"#b42318"}},[5.019,"재스캔 5초"],[300.024,"재스캔 300초"]]}]}
 {{< /chart >}}
 
 | 조건 | p95(초) | 최대(초) |
