@@ -1,6 +1,7 @@
 ---
 title: "EXISTS와 일반 계획이 채팅 조회를 끝까지 훑게 했습니다"
 date: 2026-11-14T22:28:44+09:00
+lastmod: "2026-11-15T03:10:00+09:00"
 categories: ["projects"]
 tags: ["PokeClip", "PostgreSQL", "실행 계획", "pgjdbc", "색인"]
 draft: false
@@ -22,11 +23,19 @@ PokéClip의 채팅 급증 판별기는 하이라이트 카드를 만들 때마�
 
 비용은 PostgreSQL `EXPLAIN (ANALYZE, BUFFERS)`가 세는 버퍼로 쟀습니다. 버퍼 하나는 조회가 읽은 8KB 페이지 하나입니다. 시험 장부는 공개 시험 코드의 세 방송(판 2 행 30만, 판 NULL 행 30만, 판 2 행 30만 뒤 판 NULL 행 7,200인 롤백 방송)을 그대로 세웠습니다. 조각은 4초, PDT는 조각 순서대로 늘고, 파일명 시각은 PDT보다 200ms 이릅니다. 운영 장부(약 5,500행, [PR 510](https://github.com/3K-PokeClip/PokeClip-mono/pull/510) 본문)보다 훨씬 큰 시험입니다.
 
-[[fig-ledger-buffers]]에서 회색 막대가 바꾸기 전, 청록 막대가 바꾼 뒤입니다. 눈금이 로그라 막대 길이 한 칸이 열 배입니다.
+[[fig-ledger-buffers]]에서 회색 막대가 바꾸기 전, 청록 막대가 바꾼 뒤입니다. 눈금이 선형이라 바꾼 뒤의 21 · 4 · 11 버퍼는 막대가 거의 보이지 않습니다.
 
-{{< chart id="fig-ledger-buffers" kind="실측" caption="자리별로 바꾸기 전과 바꾼 뒤 조회가 읽은 버퍼(로그 눈금). 옛 역행 검사는 판 NULL만 있는 방송에서 바인딩 값 계획끼리, 판 2 후보는 판 2만 있는 방송에서 쟀습니다. 판 2 이른 시각은 일반 계획끼리, 첫 PDT + 1ms는 일반 계획과 바인딩 값 계획을 견줬습니다. 중간 시각은 바꾼 뒤에도 그대로라 두 막대 모두 회색입니다. PostgreSQL 17.12, 표 907,200행, 자리마다 5회 모두 같은 버퍼." source="https://github.com/xodbs1021/xodbs1021.github.io/tree/main/_workspace/blog/pokeclip-chat-ledger-query-plans/measure" height="400px" >}}
-{"grid":{"left":8,"right":56,"top":40,"bottom":8,"containLabel":true},"legend":{"top":0,"data":["바꾸기 전","바꾼 뒤"]},"xAxis":{"type":"log","name":"버퍼","min":1,"max":100000,"logBase":10,"axisLabel":{"showMaxLabel":false}},"yAxis":{"type":"category","inverse":true,"data":["역행 검사 · 꼬리","역행 검사 · 첫 행+1초","판 2 · 이른 시각","판 2 · 첫 PDT+1ms","판 2 · 중간 시각"]},"series":[{"name":"바꾸기 전","type":"bar","barWidth":14,"itemStyle":{"color":"#7a8a9b"},"label":{"show":true,"position":"right","formatter":"{c}"},"data":[12685,12685,7246,7249,3625]},{"name":"바꾼 뒤","type":"bar","barWidth":14,"itemStyle":{"color":"#087f8b"},"label":{"show":true,"position":"right","formatter":"{c}"},"data":[21,5498,4,11,{"value":3629,"itemStyle":{"color":"#7a8a9b"}}]}]}
+{{< chart id="fig-ledger-buffers" kind="실측" caption="자리별로 바꾸기 전과 바꾼 뒤 조회가 읽은 버퍼. 옛 역행 검사는 판 NULL만 있는 방송에서 바인딩 값 계획끼리, 판 2 후보는 판 2만 있는 방송에서 쟀습니다. 판 2 이른 시각은 일반 계획끼리, 첫 PDT + 1ms는 일반 계획과 바인딩 값 계획을 견줬습니다. 중간 시각은 바꾼 뒤에도 그대로라 두 막대 모두 회색입니다. PostgreSQL 17.12, 표 907,200행, 자리마다 5회 모두 같은 버퍼." source="https://github.com/xodbs1021/xodbs1021.github.io/tree/main/_workspace/blog/pokeclip-chat-ledger-query-plans/measure" height="400px" >}}
+{"grid":{"left":8,"right":56,"top":40,"bottom":8,"containLabel":true},"legend":{"top":0,"data":["바꾸기 전","바꾼 뒤"]},"xAxis":{"type":"value","name":"버퍼","min":0,"max":14000,"interval":3500},"yAxis":{"type":"category","inverse":true,"data":["역행 검사 · 꼬리","역행 검사 · 첫 행+1초","판 2 · 이른 시각","판 2 · 첫 PDT+1ms","판 2 · 중간 시각"]},"series":[{"name":"바꾸기 전","type":"bar","barWidth":14,"itemStyle":{"color":"#7a8a9b"},"label":{"show":true,"position":"right","formatter":"{c}"},"data":[12685,12685,7246,7249,3625]},{"name":"바꾼 뒤","type":"bar","barWidth":14,"itemStyle":{"color":"#087f8b"},"label":{"show":true,"position":"right","formatter":"{c}"},"data":[21,5498,4,11,{"value":3629,"itemStyle":{"color":"#7a8a9b"}}]}]}
 {{< /chart >}}
+
+| 자리 | 견준 계획 | 바꾸기 전 버퍼 | 바꾼 뒤 버퍼 |
+|---|---|---:|---:|
+| 역행 검사 · 꼬리 | 바인딩 값 계획끼리 | 12,685 | 21 |
+| 역행 검사 · 첫 행+1초 | 바인딩 값 계획끼리 | 12,685 | 5,498 |
+| 판 2 · 이른 시각 | 일반 계획끼리 | 7,246 | 4 |
+| 판 2 · 첫 PDT+1ms | 일반 계획 → 바인딩 값 계획 | 7,249 | 11 |
+| 판 2 · 중간 시각 | 두 계획 같음 | 3,625 | 3,629 |
 
 세 자리가 같은 크기를 읽은 것은 아닙니다. 옛 역행 검사의 비용은 표 전체 행 수에, 판 2 후보 조회의 비용은 그 방송의 판 2 행 수(30만)에 비례했습니다. 옛 역행 검사는 판 NULL만 있는 방송을 물어도 다른 두 방송의 행 60만여 개까지 읽었습니다.
 
