@@ -1,7 +1,7 @@
 ---
 title: "Opus는 신호와 비트레이트로 SILK와 CELT를 오갑니다"
 date: 2026-06-20T15:25:34+09:00
-lastmod: "2026-11-13T15:18:40+09:00"
+lastmod: "2026-11-15T03:41:49+09:00"
 description: "Opus는 음성용 SILK와 음악용 CELT를 한 코덱에 두고, 패킷마다 어느 쪽으로 부호화했는지를 첫 바이트에 적습니다. RFC 6716 · 7587 · 7845 · 7874와 Vectis 특허 풀, libopus 1.6.1의 모드 전환 · 지연 · 인밴드 FEC · DTX, 프레임 길이별 RTP 머리 비용, Chrome 157의 기본 SDP 제안, FFmpeg 9.0.2 libopus 옵션, webrtc-stats의 누적 카운터를 1차 문서와 Sintel 예고편 소리 실측으로 확인했습니다."
 categories: ["tech-blurting"]
 tags: ["Opus", "WebRTC", "SILK", "CELT", "FEC", "DTX", "SDP"]
@@ -42,7 +42,7 @@ Opus 패킷의 첫 바이트(TOC)는 위 5비트가 구성 번호, 그다음 1�
 
 표는 RFC 6716 3.1절 표 2입니다. 모드를 언제 바꿀지는 규격이 정하지 않고 인코더가 정합니다. Sintel 예고편 소리를 libopus로 비트레이트만 바꿔 인코딩하고 패킷마다 구성 번호를 읽었습니다. [[fig-opus-mode-share]]의 막대는 왼쪽부터 SILK, 하이브리드, CELT(청록) 순으로 쌓았습니다.
 
-{{< chart id="fig-opus-mode-share" kind="실측" caption="비트레이트별 패킷 모드 비율(%). 10kbps는 모두 SILK-WB, 64kbps는 모두 CELT였고, 16–48kbps는 한 파일 안에서 세 모드가 섞였습니다. 앞쪽 약 3초의 조용한 도입부가 SILK로 부호화됐습니다. Sintel 예고편 소리 51.9초(패킷 2,597개), libopus 1.6.1, -application audio, 20ms 프레임." source="아래 「측정 조건」" height="320px" >}}
+{{< chart id="fig-opus-mode-share" kind="실측" caption="비트레이트별 패킷 모드 비율(%). 10kbps는 모두 SILK-WB, 64kbps는 모두 CELT였고, 16–48kbps는 한 파일 안에서 세 모드가 섞였습니다. 앞쪽 약 3초의 조용한 도입부가 SILK로 부호화됐습니다. 막대에서 읽기 어려운 SILK · 하이브리드의 작은 비율까지 모든 값은 아래 표에 있습니다. Sintel 예고편 소리 51.9초(패킷 2,597개), libopus 1.6.1, -application audio, 20ms 프레임." source="아래 「측정 조건」" height="320px" >}}
 {
   "grid": {"left": 8, "right": 24, "top": 40, "bottom": 28, "containLabel": true},
   "legend": {"top": 0, "data": ["SILK", "하이브리드", "CELT"]},
@@ -55,6 +55,15 @@ Opus 패킷의 첫 바이트(TOC)는 위 5비트가 구성 번호, 그다음 1�
   ]
 }
 {{< /chart >}}
+
+| 비트레이트 | SILK | 하이브리드 | CELT |
+| --- | ---: | ---: | ---: |
+| 10kbps | 100% | 0% | 0% |
+| 16kbps | 5.9% | 12.1% | 82.0% |
+| 24kbps | 5.9% | 11.0% | 83.1% |
+| 32kbps | 5.9% | 8.9% | 85.3% |
+| 48kbps | 4.5% | 0.3% | 95.1% |
+| 64kbps | 0% | 0% | 100% |
 
 CELT 비율은 16kbps에서 82.0%, 32kbps에서 85.3%, 48kbps에서 95.1%였습니다. 같은 파일 안에서도 모드는 신호를 따라 바뀝니다. [[fig-opus-mode-strip]]의 위 줄은 32kbps(`-application voip`)로 인코딩한 패킷을 시간 순으로 칠한 것입니다. 조용한 도입부가 SILK, 이어지는 약 4초가 하이브리드이고, 7.27초에 처음 CELT로 바뀌고, 9.77초부터 대부분 CELT이며, 38초 부근에서 잠시 하이브리드로 돌아옵니다. 같은 32kbps라도 `-application audio`에서는 CELT 패킷이 2,214개였습니다. 아래 줄은 다음 절에서 다룰 FEC를 켜고 예상 손실률 10%를 준 같은 설정입니다.
 
