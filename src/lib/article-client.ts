@@ -3,8 +3,10 @@ import {setupMotion} from './motion-client';
 if(matchMedia('(max-width: 800px)').matches)document.querySelector('.toc details')?.removeAttribute('open');
 await document.fonts.ready;
 const fontFamily=getComputedStyle(document.body).fontFamily;
-// Charts and diagrams are static SVG from the build. Only interactive="true" charts load ECharts.
-// Observe the figure: the live container stays hidden (no box) until ECharts mounts.
+// Charts and diagrams are static SVG from the build. Charts (all but interactive="false") load ECharts
+// once they come near the viewport, so pages without charts never fetch it.
+// Observe the figure: the live container stays hidden (no box) until ECharts mounts. data-chart-state
+// tells checks the swap is over ("live", or "static" when loading failed and the SVG stays).
 const liveCharts=[...document.querySelectorAll<HTMLElement>('.chart-figure.is-interactive')];
 if(liveCharts.length){
   const observer=new IntersectionObserver(async entries=>{
@@ -17,7 +19,8 @@ if(liveCharts.length){
         el.style.height=`${Number(el.dataset.height)||360}px`;
         el.hidden=false;figure.classList.add('is-live');
         mountChart(el,source,fontFamily);
-      }catch{el.hidden=true;figure.classList.remove('is-live')} // the static SVG stays in place
+        figure.dataset.chartState='live';
+      }catch{el.hidden=true;figure.classList.remove('is-live');figure.dataset.chartState='static'} // the static SVG stays in place
     }
   },{rootMargin:'300px'});
   liveCharts.forEach(figure=>observer.observe(figure));

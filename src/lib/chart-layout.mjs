@@ -1,3 +1,7 @@
+// Below this column width charts use the phone layout (static 360px SVG, live narrowChartOption);
+// article-visuals.css switches at the same point with @container (max-width: 599px).
+export const NARROW_CHART_WIDTH = 600;
+
 // Preserve data/units while reserving room for axes, outer values and legends.
 export function readableChartOption(option, fontFamily) {
   const series = Array.isArray(option.series) ? option.series : [option.series].filter(Boolean);
