@@ -1,7 +1,7 @@
 ---
 title: "라이브 트랜스코딩 서버는 실시간 배속으로 수용량을 잽니다"
 date: 2026-06-22T15:38:47+09:00
-lastmod: "2026-11-15T04:05:01+09:00"
+lastmod: "2026-11-15T04:06:44+09:00"
 description: "라이브 트랜스코더 한 대에 넣을 채널 수는 CPU 사용률이 아니라 각 출력이 실시간 속도(speed 1.0)를 지키는지로 정합니다. 1080p30 입력을 세 화질로 인코딩하는 FFmpeg를 팬 없는 맥북에서 1개부터 8개까지 동시에 돌려 speed와 조각 지연을 쟀고, 같은 개수에서도 회차마다 결과가 크게 흔들린 것을 그대로 적었습니다. 수신·인코딩·포장을 나누는 이유, 디코딩을 한 번만 하는 사다리, GPU 서버의 세션·엔진 한도, 채우는 배치와 흩는 배치, 멈춘 인코더 감지, 재시작 뒤의 끊김 표시, 관리형 서비스의 과금 단위를 공식 문서로 정리했습니다."
 categories: ["tech-blurting"]
 tags: ["라이브 트랜스코딩", "FFmpeg", "x264", "HLS", "NVENC", "Kubernetes"]
@@ -41,7 +41,7 @@ FFmpeg `-progress`의 `speed`는 처리한 미디어 시간을 흐른 벽시계 
 [[fig-speed-by-channels]]는 채널을 1개부터 8개까지 동시에 돌린 첫 회차와, 그 직후 3–6개를 다시 돌린 둘째 회차의 마지막 speed 평균입니다. 점선이 실시간 기준 1.0입니다.
 
 {{< chart id="fig-speed-by-channels" kind="실측" caption="동시 채널 수별 FFmpeg -progress의 마지막 speed(채널들의 평균). 채널 하나는 1080p30 합성 입력을 -re로 읽어 1080p · 720p · 480p로 x264 veryfast 인코딩하는 FFmpeg 프로세스이고 40초 동안 돌렸습니다. 청록은 첫 회차(N=1–6, 8), 회색은 바로 이어 돈 둘째 회차(N=3–6)입니다. 7개는 돌리지 않아 점이 없습니다. 세로축은 0.4부터 시작합니다. 팬 없는 MacBook Air(Apple M5), 다른 세션의 작업이 함께 돌던 상태라 회차마다 값이 흔들렸습니다." source="로컬 실측(2026-11-13), 아래 「측정 조건」" height="340px" >}}
-{"grid":{"left":8,"right":24,"top":40,"bottom":8,"containLabel":true},"legend":{"top":0,"data":["첫 회차","둘째 회차"]},"xAxis":{"type":"value","name":"동시 채널 수","min":1,"max":8,"interval":1},"yAxis":{"type":"value","name":"speed","min":0.4,"max":1.1,"interval":0.1},"series":[{"name":"첫 회차","type":"line","symbolSize":10,"itemStyle":{"color":"#087f8b"},"lineStyle":{"color":"#087f8b","width":3},"label":{"show":true,"position":"top","formatter":"{@[1]}"},"markLine":{"symbol":"none","silent":true,"lineStyle":{"color":"#172c40","type":"dashed","width":2},"label":{"show":false},"data":[{"yAxis":1}]},"data":[[1,1.01],[2,1.01],[3,1.01],[4,0.90],[5,0.99],[6,0.75],[8,0.52]]},{"name":"둘째 회차","type":"line","symbolSize":10,"itemStyle":{"color":"#7a8a9b"},"lineStyle":{"color":"#7a8a9b","width":3},"label":{"show":true,"position":"bottom","formatter":"{@[1]}"},"data":[[3,0.98],[4,0.70],[5,0.52],[6,0.63]]}]}
+{"grid":{"left":8,"right":24,"top":40,"bottom":8,"containLabel":true},"legend":{"top":0,"data":["첫 회차","둘째 회차"]},"xAxis":{"type":"value","name":"동시 채널 수","min":1,"max":8,"interval":1},"yAxis":{"type":"value","name":"speed","min":0.4,"max":1.1,"interval":0.1},"series":[{"name":"첫 회차","type":"line","symbolSize":10,"itemStyle":{"color":"#087f8b"},"lineStyle":{"color":"#087f8b","width":3},"label":{"show":true,"position":"top","formatter":"{@[1]}"},"markLine":{"symbol":"none","silent":true,"lineStyle":{"color":"#172c40","type":"dashed","width":2},"label":{"show":false},"data":[{"yAxis":1}]},"data":[[1,1.01],[2,1.01],[3,1.01],{"value":[4,0.90],"label":{"formatter":"0.90"}},[5,0.99],[6,0.75],[8,0.52]]},{"name":"둘째 회차","type":"line","symbolSize":10,"itemStyle":{"color":"#7a8a9b"},"lineStyle":{"color":"#7a8a9b","width":3},"label":{"show":true,"position":"bottom","formatter":"{@[1]}"},"data":[[3,0.98],{"value":[4,0.70],"label":{"formatter":"0.70"}},[5,0.52],[6,0.63]]}]}
 {{< /chart >}}
 
 첫 회차만 보면 3개까지는 실시간을 지키고 4개부터 무너졌지만, 5개(0.99)가 4개(0.90)보다 나았고 둘째 회차에서는 4개가 0.70, 5개가 0.52까지 떨어졌습니다. 같은 기계, 같은 명령인데 몇 분 사이에 결과가 이만큼 다릅니다. 이 맥북은 팬이 없어 부하가 길어지면 클럭을 낮출 수 있습니다. 둘째 회차 앞뒤에 잰 FFmpeg 밖 프로세스만 해도 CPU 4–5코어 분량을 쓰고 있었고, 같은 시기에 돌던 다른 FFmpeg 실험은 이 값에 들어 있지 않습니다. 첫 회차는 이 부하를 기록하지 않았습니다. 온도와 클럭도 기록하지 않았으므로 어느 쪽이 얼마나 기여했는지는 모릅니다.
@@ -50,7 +50,7 @@ speed가 1을 밑돌 때 시청자에게 보이는 것은 조각이 늦게 나�
 
 {{< motion scene="SpeedBelowRealtime" id="fig-speed-below-realtime" kind="재구성" caption="첫 회차의 동시 3개 · 6개 실행에서 채널 하나의 1080p 2초 조각이 완성된 벽시계 시각. 흐린 눈금은 실시간이면 조각이 끝날 수 있는 가장 이른 시각(조각 번호 × 2초)입니다. 3개일 때는 모든 조각이 그 눈금보다 약 0.5초 뒤에 나왔고, 6개일 때는 점점 밀려 19번째 조각이 14.2초 늦게 나왔습니다." >}}
 
-조각마다의 지연은 아래 표와 같습니다. n번째 조각(1부터 셉니다)의 지연은 그 조각 파일이 완성된 시각에서 채널 출력 폴더가 생긴 시각과 실시간 기준(2n초)을 뺀 값이고, 길이가 짧은 20번째 끝 조각은 뺐습니다.
+n번째 조각(1부터 셉니다)의 지연은 그 조각 파일이 완성된 시각에서 채널 출력 폴더가 생긴 시각과 실시간 기준(2n초)을 뺀 값이고, 길이가 짧은 20번째 끝 조각은 뺐습니다.
 
 | 조각 | 동시 3개 지연(초) | 동시 6개 지연(초) |
 | ---: | ---: | ---: |
