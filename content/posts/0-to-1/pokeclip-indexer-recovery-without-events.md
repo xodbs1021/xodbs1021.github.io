@@ -1,7 +1,7 @@
 ---
 title: "완료 알림이 사라져도 녹화 파일은 디스크 재스캔으로 찾습니다"
 date: "2026-10-15T11:28:22+09:00"
-lastmod: "2026-11-12T02:10:00+09:00"
+lastmod: "2026-11-15T03:10:00+09:00"
 author: "김태윤"
 categories: ["0-to-1"]
 draft: false
@@ -56,8 +56,15 @@ PokeClip의 편집기는 DB 장부에서 방송 시각에 해당하는 녹화 �
 [[fig-indexer-recovery-latency]]는 같은 시험의 등록 지연입니다. 로그 눈금이라 막대 길이가 아니라 자릿수를 보십시오. 「훅 끊음, 감시만」의 p95와 최대가 두 자릿수 넘게 벌어집니다.
 
 {{< chart id="fig-indexer-recovery-latency" kind="실측" caption="10월 6일 네 조건의 등록 지연 p95와 최대(초, 로그 눈금). 훅을 끊고 감시만 남기면 p95는 0.073초였지만 각 실행의 마지막 파일이 유휴 판정을 기다려 최대 13.526초였습니다. 훅과 감시를 모두 끊으면 재스캔 주기가 지연을 정했습니다. Apple M5, Go 1.26.5, PostgreSQL 17, 앞의 세 조건 3회·마지막 조건 1회." source="팀 내부 실측(비공개 원시 묶음), 포트폴리오 요약 2026-10-15판 8쪽" height="340px" >}}
-{"grid":{"left":8,"right":40,"top":40,"bottom":8,"containLabel":true},"legend":{"top":0,"data":["p95","최대"]},"xAxis":{"type":"log","name":"초","min":0.01,"max":10000,"logBase":10,"axisLabel":{"showMaxLabel":false}},"yAxis":{"type":"category","inverse":true,"data":["훅 + 감시","감시만","재스캔 5초","재스캔 300초"]},"series":[{"name":"p95","type":"bar","barWidth":14,"itemStyle":{"color":"#7a8a9b"},"label":{"show":true,"position":"right","formatter":"{c}"},"data":[0.067,0.073,4.973,300.014]},{"name":"최대","type":"bar","barWidth":14,"itemStyle":{"color":"#087f8b"},"label":{"show":true,"position":"right","formatter":"{c}"},"data":[0.123,{"value":13.526,"itemStyle":{"color":"#b42318"}},5.019,300.024]}]}
+{"grid":{"left":8,"right":40,"top":40,"bottom":8,"containLabel":true},"legend":{"top":0,"data":["p95","최대"]},"xAxis":{"type":"log","name":"초(로그 눈금)","min":0.01,"max":10000,"logBase":10,"axisLabel":{"showMaxLabel":false}},"yAxis":{"type":"category","inverse":true,"data":["훅 + 감시","감시만","재스캔 5초","재스캔 300초"]},"series":[{"name":"p95","type":"bar","barWidth":14,"itemStyle":{"color":"#7a8a9b"},"label":{"show":true,"position":"right","formatter":"{c}"},"data":[0.067,0.073,4.973,300.014]},{"name":"최대","type":"bar","barWidth":14,"itemStyle":{"color":"#087f8b"},"label":{"show":true,"position":"right","formatter":"{c}"},"data":[0.123,{"value":13.526,"itemStyle":{"color":"#b42318"}},5.019,300.024]}]}
 {{< /chart >}}
+
+| 조건 | p95(초) | 최대(초) |
+|---|---:|---:|
+| 훅 + 감시 | 0.067 | 0.123 |
+| 훅 끊음, 감시만 | 0.073 | 13.526 |
+| 둘 다 끊음, 재스캔 5초 | 4.973 | 5.019 |
+| 둘 다 끊음, 재스캔 기본 300초 | 300.014 | 300.024 |
 
 감시 경로는 다음 파일이 생기면 앞 파일을 바로 완성으로 판정합니다. 그래서 대부분의 파일은 훅이 있을 때와 거의 같은 0.07초 안에 들어갔습니다. 실행마다 마지막 파일에는 다음 파일이 없어서, 쓰기가 멈춘 뒤 유휴 판정을 기다려야 했습니다. 실행당 한 파일뿐이라 p95에는 드러나지 않았고, 최대값에서만 13.526초로 보였습니다. 훅과 감시를 모두 끊으면 재스캔 주기가 지연을 정했습니다. 5초 재스캔의 최대는 5.019초, 기본 300초 재스캔의 최대는 300.024초였습니다.
 

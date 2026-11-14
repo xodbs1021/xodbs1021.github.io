@@ -1,7 +1,7 @@
 ---
 title: "HLS 재생 목록은 연속으로 확정된 조각까지만 공개했습니다"
 date: "2026-10-15T11:28:22+09:00"
-lastmod: "2026-11-11T06:06:24+09:00"
+lastmod: "2026-11-15T03:10:00+09:00"
 author: "김태윤"
 categories: ["0-to-1"]
 draft: false
@@ -47,11 +47,18 @@ portfolio_edition: "2026-10-15-v2"
 
 ## 10만 행 장부에서도 공개하는 창은 900조각입니다 {#10만-행이-있어도-보여-줄-창은-900조각입니다}
 
-10월 6일 합성 장부로 최근 1시간(4초 조각 900개) 창을 고정한 채 들고 있는 장부 행만 늘렸습니다. 처음 경계를 계산하는 작업과 직전 꼬리부터 다시 계산하는 갱신은 같은 구현의 다른 작업입니다. 그림 2는 두 작업의 시간입니다. 세로축은 로그 눈금입니다.
+10월 6일 합성 장부로 최근 1시간(4초 조각 900개) 창을 고정한 채 들고 있는 장부 행만 늘렸습니다. 처음 경계를 계산하는 작업과 직전 꼬리부터 다시 계산하는 갱신은 같은 구현의 다른 작업입니다. 그림 2는 두 작업의 시간입니다. 세로축이 선형 눈금이라 갱신 선은 바닥에 붙어 보입니다.
 
-{{< chart id="fig-boundary-cost" kind="실측" caption="장부 행 수에 따른 경계 계산 시간(μs, 로그 눈금). 처음 계산은 장부를 처음부터 훑어 3.933μs에서 320.410μs로 늘었고, 직전 꼬리부터 다시 계산하는 갱신은 10만 행에서도 2.952μs였습니다. 2026-10-06, Apple M5, Go 1.26.5, 조건마다 1초 × 10회. 수정 전후 비교가 아니라 같은 구현의 다른 작업입니다." source="팀 내부 실측(비공개 원시 묶음), 포트폴리오 요약 2026-10-15판 32쪽" height="340px" >}}
-{"grid":{"left":8,"right":24,"top":44,"bottom":8,"containLabel":true},"legend":{"top":0,"data":["처음 계산","직전 꼬리부터 갱신"]},"xAxis":{"type":"category","name":"장부 행 수","data":["900","5,400","21,600","100,000"]},"yAxis":{"type":"log","name":"시간(μs)","min":1,"max":1000,"logBase":10},"series":[{"name":"처음 계산","type":"line","symbolSize":8,"itemStyle":{"color":"#087f8b"},"lineStyle":{"width":3},"label":{"show":true,"position":"top","formatter":"{c}"},"data":[3.933,21.324,71.739,320.41]},{"name":"직전 꼬리부터 갱신","type":"line","symbolSize":8,"itemStyle":{"color":"#7a8a9b"},"lineStyle":{"width":2,"type":"dashed"},"label":{"show":true,"position":"bottom","formatter":"{c}"},"data":[4.162,3.646,2.855,2.952]}]}
+{{< chart id="fig-boundary-cost" kind="실측" caption="장부 행 수에 따른 경계 계산 시간(μs). 처음 계산은 장부를 처음부터 훑어 3.933μs에서 320.410μs로 늘었고, 직전 꼬리부터 다시 계산하는 갱신은 10만 행에서도 2.952μs였습니다. 2026-10-06, Apple M5, Go 1.26.5, 조건마다 1초 × 10회. 수정 전후 비교가 아니라 같은 구현의 다른 작업입니다." source="팀 내부 실측(비공개 원시 묶음), 포트폴리오 요약 2026-10-15판 32쪽" height="340px" >}}
+{"grid":{"left":8,"right":24,"top":44,"bottom":8,"containLabel":true},"legend":{"top":0,"data":["처음 계산","직전 꼬리부터 갱신"]},"xAxis":{"type":"category","name":"장부 행 수","data":["900","5,400","21,600","100,000"]},"yAxis":{"type":"value","name":"시간(μs)","min":0,"max":350,"interval":100},"series":[{"name":"처음 계산","type":"line","symbolSize":8,"itemStyle":{"color":"#087f8b"},"lineStyle":{"width":3},"label":{"show":true,"position":"top","formatter":"{c}"},"data":[3.933,21.324,71.739,320.41]},{"name":"직전 꼬리부터 갱신","type":"line","symbolSize":8,"itemStyle":{"color":"#7a8a9b"},"lineStyle":{"width":2,"type":"dashed"},"data":[4.162,3.646,2.855,{"value":2.952,"label":{"show":true,"position":"top","formatter":"{c}"}}]}]}
 {{< /chart >}}
+
+| 장부 행 수 | 처음 계산(μs) | 직전 꼬리부터 갱신(μs) |
+|---:|---:|---:|
+| 900 | 3.933 | 4.162 |
+| 5,400 | 21.324 | 3.646 |
+| 21,600 | 71.739 | 2.855 |
+| 100,000 | 320.410 | 2.952 |
 
 처음 계산은 장부가 커질수록 늘었지만, 갱신은 10만 행에서도 3μs 안팎이었습니다. 정상 송출 중에는 갱신만 돌므로 창을 다시 찾는 작업량은 장부 크기와 상관없이 작게 유지됩니다. 처음 계산 320.410μs와 갱신 2.952μs는 고치기 전후가 아니므로 개선 배수로 쓰지 않습니다.
 

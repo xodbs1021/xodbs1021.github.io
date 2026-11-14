@@ -1,7 +1,7 @@
 ---
 title: "H.265의 HDR은 PQ와 HLG 두 전달 곡선으로 나뉩니다"
 date: 2026-06-20T14:42:30+09:00
-lastmod: "2026-11-13T07:55:32+09:00"
+lastmod: "2026-11-15T03:10:00+09:00"
 description: "H.265(HEVC)를 고를 때는 압축률보다 디코더·라이선스·HDR 신호를 먼저 봐야 합니다. JCT-VC 검증 시험의 59% 절감이 어떤 조건의 값인지, 64×64 CTU와 4분 트리, Via LA와 Access Advance로 모인 특허 풀, FFmpeg가 hev1로 적는 태그와 애플의 hvc1 권고, 4K60의 레벨 5.1, PQ와 HLG의 곡선·메타데이터 차이와 VIDEO-RANGE, 아이폰 HDR이 HLG인 이유를 1차 문서로 확인했습니다. Sintel 예고편으로 같은 VMAF 93에서 x264·x265·SVT-AV1의 비트레이트와 CPU 시간을 직접 쟀습니다."
 categories: ["tech-blurting"]
 tags: ["HEVC", "H.265", "HDR", "PQ", "HLG", "x265", "VMAF"]
@@ -108,7 +108,7 @@ HEVC 레벨은 한 장의 휘도 표본 수(MaxLumaPs)와 초당 휘도 표본 �
   "grid": {"left": 8, "right": 24, "top": 44, "bottom": 28, "containLabel": true},
   "legend": {"top": 0, "data": ["PQ", "HLG(1,000cd/m² 화면)", "SDR(100cd/m² 화면)"]},
   "xAxis": {"type": "value", "name": "부호값", "min": 0, "max": 1, "interval": 0.25},
-  "yAxis": {"type": "log", "name": "cd/m²", "min": 0.01, "max": 10000, "logBase": 10},
+  "yAxis": {"type": "log", "name": "cd/m²(로그 눈금)", "min": 0.01, "max": 10000, "logBase": 10},
   "series": [
     {"name": "PQ", "type": "line", "showSymbol": false, "itemStyle": {"color": "#087f8b"}, "lineStyle": {"width": 3},
      "markLine": {"symbol": "none", "silent": true, "lineStyle": {"color": "#7a8a9b", "type": "dashed", "width": 1}, "label": {"formatter": "기준 흰색 203", "position": "insideStartTop"}, "data": [{"yAxis": 203}]},
@@ -120,6 +120,14 @@ HEVC 레벨은 한 장의 휘도 표본 수(MaxLumaPs)와 초당 휘도 표본 �
   ]
 }
 {{< /chart >}}
+
+| 부호값 | PQ(cd/m²) | HLG(cd/m²) | SDR(cd/m²) |
+|---:|---:|---:|---:|
+| 0.1 | 0.325 | 1.07 | 0.398 |
+| 0.25 | 5.15 | 9.61 | 3.59 |
+| 0.5 | 92.2 | 50.7 | 18.9 |
+| 0.75 | 983 | 203 | 50.1 |
+| 1.0 | 10,000 | 1,000 | 100 |
 
 PQ는 부호값 0.58 근처에서 기준 흰색 203cd/m²에 닿고, 그 위 0.42를 하이라이트에 씁니다. 같은 203cd/m²가 HLG(1,000cd/m² 화면)에서는 0.75입니다. HLG 곡선은 화면이 바뀌면 함께 움직이고(BT.2100은 화면 최대 밝기에 따라 시스템 감마를 바꾸는 식을 둡니다), PQ 곡선은 화면과 상관없이 고정입니다. 그래서 「HDR = 1,000니트」는 틀린 요약입니다. 1,000은 HLG를 계산할 때 고른 화면의 값이고, PQ의 부호 범위는 10,000cd/m²까지입니다.
 
