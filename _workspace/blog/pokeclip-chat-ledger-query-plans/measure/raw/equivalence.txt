@@ -1,0 +1,11 @@
+[옛 후보 역행 신호] EXISTS 꼴(legacy_exists) 대 바뀐 꼴(legacy_rewrite)
+compared|differ|no_floor|earlier_is_future_true|max_candidate_ne_floor
+500|0|137|38|127
+
+[판 2 후보] 존재 확인 없음(v2_plain) 대 min 확인(v2_min) · EXISTS 확인(v2_exists) · PDT 최대 지름길(v2_pdt_max)
+compared|plain_vs_min_differ|plain_vs_exists_differ|empty|found|plain_vs_pdt_max_differ
+500|0|0|199|301|73
+
+[반례 cex-reset] t | seq 최대(v2_min) | PDT 최대(v2_pdt_max)
+T0+18000ms | 102 | 102
+T0+20500ms | 102 | 100
