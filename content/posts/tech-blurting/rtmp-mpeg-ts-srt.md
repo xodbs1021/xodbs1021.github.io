@@ -1,7 +1,7 @@
 ---
 title: "MPEG-TS는 PID로 여러 오디오 트랙을 한 흐름에 담습니다"
 date: 2026-06-13T00:36:41+09:00
-lastmod: "2026-11-12T15:32:05+09:00"
+lastmod: "2026-11-15T03:32:00+09:00"
 description: "영상 하나와 오디오 여러 개를 한 연결로 보내려면 받는 쪽이 패킷마다 어느 트랙인지 알아야 합니다. MPEG-TS는 188바이트 패킷 머리의 13비트 PID와 PAT·PMT 표로 이를 표시합니다. FFmpeg 9.0.2로 영상 1 + 오디오 6 트랙 TS를 만들어 PID 배정, 패킷 수, 여섯 번째 오디오 PID만 꺼낸 소리를 확인했고, SRT가 이 흐름을 나를 뿐 트랙을 모른다는 점과 PokeClip이 받는 6트랙 구조를 함께 정리했습니다."
 categories: ["tech-blurting"]
 tags: ["MPEG-TS", "PID", "SRT", "FFmpeg", "멀티 오디오", "PokeClip"]
@@ -37,7 +37,7 @@ MPEG-TS는 ITU-T H.222.0 | ISO/IEC 13818-1이 정한 전송용 묶음 형식입�
 
 PID 번호 자체에는 「영상」·「오디오」라는 뜻이 없습니다. 받는 쪽은 PID 0에 실린 PAT(Program Association Table)에서 프로그램마다 PMT(Program Map Table)가 실린 PID를 찾고, PMT에서 트랙마다 종류(stream_type)와 PID를 읽습니다. [[fig-ts-tables]]는 이번에 만든 파일의 PAT·PMT를 직접 풀어 읽은 값입니다.
 
-```mermaid {#fig-ts-tables kind="실측" caption="FFmpeg 9.0.2 기본값으로 만든 영상 1 + 오디오 6 TS의 표. PID 0의 PAT가 프로그램 1의 PMT 위치를 알리고, PMT가 H.264 영상(stream_type 1B)과 AAC 오디오(0F) 여섯의 PID를 알려 줍니다. 시각 기준(PCR)은 영상 PID에 실립니다. 파일의 PAT·PMT 바이트를 직접 풀어 읽었습니다." source="로컬 실측(2026-11-12), 아래 「측정 조건」"}
+```mermaid {#fig-ts-tables kind="재구성" caption="FFmpeg 9.0.2 기본값으로 만든 영상 1 + 오디오 6 TS의 표. PID 0의 PAT가 프로그램 1의 PMT 위치를 알리고, PMT가 H.264 영상(stream_type 1B)과 AAC 오디오(0F) 여섯의 PID를 알려 줍니다. 시각 기준(PCR)은 영상 PID에 실립니다. 파일의 PAT·PMT 바이트를 직접 풀어 읽었습니다." source="로컬 실측(2026-11-12), 아래 「측정 조건」"}
 flowchart TB
   accTitle: PAT와 PMT로 트랙을 찾는 순서
   accDescr: PID 0x0의 PAT가 PMT의 PID 0x1000을 알려 주고, PMT가 영상 H.264를 PID 0x100에, AAC 오디오 여섯을 PID 0x101부터 0x106에 둔다고 알려 준다.

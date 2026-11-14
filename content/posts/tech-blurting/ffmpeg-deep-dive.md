@@ -1,7 +1,7 @@
 ---
 title: "FFmpeg 옵션은 놓인 자리에 따라 걸리는 단계가 다릅니다"
 date: 2026-06-21T04:18:25+09:00
-lastmod: "2026-11-13T03:16:18+09:00"
+lastmod: "2026-11-15T03:32:00+09:00"
 description: "ffmpeg 명령의 옵션은 바로 뒤의 입력이나 출력 하나에만 걸리고, 같은 출력에 같은 옵션을 거듭 주면 마지막 값만 남습니다. HLS 출력 하나에 -b:v를 세 번 주면 세 화질이 모두 600kbps 목표로 인코딩됐고, 스트림 지정자로 나누자 3,118 · 1,581 · 650kbps가 나왔습니다. 인코딩할 때는 -i 앞의 -ss도 프레임 단위로 정확했고 키프레임에 묶인 것은 스트림 복사였습니다. 다섯 단계 파이프라인, 필터와 재인코딩, -map 기본 선택, -re, 재포장, split, -progress speed를 FFmpeg 9.0.2 문서 · 소스와 로컬 실측으로 확인했습니다."
 categories: ["tech-blurting"]
 tags: ["FFmpeg", "libavformat", "스트림 복사", "filter_complex", "라이브 트랜스코딩"]
@@ -74,7 +74,7 @@ ffmpeg -f lavfi -i testsrc2=size=1280x720:rate=30 -t 20 -filter_complex "[0:v]sp
 
 왼쪽은 `-b:v`를 세 번 준 경우이고 오른쪽은 스트림 지정자로 나눈 경우입니다.
 
-{{< motion scene="OptionScopeOverride" id="fig-option-scope-override" kind="실측" caption="HLS 출력 하나에 세 화질을 담을 때 비트레이트 옵션이 걸리는 방식. -b:v를 세 번 주면 같은 출력의 앞 값이 덮여 세 인코더가 모두 600k 목표로 돌고, 20초 평균이 699 · 657 · 650kbps로 모입니다. -b:v:0 · -b:v:1 · -b:v:2로 나누면 3,118 · 1,581 · 650kbps로 갈라집니다. 수치는 이 글의 FFmpeg 9.0.2 실측입니다." >}}
+{{< motion scene="OptionScopeOverride" id="fig-option-scope-override" kind="재구성" caption="HLS 출력 하나에 세 화질을 담을 때 비트레이트 옵션이 걸리는 방식. -b:v를 세 번 주면 같은 출력의 앞 값이 덮여 세 인코더가 모두 600k 목표로 돌고, 20초 평균이 699 · 657 · 650kbps로 모입니다. -b:v:0 · -b:v:1 · -b:v:2로 나누면 3,118 · 1,581 · 650kbps로 갈라집니다. 수치는 이 글의 FFmpeg 9.0.2 실측입니다." >}}
 
 나눈 값은 마스터 목록에도 드러났습니다. 덮인 쪽은 720p 변형의 `BANDWIDTH`가 801,632로 360p의 697,856과 거의 같았고, 나눈 쪽은 3,264,432 · 1,724,336 · 697,856이었습니다.
 
