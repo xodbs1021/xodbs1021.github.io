@@ -1,7 +1,7 @@
 ---
 title: "치지직 하이라이트 자동 추출 파이프라인 설계기 - PokeClip"
 date: 2026-06-13T00:52:51+09:00
-lastmod: "2026-11-15T03:31:45+09:00"
+lastmod: "2026-11-15T04:06:44+09:00"
 categories: ["0-to-1"]
 draft: false
 ---
@@ -22,7 +22,7 @@ flowchart TB
   accDescr: OBS가 RTMP로 치지직에 방송을 보내고, SRT와 MPEG-TS로 EC2에 분석용 스트림을 보낸다. EC2의 FFmpeg가 영상과 오디오 4트랙을 나눠 분석 엔진 5개에 넘기고, 치지직 방송의 채팅도 엔진에 들어간다. 엔진 신호는 Hybrid Voting으로 합쳐지고, LLM이 구간을 태깅한 뒤 클립 구간을 확정해 저장한다.
   obs[OBS] -->|RTMP| chz[치지직 방송]
   obs -->|SRT + MPEG-TS| ff[EC2 FFmpeg<br/>트랙 분리]
-  ff -->|영상 · 오디오 4트랙| eng[분석 엔진 5개 병렬]
+  ff -->|영상 · 오디오 트랙| eng[분석 엔진 5개 병렬]
   chz -->|채팅| eng
   eng --> score[점수 통합<br/>Hybrid Voting]
   score --> llm[LLM 구간 태깅]

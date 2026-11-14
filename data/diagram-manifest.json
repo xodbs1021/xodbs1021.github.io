@@ -242,15 +242,6 @@
       "bytes": 28614
     }
   },
-  "55ca3f25fcd35f6f": {
-    "source": "content/posts/0-to-1/pokeclip-architecture.md",
-    "wide": {
-      "file": "55ca3f25fcd35f6f-wide.svg",
-      "width": 392,
-      "height": 642,
-      "bytes": 22388
-    }
-  },
   "5efdefe49e60f0d1": {
     "source": "content/posts/projects/pokeclip-media-timeline-over-wall-clock.md",
     "wide": {
@@ -402,6 +393,15 @@
       "width": 392,
       "height": 749,
       "bytes": 22461
+    }
+  },
+  "8fffc9dd5daed364": {
+    "source": "content/posts/0-to-1/pokeclip-architecture.md",
+    "wide": {
+      "file": "8fffc9dd5daed364-wide.svg",
+      "width": 392,
+      "height": 642,
+      "bytes": 22378
     }
   },
   "9d74bb6857a2e8fc": {
