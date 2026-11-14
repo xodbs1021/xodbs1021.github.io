@@ -37,15 +37,15 @@
 ## 재측정(공개, measure/)
 
 - 스크립트: `measure/run.sh`(컨테이너 · 장부 · 정리), `schema.sql`, `seed.sql`, `measure.py`. 원자료: `measure/raw/`(results.csv 회차별, summary.csv, plans.jsonl 1회차 계획 전체, equivalence.txt, env.json, machine.txt).
-- 환경: PostgreSQL 17.12 (Debian 17.12-1.pgdg13+1) aarch64, 이미지 postgres:17.12 @sha256:dbb9623d…3205, 설정 기본값(shared_buffers 128MB, jit on), OrbStack Docker Engine 29.8.2, MacBook Air Apple M5 32GB 팬 없음, macOS 27.0.1, load average 1.97 → 2.23.
+- 환경: PostgreSQL 17.12 (Debian 17.12-1.pgdg13+1) aarch64, 이미지 postgres:17.12 @sha256:dbb9623d…3205, 설정 기본값(shared_buffers 128MB, jit on), OrbStack Docker Engine 29.8.2, MacBook Air Apple M5 32GB 팬 없음, macOS 27.0.1, load average(1분) 회차별 1.82–2.37.
 - 표 907,200행, 색인 PK · local_path_uq · wall_idx · v2_seq_idx · legacy_wall_idx · v2_pdt_idx. ANALYZE 뒤 VACUUM 없음(원 시험과 같은 상태, 마지막 판 2 행 삭제 단계만 VACUUM ANALYZE).
 - 5회, 버퍼는 모든 경우 한 값.
 
 | 자리 | 재측정(버퍼 · ms) | 앞선 값 |
 |---|---|---|
 | ① EXISTS 꼴(판 조건 포함) 꼬리 | 12,685 · 36.7–38.9 | 12,676 · 약 35 |
-| ① 바뀐 꼴 꼬리 | 21 · 0.055–0.064 | 12 · 0.117 |
-| ① 바뀐 꼴 첫 행 + 1초 | 5,498 · 15.3–16.2 | 5,489 · 38.8 |
+| ① 바뀐 꼴 꼬리 | 21 · 0.055–0.064 | 12 |
+| ① 바뀐 꼴 첫 행 + 1초 | 5,498 · 15.3–16.2 | 5,489 |
 | ① 롤백 장부 꼬리 / 첫 판 NULL + 1초 | 12,685 → 21 / 12,909 → 377 | — |
 | ① 5ad61a0c develop 꼴 꼬리 | 12,685 · 28.1–29.3 | — |
 | ① 바뀐 꼴 첫 행 + 1초, 강제 일반 계획 | 14,806 · 31.7–33.0 (max_candidate 서브쿼리가 PK 역순 9,312) | — |

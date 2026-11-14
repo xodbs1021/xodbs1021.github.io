@@ -5,11 +5,13 @@
 #   ./run.sh measure <출력 폴더> # measure.py 를 돌린다
 #   ./run.sh down              # 라벨이 붙은 컨테이너 · 볼륨만 지운다
 #
+# measure 는 마지막 단계에서 판 2 두 방송을 지우고 동치 대조용 행을 넣었다 지운다. 다시 재려면 down → up 으로 장부를 새로 세운다.
+#
 # 바꿀 수 있는 값(환경 변수): CHATQ_IMAGE · CHATQ_CONTAINER · CHATQ_PORT · CHATQ_LABEL
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
-IMAGE="${CHATQ_IMAGE:-postgres:17.12}"
+IMAGE="${CHATQ_IMAGE:-postgres:17.12@sha256:dbb9623d5121b5d2c2c9e2fba56e40193cbb3510d4af7f035b1ab1823aff3205}"
 NAME="${CHATQ_CONTAINER:-chatq-pg}"
 PORT="${CHATQ_PORT:-55433}"
 LABEL="${CHATQ_LABEL:-com.techblog.bench=chatq}"

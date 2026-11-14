@@ -8,7 +8,8 @@
 --       stream_segments_v2_pdt_idx(PR 510 이 더한 색인)
 --   SegmentLedgerIndexTest @ 7c3464e3 이 세우는 색인 넷과 같다. 운영 표의 다른 칸·색인(session_id 등)은 없다.
 --
--- 이 파일은 표와 기본 색인만 만든다. v2_pdt_idx 는 measure.py 가 켜고 끈다(indexes.sql).
+-- 이 파일은 표와 기본 키 · local_path 유일 색인만 만든다. 나머지 색인 넷은 seed.sql 이 장부를 넣은 뒤 만들고,
+-- v2_pdt_idx 는 measure.py 가 측정 단계마다 지우고 다시 만든다.
 
 CREATE TABLE IF NOT EXISTS public.stream_segments (
     stream_id        text        NOT NULL,
