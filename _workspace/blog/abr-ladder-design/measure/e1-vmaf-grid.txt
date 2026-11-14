@@ -6,4 +6,4 @@
 VMAF: ffmpeg -i e_H_B.mp4 -i ref.mkv -lavfi "[0:v]scale=1920:1080:flags=bicubic,setpts=N/24/TB[d];[1:v]setpts=N/24/TB[r];[d][r]libvmaf=log_fmt=json:log_path=v.json:n_threads=4" -f null -
 각 점 1회. e1-vmaf-grid.csv 열: res, 목표 kbps, 파일 바이트, 실제 kbps(바이트×8/10초), VMAF 평균, 인코딩 CPU 초(디코딩·확대 포함).
 윗선(격자 점 기준 최고 해상도): 300→540p(55.90, 360p 54.98) / 600→540p(73.60, 720p 72.87) / 1000→720p(83.66, 1080p 82.21) / 1600·2500·4000·6000→1080p
-교차점(로그 가로축 직선 보간 대신 kbps 직선 보간): 540p→720p 약 700kbps, 720p→1080p 약 1,200kbps. 360p는 격자 범위에서 윗선에 오르지 않음.
+교차점(2026-11-15 재계산, 영상 ConvexHullClimb와 같이 실제 평균 kbps를 로그 가로축에 놓고 직선으로 이음): 540p→720p 약 708kbps, 720p→1080p 약 1,270kbps(글에는 약 700 · 1,300kbps). 목표 kbps 직선 보간이면 697 · 1,219kbps, 실제 평균 kbps 직선 보간이면 726 · 1,307kbps. 360p는 격자 범위에서 윗선에 오르지 않음.
