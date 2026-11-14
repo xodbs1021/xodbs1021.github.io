@@ -94,6 +94,7 @@ import { SEGMENT_COUNT_GATE_FRAMES, SegmentCountGate } from "./scenes/mediamtx-h
 import { EXIT_CODE_DISCARDED_FRAMES, ExitCodeDiscarded } from "./scenes/mediamtx-hook-exit-code-return/ExitCodeDiscarded";
 import { OFFLINE_RECORDING_GATE_FRAMES, OfflineRecordingGate } from "./scenes/mediamtx-offline-recording-source-lifecycle/OfflineRecordingGate";
 import { SHARED_DEFAULT_ALIAS_FRAMES, SharedDefaultAlias } from "./scenes/mediamtx-auth-defaults-normalization-and-clone/SharedDefaultAlias";
+import { LEDGER_SCAN_STOP_FRAMES, LedgerScanStop } from "./scenes/pokeclip-chat-ledger-query-plans/LedgerScanStop";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
@@ -1031,6 +1032,16 @@ export const RemotionRoot: React.FC = () => (
       component={SharedDefaultAlias}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={SHARED_DEFAULT_ALIAS_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="LedgerScanStop" component={LedgerScanStop} durationInFrames={LEDGER_SCAN_STOP_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="LedgerScanStopMobile"
+      component={LedgerScanStop}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={LEDGER_SCAN_STOP_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}
