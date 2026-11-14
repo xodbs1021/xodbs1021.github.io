@@ -53,6 +53,15 @@
       "bytes": 22663
     }
   },
+  "130a82ed07b93245": {
+    "source": "content/posts/0-to-1/pokeclip-architecture.md",
+    "wide": {
+      "file": "130a82ed07b93245-wide.svg",
+      "width": 392,
+      "height": 350,
+      "bytes": 17268
+    }
+  },
   "16a8f0d34788aa43": {
     "source": "content/posts/0-to-1/harness-session-isolation-worktree-root.md",
     "wide": {
@@ -233,6 +242,15 @@
       "bytes": 28614
     }
   },
+  "55ca3f25fcd35f6f": {
+    "source": "content/posts/0-to-1/pokeclip-architecture.md",
+    "wide": {
+      "file": "55ca3f25fcd35f6f-wide.svg",
+      "width": 392,
+      "height": 642,
+      "bytes": 22388
+    }
+  },
   "5efdefe49e60f0d1": {
     "source": "content/posts/projects/pokeclip-media-timeline-over-wall-clock.md",
     "wide": {
@@ -258,6 +276,15 @@
       "width": 392,
       "height": 587,
       "bytes": 19894
+    }
+  },
+  "6656f90175129804": {
+    "source": "content/posts/0-to-1/pokeclip-architecture.md",
+    "wide": {
+      "file": "6656f90175129804-wide.svg",
+      "width": 412,
+      "height": 387,
+      "bytes": 17975
     }
   },
   "66ad17afced95c48": {
@@ -420,6 +447,15 @@
       "width": 392,
       "height": 634,
       "bytes": 22139
+    }
+  },
+  "ac536b3ce46a31ac": {
+    "source": "content/posts/0-to-1/pokeclip-architecture.md",
+    "wide": {
+      "file": "ac536b3ce46a31ac-wide.svg",
+      "width": 412,
+      "height": 518,
+      "bytes": 19831
     }
   },
   "b444c2613e32344b": {
