@@ -79,7 +79,7 @@
 - 글 소제목 ↔ `data/legacy-heading-ids.json` ↔ `tests/blog-quality.test.mjs` — 공유 계약: slug 별 id 배열.
 - 본문 그림 경로 ↔ `scripts/optimize-images.mjs` ↔ 렌더러의 `<picture>` 생성 — 공유 계약: `static/images/<이름>` 평평한 경로 · 마크다운 이미지 문법.
 - `motion/src/scenes/registry.json` ↔ `motion/src/Root.tsx` ↔ `static/videos|images/<slug>-<장면>` ↔ 글의 `<video>` 마크업 — 공유 계약: 장면 id(PascalCase → kebab 파일 이름) · posterFrame · alt.
-- 차트 JSON(본문) ↔ `src/lib/chart-render.mjs`(빌드 SSR) · `src/lib/chart-layout.mjs`(폭별 배치) ↔ `src/pages/charts/`(`interactive="true"` 차트만) — 공유 계약: ECharts option 형태(순수 JSON).
+- 차트 JSON(본문) ↔ `src/lib/chart-render.mjs`(빌드 SSR) · `src/lib/chart-layout.mjs`(폭별 배치) · `src/lib/chart-defaults.mjs`(두 렌더러 공통 표시 기본값) ↔ `src/pages/charts/`(기본 인터랙션이라 `interactive="false"`가 아닌 모든 차트) ↔ `src/lib/chart-live.ts`(브라우저 ECharts) — 공유 계약: ECharts option 형태(순수 JSON).
 - `static/videos/*.mp4` ↔ `scripts/check-videos.mjs` ↔ `data/video-manifest.json` ↔ `src/lib/videos.mjs` · `visuals.mjs` — 공유 계약: 파일 이름(`<글>-<장면>` · `-mobile`), 해시(주소의 `?v=`), 길이(12초 이하 = 반복 재생).
 - Mermaid 원문 ↔ `src/lib/diagrams.mjs`(키 = 원문 + 렌더 정책 + mermaid 판) ↔ `scripts/render-diagrams.mjs` ↔ `data/diagram-manifest.json` — 공유 계약: 키와 SVG 파일 이름.
 - 그림 속성(Mermaid 펜스 `{#id kind caption source}` · chart `kind` `source` `interactive` · 이미지 `{kind caption source}`) ↔ `src/lib/figures.mjs`(번호 · 캡션) ↔ `tests/visuals.test.mjs` — 공유 계약: `kind` 허용 값 6개.

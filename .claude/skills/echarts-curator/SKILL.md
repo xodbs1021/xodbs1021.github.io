@@ -48,6 +48,7 @@ description: "블로그의 수치 비교·추세·분포에 적합한 ECharts를
 - `caption`·`kind`(필수): `kind`는 `실측` · `문헌값` · `설명용 가정` · `개념도` · `재구성` · `스크린샷` 중 하나. 새 글에서 빠지면 `npm test`가 실패한다. 캡션 문장에 성격 접두어를 쓰지 않는다.
 - `source`: 출처 URL 또는 짧은 설명. `id`: `[[fig-latency]]`로 본문에서 "그림 N"을 가리킬 때.
 - `interactive="false"`(선택): 그 차트만 정지 SVG로 둔다. 기본값은 켬이라 보통 쓰지 않는다.
+- 두 렌더러 공통 기본값(`src/lib/chart-defaults.mjs`): 값 라벨 `"{c}"`(앞뒤 글자 포함 가능)는 천 단위 구분으로 표시한다(`12,685`). 산점도 점은 불투명(`itemStyle.opacity: 1`)이 기본이다 — ECharts 기본 0.8이면 회색 점이 그림 면 대비 3:1 아래로 떨어진다. formatter 자리(축 라벨 · 값 라벨 · 툴팁)의 함수 문자열은 단위 붙이기 꼴만 함수로 바꾸고 나머지는 버린다. 글 option이 정한 값이 우선한다.
 - 툴팁: option에 `tooltip`이 없어도 기본으로 붙는다(막대·선이 있으면 axis, 산점도·파이·깔때기만 있으면 item). option에 `tooltip`을 쓰면 그 키가 우선한다. JSON이라 함수는 못 쓴다 — `valueFormatter`는 `"function(v){return v + '%'}"` 같은 단위 붙이기만 해석하고, 다른 함수 문자열은 버린다.
 - 내부는 JavaScript 함수가 아닌 JSON으로 파싱 가능한 ECharts option이어야 한다. 렌더러가 지원하지 않는 속성을 있다고 가정하지 않는다.
 
