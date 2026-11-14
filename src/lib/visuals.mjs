@@ -1,7 +1,7 @@
 import {createHash} from 'node:crypto';
 import {createFigures, parseArgs} from './figures.mjs';
 import {loadManifest, readDiagramSvg, diagramKey, FONT_SIZE} from './diagrams.mjs';
-import {renderChart} from './chart-render.mjs';
+import {renderChart, roleColors, logBarProblem} from './chart-render.mjs';
 import fs from 'node:fs';
 import {loadVideoManifest, resolveVideo, videoUrl, MOBILE_QUERY} from './videos.mjs';
 
@@ -77,19 +77,24 @@ function chartFigure(item, figures, slug) {
   let option;
   try { option = JSON.parse(item.source); }
   catch (error) { throw new Error(`${slug}: ${fig.label} chart is not valid JSON (${error.message})`); }
+  const logBar = logBarProblem(option);
+  if (logBar) throw new Error(`${slug}: ${fig.label} ${logBar}`);
   const height = Number(String(args.height || '360').replace(/px$/, '')) || 360;
   const chart = renderChart(option, {height, title: fig.title, idPrefix: fig.id});
   for (const warning of chart.warnings) visualReport.warnings.push(`${slug}: ${fig.label} ${warning}`);
-  const interactive = args.interactive === 'true';
+  // Charts are interactive by default: the static SVG is the no-JavaScript and first-paint copy, and
+  // the browser swaps in ECharts (tooltips, legend toggles) near the viewport. interactive="false" opts out.
+  const interactive = args.interactive !== 'false';
   let live = '';
   if (interactive) {
     const id = createHash('sha256').update(item.source).digest('hex').slice(0, 16);
-    interactiveCharts.set(id, item.source.trim());
-    live = `<div class="echart" data-chart="${id}" data-height="${height}" hidden></div>`;
+    interactiveCharts.set(id, JSON.stringify(roleColors(option)));
+    live = `<div class="echart" data-chart="${id}" data-height="${height}" role="img" tabindex="0" aria-labelledby="${esc(fig.id)}-w-title" aria-describedby="${esc(fig.id)}-w-desc" hidden></div>`;
   }
+  // Axis names sit under the phone layout (static or live); outside the variants so a live chart keeps them.
   const axes = chart.axisNames.length ? `<p class="chart-axes">${chart.axisNames.map(([axis, name]) => `${axis}: ${esc(name)}`).join(' · ')}</p>` : '';
   const table = chart.table ? `<details class="figure-data"><summary>데이터 표</summary><div class="figure-data-table">${chart.table}</div></details>` : '';
-  return `<figure class="chart-figure${interactive ? ' is-interactive' : ''}" id="${esc(fig.id)}"><div class="chart-variant chart-wide">${chart.wide}</div><div class="chart-variant chart-narrow">${chart.narrow}${axes}</div>${live}${table}${fig.figcaption}</figure>`;
+  return `<figure class="chart-figure${interactive ? ' is-interactive' : ''}" id="${esc(fig.id)}"><div class="chart-variant chart-wide">${chart.wide}</div><div class="chart-variant chart-narrow">${chart.narrow}</div>${live}${axes}${table}${fig.figcaption}</figure>`;
 }
 
 function staticSvgFigure(item, figures) {

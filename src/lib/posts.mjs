@@ -71,7 +71,7 @@ md.renderer.rules.fence=(tokens,idx,options,env,self)=> {
   if(token.info.trim()==='mermaid') return env.visuals.placeholder({type:'diagram',source:token.content,attrs:Object.fromEntries(token.attrs||[])})+'\n';
   return fence(tokens,idx,options,env,self);
 };
-// Only charts marked interactive="true" are fetched by the client; the rest are static SVG.
+// Chart options served at /charts/<id>.js for the live (default) charts; interactive="false" ones stay static SVG.
 export const charts = interactiveCharts;
 // Markdown → HTML with numbered figures. Exported so tests can render fixtures the same way.
 export function renderBody(content, slug) {

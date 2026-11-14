@@ -1,14 +1,15 @@
 ---
 title: "EXISTS와 일반 계획이 채팅 조회를 끝까지 훑게 했습니다"
 date: 2026-11-14T22:28:44+09:00
+lastmod: "2026-11-15T03:10:00+09:00"
 categories: ["projects"]
 tags: ["PokeClip", "PostgreSQL", "실행 계획", "pgjdbc", "색인"]
 draft: false
 author: "김태윤"
-description: "채팅 시각을 영상 위치로 바꾸는 녹화 장부 조회가 907,200행 시험 장부에서 자리마다 수천–1만 버퍼를 읽은 과정. 표 전체를 Seq Scan 하던 EXISTS 역행 검사를 ORDER BY … LIMIT 1로 바꾸고, 판 2 후보 앞에 min 존재 확인을 세우고, pgjdbc가 다섯 번째 실행부터 올리는 서버 준비 문장을 그 조회 하나만 끈 결정. PostgreSQL 17.12 공개 재측정 12,685 → 21, 7,246 → 4, 7,249 → 11 버퍼와 그대로 남긴 중간 시각 3,629 버퍼, 아직 운영에 들어가지 않은 상태까지."
+description: "채팅 시각을 영상 위치로 바꾸는 녹화 장부 조회가 907,200행 시험 장부에서 자리마다 수천–1만 버퍼를 읽은 과정. 표 전체를 Seq Scan 하던 EXISTS 역행 검사를 ORDER BY … LIMIT 1로 바꾸고, 판 2 후보 앞에 min 존재 확인을 세우고, pgjdbc가 다섯 번째 실행부터 올리는 서버 준비 문장을 그 조회 하나만 끈 결정. PostgreSQL 17.12 공개 재측정 12,685 → 21, 7,246 → 4, 7,249 → 11 버퍼와 거의 그대로 남은 중간 시각 3,625 → 3,629 버퍼, 아직 운영에 들어가지 않은 상태까지."
 ---
 
-PokéClip의 채팅 급증 판별기는 하이라이트 카드를 만들 때마다 채팅 수집기에 영상 위치를 한 번 묻습니다. 수집기는 그 답을 내려고 녹화 장부에서 조각 하나를 고르는데, 방송 셋을 담은 시험 장부(표 907,200행)에서 이 조회의 세 자리가 시각에 따라 7,246–12,685 버퍼를 읽었습니다. 같은 뜻을 다른 SQL 꼴로 바꾸고 한 조회의 서버 준비 문장을 끄자, 옛 역행 검사는 꼬리 시각에서 12,685 버퍼가 21 버퍼로, 판 2 후보 조회는 이른 시각의 일반 계획에서 7,246 버퍼가 4 버퍼로 줄었습니다. 첫 판 2 조각 바로 뒤 시각은 일반 계획을 강제했을 때의 7,249 버퍼 대신 바인딩 값 계획의 11 버퍼로 돌게 됐습니다. 판 2 행 한가운데 시각의 3,629 버퍼는 그대로 남겼습니다. 수치는 2026년 11월 14일 PostgreSQL 17.12에서 공개 스크립트로 다시 잰 값입니다([측정 조건](#측정-조건)).
+PokéClip의 채팅 급증 판별기는 하이라이트 카드를 만들 때마다 채팅 수집기에 영상 위치를 한 번 묻습니다. 수집기는 그 답을 내려고 녹화 장부에서 조각 하나를 고르는데, 방송 셋을 담은 시험 장부(표 907,200행)에서 이 조회의 세 자리가 시각에 따라 7,246–12,685 버퍼를 읽었습니다. 같은 뜻을 다른 SQL 꼴로 바꾸고 한 조회의 서버 준비 문장을 끄자, 옛 역행 검사는 꼬리 시각에서 12,685 버퍼가 21 버퍼로, 판 2 후보 조회는 이른 시각의 일반 계획에서 7,246 버퍼가 4 버퍼로 줄었습니다. 첫 판 2 조각 바로 뒤 시각은 일반 계획을 강제했을 때의 7,249 버퍼 대신 바인딩 값 계획의 11 버퍼로 돌게 됐습니다. 판 2 행 한가운데 시각은 3,625 버퍼에서 3,629 버퍼로 거의 그대로 남았습니다. 수치는 2026년 11월 14일 PostgreSQL 17.12에서 공개 스크립트로 다시 잰 값입니다([측정 조건](#측정-조건)).
 
 어떤 꼴을 받아들일지, 어느 비용을 남길지는 제가 정했습니다. 조회 수정 · 시험 · 실측과 이 글의 재측정은 AI 에이전트(Claude Code와 Codex)가 했습니다. 바뀐 조회는 11월 14일 0시 30분 develop에 병합됐지만([PR 511](https://github.com/3K-PokeClip/PokeClip-mono/pull/511)) 아직 운영 채팅 이미지에 없고, 생산자가 더한 색인([PR 510](https://github.com/3K-PokeClip/PokeClip-mono/pull/510))도 운영 DB에 적용하기 전입니다.
 
@@ -22,11 +23,19 @@ PokéClip의 채팅 급증 판별기는 하이라이트 카드를 만들 때마�
 
 비용은 PostgreSQL `EXPLAIN (ANALYZE, BUFFERS)`가 세는 버퍼로 쟀습니다. 버퍼 하나는 조회가 읽은 8KB 페이지 하나입니다. 시험 장부는 공개 시험 코드의 세 방송(판 2 행 30만, 판 NULL 행 30만, 판 2 행 30만 뒤 판 NULL 행 7,200인 롤백 방송)을 그대로 세웠습니다. 조각은 4초, PDT는 조각 순서대로 늘고, 파일명 시각은 PDT보다 200ms 이릅니다. 운영 장부(약 5,500행, [PR 510](https://github.com/3K-PokeClip/PokeClip-mono/pull/510) 본문)보다 훨씬 큰 시험입니다.
 
-[[fig-ledger-buffers]]에서 회색 막대가 바꾸기 전, 청록 막대가 바꾼 뒤입니다. 눈금이 로그라 막대 길이 한 칸이 열 배입니다.
+[[fig-ledger-buffers]]에서 회색 막대가 바꾸기 전, 청록 막대가 바꾼 뒤입니다. 눈금이 선형이라 바꾼 뒤의 21 · 4 · 11 버퍼는 막대가 거의 보이지 않습니다.
 
-{{< chart id="fig-ledger-buffers" kind="실측" caption="자리별로 바꾸기 전과 바꾼 뒤 조회가 읽은 버퍼(로그 눈금). 옛 역행 검사는 판 NULL만 있는 방송에서 바인딩 값 계획끼리, 판 2 후보는 판 2만 있는 방송에서 쟀습니다. 판 2 이른 시각은 일반 계획끼리, 첫 PDT + 1ms는 일반 계획과 바인딩 값 계획을 견줬습니다. 중간 시각은 바꾼 뒤에도 그대로라 두 막대 모두 회색입니다. PostgreSQL 17.12, 표 907,200행, 자리마다 5회 모두 같은 버퍼." source="https://github.com/xodbs1021/xodbs1021.github.io/tree/main/_workspace/blog/pokeclip-chat-ledger-query-plans/measure" height="400px" >}}
-{"grid":{"left":8,"right":56,"top":40,"bottom":8,"containLabel":true},"legend":{"top":0,"data":["바꾸기 전","바꾼 뒤"]},"xAxis":{"type":"log","name":"버퍼","min":1,"max":100000,"logBase":10,"axisLabel":{"showMaxLabel":false}},"yAxis":{"type":"category","inverse":true,"data":["역행 검사 · 꼬리","역행 검사 · 첫 행+1초","판 2 · 이른 시각","판 2 · 첫 PDT+1ms","판 2 · 중간 시각"]},"series":[{"name":"바꾸기 전","type":"bar","barWidth":14,"itemStyle":{"color":"#7a8a9b"},"label":{"show":true,"position":"right","formatter":"{c}"},"data":[12685,12685,7246,7249,3625]},{"name":"바꾼 뒤","type":"bar","barWidth":14,"itemStyle":{"color":"#087f8b"},"label":{"show":true,"position":"right","formatter":"{c}"},"data":[21,5498,4,11,{"value":3629,"itemStyle":{"color":"#7a8a9b"}}]}]}
+{{< chart id="fig-ledger-buffers" kind="실측" caption="자리별로 바꾸기 전과 바꾼 뒤 조회가 읽은 버퍼. 옛 역행 검사는 판 NULL만 있는 방송에서 바인딩 값 계획끼리, 판 2 후보는 판 2만 있는 방송에서 쟀습니다. 판 2 이른 시각은 일반 계획끼리, 첫 PDT + 1ms는 일반 계획과 바인딩 값 계획을 견줬습니다. 중간 시각은 바꾼 뒤에도 그대로라 두 막대 모두 회색입니다. PostgreSQL 17.12, 표 907,200행, 자리마다 5회 모두 같은 버퍼." source="https://github.com/xodbs1021/xodbs1021.github.io/tree/main/_workspace/blog/pokeclip-chat-ledger-query-plans/measure" height="400px" >}}
+{"grid":{"left":8,"right":56,"top":40,"bottom":8,"containLabel":true},"legend":{"top":0,"data":["바꾸기 전","바꾼 뒤"]},"xAxis":{"type":"value","name":"버퍼","min":0,"max":14000,"interval":3500},"yAxis":{"type":"category","inverse":true,"data":["역행 검사 · 꼬리","역행 검사 · 첫 행+1초","판 2 · 이른 시각","판 2 · 첫 PDT+1ms","판 2 · 중간 시각"]},"series":[{"name":"바꾸기 전","type":"bar","barWidth":14,"itemStyle":{"color":"#7a8a9b"},"label":{"show":true,"position":"right","formatter":"{c}"},"data":[12685,12685,7246,7249,3625]},{"name":"바꾼 뒤","type":"bar","barWidth":14,"itemStyle":{"color":"#087f8b"},"label":{"show":true,"position":"right","formatter":"{c}"},"data":[21,5498,4,11,{"value":3629,"itemStyle":{"color":"#7a8a9b"}}]}]}
 {{< /chart >}}
+
+| 자리 | 견준 계획 | 바꾸기 전 버퍼 | 바꾼 뒤 버퍼 |
+|---|---|---:|---:|
+| 역행 검사 · 꼬리 | 바인딩 값 계획끼리 | 12,685 | 21 |
+| 역행 검사 · 첫 행+1초 | 바인딩 값 계획끼리 | 12,685 | 5,498 |
+| 판 2 · 이른 시각 | 일반 계획끼리 | 7,246 | 4 |
+| 판 2 · 첫 PDT+1ms | 일반 계획 → 바인딩 값 계획 | 7,249 | 11 |
+| 판 2 · 중간 시각 | 두 계획 같음 | 3,625 | 3,629 |
 
 세 자리가 같은 크기를 읽은 것은 아닙니다. 옛 역행 검사의 비용은 표 전체 행 수에, 판 2 후보 조회의 비용은 그 방송의 판 2 행 수(30만)에 비례했습니다. 옛 역행 검사는 판 NULL만 있는 방송을 물어도 다른 두 방송의 행 60만여 개까지 읽었습니다.
 
@@ -105,7 +114,7 @@ SELECT seq, start_pts_ms, start_wall_utc, playback_pdt, timing_version, duration
 
 ## 답을 고르는 조회는 그대로라 중간 시각 비용은 남았습니다
 
-존재 확인은 「있나」만 빠르게 합니다. 답(seq 최대)은 여전히 `v2_seq_idx`를 seq 역순으로 타며 고릅니다. 답이 있고 그 뒤에 판 2 행이 많은 시각이면 본 조회가 그 행들을 지나야 답에 닿습니다. 판 2 행 약 15만 번째 조각 시각에서 3,629 버퍼, 8.8–9.4ms였고, 바인딩 값 계획과 일반 계획이 같았습니다.
+존재 확인은 「있나」만 빠르게 합니다. 답(seq 최대)은 여전히 `v2_seq_idx`를 seq 역순으로 타며 고릅니다. 답이 있고 그 뒤에 판 2 행이 많은 시각이면 본 조회가 그 행들을 지나야 답에 닿습니다. 판 2 행 약 15만 번째 조각 시각에서 3,629 버퍼, 8.8–9.4ms였고, 바인딩 값 계획과 일반 계획이 같았습니다. 바꾸기 전 꼴도 이 시각에 3,625 버퍼였습니다.
 
 PDT 색인으로 답까지 고르면 이 비용이 없어 보이지만, 그 지름길은 틀린 답을 냅니다. 판 2 PDT는 seq 순서대로 늘지 않습니다. 회차가 바뀌면 PDT가 뒤로 갈 수 있고, 장 경계에서는 1초 미만 겹칩니다. 공개 시험의 행으로 보면 이렇습니다([`VideoPositionV2Test`@7c3464e3](https://github.com/3K-PokeClip/PokeClip-mono/blob/7c3464e331c4e7730ad4eecc2ec15c84d4674d4b/services/chat-collector/src/test/java/com/pokeclip/chat/collector/sync/VideoPositionV2Test.java#L120-L131)).
 

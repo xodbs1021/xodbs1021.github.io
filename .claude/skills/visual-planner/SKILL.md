@@ -48,7 +48,8 @@ description: "블로그 글의 설명마다 맞는 시각 형식(영상·단계�
 - 노드 3개 이하의 직선 흐름(문장이 더 짧다).
 - 값 2개뿐인 비교.
 - 본문 문장을 그대로 다시 그린 그림.
-- 같은 내용을 그래프와 표로 중복.
+- 같은 내용을 그래프와 표로 중복. 예외: 로그 눈금 그래프와, 작은 값이 막대로 거의 안 보이는 선형 비교 그래프에는 정확한 값 표를 함께 둔다([echarts-curator](../echarts-curator/SKILL.md) 「로그 눈금」).
+- 생성 이미지로 만든 그래프·표·수치 그림. 그래프·표는 ECharts · Mermaid · 마크다운 표 같은 렌더 도구로 만든다.
 - 의미 없는 색 구분(범주 5개 초과, 범례 없는 색).
 - 출처가 불분명한 생성 그림, 실제 화면·측정처럼 보이는 생성 그림.
 
@@ -78,7 +79,7 @@ description: "블로그 글의 설명마다 맞는 시각 형식(영상·단계�
   ````
 
   도식을 추가·수정하면 `npm run render:diagrams`를 실행하고 `data/diagrams/`와 `data/diagram-manifest.json`을 커밋한다(빌드는 렌더 결과만 읽고, 없으면 실패한다). 노드 글자는 15px이고 휴대폰 칸에서 12px까지 줄어들 수 있으므로 새 도식은 세로(TB) 기준 폭 약 440px 이하로 설계한다. 넓은 `LR` 도식은 휴대폰용 TB 판이 자동으로 생긴다. 시퀀스도는 TB 판이 없으니 참가자 수를 줄인다.
-- **그래프**: `{{< chart caption="…" kind="…" source="…" id="fig-…" height="360px" >}}` 안에 JSON ECharts option. 툴팁이 꼭 필요할 때만 `interactive="true"`(브라우저에서 ECharts를 불러온다). 세부 규칙은 [echarts-curator](../echarts-curator/SKILL.md).
+- **그래프**: `{{< chart caption="…" kind="…" source="…" id="fig-…" height="360px" >}}` 안에 JSON ECharts option. 기본으로 인터랙션이다 — 화면에 들어오면 브라우저가 ECharts로 바꿔 툴팁 · 범례 클릭이 되고, 빌드 때 만든 정지 SVG는 JavaScript가 없을 때와 첫 화면용 대체다. 한 차트만 끄려면 `interactive="false"`. 전후 감소·비율 비교는 선형 눈금, 값 범위가 몇 자릿수라 선형으로 읽을 수 없을 때만 로그 눈금(축 이름·캡션에 「로그 눈금」, 정확한 값 표). 세부 규칙은 [echarts-curator](../echarts-curator/SKILL.md).
 - **이미지**: 문단에 이미지 하나만 있을 때 `![대체 텍스트](/images/x.png){kind="스크린샷" caption="…" source="https://…"}`. 속성이 없는 이미지는 번호 없이 렌더된다.
 - **영상**: `{{< motion scene="<Remotion 장면 id>" kind="개념도" caption="…" >}}` 또는 저장소 밖에서 만든 영상은 `{{< motion name="<static/videos 파일 이름>" alt="…" kind="…" caption="…" >}}`. 12초 이하는 화면에 들어올 때만 소리 없이 반복 재생하고 일시정지 버튼이 붙는다(움직임 줄이기 설정이면 포스터와 재생 버튼). 12초를 넘으면 컨트롤로 독자가 재생한다. 세부 규칙은 [motion-explainer](../motion-explainer/SKILL.md).
 - **본문 참조**: `[[fig-scheduler]]` → "그림 3" 링크. 없는 id는 빌드 경고다.

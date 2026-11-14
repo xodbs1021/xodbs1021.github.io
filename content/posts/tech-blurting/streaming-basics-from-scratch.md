@@ -1,7 +1,7 @@
 ---
 title: "라이브 영상은 압축·송출·포장·캐시·버퍼를 거쳐 재생됩니다"
 date: 2026-06-14T10:11:10+09:00
-lastmod: "2026-11-13T18:09:41+09:00"
+lastmod: "2026-11-15T03:10:00+09:00"
 description: "1080p30 화면은 압축하지 않으면 YUV 4:2:0으로도 초당 93.3MB, 한 시간 336GB이고, x264 6Mbps 목표로 압축하자 초당 0.77MB가 됐습니다(실측). 이 줄기가 송출 규약의 재전송 상한, 몇 초 조각과 목록, 캐시 층을 지나 플레이어 버퍼에 닿는 순서와, 지연이 조각 길이와 시작 거리에서 생기는 이유를 연재의 각 글로 이어 정리했습니다."
 categories: ["tech-blurting"]
 tags: ["스트리밍", "HLS", "CDN", "TCP", "압축", "라이브 지연"]
@@ -18,12 +18,12 @@ draft: false
 
 {{< motion scene="FrameToPlayer" id="fig-frame-to-player" kind="재구성" caption="1080p30 화면 한 줄기가 색 줄이기(YUV 4:2:0)와 x264 압축을 지나며 초당 186.6MB → 93.3MB → 0.77MB로 줄고, 송출 · 포장을 거쳐 CDN에서 여러 시청자에게 같은 조각으로 나뉩니다. 숫자는 시험 화면(testsrc2) 실측값이고 움직임은 설명용입니다." >}}
 
-로그 눈금으로 놓으면 세 값의 차이가 한 그림에 들어옵니다.
+같은 선형 눈금에 놓으면 압축한 쪽의 0.77MB는 막대가 거의 보이지 않습니다.
 
-{{< chart id="fig-raw-vs-encoded" kind="실측" caption="1080p30 시험 화면 10초의 초당 바이트(MB, 가로축은 로그 눈금). 압축 전 RGB 24비트 186.6MB, YUV 4:2:0 93.3MB, x264 목표 6Mbps 출력의 영상 패킷 0.77MB. FFmpeg 9.0.2, 2026-11-13." source="아래 「측정 조건」" height="240px" >}}
+{{< chart id="fig-raw-vs-encoded" kind="실측" caption="1080p30 시험 화면 10초의 초당 바이트(MB). 압축 전 RGB 24비트 186.6MB, YUV 4:2:0 93.3MB, x264 목표 6Mbps 출력의 영상 패킷 0.77MB. FFmpeg 9.0.2, 2026-11-13." source="아래 「측정 조건」" height="240px" >}}
 {
   "grid": {"left": 8, "right": 72, "top": 16, "bottom": 28, "containLabel": true},
-  "xAxis": {"type": "log", "name": "MB/초", "min": 0.1, "max": 1000, "logBase": 10},
+  "xAxis": {"type": "value", "name": "MB/초", "min": 0, "max": 200, "interval": 50},
   "yAxis": {"type": "category", "inverse": true, "data": ["RGB 24비트", "YUV 4:2:0", "x264 6Mbps"]},
   "series": [
     {"type": "bar", "barWidth": 22, "itemStyle": {"color": "#7a8a9b"}, "label": {"show": true, "position": "right", "formatter": "{c}"},
@@ -31,6 +31,12 @@ draft: false
   ]
 }
 {{< /chart >}}
+
+| 형식 | 초당 바이트 |
+|---|---:|
+| 압축 전 RGB 24비트 | 186.624MB |
+| 압축 전 YUV 4:2:0 | 93.312MB |
+| x264 목표 6Mbps 출력(영상 패킷) | 0.77MB |
 
 압축한 쪽은 압축 전 YUV의 약 120분의 1, RGB의 약 240분의 1입니다. 다만 실제 평균은 목표 6Mbps(초당 0.75MB)보다 많은 6,164–6,242kbps(네 번 실행, 2.7–4.0% 많음)였습니다. 압축 전 바이트 수는 해상도와 화소 형식만으로 정해지지만, x264 출력은 같은 명령이라도 실행마다 1% 남짓 달라집니다. x264의 버퍼 설정(VBV)은 순간 비트레이트를 정해 둔 구간 안에서만 묶기 때문입니다([x264 글](/posts/tech-blurting/x264-live-rate-control-gop/)). 시험 화면은 합성 영상이라 실제 방송 화면과 압축률이 다르고, 화질은 재지 않았습니다.
 

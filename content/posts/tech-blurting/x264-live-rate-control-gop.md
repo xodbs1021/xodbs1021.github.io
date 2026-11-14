@@ -1,6 +1,7 @@
 ---
 title: "라이브 x264는 VBV와 키프레임 간격을 옵션으로 고정합니다"
 date: 2026-11-13T03:15:18+09:00
+lastmod: "2026-11-15T03:10:00+09:00"
 description: "라이브 송출용 x264 설정은 화질보다 순간 비트와 키프레임 위치를 묶는 일입니다. FFmpeg 9.0.2 · x264 core 165로 preset 10종의 CPU 시간과 크기, zerolatency가 끄는 설정, maxrate · bufsize가 정하는 VBV 상한과 HLS BANDWIDTH 125% 규칙, -minrate가 libx264에 전달되지 않아 필러가 0개인 것, -g와 -sc_threshold 0으로 고정한 키프레임 위치를 직접 재 확인했습니다."
 categories: ["tech-blurting"]
 tags: ["x264", "FFmpeg", "VBV", "GOP", "라이브 송출", "HLS"]
@@ -14,12 +15,12 @@ author: "김태윤"
 
 x264의 preset은 움직임 탐색 범위, 참조 프레임 수, B 프레임 수, lookahead 길이 같은 내부 설정을 한 번에 고르는 묶음입니다. FFmpeg H.264 위키는 느린 preset일수록 압축 효율이 좋아서, 같은 CRF에서는 비트레이트가 줄고 같은 비트레이트에서는 화질이 오른다고 설명합니다([FFmpeg 위키 H.264](https://trac.ffmpeg.org/wiki/Encode/H.264)). CRF(Constant Rate Factor)는 화질 목표를 정하는 값으로 0–51 범위에 기본 23이고, 위키는 17–18을 「시각적으로 거의 무손실」로 봅니다.
 
-Sintel 예고편 10초(1080p 24fps)를 CRF 23으로 고정하고 preset만 10가지로 바꿔 인코딩했습니다. 막대는 인코딩에 쓴 CPU 시간(user + sys)이고, 가로축은 로그 눈금입니다.
+Sintel 예고편 10초(1080p 24fps)를 CRF 23으로 고정하고 preset만 10가지로 바꿔 인코딩했습니다. 막대는 인코딩에 쓴 CPU 시간(user + sys)입니다. 선형 눈금이라 placebo 하나가 나머지 아홉을 합친 것보다 깁니다.
 
-{{< chart id="fig-preset-cpu" kind="실측" caption="preset별 CPU 시간(초, 로그 눈금). 같은 10초 1080p24 입력을 CRF 23으로 인코딩. ultrafast 6.8초에서 placebo 956초까지 약 140배 차이. 2026-11-13, MacBook Air(M5), FFmpeg 9.0.2, x264 core 165, 1회." source="아래 「측정 조건」" height="420px" >}}
+{{< chart id="fig-preset-cpu" kind="실측" caption="preset별 CPU 시간(초). 같은 10초 1080p24 입력을 CRF 23으로 인코딩. ultrafast 6.8초에서 placebo 956초까지 약 140배 차이. 2026-11-13, MacBook Air(M5), FFmpeg 9.0.2, x264 core 165, 1회." source="아래 「측정 조건」" height="420px" >}}
 {
   "grid": {"left": 8, "right": 64, "top": 16, "bottom": 28, "containLabel": true},
-  "xAxis": {"type": "log", "name": "CPU 초", "min": 1, "max": 10000, "logBase": 10, "axisLabel": {"showMaxLabel": false}},
+  "xAxis": {"type": "value", "name": "CPU 초", "min": 0, "max": 1000, "interval": 250},
   "yAxis": {"type": "category", "inverse": true, "data": ["ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow", "placebo"]},
   "series": [
     {"type": "bar", "barWidth": 16, "itemStyle": {"color": "#7a8a9b"}, "label": {"show": true, "position": "right", "formatter": "{c}"},
@@ -27,6 +28,19 @@ Sintel 예고편 10초(1080p 24fps)를 CRF 23으로 고정하고 preset만 10가
   ]
 }
 {{< /chart >}}
+
+| preset | CPU 시간(초) |
+|---|---:|
+| ultrafast | 6.8 |
+| superfast | 14.5 |
+| veryfast | 18.0 |
+| faster | 24.8 |
+| fast | 31.1 |
+| medium | 35.3 |
+| slow | 46.3 |
+| slower | 80.1 |
+| veryslow | 174.2 |
+| placebo | 956.0 |
 
 CPU 시간은 preset이 느려질수록 꾸준히 늘었고, veryslow에서 placebo로 넘어갈 때 가장 크게 뛰었습니다. 다만 placebo는 기계 부하가 가장 높던 측정 끝에 돌았으므로 이 배수는 약하게 읽어야 합니다(아래 「측정 조건」). 결과 파일의 크기는 다르게 움직였습니다.
 

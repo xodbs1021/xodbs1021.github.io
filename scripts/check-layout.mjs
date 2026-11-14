@@ -134,8 +134,13 @@ try {
   // Every chart/diagram is checked as readers see it: the variant actually shown at this width,
   // its real rendered text size, how much of it fits before scrolling, contrast and accessible names.
   const visualPosts=posts.filter(p=>selected.includes(p.url)&&/class="(chart-figure|diagram)[ "]/.test(p.html));
-  for(const {width,theme} of (['pages','labs','videos'].includes(process.env.LAYOUT_PHASE)?[]:[{width:390,theme:'light'},{width:1440,theme:'light'},{width:390,theme:'dark'}])){
+  // Charts are live by default; two more passes measure every chart's static SVG (what readers see
+  // first and without JavaScript) with the live runtime blocked: the phone copy in light, the wide copy in dark.
+  const visualPasses=[{width:390,theme:'light'},{width:1440,theme:'light'},{width:390,theme:'dark'},{width:390,theme:'light',staticCharts:true},{width:1440,theme:'dark',staticCharts:true}];
+  for(const {width,theme,staticCharts} of (['pages','labs','videos'].includes(process.env.LAYOUT_PHASE)?[]:visualPasses)){
     const page=await browser.newPage();
+    const pass=staticCharts?`${theme}/static`:theme;
+    if(staticCharts)await page.route(/\/_astro\/chart-live[^/]*\.js$|\/charts\/[^/]+\.js$/,r=>r.abort());
     await page.route('**/api/views/**',r=>r.fulfill({status:200,contentType:'application/json',body:'{"views":0}'}));
     // Layout shifts are recorded from the first paint; a shift whose source sits in a figure fails.
     await page.addInitScript(()=>{window.__shifts=[];new PerformanceObserver(list=>{for(const entry of list.getEntries())for(const source of entry.sources||[]){const n=source.node,r=x=>[x.x,x.y,x.width,x.height].map(Math.round).join(',');window.__shifts.push({value:entry.value,at:Math.round(entry.startTime),figure:!!n?.closest?.('figure'),node:n?`${n.nodeName.toLowerCase()}${n.id?'#'+n.id:''}${typeof n.className==='string'&&n.className?'.'+n.className.split(' ')[0]:''} in ${n.closest?.('figure')?.id||'-'}`:'?',from:r(source.previousRect),to:r(source.currentRect)})}}).observe({type:'layout-shift',buffered:true})});
@@ -143,23 +148,25 @@ try {
     if(process.env.LAYOUT_CPU_THROTTLE)await (await page.context().newCDPSession(page)).send('Emulation.setCPUThrottlingRate',{rate:Number(process.env.LAYOUT_CPU_THROTTLE)});
     const requests=[];
     page.on('request',request=>requests.push(request.url()));
-    for(const post of visualPosts){
+    for(const post of staticCharts?visualPosts.filter(p=>p.html.includes('is-interactive')):visualPosts){
       requests.length=0;
       await open(page,post.url,width,theme);
-      const figures=page.locator('.chart-figure,.diagram');
+      const figures=page.locator(staticCharts?'.chart-figure':'.chart-figure,.diagram');
       // Layout shifts are judged on a reader's pass (load, then scroll past every figure) before any
       // capture: element screenshots of figures taller than the viewport briefly resize it, which
       // Chromium records as shifts that no visitor ever sees (CI run 42692708559).
       // Dwell at each figure like a reader, so late size changes happen while it is on screen.
       for(let i=0;i<await figures.count();i++){await figures.nth(i).scrollIntoViewIfNeeded();await page.waitForTimeout(200);}
       const shifts=await page.evaluate(()=>window.__shifts.filter(s=>s.figure));
-      if(shifts.length)fail(`${post.url}@${width}/${theme}`,`layout shift from figures: ${shifts.map(s=>`${s.value.toFixed(4)} @${s.at}ms ${s.node} [${s.from}]→[${s.to}]`).join('; ')}`);
+      if(shifts.length)fail(`${post.url}@${width}/${pass}`,`layout shift from figures: ${shifts.map(s=>`${s.value.toFixed(4)} @${s.at}ms ${s.node} [${s.from}]→[${s.to}]`).join('; ')}`);
       for(let i=0;i<await figures.count();i++){
-        const figure=figures.nth(i),scope=`${post.url}@${width}/${theme} figure ${i}`;
+        const figure=figures.nth(i),scope=`${post.url}@${width}/${pass} figure ${i}`;
         try{
           await figure.scrollIntoViewIfNeeded();
+          // Live charts (the default) are checked after the swap to ECharts, as readers see them.
+          if(await figure.evaluate(el=>el.classList.contains('is-interactive')))await page.waitForFunction(el=>!!el.dataset.chartState,await figure.elementHandle(),{timeout:15000});
           await figure.locator('svg:visible').first().waitFor({timeout:15000});
-          const file=`visual-${slugName(post.slug)}-${width}-${theme}-${i}.png`;
+          const file=`visual-${slugName(post.slug)}-${width}-${theme}${staticCharts?"-static":""}-${i}.png`;
           await figure.screenshot({path:path.join(out,file),animations:'disabled'});
           const sizes=await figure.evaluate((el,theme)=>{
             const svg=[...el.querySelectorAll('svg')].find(s=>s.getClientRects().length);
@@ -197,18 +204,27 @@ try {
             if(el.classList.contains('chart-figure'))for(const shape of svg.querySelectorAll('path,rect,circle')){
               const r=shape.getBoundingClientRect(),s=getComputedStyle(shape);
               const fill=parse(s.fill),stroke=parse(s.stroke),strokeWidth=parseFloat(s.strokeWidth)*scale;
-              const mark=fill&&fill.alpha*parseFloat(s.fillOpacity||'1')>=.9&&r.width*r.height>=16?fill:stroke&&strokeWidth>=1.5&&stroke.alpha>=.9?stroke:null;
+              // Translucent marks are judged by the color a reader sees: the paint blended over the figure
+              // surface (an ECharts scatter point is 0.8 opaque by default). Fills fainter than half are
+              // backgrounds (area shading, mark areas), not marks.
+              const opacity=parseFloat(s.opacity||'1'),fillAlpha=fill?fill.alpha*parseFloat(s.fillOpacity||'1')*opacity:0,strokeAlpha=stroke?stroke.alpha*parseFloat(s.strokeOpacity||'1')*opacity:0;
+              const seen=(c,a)=>bg?{rgb:c.rgb.map((v,k)=>v*a+bg.rgb[k]*(1-a)),alpha:1}:c;
+              const mark=fill&&fillAlpha>=.5&&r.width*r.height>=16?seen(fill,fillAlpha):stroke&&strokeWidth>=1.5&&strokeAlpha>=.5?seen(stroke,strokeAlpha):null;
               if(mark&&bg&&ratio(mark,bg)<3&&ratio(mark,bg)>1.01)lowMarks.push(`${shape.tagName} ${ratio(mark,bg).toFixed(2)}:1`);
             }
+            // An invisible paint (ECharts' transparent legend box is black at fill-opacity 0) is no surface.
             if(theme==='dark')for(const shape of svg.querySelectorAll('path,rect,polygon,circle')){
-              const fill=parse(getComputedStyle(shape).fill),r=shape.getBoundingClientRect();
-              if(fill&&fill.alpha>=.9&&r.width*r.height>100&&(fill.rgb.every(c=>c>.98)||fill.rgb.every(c=>c<.02)))hardSurfaces.push(shape.tagName);
+              const s=getComputedStyle(shape),fill=parse(s.fill),r=shape.getBoundingClientRect();
+              if(fill&&fill.alpha*parseFloat(s.fillOpacity||'1')>=.9&&r.width*r.height>100&&(fill.rgb.every(c=>c>.98)||fill.rgb.every(c=>c<.02)))hardSurfaces.push(shape.tagName);
             }
             const caption=el.querySelector('figcaption');
             const captionContrast=caption&&bg?ratio(parse(getComputedStyle(caption).color),bg):null;
-            const title=svg.querySelector('title')?.textContent.trim();
+            // A live chart is named by its container (role="img" pointing at the static SVG's title and desc).
+            const live=el.dataset.chartState==='live'?el.querySelector('.echart[role="img"]'):null;
+            const named=ids=>!!ids&&ids.split(/\s+/).every(id=>document.getElementById(id)?.textContent.trim());
+            const title=live?named(live.getAttribute('aria-labelledby')):svg.querySelector('title')?.textContent.trim();
             const authoredLegacy=el.dataset.authored==='legacy';
-            return {authoredLegacy,variant:svg.closest('[class*="-variant"]')?.className||'svg',scale,visibleRatio,scrollAllowed:el.dataset.scroll==='allowed',minText:Math.min(...textSizes.map(t=>t.px)),small,outside,lowText:[...new Set(lowText)].slice(0,8),lowMarks:[...new Set(lowMarks)].slice(0,8),hardSurfaces:hardSurfaces.length,captionContrast,title:!!title,desc:!!svg.querySelector('desc'),chart:el.classList.contains('chart-figure'),emptyStatic:el.classList.contains('static-diagram')&&!svg.querySelector('text'),error:!!el.querySelector('.diagram-missing')||el.classList.contains('diagram-missing')};
+            return {authoredLegacy,variant:svg.closest('[class*="-variant"]')?.className||'svg',scale,visibleRatio,scrollAllowed:el.dataset.scroll==='allowed',minText:Math.min(...textSizes.map(t=>t.px)),small,outside,lowText:[...new Set(lowText)].slice(0,8),lowMarks:[...new Set(lowMarks)].slice(0,8),hardSurfaces:hardSurfaces.length,captionContrast,title:!!title,desc:live?named(live.getAttribute('aria-describedby')):!!svg.querySelector('desc'),live:!!live,chartState:el.dataset.chartState||null,chart:el.classList.contains('chart-figure'),emptyStatic:el.classList.contains('static-diagram')&&!svg.querySelector('text'),error:!!el.querySelector('.diagram-missing')||el.classList.contains('diagram-missing')};
           },theme);
           if(sizes.error) fail(scope,'figure has no rendered SVG (missing pre-render?)');
           if(sizes.emptyStatic)fail(scope,'static SVG has no SVG text (HTML parser breakout)');
@@ -223,6 +239,8 @@ try {
           if(sizes.captionContrast!==null&&sizes.captionContrast<4.5)fail(scope,`caption contrast ${sizes.captionContrast.toFixed(2)}:1`);
           if(!sizes.title)fail(scope,'SVG has no <title>');
           if(sizes.chart&&!sizes.desc)fail(scope,'chart SVG has no <desc>');
+          if(!staticCharts&&sizes.chartState==='static')fail(scope,'live chart failed to load; the static SVG stayed');
+          if(staticCharts&&sizes.chart&&sizes.live)fail(scope,'static pass measured a live chart (runtime not blocked)');
           // At first view at least 80% of the drawing is visible; only earlier, undescribed figures may scroll.
           if(width<=390&&sizes.visibleRatio<.8){
             if(sizes.scrollAllowed)report.warnings.push({scope,message:`scrolls: ${(sizes.visibleRatio*100).toFixed(0)}% visible (earlier post, allowed)`});
@@ -235,12 +253,13 @@ try {
             await figure.screenshot({path:path.join(out,file.replace('.png','-end.png')),animations:'disabled'});
             await scrollFrame.evaluate(el=>el.scrollLeft=0);
           }
-          report.visuals.push({url:post.url,width,theme,index:i,file,...sizes});
+          report.visuals.push({url:post.url,width,theme,index:i,file,staticPass:!!staticCharts,...sizes});
           if(report.visuals.length%50===0)console.log(`Captured ${report.visuals.length} figures`);
         }catch(error){fail(scope,String(error));}
       }
       // Static figures need no chart or diagram runtime: report regressions in what the page downloads.
-      if(!post.html.includes('is-interactive')){
+      // (Charts are live by default, so this covers pages whose only figures are diagrams or opted-out charts.)
+      if(!staticCharts&&!post.html.includes('is-interactive')){
         const heavy=requests.filter(u=>/\/_astro\/[^/]*(elk|echarts|mermaid|chart-live|flowDiagram|sequenceDiagram)[^/]*\.js/i.test(u));
         if(heavy.length)report.warnings.push({scope:`${post.url}@${width}/${theme}`,message:`static figures but loaded ${heavy.map(u=>u.split('/').pop()).join(', ')}`});
       }

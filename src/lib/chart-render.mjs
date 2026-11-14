@@ -1,7 +1,8 @@
 import * as echarts from 'echarts';
 import {readableChartOption, narrowChartOption} from './chart-layout.mjs';
 import {tokens, cssVar} from './tokens.mjs';
-import {LEGACY_COLORS as LEGACY} from './chart-colors.mjs';
+import {LEGACY_COLORS as LEGACY, chartTheme} from './chart-colors.mjs';
+import {chartDefaults} from './chart-defaults.mjs';
 
 const LEGACY_COLORS = {...LEGACY};
 
@@ -21,48 +22,39 @@ const roleOfHex = hex => roleOfRgb(...hex.slice(1).match(/\w\w/g).map(x => parse
 export {LEGACY_COLORS};
 for (const [key, value] of Object.entries(tokens.themes.light)) if (ROLE_KEYS.includes(key)) LEGACY_COLORS[value] ??= key;
 
-const axisTheme = {
-  axisLine: {lineStyle: {color: SENTINEL.muted}}, axisTick: {lineStyle: {color: SENTINEL.muted}},
-  axisLabel: {color: SENTINEL.muted}, splitLine: {lineStyle: {color: [SENTINEL.grid]}},
-  nameTextStyle: {color: SENTINEL.muted}, splitArea: {show: false},
-};
-echarts.registerTheme('blog-ssr', {
-  color: [SENTINEL.cat1, SENTINEL.cat2, SENTINEL.cat3, SENTINEL.cat4, SENTINEL.cat5],
-  backgroundColor: 'transparent',
-  textStyle: {color: SENTINEL.ink, fontFamily: FONT},
-  title: {textStyle: {color: SENTINEL.ink}, subtextStyle: {color: SENTINEL.muted}},
-  legend: {textStyle: {color: SENTINEL.ink}, inactiveColor: SENTINEL.dataMuted},
-  categoryAxis: axisTheme, valueAxis: axisTheme, logAxis: axisTheme, timeAxis: axisTheme,
-  markLine: {lineStyle: {color: SENTINEL.muted}, label: {color: SENTINEL.ink}},
-  label: {color: SENTINEL.ink},
-});
+echarts.registerTheme('blog-ssr', chartTheme(role => SENTINEL[role], FONT));
 
 const isColor = v => typeof v === 'string' && /^#[0-9a-f]{3}([0-9a-f]{3})?$/i.test(v);
 const fullHex = v => v.length === 4 ? '#' + [...v.slice(1)].map(c => c + c).join('') : v;
 const RGB = /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)$/i;
 const toHex = (r, g, b) => '#' + [r, g, b].map(n => Number(n).toString(16).padStart(2, '0')).join('');
 
-// Replace every literal color in the option with a sentinel; report the ones without a role.
-function themeColors(option, unknown) {
+// Replace every literal color that has a token role; report the ones without one.
+function mapColors(option, replace, unknown) {
   const walk = value => {
     if (Array.isArray(value)) return value.map(walk);
     if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, walk(v)]));
     if (isColor(value)) {
       const role = LEGACY_COLORS[fullHex(value.toLowerCase())];
-      if (role) return SENTINEL[role];
-      unknown.add(value);
+      if (role) return replace(role);
+      unknown?.add(value);
     }
     const rgb = typeof value === 'string' && value.match(RGB);
     if (rgb && rgb[4] !== undefined && Number(rgb[4]) === 0) return value;
     if (rgb) {
       const role = LEGACY_COLORS[toHex(rgb[1], rgb[2], rgb[3])];
-      if (role) return rgb[4] === undefined ? SENTINEL[role] : `rgba(${SENTINEL_RGB[role].join(',')},${rgb[4]})`;
-      unknown.add(value);
+      if (role) return replace(role, rgb[4]);
+      unknown?.add(value);
     }
     return value;
   };
   return walk(option);
 }
+// Static SVG: sentinels, rewritten to var(--token) after rendering.
+const themeColors = (option, unknown) => mapColors(option, (role, alpha) => alpha === undefined ? SENTINEL[role] : `rgba(${SENTINEL_RGB[role].join(',')},${alpha})`, unknown);
+// Live chart source: "@token:<role>[/alpha]", resolved from the page's CSS variables (chart-live.ts),
+// so both renderers share one color map (chart-colors.mjs plus the light token values).
+export const roleColors = option => mapColors(option, (role, alpha) => `@token:${role}${alpha === undefined ? '' : '/' + alpha}`);
 
 const axesOf = value => [value].flat().filter(Boolean);
 const seriesOf = option => [option.series].flat().filter(Boolean);
@@ -157,9 +149,17 @@ export function dataTable(option) {
   return '';
 }
 
+// ECharts grows log-axis bars from 1: values below 1 point the wrong way and every bar length
+// reads as a ratio it is not. Bars need a linear value axis; on a log axis use points (scatter).
+export function logBarProblem(option) {
+  const logAxes = [...axesOf(option.xAxis), ...axesOf(option.yAxis)].filter(a => a.type === 'log');
+  if (!logAxes.length) return null;
+  return seriesOf(option).some(s => s.type === 'bar') ? 'bar series on a log axis (bars grow from 1; use a linear axis, or points on the log axis)' : null;
+}
+
 export function renderChart(source, {height = 360, title, idPrefix}) {
   const unknownColors = new Set();
-  const option = themeColors(source, unknownColors);
+  const option = chartDefaults(themeColors(source, unknownColors));
   const desc = summarize(source);
   const narrow = narrowLayout(option);
   const wide = finishSvg(renderWidth(wideLayout(option), CHART_WIDTHS.wide, height), {title, desc, idPrefix: idPrefix + '-w'});

@@ -28,10 +28,16 @@
 /* Charts: 720px drawing above 600px of column, 360px drawing (horizontal bars, wrapped labels) below. */
 .chart-variant svg { width: 100%; height: auto; max-width: 100%; }
 .chart-narrow { display: none; max-width: 480px; margin: 0 auto; }
-@container (max-width: 599px) { .chart-wide { display: none; } .chart-narrow { display: block; } }
-.chart-axes { margin: 8px 0 0; font-size: 12px; line-height: 1.6; color: var(--muted); text-align: center; }
+/* Axis names are shown under the phone layout only (the 360px drawing and narrowChartOption drop them). */
+.chart-axes { display: none; margin: 8px 0 0; font-size: 12px; line-height: 1.6; color: var(--muted); text-align: center; }
+@container (max-width: 599px) { .chart-wide { display: none; } .chart-narrow, .chart-axes { display: block; } }
+/* Live ECharts (default; interactive="false" keeps the static SVG) replaces the variant at its height. */
 .chart-figure.is-live .chart-variant { display: none; }
+/* ECharts paints hollow symbols with white: follow the figure surface, as the static SVG does. */
 .chart-figure .echart { width: 100%; }
+.chart-figure .echart svg [fill="#fff"] { fill: var(--surface); }
+.chart-figure .echart svg [stroke="#fff"] { stroke: var(--surface); }
+@container (max-width: 599px) { .chart-figure .echart { max-width: 480px; margin: 0 auto; } }
 
 /* Data tables behind every chart: the accessible equivalent, collapsed by default. */
 .figure-data { margin-top: 12px; font-size: 13px; }

@@ -6,6 +6,8 @@ import {tokens, tokensCss, contrast} from '../src/lib/tokens.mjs';
 import {createFigures, parseArgs, FIGURE_KINDS} from '../src/lib/figures.mjs';
 import {collectDiagrams, loadManifest, narrowSource, DIAGRAM_DIR} from '../src/lib/diagrams.mjs';
 import {narrowChartOption} from '../src/lib/chart-layout.mjs';
+import {withDefaultTooltip} from '../src/lib/chart-tooltip.mjs';
+import {chartDefaults} from '../src/lib/chart-defaults.mjs';
 import {posts, renderBody, charts} from '../src/lib/posts.mjs';
 
 test('token colors keep text at 4.5:1 and graphics at 3:1 on both backgrounds in both themes', () => {
@@ -51,7 +53,7 @@ test('Markdown fixtures: Mermaid fence attributes, chart shortcode, image figure
     diagram.trimEnd(),
     '```',
     '',
-    `{{< chart caption="단계별 지연" kind="실측" source="사내 측정" interactive="true" >}}\n${chart}\n{{< /chart >}}`,
+    `{{< chart caption="단계별 지연" kind="실측" source="사내 측정" >}}\n${chart}\n{{< /chart >}}`,
   ].join('\n'), 'fixture/one');
   const $ = load(html);
   assert.deepEqual(figures.map(f => [f.number, f.type, f.kind, f.complete]), [[1, 'image', '스크린샷', true], [2, 'diagram', '개념도', true], [3, 'chart', '실측', true]]);
@@ -62,11 +64,91 @@ test('Markdown fixtures: Mermaid fence attributes, chart shortcode, image figure
   assert.equal($('a.fig-ref').text(), '그림 2');
   assert.ok($('#fig-flow svg[role=img] title').length >= 1);
   const live = $('.chart-figure.is-interactive [data-chart]').attr('data-chart');
-  assert.ok(charts.has(live), 'interactive chart source is served from /charts/');
+  assert.ok(charts.has(live), 'charts are live by default; the source is served from /charts/');
   assert.equal($('.chart-figure svg').length, 2);
   assert.equal($('.chart-figure svg title').first().text(), '단계별 지연');
   assert.match($('.chart-figure svg desc').first().text(), /지연: 최대 b 5, 최소 a 3/);
   assert.equal($('.chart-figure .figure-data table tbody tr').length, 2);
+});
+
+test('interactive="false" keeps a chart static: no live container, no /charts/ source', () => {
+  const chart = '{"xAxis":{"type":"category","data":["a","b"]},"yAxis":{"type":"value"},"series":[{"type":"bar","data":[1,2]}]}';
+  const {html} = renderBody(`{{< chart caption="정지" kind="실측" source="사내" interactive="false" >}}\n${chart}\n{{< /chart >}}`, 'fixture/static-chart');
+  const $ = load(html);
+  assert.equal($('.chart-figure').length, 1);
+  assert.equal($('.chart-figure.is-interactive').length, 0);
+  assert.equal($('.chart-figure [data-chart]').length, 0);
+  assert.equal($('.chart-figure svg').length, 2, 'static SVG pair stays');
+});
+
+test('live chart sources carry token roles, not light-theme hex, so dark mode recolors them', () => {
+  const chart = '{"xAxis":{"type":"category","data":["a","b"]},"yAxis":{"type":"value"},"series":[{"type":"bar","itemStyle":{"color":"#7a8a9b"},"data":[1,{"value":2,"itemStyle":{"color":"#087f8b"}}]},{"type":"line","areaStyle":{"color":"rgba(8,127,139,0.2)"},"data":[1,2]}]}';
+  const {html} = renderBody(`{{< chart caption="색" kind="실측" source="사내" >}}\n${chart}\n{{< /chart >}}`, 'fixture/live-colors');
+  const served = charts.get(load(html)('[data-chart]').attr('data-chart'));
+  assert.match(served, /"@token:dataMuted"/);
+  assert.match(served, /"@token:accent"/);
+  assert.match(served, /"@token:accent\/0\.2"/);
+  assert.doesNotMatch(served, /#7a8a9b|#087f8b|rgba\(8,127,139/i);
+});
+
+test('a bar series on a log axis fails the build (ECharts grows log bars from 1)', () => {
+  const bar = '{"xAxis":{"type":"log","min":0.01},"yAxis":{"type":"category","data":["a","b"]},"series":[{"type":"bar","data":[0.05,30]}]}';
+  assert.throws(() => renderBody(`{{< chart caption="로그 막대" kind="실측" source="사내" >}}\n${bar}\n{{< /chart >}}`, 'fixture/log-bar'), /bar series on a log axis/);
+  const dots = '{"xAxis":{"type":"log","min":0.01},"yAxis":{"type":"category","data":["a","b"]},"series":[{"type":"scatter","data":[[0.05,"a"],[30,"b"]]}]}';
+  assert.doesNotThrow(() => renderBody(`{{< chart caption="로그 점" kind="실측" source="사내" >}}\n${dots}\n{{< /chart >}}`, 'fixture/log-dots'));
+});
+
+test('live charts get a default tooltip by series type; an authored tooltip wins key by key', () => {
+  const style = {confine: true, backgroundColor: 'var-surface'};
+  const bar = withDefaultTooltip({series: [{type: 'bar', data: [1]}]}, style);
+  assert.deepEqual(bar.tooltip, {...style, trigger: 'axis', axisPointer: {type: 'shadow'}});
+  assert.deepEqual(withDefaultTooltip({series: [{type: 'line', data: [1]}, {type: 'bar', data: [2]}]}).tooltip, {trigger: 'axis', axisPointer: {type: 'line'}});
+  assert.equal(withDefaultTooltip({series: [{type: 'scatter', data: [[1, 2]]}]}).tooltip.trigger, 'item');
+  assert.equal(withDefaultTooltip({series: [{type: 'line', showSymbol: false, data: [[1, 2]]}, {type: 'scatter', data: [[1, 2]]}]}).tooltip.trigger, 'axis', 'a symbol-less line answers only an axis trigger');
+  assert.equal(withDefaultTooltip({series: [{type: 'pie', data: [{name: 'a', value: 1}]}]}).tooltip.trigger, 'item');
+  const authored = withDefaultTooltip({tooltip: {trigger: 'item', show: false}, series: [{type: 'bar', data: [1]}]}, style);
+  assert.equal(authored.tooltip.trigger, 'item');
+  assert.equal(authored.tooltip.show, false);
+  assert.equal(authored.tooltip.confine, true, 'style still applies under the authored tooltip');
+  const source = {series: [{type: 'bar', data: [1]}]};
+  withDefaultTooltip(source);
+  assert.equal(source.tooltip, undefined, 'source option is not mutated');
+});
+
+test('chart defaults: formatter function text is made safe anywhere in the option', () => {
+  // JSON cannot carry functions: a unit-suffix formatter becomes a real one, other function text is dropped.
+  const {tooltip, xAxis, series} = chartDefaults({
+    tooltip: {valueFormatter: "function(v){return v===null?'-':v+'건'}"},
+    xAxis: {axisLabel: {formatter: "v => v + 'ms'"}},
+    series: [{type: 'bar', label: {formatter: "function(p){return p.value + '%'}"}, data: [1]},
+      {type: 'line', label: {formatter: '(a, b) => a + b'}, data: [2]},
+      {type: 'line', label: {formatter: 'function(p){return p.name}'}, data: [3]}],
+  });
+  assert.equal(tooltip.valueFormatter(12685), '12,685건');
+  assert.equal(tooltip.valueFormatter(null), '-');
+  assert.equal(xAxis.axisLabel.formatter(250), '250ms');
+  assert.equal(series[0].label.formatter({value: 22.5}), '22.5%');
+  assert.equal(series[1].label.formatter, undefined, 'multi-parameter arrow function text is dropped');
+  assert.equal(series[2].label.formatter, undefined);
+  assert.equal(chartDefaults({tooltip: {valueFormatter: 'v => v * 2'}, series: []}).tooltip.valueFormatter, undefined);
+  assert.equal(chartDefaults({tooltip: {formatter: '{b}: {c}'}, series: []}).tooltip.formatter, '{b}: {c}', 'templates stay');
+});
+
+test('chart defaults: thousands separators in "{c}" labels, opaque scatter points, post values win', () => {
+  const source = {series: [
+    {type: 'bar', label: {show: true, formatter: '{c}'}, data: [12685, {value: 5498, label: {formatter: '{c}초'}}, 0.067]},
+    {type: 'scatter', data: [[1, 2]], label: {formatter: '{c}'}},
+    {type: 'scatter', itemStyle: {opacity: 0.5, color: '#087f8b'}, data: [[1, 2]]},
+  ]};
+  const snapshot = structuredClone(source);
+  const {series} = chartDefaults(source);
+  assert.deepEqual(source, snapshot, 'source option is not mutated');
+  assert.equal(series[0].label.formatter({value: 12685}), '12,685');
+  assert.equal(series[0].label.formatter({value: 0.067}), '0.067');
+  assert.equal(series[0].data[1].label.formatter({value: 5498}), '5,498초');
+  assert.equal(series[1].label.formatter, '{c}', 'pairs keep the template');
+  assert.equal(series[1].itemStyle.opacity, 1);
+  assert.equal(series[2].itemStyle.opacity, 0.5);
 });
 
 test('every Mermaid block has a committed render whose colors are theme variables', () => {
@@ -105,6 +187,14 @@ test('built pages number figures in order and use no client renderer or fixed ca
       assert.equal($(el).find('.chart-wide svg title').length, 1);
       assert.equal($(el).find('.chart-narrow svg desc').length, 1);
       assert.ok(!/(fill|stroke)="#[0-9a-f]{6}"/i.test($(el).find('svg').toString()), `${post.slug}: literal chart color`);
+      // Live by default; the live container is named by the static SVG's title and desc.
+      const live = $(el).find('.echart[data-chart]');
+      if ($(el).hasClass('is-interactive')) {
+        assert.equal(live.length, 1, `${post.slug}: live container`);
+        assert.equal(live.attr('role'), 'img');
+        assert.ok($(`[id="${live.attr('aria-labelledby')}"]`).text().trim(), `${post.slug}: live chart name`);
+        assert.ok($(`[id="${live.attr('aria-describedby')}"]`).text().trim(), `${post.slug}: live chart description`);
+      } else assert.equal(live.length, 0);
     });
   }
 });
