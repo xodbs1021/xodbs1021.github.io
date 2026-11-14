@@ -1,7 +1,7 @@
 ---
 title: "채팅은 알고 있었다 - PokeClip 파이프라인을 갈아엎은 기록 (v3→v4)"
 date: 2026-07-03T16:30:00+09:00
-lastmod: "2026-11-15T03:31:45+09:00"
+lastmod: "2026-11-15T03:41:49+09:00"
 categories: ["0-to-1"]
 draft: false
 ---
@@ -3293,7 +3293,7 @@ MSI T1 경기의 치지직 채팅을 수집해서 분석했다. 2세션 65분, 1
 {
   "tooltip": { "trigger": "axis", "axisPointer": { "type": "shadow" }, "formatter": "{b0}<br/>{a0}: {c0}%<br/>{a1}: {c1}%" },
   "legend": { "top": 0 },
-  "grid": { "left": "26%", "right": "12%", "bottom": "12%", "top": "14%" },
+  "grid": { "left": "26%", "right": "12%", "bottom": "12%", "top": "20%" },
   "xAxis": { "type": "value", "name": "방송 시간 비중 (%)", "min": 0, "max": 60 },
   "yAxis": {
     "type": "category",
@@ -3309,7 +3309,7 @@ MSI T1 경기의 치지직 채팅을 수집해서 분석했다. 2세션 65분, 1
       "markArea": {
         "silent": true,
         "itemStyle": { "color": "#008b6a", "opacity": 0.15 },
-        "label": { "position": "insideTop", "formatter": "목표 20~25%" },
+        "label": { "position": "top", "formatter": "목표 20~25%" },
         "data": [[{ "xAxis": 20 }, { "xAxis": 25 }]]
       }
     },
