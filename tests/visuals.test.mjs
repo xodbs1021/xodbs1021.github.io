@@ -90,6 +90,13 @@ test('live chart sources carry token roles, not light-theme hex, so dark mode re
   assert.doesNotMatch(served, /#7a8a9b|#087f8b|rgba\(8,127,139/i);
 });
 
+test('a bar series on a log axis fails the build (ECharts grows log bars from 1)', () => {
+  const bar = '{"xAxis":{"type":"log","min":0.01},"yAxis":{"type":"category","data":["a","b"]},"series":[{"type":"bar","data":[0.05,30]}]}';
+  assert.throws(() => renderBody(`{{< chart caption="로그 막대" kind="실측" source="사내" >}}\n${bar}\n{{< /chart >}}`, 'fixture/log-bar'), /bar series on a log axis/);
+  const dots = '{"xAxis":{"type":"log","min":0.01},"yAxis":{"type":"category","data":["a","b"]},"series":[{"type":"scatter","data":[[0.05,"a"],[30,"b"]]}]}';
+  assert.doesNotThrow(() => renderBody(`{{< chart caption="로그 점" kind="실측" source="사내" >}}\n${dots}\n{{< /chart >}}`, 'fixture/log-dots'));
+});
+
 test('live charts get a default tooltip by series type; an authored tooltip wins key by key', () => {
   const style = {confine: true, backgroundColor: 'var-surface'};
   const bar = withDefaultTooltip({series: [{type: 'bar', data: [1]}]}, style);

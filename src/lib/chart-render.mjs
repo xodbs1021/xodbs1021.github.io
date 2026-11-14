@@ -148,6 +148,14 @@ export function dataTable(option) {
   return '';
 }
 
+// ECharts grows log-axis bars from 1: values below 1 point the wrong way and every bar length
+// reads as a ratio it is not. Bars need a linear value axis; on a log axis use points (scatter).
+export function logBarProblem(option) {
+  const logAxes = [...axesOf(option.xAxis), ...axesOf(option.yAxis)].filter(a => a.type === 'log');
+  if (!logAxes.length) return null;
+  return seriesOf(option).some(s => s.type === 'bar') ? 'bar series on a log axis (bars grow from 1; use a linear axis, or points on the log axis)' : null;
+}
+
 export function renderChart(source, {height = 360, title, idPrefix}) {
   const unknownColors = new Set();
   const option = themeColors(source, unknownColors);

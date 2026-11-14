@@ -1,7 +1,7 @@
 import {createHash} from 'node:crypto';
 import {createFigures, parseArgs} from './figures.mjs';
 import {loadManifest, readDiagramSvg, diagramKey, FONT_SIZE} from './diagrams.mjs';
-import {renderChart, roleColors} from './chart-render.mjs';
+import {renderChart, roleColors, logBarProblem} from './chart-render.mjs';
 import fs from 'node:fs';
 import {loadVideoManifest, resolveVideo, videoUrl, MOBILE_QUERY} from './videos.mjs';
 
@@ -77,6 +77,8 @@ function chartFigure(item, figures, slug) {
   let option;
   try { option = JSON.parse(item.source); }
   catch (error) { throw new Error(`${slug}: ${fig.label} chart is not valid JSON (${error.message})`); }
+  const logBar = logBarProblem(option);
+  if (logBar) throw new Error(`${slug}: ${fig.label} ${logBar}`);
   const height = Number(String(args.height || '360').replace(/px$/, '')) || 360;
   const chart = renderChart(option, {height, title: fig.title, idPrefix: fig.id});
   for (const warning of chart.warnings) visualReport.warnings.push(`${slug}: ${fig.label} ${warning}`);
