@@ -1,7 +1,7 @@
 // 콘티: _workspace/blog/shakedown-plan-deployment-and-recovery/storyboard.md
 // 기동과 중지의 시간 예산. 위 줄: Spring 기동 약 41초 막대가 유예 30초 세로선을 넘어 「태스크 교체」(위험색),
 // 세로선이 120초로 옮겨 가며 「유예 120초로 조정」(강조색). 아래 줄: 「공개 경로 403」 뒤 중지 막대가 120초 제한을 넘어
-// 「medium · 502」, 600초 · 630초 한도가 서고 「large · 204」. 두 줄의 가로 눈금은 다르다. 반복 클립, 생성 소재 없음.
+// 「medium · 502」, 600초 · 630초 한도가 서고 「large · 204」. 두 줄은 같은 가로 눈금(0–700초)이다. 반복 클립, 생성 소재 없음.
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { Label, Tag } from "../../components/Timeline";
 import { progress } from "../../lib/motion";
@@ -42,13 +42,15 @@ const T = {
 } as const;
 
 const START_SECONDS = 41;
+// 같은 0–700초 눈금에서는 유예 30초 세로선이 왼쪽 끝에 붙는다. 이름표가 화면 밖으로 잘리지 않게 중심을 이만큼 안쪽에 둔다.
+const GRACE_TAG_HALF = { desktop: 110, mobile: 130 } as const;
 const STOP_SECONDS = 189.7;
 
 const DESKTOP: Layout = {
   x0: 360,
   x1: 1780,
   barH: 70,
-  start: { barY: 190, maxSeconds: 150, title: { x: 120, y: 200 }, markerTagY: [296, 296], resultY: 380 },
+  start: { barY: 190, maxSeconds: 700, title: { x: 120, y: 200 }, markerTagY: [296, 296], resultY: 380 },
   stop: { barY: 640, maxSeconds: 700, title: { x: 120, y: 650 }, markerTagY: [746, 816], resultY: 910 },
   text: { tag: TEXT.small, title: TEXT.label, tick: TEXT.small },
 };
@@ -57,7 +59,7 @@ const MOBILE: Layout = {
   x0: 60,
   x1: 1000,
   barH: 80,
-  start: { barY: 230, maxSeconds: 150, title: { x: 60, y: 40 }, markerTagY: [340, 340], resultY: 440 },
+  start: { barY: 230, maxSeconds: 700, title: { x: 60, y: 40 }, markerTagY: [340, 340], resultY: 440 },
   stop: { barY: 860, maxSeconds: 700, title: { x: 60, y: 670 }, markerTagY: [970, 1050], resultY: 1160 },
   text: { tag: MOBILE_TEXT.small, title: MOBILE_TEXT.label, tick: MOBILE_TEXT.small },
 };
@@ -148,7 +150,7 @@ export const StartStopTimeBudgets: React.FC<Props> = ({ layout = "desktop" }) =>
       {track(s)}
       {bar(s, startShown, COLOR.ink)}
       <Marker x={xAt(s, graceSeconds)} y={s.barY} h={l.barH} color={graceColor} opacity={progress(frame, T.graceShort, 10)} />
-      <Tag x={xAt(s, graceSeconds)} y={s.markerTagY[0]} anchor="center" tone={graceMoved ? "accent" : "danger"} size={l.text.tag} opacity={progress(frame, T.graceShort, 10)}>
+      <Tag x={Math.max(xAt(s, graceSeconds), l.x0 + GRACE_TAG_HALF[layout])} y={s.markerTagY[0]} anchor="center" tone={graceMoved ? "accent" : "danger"} size={l.text.tag} opacity={progress(frame, T.graceShort, 10)}>
         {graceMoved ? "유예 120초" : "유예 30초"}
       </Tag>
       <Tag x={l.x0} y={s.resultY} tone="ink" size={l.text.tag} opacity={progress(frame, T.startBar[0] + T.startBar[1], 8)}>

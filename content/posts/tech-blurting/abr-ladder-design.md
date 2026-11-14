@@ -1,7 +1,7 @@
 ---
 title: "ABR 사다리는 해상도별 화질 곡선의 윗선에서 고릅니다"
 date: 2026-06-22T01:55:58+09:00
-lastmod: "2026-11-13T17:07:29+09:00"
+lastmod: "2026-11-15T04:04:44+09:00"
 description: "ABR 사다리는 같은 영상을 여러 해상도와 비트레이트로 준비한 목록입니다. 애플 HLS 저작 규격의 H.264 9단계 · HEVC 12단계 예시, bpp의 한계, 4:2:0 때문에 짝수인 해상도, Netflix 2015 per-title과 2018 shot-based 최적화를 원문으로 확인하고, Sintel 예고편 10초를 4개 해상도 × 7개 비트레이트로 인코딩해 VMAF 곡선의 윗선이 540p → 720p → 1080p로 넘어가는 지점을 직접 쟀습니다. 단계 비용은 픽셀률 합으로 계산했습니다."
 categories: ["tech-blurting"]
 tags: ["ABR", "HLS", "VMAF", "per-title", "FFmpeg", "x264"]
@@ -58,7 +58,7 @@ ffmpeg -i input.mp4 -vf scale=-2:480 -c:v libx264 out480.mp4
 
 Sintel 예고편 10초를 360p · 540p · 720p · 1080p로 줄이고 300kbps부터 6,000kbps까지 7개 비트레이트로 인코딩했습니다. 각 결과를 1080p로 다시 확대해 원본과 VMAF를 쟀습니다. 비트레이트를 왼쪽에서 오른쪽으로 쓸면서, 그 비트레이트에서 가장 높은 곡선을 강조색으로 이어 봤습니다.
 
-{{< motion scene="ConvexHullClimb" id="fig-convex-hull-climb" kind="실측" caption="Sintel 예고편 10초를 4개 해상도 × 7개 비트레이트로 인코딩해 1080p로 확대한 뒤 잰 VMAF. 비트레이트(로그 눈금)를 올려 가며 각 지점에서 가장 높은 곡선을 강조색으로 잇습니다. 윗선의 주인은 540p에서 720p(약 700kbps), 1080p(약 1,200kbps)로 넘어가고 360p는 이 범위에서 한 번도 올라서지 않습니다. 점 사이는 직선으로 이은 것입니다." >}}
+{{< motion scene="ConvexHullClimb" id="fig-convex-hull-climb" kind="재구성" caption="Sintel 예고편 10초를 4개 해상도 × 7개 비트레이트로 인코딩해 1080p로 확대한 뒤 잰 VMAF. 비트레이트(로그 눈금)를 올려 가며 각 지점에서 가장 높은 곡선을 강조색으로 잇습니다. 윗선의 주인은 540p에서 720p(약 700kbps), 1080p(약 1,300kbps)로 넘어가고 360p는 이 범위에서 한 번도 올라서지 않습니다. 점 사이는 직선으로 이은 것입니다." >}}
 
 격자 점에서 가장 높은 해상도만 모으면 다음과 같습니다.
 
@@ -134,7 +134,7 @@ FFmpeg 9.0.2로 실행하자 x264가 출력 파일에 적은 설정이 스트림
 - 입력: [Sintel 예고편](https://durian.blender.org/sharing/) 1080p(© copyright Blender Foundation | durian.blender.org, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)) 20초 지점부터 10초를 FFV1로 풀어 둔 파일(1920×1080, 24fps, 240프레임). 원본이 H.264 약 2.1Mbps로 이미 압축된 영상이고 위아래 검은 띠가 있습니다.
   - `ffmpeg -ss 20 -i sintel_trailer-1080p.mp4 -t 10 -an -c:v ffv1 ref.mkv`
 - 인코딩: `ffmpeg -i ref.mkv -vf scale=<W>:<H>:flags=bicubic -c:v libx264 -preset medium -threads 4 -b:v <B>k -maxrate <B>k -bufsize <2B>k out.mp4` — W:H는 640:360 · 960:540 · 1280:720 · 1920:1080, B는 300 · 600 · 1000 · 1600 · 2500 · 4000 · 6000.
-- VMAF: `ffmpeg -i out.mp4 -i ref.mkv -lavfi "[0:v]scale=1920:1080:flags=bicubic,setpts=N/24/TB[d];[1:v]setpts=N/24/TB[r];[d][r]libvmaf=n_threads=4" -f null -`. 프레임 번호로 맞췄습니다(mkv의 밀리초 타임스탬프로 맞추면 프레임이 어긋났습니다). 표의 목표 kbps와 실제 평균은 5% 이내로 달랐고, 영상의 가로 위치는 실제 평균을 썼습니다. 교차점(약 700 · 1,200kbps)은 격자 두 점 사이를 비트레이트 기준 직선으로 보간한 값입니다.
+- VMAF: `ffmpeg -i out.mp4 -i ref.mkv -lavfi "[0:v]scale=1920:1080:flags=bicubic,setpts=N/24/TB[d];[1:v]setpts=N/24/TB[r];[d][r]libvmaf=n_threads=4" -f null -`. 프레임 번호로 맞췄습니다(mkv의 밀리초 타임스탬프로 맞추면 프레임이 어긋났습니다). 표의 목표 kbps와 실제 평균은 5% 이내로 달랐고, 영상의 가로 위치는 실제 평균을 썼습니다. 교차점(약 700 · 1,300kbps)은 영상과 같이 실제 평균 kbps를 로그 눈금에 놓고 격자 두 점 사이를 직선으로 이어 구한 값입니다(708 · 1,270kbps). 목표 kbps로 직선 보간하면 약 700 · 1,220kbps입니다.
 - 짝수 해상도와 SPS 크롭: `ffmpeg -f lavfi -i testsrc2=size=1280x720:rate=30 -t 1 -vf scale=853:480 -c:v libx264 odd.mp4`(오류), `ffmpeg -i out1080.mp4 -c copy -bsf:v trace_headers -frames:v 1 -f null -`.
 
 ## 출처

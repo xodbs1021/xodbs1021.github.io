@@ -1,6 +1,7 @@
 ---
 title: "FFmpeg dash 먹서는 HLS 목록도 같은 조각으로 씁니다"
 date: 2026-11-13T03:16:18+09:00
+lastmod: "2026-11-15T03:32:00+09:00"
 description: "HLS와 DASH를 함께 내려고 ffmpeg에 출력 두 개를 주면 인코더도 두 개가 돌아 CPU 시간과 저장량이 두 배가 됩니다. dash 먹서에 -hls_playlist 1을 주면 인코딩 한 번으로 만든 fMP4 조각 한 벌을 MPD와 m3u8이 함께 가리켰습니다. hls 먹서의 hls_time 기본 2초, 태그만 붙이는 independent_segments, 프로토콜 7에서 사라진 ALLOW-CACHE, event 목록과 ENDLIST, var_stream_map 사다리, LL-HLS 파트를 만들지 않는 점까지 FFmpeg 9.0.2 소스와 로컬 실측으로 확인했습니다."
 categories: ["tech-blurting"]
 tags: ["FFmpeg", "HLS", "DASH", "fMP4", "먹서"]
@@ -100,7 +101,7 @@ flowchart TB
 
 두 방식의 차이를 시간 순서로 보면, 위쪽은 인코더 둘이 조각을 두 벌 쌓고 아래쪽은 인코더 하나가 쌓은 한 벌을 두 목록이 나눠 가리킵니다.
 
-{{< motion scene="SharedSegments" id="fig-shared-segments" kind="실측" caption="HLS와 DASH를 함께 낼 때 두 방식. 출력을 둘로 두면 x264 인코더 둘이 조각을 두 벌(15.1MB) 만들고, dash 먹서에 -hls_playlist 1을 주면 인코더 하나가 만든 조각 한 벌(7.56MB)을 MPD와 m3u8이 함께 가리킵니다. 조각 수와 바이트는 이 글의 FFmpeg 9.0.2 실측입니다." >}}
+{{< motion scene="SharedSegments" id="fig-shared-segments" kind="재구성" caption="HLS와 DASH를 함께 낼 때 두 방식. 출력을 둘로 두면 x264 인코더 둘이 조각을 두 벌(15.1MB) 만들고, dash 먹서에 -hls_playlist 1을 주면 인코더 하나가 만든 조각 한 벌(7.56MB)을 MPD와 m3u8이 함께 가리킵니다. 조각 수와 바이트는 이 글의 FFmpeg 9.0.2 실측입니다." >}}
 
 이 방식의 HLS 목록에는 dash 먹서의 성질이 따라옵니다. 조각은 fMP4라 HLS 판 6 이상을 지원하는 재생기가 필요하고, 미디어 목록에 조각마다 `EXT-X-PROGRAM-DATE-TIME`이 붙었습니다. dash 먹서에는 hls 먹서의 `independent_segments` · `hls_playlist_type` 같은 HLS 쪽 옵션이 없습니다.
 

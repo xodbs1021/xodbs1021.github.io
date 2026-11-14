@@ -1,7 +1,7 @@
 ---
 title: "CMAF는 HLS와 DASH가 같은 조각 파일을 쓰게 합니다"
 date: 2026-06-22T11:15:31+09:00
-lastmod: "2026-11-12T22:56:00+09:00"
+lastmod: "2026-11-15T03:32:00+09:00"
 description: "HLS와 DASH는 매니페스트가 다르지만 fMP4 미디어는 맞출 수 있습니다. CMAF(ISO/IEC 23000-19, 3판 2024)는 그 조각 · 청크 형식을 정합니다. FFmpeg 9.0.2의 CMAF 플래그(+cmaf)로 만든 2초 fMP4 조각을 Bento4로 풀어 init과 moof+mdat 청크 4개, tfdt 간격, 브랜드를 확인했고, 공유로 줄어드는 것은 인코딩이 아니라 포장과 저장이라는 점, tfdt가 어긋나면 오류 없이 구간이 사라지는 사례, 청크와 LL-HLS 파트 · LL-DASH의 관계, 한 파일로 여러 DRM을 쓰려면 cbcs로 맞춰야 하는 조건을 규격 문서로 정리했습니다."
 categories: ["tech-blurting"]
 tags: ["CMAF", "fMP4", "HLS", "DASH", "CENC", "cbcs"]
@@ -47,7 +47,7 @@ RFC 8216 3.3절은 fMP4 초기화 파일이 `iso6` 이상과 호환되는 브랜
 
 FFmpeg 9.0.2의 DASH 묶개에 CMAF 호환 플래그(`movflags=+cmaf`)를 주고 1280×720 30fps H.264를 2초 조각 · 0.5초 청크로 만들었습니다. [[fig-cmaf-init-tree]]는 만들어진 `init.mp4`(815바이트)를 Bento4 `mp4dump`로 푼 상자 구조입니다.
 
-```mermaid {#fig-cmaf-init-tree kind="실측" caption="FFmpeg 9.0.2가 만든 CMAF init.mp4의 상자 구조. ftyp의 호환 브랜드에 cmfc가 들어 있고, moov는 트랙 하나(영상, timescale 15360)의 설정과 avcC(SPS · PPS)를 담으며, 마지막에 mvex가 조각이 뒤따름을 알립니다. udta 등 일부 상자는 생략했습니다. 아래 「측정 조건」의 명령으로 만든 파일을 mp4dump로 풀었습니다." source="로컬 실측(2026-11-12), 아래 「측정 조건」"}
+```mermaid {#fig-cmaf-init-tree kind="재구성" caption="FFmpeg 9.0.2가 만든 CMAF init.mp4의 상자 구조. ftyp의 호환 브랜드에 cmfc가 들어 있고, moov는 트랙 하나(영상, timescale 15360)의 설정과 avcC(SPS · PPS)를 담으며, 마지막에 mvex가 조각이 뒤따름을 알립니다. udta 등 일부 상자는 생략했습니다. 아래 「측정 조건」의 명령으로 만든 파일을 mp4dump로 풀었습니다." source="로컬 실측(2026-11-12), 아래 「측정 조건」"}
 flowchart TB
   accTitle: CMAF init.mp4 상자 구조
   accDescr: init.mp4는 ftyp과 moov로 이뤄진다. ftyp의 주 브랜드는 iso5이고 호환 브랜드에 cmfc가 있다. moov 안에 mvhd, 영상 trak, mvex가 있고, trak 안 mdhd의 timescale은 15360, 표본 설명 avc1 안에 avcC가 있다.
@@ -97,7 +97,7 @@ MP4의 시각은 트랙마다 정한 단위(timescale)로 셉니다. 이번 파�
 
 `moof`+`mdat` 한 쌍은 혼자 해석할 수 있는 단위입니다. CMAF는 이것을 청크(chunk)라 부르고, 조각 하나를 여러 청크로 나눌 수 있습니다. 아래 영상에서 0.5초마다 청크가 하나씩 쌓이는 동안, 옆 목록에 파트 줄이 붙고 2초가 차면 조각 줄(`EXTINF`)이 붙는 순서를 보십시오.
 
-{{< motion scene="ChunkedSegment" id="fig-chunked-segment" kind="개념도" caption="2초 CMAF 조각 하나에 0.5초짜리 moof+mdat 청크가 하나씩 쌓입니다. 청크가 완성될 때마다 LL-HLS 목록에 그 청크를 가리키는 EXT-X-PART 줄이 붙고, 네 번째 청크로 조각이 끝나면 EXTINF 줄이 붙습니다. 청크 수와 길이는 이 글의 FFmpeg 실측 파일과 같고, 목록 줄은 설명용입니다." >}}
+{{< motion scene="ChunkedSegment" id="fig-chunked-segment" kind="재구성" caption="2초 CMAF 조각 하나에 0.5초짜리 moof+mdat 청크가 하나씩 쌓입니다. 청크가 완성될 때마다 LL-HLS 목록에 그 청크를 가리키는 EXT-X-PART 줄이 붙고, 네 번째 청크로 조각이 끝나면 EXTINF 줄이 붙습니다. 청크 수와 길이는 이 글의 FFmpeg 실측 파일과 같고, 목록 줄은 설명용입니다." >}}
 
 두 저지연 방식은 청크를 다르게 씁니다.
 

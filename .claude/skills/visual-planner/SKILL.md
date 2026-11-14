@@ -66,7 +66,7 @@ description: "블로그 글의 설명마다 맞는 시각 형식(영상·단계�
 
 렌더러(`src/lib/posts.mjs`, `src/lib/visuals.mjs`)가 지원하는 것만 쓴다. MDX는 지원하지 않는다. 그림은 글 안 순서대로 "그림 N."으로 번호가 붙는다.
 
-- **`kind`**(필수): `실측` · `문헌값` · `설명용 가정` · `개념도` · `재구성` · `스크린샷` 중 하나. 새 글에서 `kind`·`caption`이 빠지면 `npm test`(`tests/visuals.test.mjs`)가 실패한다.
+- **`kind`**(필수): `실측` · `문헌값` · `설명용 가정` · `개념도` · `재구성` · `스크린샷` 중 하나. `재구성`은 실측 수치를 비례 · 순서대로 다시 그린 영상 · 도식, `개념도`는 수치가 없거나 수치가 이름표로만 붙은 구조도다. 새 글에서 `kind`·`caption`이 빠지면 `npm test`(`tests/visuals.test.mjs`)가 실패한다.
 - **Mermaid**: 펜스 속성으로 id·성격·캡션·출처를 적는다. `accTitle`/`accDescr`는 **다이어그램 선언 줄 다음**에 둔다 — 선언(`flowchart TB` 등)보다 앞에 두면 mermaid 12가 종류를 찾지 못해 렌더가 실패한다(`npm run render:diagrams`가 파일과 함께 알려 준다).
 
   ````markdown
@@ -81,7 +81,7 @@ description: "블로그 글의 설명마다 맞는 시각 형식(영상·단계�
   도식을 추가·수정하면 `npm run render:diagrams`를 실행하고 `data/diagrams/`와 `data/diagram-manifest.json`을 커밋한다(빌드는 렌더 결과만 읽고, 없으면 실패한다). 노드 글자는 15px이고 휴대폰 칸에서 12px까지 줄어들 수 있으므로 새 도식은 세로(TB) 기준 폭 약 440px 이하로 설계한다. 넓은 `LR` 도식은 휴대폰용 TB 판이 자동으로 생긴다. 시퀀스도는 TB 판이 없으니 참가자 수를 줄인다.
 - **그래프**: `{{< chart caption="…" kind="…" source="…" id="fig-…" height="360px" >}}` 안에 JSON ECharts option. 기본으로 인터랙션이다 — 화면에 들어오면 브라우저가 ECharts로 바꿔 툴팁 · 범례 클릭이 되고, 빌드 때 만든 정지 SVG는 JavaScript가 없을 때와 첫 화면용 대체다. 한 차트만 끄려면 `interactive="false"`. 전후 감소·비율 비교는 선형 눈금, 값 범위가 몇 자릿수라 선형으로 읽을 수 없을 때만 로그 눈금(축 이름·캡션에 「로그 눈금」, 정확한 값 표). 세부 규칙은 [echarts-curator](../echarts-curator/SKILL.md).
 - **이미지**: 문단에 이미지 하나만 있을 때 `![대체 텍스트](/images/x.png){kind="스크린샷" caption="…" source="https://…"}`. 속성이 없는 이미지는 번호 없이 렌더된다.
-- **영상**: `{{< motion scene="<Remotion 장면 id>" kind="개념도" caption="…" >}}` 또는 저장소 밖에서 만든 영상은 `{{< motion name="<static/videos 파일 이름>" alt="…" kind="…" caption="…" >}}`. 12초 이하는 화면에 들어올 때만 소리 없이 반복 재생하고 일시정지 버튼이 붙는다(움직임 줄이기 설정이면 포스터와 재생 버튼). 12초를 넘으면 컨트롤로 독자가 재생한다. 세부 규칙은 [motion-explainer](../motion-explainer/SKILL.md).
+- **영상**: `{{< motion scene="<Remotion 장면 id>" kind="재구성|개념도" caption="…" >}}` 또는 저장소 밖에서 만든 영상은 `{{< motion name="<static/videos 파일 이름>" alt="…" kind="…" caption="…" >}}`. 12초 이하는 화면에 들어올 때만 소리 없이 반복 재생하고 일시정지 버튼이 붙는다(움직임 줄이기 설정이면 포스터와 재생 버튼). 12초를 넘으면 컨트롤로 독자가 재생한다. 세부 규칙은 [motion-explainer](../motion-explainer/SKILL.md).
 - **본문 참조**: `[[fig-scheduler]]` → "그림 3" 링크. 없는 id는 빌드 경고다.
 
 ## 결과

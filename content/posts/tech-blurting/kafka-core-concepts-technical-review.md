@@ -1,7 +1,7 @@
 ---
 title: "Kafka는 파티션 로그를 페이지 캐시에서 바로 내보냅니다"
 date: 2026-05-18T10:00:00+09:00
-lastmod: "2026-11-13T18:09:41+09:00"
+lastmod: "2026-11-15T03:41:49+09:00"
 description: "Kafka는 토픽을 파티션마다 끝에 덧붙이는 로그로 저장하고, 따라잡은 소비자에게는 운영체제 페이지 캐시에서 sendfile로 바로 보냅니다. 쓰기가 확정되는 조건(acks · ISR · min.insync.replicas), 묶어 보내기(linger.ms 5 · batch.size 16KB), 컨슈머 그룹과 4.2에서 정식이 된 공유 그룹, 4.0에서 ZooKeeper를 없앤 KRaft를 Apache Kafka 4.4 문서와 브로커 3대 실측으로 정리했습니다."
 categories: ["tech-blurting"]
 tags: ["Kafka", "KRaft", "복제", "ISR", "페이지 캐시", "컨슈머 그룹"]
@@ -48,9 +48,9 @@ ISR(in-sync replicas)은 리더를 따라잡고 있는 복제본 목록입니다
 
 복제 3, `min.insync.replicas=2`인 파티션에서 팔로워 둘을 멈추자 약 7초 안에 ISR이 리더 하나로 줄었습니다. 이때 `acks=all` 100건은 모두 `NotEnoughReplicasException`으로 거절됐고, `acks=1` 100건은 모두 성공 응답을 받았습니다. 성공한 100건도 확정 위치는 0에 머물러 소비자에게는 보이지 않았습니다.
 
-아래 영상은 리더 장애까지 이어 간 시험의 순서입니다. 왼쪽 `acks=1`에서 청록 칸 100건이 확인 응답을 받은 뒤 사라지는 것을 보십시오.
+아래 영상은 리더 장애까지 이어 간 시험의 순서입니다. 이 시험은 팔로워 둘을 멈춘 지 0.35초 만에 `acks=all` 100건을 썼습니다. ISR이 아직 셋이어서 리더는 쓰기를 거절하지 않고 받아 둔 채 복제를 기다렸고, 제한 시간(`delivery.timeout.ms` 8초)을 넘겨 100건 모두 시간 초과가 났습니다. 앞 시험은 ISR이 리더 하나로 줄어든 뒤(멈춘 지 약 35초 뒤)에 써서 리더가 바로 `NotEnoughReplicasException`으로 거절한 것입니다. 왼쪽 `acks=1`에서 청록 칸 100건이 확인 응답을 받은 뒤 사라지는 것을 보십시오.
 
-{{< motion scene="AcksIsrCommit" id="fig-acks-isr-commit" kind="재구성" caption="복제 3, min.insync.replicas=2 파티션에 1,000건이 확정된 뒤 팔로워 둘(B2 · B3)을 멈추고 100건을 썼습니다. acks=1은 리더 B1에만 쓰고 100건 모두 확인 응답을 받았지만, B1이 죽고 B2가 새 리더가 되자 그 100건은 남지 않았습니다. acks=all은 100건 모두 시간 초과로 확인 응답이 없었고, 새 리더 B3에도 확정된 1,000건이 그대로 남았습니다. Kafka 4.4.0 실측 순서를 다시 그린 그림입니다." >}}
+{{< motion scene="AcksIsrCommit" id="fig-acks-isr-commit" kind="재구성" caption="복제 3, min.insync.replicas=2 파티션에 1,000건이 확정된 뒤 팔로워 둘(B2 · B3)을 멈추고 100건을 썼습니다. acks=1은 리더 B1에만 쓰고 100건 모두 확인 응답을 받았지만, B1이 죽고 B2가 새 리더가 되자 그 100건은 남지 않았습니다. acks=all은 팔로워를 멈춘 직후 써서 100건 모두 시간 초과로 확인 응답이 없었고, 새 리더 B3에도 확정된 1,000건이 그대로 남았습니다. Kafka 4.4.0 실측 순서를 다시 그린 그림입니다." >}}
 
 `acks=1`에서 리더가 죽은 뒤 새 리더가 된 브로커 2의 끝 오프셋은 1,000이었고, 옛 리더를 다시 띄운 뒤 처음부터 읽은 레코드도 1,000건이었습니다. 옛 리더는 팔로워로 다시 합류하면서 새 리더의 로그를 따릅니다. `acks=all` 쪽은 팔로워가 멈춘 동안 세션을 잃어 ISR에서 빠졌지만, 리더가 죽자 컨트롤러가 ELR(Eligible Leader Replicas)에 남아 있던 브로커 3을 새 리더로 골랐습니다. ELR은 ISR 밖이지만 확정된 기록을 모두 가져 리더가 되어도 안전한 복제본 목록이고, 4.0에 들어와 4.1부터 새 클러스터에서 기본으로 켜집니다([ELR 문서](https://kafka.apache.org/44/operations/eligible-leader-replicas/), [4.1 업그레이드 노트](https://kafka.apache.org/44/getting-started/upgrade/)).
 

@@ -1,7 +1,7 @@
 ---
 title: "MediaMTX는 LL-HLS 조각 6개 설정으로도 기동했습니다"
 date: "2026-10-15T11:40:52+09:00"
-lastmod: "2026-11-14T00:17:06+09:00"
+lastmod: "2026-11-15T03:32:00+09:00"
 draft: false
 author: "김태윤"
 description: "MediaMTX v1.20.1은 LL-HLS 조각 수 6을 받아 기동한 뒤, 송출이 들어오면 gohlslib 먹서가 7개 하한으로 실패하고 10초마다 같은 실패를 되풀이했습니다. 같은 하한을 Conf.Validate에 넣은 PR #6154(v1.21.0)와, v1.20.1 · v1.21.0 · v1.21.3을 빌드해 45초 송출 중 실패 5번이 기동 거부(종료 코드 1)로 바뀐 것과 경계 여덟 가지 · 환경변수 · API 경로를 확인한 AI 재측정."
@@ -30,7 +30,7 @@ MediaMTX는 먹서가 실패하면 `muxer instance crashed`를 남기고 10초 �
 
 [[fig-segment-count-gate]]의 위 줄이 v1.20.1, 아래 줄이 v1.21.0입니다. 위 줄은 기동한 뒤 실패를 10초마다 쌓고, 아래 줄은 송출을 받기 전에 끝납니다.
 
-{{< motion scene="SegmentCountGate" id="fig-segment-count-gate" kind="개념도" caption="조각 6개 LL-HLS 설정을 v1.20.1은 받아 기동한 뒤 송출 45초 동안 먹서 실패를 10초 간격으로 5번 남기고, v1.21.0은 기동 단계에서 거부해 종료 코드 1로 끝납니다. 실패 시각은 아래 재측정 값으로, 송출 시작 뒤 약 0.1초부터 10초 간격입니다(세 번 0.04–0.11초, 간격 10.000–10.004초)." >}}
+{{< motion scene="SegmentCountGate" id="fig-segment-count-gate" kind="재구성" caption="조각 6개 LL-HLS 설정을 v1.20.1은 받아 기동한 뒤 송출 45초 동안 먹서 실패를 10초 간격으로 5번 남기고, v1.21.0은 기동 단계에서 거부해 종료 코드 1로 끝납니다. 실패 시각은 아래 재측정 값으로, 송출 시작 뒤 약 0.1초부터 10초 간격입니다(세 번 0.04–0.11초, 간격 10.000–10.004초)." >}}
 
 #6154는 재시도 간격을 바꾸지 않고, 설정을 받아들이는 곳에 같은 하한을 넣었습니다. `Conf.Validate()`의 HLS 검사에 LL-HLS는 7 이상, 그 밖의 방식은 3 이상을 요구하는 분기를 더했습니다([`acb78cf5`의 `conf.go` 948–965행](https://github.com/bluenviron/mediamtx/blob/acb78cf594fce0f4c768398fdb04c17bb80a841d/internal/conf/conf.go#L948-L965)). gohlslib 쪽 검사는 그대로 남아 있습니다. 같은 하한을 설정 단계에서 한 번, 먹서를 만들 때 한 번 검사하는 구조입니다.
 

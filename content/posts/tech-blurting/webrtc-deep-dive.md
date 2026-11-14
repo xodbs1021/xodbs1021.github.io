@@ -1,7 +1,7 @@
 ---
 title: "WebRTC는 NAT 뒤 두 브라우저를 ICE 후보로 잇습니다"
 date: 2026-06-20T10:04:12+09:00
-lastmod: "2026-11-12T15:32:05+09:00"
+lastmod: "2026-11-15T04:06:44+09:00"
 description: "공유기(NAT) 뒤의 두 브라우저는 서로의 주소를 모릅니다. WebRTC는 W3C API(2021년 1월 Recommendation)와 IETF 프로토콜 묶음(RFC 8825 등)으로, ICE가 host·srflx·relay 후보를 모아 연결되는 쌍을 고르게 했습니다. STUN과 TURN의 역할, SDP 제안·응답, 메시와 SFU의 연결 수, Simulcast와 SVC, 대규모 시청에서 CDN 캐시를 못 쓰는 비용을 RFC와 W3C 문서로 확인했습니다."
 categories: ["tech-blurting"]
 tags: ["WebRTC", "ICE", "STUN", "TURN", "SDP", "SFU"]
@@ -104,7 +104,7 @@ RFC 7667은 여러 사람이 RTP로 통화하는 구성을 이름 붙여 정리�
 
 메시는 사람이 늘수록 연결이 빠르게 늘어납니다. [[fig-mesh-sfu]]에서 두 선이 벌어지는 정도를 보십시오.
 
-{{< chart id="fig-mesh-sfu" kind="설명용 가정" caption="참가자 N명일 때 필요한 연결 수. 메시는 모든 쌍을 이어 N(N−1)/2개, SFU는 참가자마다 서버와 하나씩 N개입니다. 측정값이 아니라 공식으로 계산한 값입니다." source="RFC 7667 3.4절(메시)·3.7절(SFM)의 구성에서 계산" height="340px" >}}
+{{< chart id="fig-mesh-sfu" kind="문헌값" caption="참가자 N명일 때 필요한 연결 수. 메시는 모든 쌍을 이어 N(N−1)/2개, SFU는 참가자마다 서버와 하나씩 N개입니다. 측정값이 아니라 공식으로 계산한 값입니다." source="RFC 7667 3.4절(메시)·3.7절(SFM)의 구성에서 계산" height="340px" >}}
 {
   "grid": {"left": 8, "right": 32, "top": 40, "bottom": 8, "containLabel": true},
   "legend": {"top": 0, "data": ["메시 N(N−1)/2", "SFU N"]},

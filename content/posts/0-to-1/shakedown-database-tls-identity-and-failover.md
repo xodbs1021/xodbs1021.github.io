@@ -1,7 +1,7 @@
 ---
 title: "TLS 연결 성공과 잘못된 호스트 거부를 짝으로 시험했습니다"
 date: "2026-10-15T11:36:25+09:00"
-lastmod: "2026-11-12T05:30:00+09:00"
+lastmod: "2026-11-15T03:32:00+09:00"
 author: "김태윤"
 categories: ["0-to-1"]
 draft: false
@@ -80,7 +80,7 @@ replica set이 준비됐다는 것과 primary가 사라진 뒤 앱이 다시 쓸
 
 두 번째 장애는 primary의 MongoDB 컨테이너에 SIGKILL을 보낸 것입니다. 죽인 프로세스를 Docker가 곧바로 다시 띄우지 않게, 그 컨테이너의 재시작 정책을 잠시 끈 뒤 보냈습니다(같은 스크립트 31행). 영상에서 시간축의 빨간 표식 두 개가 실패한 요청이고, 청록 표식이 새 primary에서 처음 성공한 쓰기입니다.
 
-{{< motion scene="PrimaryKillFailover" id="fig-primary-kill-failover" kind="개념도" caption="primary 멤버의 MongoDB 컨테이너를 재시작을 끈 채 SIGKILL로 종료한 시험. 장애 요청 시점부터 1.89초와 7.15초의 HTTP 요청이 실패했고, 12.24초에 새 primary에서 쓰기가 성공했습니다. 시간은 제어 API · SSM 지연을 포함한 값이며 선출 시각은 따로 재지 않았습니다. 2026년 10월 10일 실험 기록을 옮긴 설명용 그림입니다." >}}
+{{< motion scene="PrimaryKillFailover" id="fig-primary-kill-failover" kind="재구성" caption="primary 멤버의 MongoDB 컨테이너를 재시작을 끈 채 SIGKILL로 종료한 시험. 장애 요청 시점부터 1.89초와 7.15초의 HTTP 요청이 실패했고, 12.24초에 새 primary에서 쓰기가 성공했습니다. 시간은 제어 API · SSM 지연을 포함한 값이며 선출 시각은 따로 재지 않았습니다. 2026년 10월 10일 실험 기록의 시각을 옮긴 그림입니다." >}}
 
 | 주입한 장애 | 새 primary 쓰기 확인 | 함께 남긴 관측 |
 |---|---:|---|
