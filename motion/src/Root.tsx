@@ -95,6 +95,7 @@ import { EXIT_CODE_DISCARDED_FRAMES, ExitCodeDiscarded } from "./scenes/mediamtx
 import { OFFLINE_RECORDING_GATE_FRAMES, OfflineRecordingGate } from "./scenes/mediamtx-offline-recording-source-lifecycle/OfflineRecordingGate";
 import { SHARED_DEFAULT_ALIAS_FRAMES, SharedDefaultAlias } from "./scenes/mediamtx-auth-defaults-normalization-and-clone/SharedDefaultAlias";
 import { LEDGER_SCAN_STOP_FRAMES, LedgerScanStop } from "./scenes/pokeclip-chat-ledger-query-plans/LedgerScanStop";
+import { SEEK_LOOP_TRUNCATION_FRAMES, SeekLoopTruncation } from "./scenes/pokeclip-editor-seek-loop/SeekLoopTruncation";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
@@ -1042,6 +1043,16 @@ export const RemotionRoot: React.FC = () => (
       component={LedgerScanStop}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={LEDGER_SCAN_STOP_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="SeekLoopTruncation" component={SeekLoopTruncation} durationInFrames={SEEK_LOOP_TRUNCATION_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="SeekLoopTruncationMobile"
+      component={SeekLoopTruncation}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={SEEK_LOOP_TRUNCATION_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}
