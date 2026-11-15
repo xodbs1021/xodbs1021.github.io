@@ -1,0 +1,71 @@
+<!doctype html><meta charset="utf-8"><title>seek-loop</title>
+<script>
+// 최소 재현: 멈춘 영상을 구간 시작 start 로 옮기고, timeupdate · seeked 마다 「반복 중이고 위치가 시작 앞이면 시작으로」
+// 판정을 한다(편집기 boundaryAction 과 같은 꼴 — seeked 도 timeupdate 처리기로 받는다). tolerance = 0 이면 엄격 비교,
+// 0.001 이면 1ms 여유. 재생은 누르지 않는다. 정해진 시간 동안 위치 넣기 · seeked 횟수와 상태를 센다.
+async function openBlobVideo(url) {
+  const v = document.createElement('video');
+  v.muted = true;
+  v.preload = 'auto';
+  document.body.append(v);
+  const bytes = await (await fetch(url)).arrayBuffer();
+  v.src = URL.createObjectURL(new Blob([bytes], { type: 'video/mp4' }));
+  await new Promise((r) => v.addEventListener('loadedmetadata', r, { once: true }));
+  return v;
+}
+
+window.runLoop = async (url, { start, tolerance, durationMs, sampleMs }) => {
+  const v = await openBlobVideo(url);
+  let sets = 0;
+  let seekedCount = 0;
+  const seekedAt = [];
+  const readBack = new Set();
+  let stop = false;
+  const boundary = () => {
+    if (stop) return;
+    const now = v.currentTime;
+    readBack.add(now);
+    if (now < start - tolerance) {
+      sets += 1;
+      v.currentTime = start;
+    }
+  };
+  v.addEventListener('timeupdate', boundary);
+  v.addEventListener('seeked', () => {
+    if (stop) return;
+    seekedCount += 1;
+    seekedAt.push(performance.now());
+  });
+  v.addEventListener('seeked', boundary);
+  // 메타데이터 뒤 첫 시크(편집기의 loadedmetadata 처리기와 같은 자리)
+  const t0 = performance.now();
+  sets += 1;
+  v.currentTime = start;
+  const samples = [];
+  while (performance.now() - t0 < durationMs) {
+    await new Promise((r) => setTimeout(r, sampleMs));
+    samples.push({ readyState: v.readyState, seeking: v.seeking });
+  }
+  stop = true;
+  const elapsed = (performance.now() - t0) / 1000;
+  const gaps = seekedAt.slice(1).map((t, i) => t - seekedAt[i]).sort((a, b) => a - b);
+  const median = gaps.length ? gaps[Math.floor(gaps.length / 2)] : null;
+  const result = {
+    start,
+    tolerance,
+    seconds: elapsed,
+    sets,
+    seeked: seekedCount,
+    seekedPerSecond: seekedCount / elapsed,
+    medianSeekedGapMs: median,
+    readBack: [...readBack],
+    endReadyState: v.readyState,
+    endSeeking: v.seeking,
+    samples: samples.length,
+    samplesHaveEnoughData: samples.filter((s) => s.readyState >= 4).length,
+    samplesSeeking: samples.filter((s) => s.seeking).length,
+  };
+  v.remove();
+  return result;
+};
+</script>
