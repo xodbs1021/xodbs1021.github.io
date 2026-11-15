@@ -1,0 +1,30 @@
+### C2 sidecar-role SDK, 10초 간격 16회(150초), real_expires_s=360
+{"step":"load","at":"2026-11-15T22:25:34.001858503Z","ok":true}
+{"step":"retrieve","i":1,"at":"2026-11-15T22:25:34.085216737Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T22:26:33Z","expires_in_s":58}
+{"step":"retrieve","i":2,"at":"2026-11-15T22:25:44.089795289Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T22:26:33Z","expires_in_s":48}
+{"step":"retrieve","i":3,"at":"2026-11-15T22:25:54.099604447Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T22:26:33Z","expires_in_s":38}
+{"step":"retrieve","i":4,"at":"2026-11-15T22:26:04.113780999Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T22:26:33Z","expires_in_s":28}
+{"step":"retrieve","i":5,"at":"2026-11-15T22:26:14.127880592Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T22:26:33Z","expires_in_s":18}
+{"step":"retrieve","i":6,"at":"2026-11-15T22:26:24.14129463Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T22:26:33Z","expires_in_s":8}
+{"step":"retrieve","i":7,"at":"2026-11-15T22:26:34.198659283Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T22:26:33Z","expires_in_s":-1}
+{"step":"retrieve","i":8,"at":"2026-11-15T22:26:44.262535748Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T22:26:33Z","expires_in_s":-11}
+{"step":"retrieve","i":9,"at":"2026-11-15T22:26:54.311072623Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T22:26:33Z","expires_in_s":-21}
+{"step":"retrieve","i":10,"at":"2026-11-15T22:27:04.353654437Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T22:26:33Z","expires_in_s":-31}
+{"step":"retrieve","i":11,"at":"2026-11-15T22:27:14.409975169Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T22:26:33Z","expires_in_s":-41}
+{"step":"retrieve","i":12,"at":"2026-11-15T22:27:24.458323751Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T22:26:33Z","expires_in_s":-51}
+{"step":"retrieve","i":13,"at":"2026-11-15T22:27:34.506449541Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T22:26:33Z","expires_in_s":-61}
+{"step":"retrieve","i":14,"at":"2026-11-15T22:27:44.559119346Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T22:26:33Z","expires_in_s":-71}
+{"step":"retrieve","i":15,"at":"2026-11-15T22:27:54.606517925Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T22:26:33Z","expires_in_s":-81}
+{"step":"retrieve","i":16,"at":"2026-11-15T22:28:04.656154303Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T22:26:33Z","expires_in_s":-91}
+### C2 relay log
+{"time":"2026-11-15T22:25:34.085000111Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":358,"source_expires_in_s":358,"from":"imds","refresh":"initial","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:26:34.198446282Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":298,"source_expires_in_s":298,"from":"imds","refresh":"window","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:26:44.261842121Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":288,"source_expires_in_s":288,"from":"imds","refresh":"window","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:26:54.310707622Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":278,"source_expires_in_s":278,"from":"imds","refresh":"window","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:27:04.353464811Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":268,"source_expires_in_s":268,"from":"imds","refresh":"window","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:27:14.409774169Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":258,"source_expires_in_s":258,"from":"imds","refresh":"window","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:27:24.458139209Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":248,"source_expires_in_s":248,"from":"imds","refresh":"window","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:27:34.506246666Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":238,"source_expires_in_s":238,"from":"imds","refresh":"window","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:27:44.558637969Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":228,"source_expires_in_s":228,"from":"imds","refresh":"window","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:27:54.606271882Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":218,"source_expires_in_s":218,"from":"imds","refresh":"window","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:28:04.655945261Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":208,"source_expires_in_s":208,"from":"imds","refresh":"window","remote":"169.254.0.2"}

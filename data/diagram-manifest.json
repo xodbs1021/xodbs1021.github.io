@@ -71,6 +71,15 @@
       "bytes": 110493
     }
   },
+  "1853355404f6e8c4": {
+    "source": "content/posts/0-to-1/pokeclip-media-imds-credential-relay.md",
+    "wide": {
+      "file": "1853355404f6e8c4-wide.svg",
+      "width": 280,
+      "height": 897,
+      "bytes": 23618
+    }
+  },
   "1b464c057dafa3a0": {
     "source": "content/posts/open-source-analysis/mediamtx-auth-defaults-normalization-and-clone.md",
     "wide": {

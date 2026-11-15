@@ -1,0 +1,26 @@
+### B2 mtx-ip 169.254.0.2
+### C1 sidecar-role SDK, 5초 간격 13회(60초)
+{"step":"load","at":"2026-11-15T22:24:32.242632933Z","ok":true}
+{"step":"retrieve","i":1,"at":"2026-11-15T22:24:32.330892813Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T23:19:32Z","expires_in_s":3299}
+{"step":"retrieve","i":2,"at":"2026-11-15T22:24:37.340072452Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T23:19:32Z","expires_in_s":3294}
+{"step":"retrieve","i":3,"at":"2026-11-15T22:24:42.3493548Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T23:19:32Z","expires_in_s":3289}
+{"step":"retrieve","i":4,"at":"2026-11-15T22:24:47.355943011Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T23:19:32Z","expires_in_s":3284}
+{"step":"retrieve","i":5,"at":"2026-11-15T22:24:52.361271175Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T23:19:32Z","expires_in_s":3279}
+{"step":"retrieve","i":6,"at":"2026-11-15T22:24:57.370379606Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T23:19:32Z","expires_in_s":3274}
+{"step":"retrieve","i":7,"at":"2026-11-15T22:25:02.379432744Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T23:19:32Z","expires_in_s":3269}
+{"step":"retrieve","i":8,"at":"2026-11-15T22:25:07.388631383Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T23:19:32Z","expires_in_s":3264}
+{"step":"retrieve","i":9,"at":"2026-11-15T22:25:12.397801772Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T23:19:32Z","expires_in_s":3259}
+{"step":"retrieve","i":10,"at":"2026-11-15T22:25:17.404720777Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T23:19:32Z","expires_in_s":3254}
+{"step":"retrieve","i":11,"at":"2026-11-15T22:25:22.40950823Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T23:19:32Z","expires_in_s":3249}
+{"step":"retrieve","i":12,"at":"2026-11-15T22:25:27.417903616Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T23:19:32Z","expires_in_s":3244}
+{"step":"retrieve","i":13,"at":"2026-11-15T22:25:32.423160779Z","ok":true,"source":"CredentialsEndpointProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T23:19:32Z","expires_in_s":3239}
+### B2 neighbor-token-file
+ls: /run/secrets/aws-cred/token: No such file or directory
+### B2 neighbor-request
+{"label": "B2-neighbor", "status": 401, "ms": 3.3, "recv": "2026-11-15T22:25:32.736+00:00", "content_type": "application/json", "cache_control": null, "code": "Unauthorized"}
+### B2 relay log
+{"time":"2026-11-15T22:24:31.693307064Z","level":"INFO","msg":"cred_relay_started","addr":"169.254.170.2:8080","callers":"indexer,janitor"}
+{"time":"2026-11-15T22:24:32.330585062Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":3600,"source_expires_in_s":21598,"from":"imds","refresh":"initial","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:25:32.736518839Z","level":"WARN","msg":"cred_denied","reason":"missing","remote":"169.254.0.2","count":1}
+### B2 imds state
+{"expiration": "2026-11-16T04:24:31Z", "expires_s": 21600, "started": "2026-11-15T22:24:31.447982+00:00", "mode": "ok", "counts": {"token": 1, "role_list": 1, "role_creds": 1}}

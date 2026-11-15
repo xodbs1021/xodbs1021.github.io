@@ -1,0 +1,17 @@
+### C3 token-file-with-newline
+{"step":"load","at":"2026-11-15T22:28:05.966323086Z","ok":true}
+{"step":"retrieve","i":1,"at":"2026-11-15T22:28:05.966411961Z","ok":false,"err":"failed to refresh cached credentials, failed to load credentials, resolve auth token: authorization token contains invalid newline sequence"}
+### C4 host-not-allowed 169.254.170.3
+{"step":"load","at":"2026-11-15T22:28:06.160453999Z","ok":false,"err":"invalid endpoint host, \"169.254.170.3\", only loopback/ecs/eks hosts are allowed"}
+### C5 relay-stopped imds-before
+{"expiration": "2026-11-16T04:28:05Z", "expires_s": 21600, "started": "2026-11-15T22:28:05.235508+00:00", "mode": "ok", "counts": {}}
+### C5 relay-stopped SDK with container vars (AWS_EC2_METADATA_DISABLED 없음)
+{"step":"load","at":"2026-11-15T22:28:06.499376544Z","ok":true}
+{"step":"retrieve","i":1,"at":"2026-11-15T22:28:16.431489837Z","ok":false,"err":"failed to refresh cached credentials, failed to load credentials, exceeded maximum number of attempts, 3, request send failed, Get \"http://169.254.170.2:8080/v1/credentials\": dial tcp 169.254.170.2:8080: connect: no route to host"}
+### C5 imds-after
+{"expiration": "2026-11-16T04:28:05Z", "expires_s": 21600, "started": "2026-11-15T22:28:05.235508+00:00", "mode": "ok", "counts": {}}
+### C5 control: no container vars → SDK IMDS provider
+{"step":"load","at":"2026-11-15T22:28:16.73436785Z","ok":true}
+{"step":"retrieve","i":1,"at":"2026-11-15T22:28:16.819513622Z","ok":true,"source":"EC2RoleProvider","key_prefix":"ASIAFAKE","expires":"2026-11-15T23:28:16Z","expires_in_s":3599}
+### C5 imds-after-control
+{"expiration": "2026-11-16T04:28:05Z", "expires_s": 21600, "started": "2026-11-15T22:28:05.235508+00:00", "mode": "ok", "counts": {"token": 1, "role_list": 1, "role_creds": 1}}
