@@ -1,6 +1,6 @@
 ---
 title: "재생 전 검은 미리보기는 µs 아래를 버린 시크 순환이었습니다"
-date: 2026-11-16T07:24:26+09:00
+date: 2026-11-16T08:02:24+09:00
 author: "김태윤"
 categories: ["projects"]
 tags: ["PokeClip", "HTMLMediaElement", "Chrome", "currentTime", "시크"]
