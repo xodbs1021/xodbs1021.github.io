@@ -1,0 +1,59 @@
+<!doctype html><meta charset="utf-8"><title>seek-snap</title>
+<script>
+// 멈춘 영상에 µs(100만분의 1초) 아래 자릿수가 있는 시각을 넣고, 넣은 직후(during)와 seeked 뒤(after)의
+// currentTime 을 읽는다. 원 실험 페이지(snap.html)의 일곱 값과 같은 값을 넣고, 90kHz 틱 값 · ms 값 훑기를 더했다.
+// 편집기처럼 영상 파일을 Blob 으로 받아 blob: 주소로 튼다.
+const SNAP_VALUES = [10.44, 10.437, 10.4371234567, 10.4379999999, 3.0000004, 12.345678912345, 7.1234565];
+
+async function openBlobVideo(url) {
+  const v = document.createElement('video');
+  v.muted = true;
+  v.preload = 'auto';
+  document.body.append(v);
+  const bytes = await (await fetch(url)).arrayBuffer();
+  v.src = URL.createObjectURL(new Blob([bytes], { type: 'video/mp4' }));
+  await new Promise((resolve, reject) => {
+    v.addEventListener('loadedmetadata', resolve, { once: true });
+    v.addEventListener('error', () => reject(new Error('video error ' + (v.error && v.error.code))), { once: true });
+  });
+  return v;
+}
+
+/** Chromium 의 double → µs 정수 변환(static_cast 와 같은 0 쪽 버림)을 JS 로 흉내 낸 값 */
+const truncUs = (t) => Math.trunc(t * 1e6) / 1e6;
+
+async function seekAndRead(v, t) {
+  const seeked = new Promise((r) => v.addEventListener('seeked', r, { once: true }));
+  v.currentTime = t;
+  const during = v.currentTime;
+  await seeked;
+  const after = v.currentTime;
+  return { set: t, during, after, smaller: after < t, diff: after - t, truncUs: truncUs(t), afterEqualsTruncUs: after === truncUs(t) };
+}
+
+window.runSnap = async (url) => {
+  const v = await openBlobVideo(url);
+  const out = [];
+  for (const t of SNAP_VALUES) out.push(await seekAndRead(v, t));
+  v.remove();
+  return out;
+};
+
+/** n/90000 초(90kHz 틱 n 개)를 차례로 넣는다 */
+window.runTicks = async (url, fromTick, count) => {
+  const v = await openBlobVideo(url);
+  const out = [];
+  for (let n = fromTick; n < fromTick + count; n += 1) out.push({ tick: n, ...(await seekAndRead(v, n / 90000)) });
+  v.remove();
+  return out;
+};
+
+/** k/1000 초(정수 ms)를 차례로 넣는다 — µs 에 딱 맞는 값으로 쓰이는 꼴 */
+window.runMs = async (url, fromMs, count) => {
+  const v = await openBlobVideo(url);
+  const out = [];
+  for (let k = fromMs; k < fromMs + count; k += 1) out.push({ ms: k, ...(await seekAndRead(v, k / 1000)) });
+  v.remove();
+  return out;
+};
+</script>
