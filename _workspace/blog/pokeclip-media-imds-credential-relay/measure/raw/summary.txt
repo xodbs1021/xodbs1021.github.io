@@ -49,3 +49,11 @@ D4#12,503,1.0ms,real_left_s=58.4
 D4#13,503,2005.4ms,real_left_s=46.4
 D4#14,503,2005.0ms,real_left_s=36.4
 imds_counts={"token": 1, "role_list": 10, "role_creds": 1, "role_creds_fail": 19}
+
+[E] 같은 망 칸 이웃의 엿보기(소켓 열림 · Authorization 머리 · 자격 JSON 이 보인 패킷 수)
+neighbor caps=default rep=1,open=True,err=-,auth=1,creds=1
+neighbor caps=default rep=2,open=True,err=-,auth=1,creds=1
+neighbor caps=default rep=3,open=True,err=-,auth=1,creds=1
+neighbor caps=drop-all rep=1,open=False,err=PermissionError errno=1,auth=-,creds=-
+neighbor caps=drop-all rep=2,open=False,err=PermissionError errno=1,auth=-,creds=-
+neighbor caps=drop-all rep=3,open=False,err=PermissionError errno=1,auth=-,creds=-

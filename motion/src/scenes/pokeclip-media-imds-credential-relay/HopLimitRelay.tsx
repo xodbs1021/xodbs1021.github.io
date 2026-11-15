@@ -169,7 +169,8 @@ export const HopLimitRelay: React.FC<Props> = ({ layout = "desktop" }) => {
       </Tag>
 
       <Node {...L.imds} tone="ink" size={L.text.node}>IMDS</Node>
-      <Node {...L.relay} tone={step >= 1 ? "accent" : "muted"} size={L.text.node}>
+      {/* 창구는 홉 1 로 바꾼 뒤에 생긴다 — 홉 2 장면에서는 보이지 않는다. */}
+      <Node {...L.relay} tone="accent" size={L.text.node} opacity={progress(frame, T.hop1, 15)}>
         대리 창구
       </Node>
       <Node {...L.mtx} tone={step === 0 ? "danger" : "ink"} size={L.text.node}>MediaMTX · nginx</Node>

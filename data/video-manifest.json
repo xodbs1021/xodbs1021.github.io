@@ -1418,8 +1418,8 @@
   "pokeclip-media-imds-credential-relay-hop-limit-relay": {
     "scene": "HopLimitRelay",
     "alt": "세 단계가 차례로 바뀐다. 홉 상한 2에서는 IMDS의 토큰 응답이 docker 브리지 안의 MediaMTX · nginx, 사이드카, janitor 모두에 닿고, 홉 상한 1에서는 브리지로 가는 응답이 경계에서 끊겨 ✕가 뜨는 대신 호스트 망의 대리 창구만 응답을 받으며, 마지막 단계에서는 창구가 토큰 파일이 있는 사이드카와 janitor에게만 자격을 건네고 MediaMTX · nginx의 요청에는 401을 돌려주는 장면",
-    "sha256": "ce6cf0db202581957929f8cb015c631dd53907fdb28ee4e3fe43b25810af5f12",
-    "bytes": 367617,
+    "sha256": "87312d6311c241819197156cba9f89c8883eb52e712eca55bb7344a0ef286fd5",
+    "bytes": 365505,
     "codec": "h264",
     "pixFmt": "yuv420p",
     "width": 1920,
@@ -1429,8 +1429,8 @@
     "faststart": true,
     "poster": "/images/pokeclip-media-imds-credential-relay-hop-limit-relay-poster.jpg",
     "mobile": {
-      "sha256": "e3f59687a9d6d0fe027455bf83edb227791896f69d35b7f39b8bed3ebd879b8f",
-      "bytes": 321467,
+      "sha256": "97f5624380e0142cc8c61eace3e43c5897cb1a896e03def724fe45547d329670",
+      "bytes": 319476,
       "codec": "h264",
       "pixFmt": "yuv420p",
       "width": 1080,

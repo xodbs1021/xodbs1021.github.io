@@ -90,6 +90,13 @@ def main(raw):
         print(f"{r['label']},{r['status']},{r['ms']}ms,real_left_s={left:.1f}")
     print("imds_counts=" + json.dumps(secs["D4 imds state"][0]["counts"]))
 
+    print("\n[E] 같은 망 칸 이웃의 엿보기(소켓 열림 · Authorization 머리 · 자격 JSON 이 보인 패킷 수)")
+    for title, rows in sections(raw / "E-sniff.txt"):
+        opened = next((r for r in rows if "sniff_open" in r), {})
+        seen = next((r for r in rows if "packets" in r), {})
+        print(f"{title[2:]},open={opened.get('sniff_open')},err={opened.get('err', '-')},"
+              f"auth={seen.get('auth_header_packets', '-')},creds={seen.get('creds_json_packets', '-')}")
+
 
 if __name__ == "__main__":
     main(sys.argv[1])

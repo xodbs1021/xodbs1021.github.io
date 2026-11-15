@@ -5,7 +5,7 @@
 1. **비공개 기록(실험 EC2 두 번)** — 계정 · ARN · 인스턴스와 보안 그룹 같은 자원 ID · 버킷 이름 · 실제 IP · 비밀 값 · 창구 운영 포트를 빼고 옮겼다. 원 기록은 공개하지 않는다. 같은 결과의 짧은 요약이 공개 저장소 [PokeClip-mono PR 519](https://github.com/3K-PokeClip/PokeClip-mono/pull/519) 본문 「Test plan」 에도 있다.
 2. **공개 재측정(이 폴더의 `measure/`)** — 가짜 IMDS · 공개 저장소의 실제 `cred-relay`(PR 519 머지 커밋 `ff0ac799` 에서 빌드) · 사이드카와 같은 판의 Go SDK 소비자로 로컬에서 다시 잰 것. 누구나 다시 돌릴 수 있다.
 
-수행 주체: 두 갈래 모두 AI 에이전트(Claude Code · Codex)가 실행했다. 실험 EC2 를 만들고 지우는 AWS 쓰기는 저장소 주인(김태윤)이 단계마다 승인했고, 2차 실험은 그의 지시로 예정(3시간)보다 일찍(약 2시간) 끝냈다.
+수행 주체: 두 갈래 모두 AI 에이전트(Claude Code · Codex)가 실행했다. 실험 EC2 를 만들고 지우는 AWS 쓰기는 저장소 주인(김태윤)이 승인했고(1차는 명령 묶음을 한 번에, 2차는 실행 직전마다), 2차 실험은 그의 지시로 예정(3시간)보다 일찍(약 2시간) 끝냈다.
 
 ---
 
@@ -14,7 +14,7 @@
 ### 1-1. 실험 EC2 1차 — 홉 상한 전제(2026-11-15 19:04–19:15 KST)
 
 - 상자: t4g.small · Amazon Linux 2023 arm64 · docker 25.0.16 · **IAM 역할 없음**(역할 자격이 없어도 IMDS 토큰 PUT 의 도달 여부는 잴 수 있다) · 들어오는 연결 0 · IMDSv2 토큰 필수.
-- 탐침: 약 30초마다 토큰 PUT → 토큰으로 GET → 토큰 없는 GET(IMDSv1) 의 HTTP 코드를 자리마다 기록.
+- 탐침: 회차 사이 30초를 쉬며(회차 간격 약 50–60초) 토큰 PUT → 토큰으로 GET → 토큰 없는 GET(IMDSv1) 의 HTTP 코드를 자리마다 기록.
 - 순서: 홉 2 로 기동 → 홉 1 로 바꿈 → 홉 2 로 되돌림 → 종료 · 삭제(잔여 0).
 
 | 탐침 자리 | 홉 2 | 홉 1 |
@@ -26,7 +26,7 @@
 | docker0 기본 브리지 컨테이너 | 토큰 받음 | **응답 없음** |
 | 모든 자리의 토큰 없는 GET | 401 | 401(홉 상한은 PUT 응답에만 걸린다) |
 
-- 실행 중 바꾼 홉 값은 재부팅 없이 반영됐다. 홉 1 로 바꾼 뒤 17초 뒤 탐침부터 브리지 쪽이 막혔고, 홉 2 로 되돌린 뒤 19초 뒤 탐침부터 다시 닿았다(탐침 간격 약 30–60초라 반영 시각의 상한만 말할 수 있다).
+- 실행 중 바꾼 홉 값은 재부팅 없이 반영됐다. 홉 1 로 바꾼 뒤 17초 뒤 탐침부터 브리지 쪽이 막혔고, 홉 2 로 되돌린 뒤 19초 뒤 탐침부터 다시 닿았다(회차 간격 약 50–60초라 반영 시각의 상한만 말할 수 있다).
 - 같은 실험에서 다른 방식 둘의 동작도 봤다: DOCKER-USER 체인에 특정 브리지 → 169.254.169.254 DROP 규칙을 넣으면 그 브리지(공유 망 칸 포함)만 홉과 무관하게 막혔고, 망 칸 안 OUTPUT 체인의 `-m owner --uid-owner` 규칙은 같은 망 칸에서도 uid 별로 갈랐다.
 
 ### 1-2. 실험 EC2 2차 — 창구 통합(2026-11-16 04:13–06:25 KST)
@@ -65,7 +65,7 @@
 
 ## 2. 공개 재측정(`measure/`)
 
-- 수행: AI(Claude Code), 2026-11-16 07:19–07:32 KST(`raw/env.txt`). 결과 수치는 `python3 -I summarize.py raw`(`raw/summary.txt`)로 원자료에서 다시 뽑는다.
+- 수행: AI(Claude Code). 경우 A–D 는 2026-11-16 07:24–07:32 KST(`raw/env.txt` — 약 8분, 빌드 · 준비는 07:19 부터), 경우 E 는 리뷰 반영 때 같은 날 08:07 KST 에 같은 빌드(sha256 같음)로 따로 돌렸다. 결과 수치는 `python3 -I summarize.py raw`(`raw/summary.txt`)로 원자료에서 다시 뽑는다.
 - 기계: MacBook Air(Apple M5, 32GB), macOS 27.0.1, OrbStack 2.2.5(Docker Engine 29.8.2, Linux VM 커널 7.2.12-orbstack, arm64).
 - 창구: 공개 저장소 3K-PokeClip/PokeClip-mono 머지 커밋 `ff0ac799235635e9e2b0d98d31a0ed0406d7a30e` 의 `media/cmd/cred-relay` 를 `golang:1.27.3-alpine`(go1.27.3)에서 `CGO_ENABLED=0 -trimpath` 로 빌드(sha256 `7221bf1f…f5ba`). 운영 compose 와 같은 제약(uid 10001 · 읽기 전용 루트 · cap 없음 · `no-new-privileges`)으로 띄웠다. 다른 점: 호스트 망이 아니라 `169.254.0.0/16` 사용자 정의 브리지의 `169.254.170.2`, 포트는 운영 값이 아닌 8080.
 - SDK 소비자: `probe/main.go` 를 같은 커밋의 media 모듈 안에 넣어 빌드(aws-sdk-go-v2 v1.43.3 · config v1.32.34 · credentials v1.19.33 — `raw/build.txt`). `config.LoadDefaultConfig` 기본 사슬.
@@ -113,13 +113,24 @@
 | D3 가짜 IMDS 가 3초 늦게 답함, 창구에 자격 없음 | 2,004ms 뒤 503 `CredentialsUnavailable`, `cred_source_failed` |
 | D4 실제 만료 3분, 첫 자격을 받은 뒤 가짜 IMDS 가 500 | 실제 만료까지 66.4초 남은 요청까지 200(마지막 자격, 알린 만료 = 실제 만료), 58.4초 남은 요청부터 503. 원천을 부른 요청은 2.0초 상한까지 기다린 뒤 답함. 첫 실패에서 `cred_source_degraded value=1` |
 
+### E. 같은 망 칸 이웃의 엿보기(각 3회)
+
+사이드카 자리(토큰 마운트, uid 10001)와 같은 망 칸에 이웃(root)을 두고, 사이드카 자리가 창구에 한 번 묻는 동안 이웃이 AF_PACKET 원시 소켓으로 그 망 칸의 패킷을 6초 동안 받았다(`sniff.py` — 값은 남기지 않고 보였는지만 센다).
+
+| 이웃의 권한 | 결과 |
+|---|---|
+| docker 기본 권한(NET_RAW 있음) | 3/3 소켓 열림, `Authorization` 머리와 자격 JSON(`SecretAccessKey`)이 각 1패킷씩 보임 |
+| `--cap-drop ALL` | 3/3 소켓을 열지 못함(`PermissionError`) |
+
+같은 결과를 11월 15일 비공개 로컬 실험(가짜 자격 창구 · 같은 꼴의 탐침)에서도 봤다: 기본 권한 3/3 엿봄, `cap_drop: ALL` 3/3 못 엿봄.
+
 ### 재측정 명령
 
 ```sh
 git clone https://github.com/3K-PokeClip/PokeClip-mono /path/to/mono
 MONO_DIR=/path/to/mono ./run.sh build   # 머지 커밋 ff0ac799 의 media 모듈만 꺼내 빌드
 ./run.sh up
-./run.sh measure "$PWD/raw"             # 약 13분
+./run.sh measure "$PWD/raw"             # 경우 A–E, 약 9분
 python3 -I summarize.py raw
 ./run.sh down                           # 라벨 com.techblog.bench=imds-relay 의 컨테이너 · 망 · 볼륨과 /tmp/imdsw-work 를 지움
 ```

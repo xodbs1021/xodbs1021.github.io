@@ -3,7 +3,8 @@
 #
 #   MONO_DIR=<PokeClip-mono 클론> ./run.sh build   # 머지 커밋의 media 모듈에서 cred-relay · imdsprobe 를 빌드한다
 #   ./run.sh up                                     # 망 · 토큰 볼륨을 만든다
-#   ./run.sh measure <출력 폴더>                    # 경우 A–D 를 돌리고 원자료를 남긴다(약 9분)
+#   ./run.sh measure <출력 폴더>                    # 경우 A–E 를 돌리고 원자료를 남긴다(약 9분)
+#   ./run.sh sniff <출력 폴더>                      # 경우 E(같은 망 칸 엿보기)만 다시 돈다(약 1분)
 #   ./run.sh down                                   # 라벨이 붙은 컨테이너 · 망 · 볼륨과 작업 폴더를 지운다
 #
 # 실제 AWS 자격 · 주소는 쓰지 않는다. 가짜 IMDS 가 가짜 자격만 낸다. 홉 상한(응답 TTL)은 흉내 내지 않는다 —
@@ -133,6 +134,39 @@ cmd_up() {
       wc -c /i/token /j/token'
 }
 
+# E. 같은 망 칸의 이웃이 평문 HTTP 를 엿보나 — 기본 권한(NET_RAW 있음) 3회 · cap_drop ALL 3회
+case_sniff() {
+  local out="$1" caps i
+  {
+    fresh 21600
+    docker rm -f imdsw-mtx >/dev/null 2>&1 || true
+    docker run -d --name imdsw-mtx --label "$LABEL" --network "$NET" --user 65534:65534 --cap-drop ALL \
+      "$RUN_IMAGE" sleep 3600 >/dev/null
+    for caps in default drop-all; do
+      for i in 1 2 3; do
+        mark "E neighbor caps=$caps rep=$i"
+        docker rm -f imdsw-sniff >/dev/null 2>&1 || true
+        if [ "$caps" = default ]; then
+          docker run -d --name imdsw-sniff --label "$LABEL" --network container:imdsw-mtx --user 0:0 \
+            -v "$HERE/sniff.py:/app/sniff.py:ro" "$PY_IMAGE" python -u /app/sniff.py 6 >/dev/null
+        else
+          docker run -d --name imdsw-sniff --label "$LABEL" --network container:imdsw-mtx --user 0:0 --cap-drop ALL \
+            -v "$HERE/sniff.py:/app/sniff.py:ro" "$PY_IMAGE" python -u /app/sniff.py 6 >/dev/null
+        fi
+        sleep 2
+        docker run --rm --label "$LABEL" --network container:imdsw-mtx --user 10001:10001 --cap-drop ALL \
+          -v "$HERE/client.py:/app/client.py:ro" -v imdsw-tok-indexer:/run/secrets/aws-cred:ro \
+          -e RELAY_HOST="$RELAY_IP" -e RELAY_PORT="$RELAY_PORT" "$PY_IMAGE" \
+          python /app/client.py once --label "E-$caps-$i" --token-file /run/secrets/aws-cred/token
+        docker wait imdsw-sniff >/dev/null
+        docker logs imdsw-sniff 2>&1
+        docker rm -f imdsw-sniff >/dev/null
+      done
+    done
+    docker rm -f imdsw-mtx >/dev/null
+  } > "$out/E-sniff.txt"
+}
+
 cmd_measure() {
   local out="${1:?출력 폴더를 주세요}"
   mkdir -p "$out"
@@ -256,6 +290,8 @@ cmd_measure() {
     mark "D4 imds state"; imds_state
   } > "$out/D4-degraded.txt"
 
+  case_sniff "$out"
+
   docker rm -f imdsw-relay imdsw-imds >/dev/null 2>&1 || true
   TZ=Asia/Seoul date '+finished %Y-%m-%dT%H:%M:%S%z' >> "$out/env.txt"
 }
@@ -274,6 +310,7 @@ case "${1:-}" in
   build) cmd_build ;;
   up) cmd_up ;;
   measure) cmd_measure "${2:-}" ;;
+  sniff) mkdir -p "${2:?출력 폴더를 주세요}"; case_sniff "$2"; docker rm -f imdsw-relay imdsw-imds >/dev/null 2>&1 || true ;;
   down) cmd_down ;;
-  *) echo "쓰임: $0 build | up | measure <출력 폴더> | down" >&2; exit 2 ;;
+  *) echo "쓰임: $0 build | up | measure <출력 폴더> | sniff <출력 폴더> | down" >&2; exit 2 ;;
 esac
