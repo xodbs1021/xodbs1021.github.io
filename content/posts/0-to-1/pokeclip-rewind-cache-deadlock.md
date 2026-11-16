@@ -1,6 +1,6 @@
 ---
 title: "다른 상자가 먼저 넣은 조각 하나에 되감기 목록이 멈췄습니다"
-date: 2026-11-17T07:24:01+09:00
+date: 2026-11-17T07:58:34+09:00
 categories: ["projects"]
 tags: ["PokeClip", "HLS", "DVR", "Go", "PostgreSQL", "pgx", "장애 대응"]
 draft: false
