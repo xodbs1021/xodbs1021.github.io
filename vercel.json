@@ -5,6 +5,12 @@
   "outputDirectory": "dist",
   "installCommand": "npm ci",
   "trailingSlash": true,
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "**": false
+    }
+  },
   "functions": {
     "api/views.mjs": {
       "maxDuration": 5
