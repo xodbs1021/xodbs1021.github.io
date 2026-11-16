@@ -1701,6 +1701,32 @@
       "poster": "/images/pokeclip-recording-defect-in-origin-decode-recovery-mobile-poster.jpg"
     }
   },
+  "pokeclip-rewind-cache-deadlock-ledger-reload": {
+    "scene": "LedgerReload",
+    "alt": "세 줄이 같은 번호 칸을 쓴다. 맨 위 장부(DB) 줄에는 7123과 7124가 있고, 상자 a의 0.3초 소리 없는 조각이 빨간 7125 칸으로 먼저 들어온 뒤 상자 b의 4초 조각이 같은 자리로 오다 빨간 ✕와 함께 버려지며, 이어 7126과 7127이 쌓인다. 가운데 고치기 전 캐시 뷰 줄에서는 7126 · 7127 알림이 7125 자리로 내려왔다가 ✕로 버려지고 청록 목록 끝 막대가 7124 뒤에 머문 채 빨간 이름표 목록 끝 7124에서 멈춤 · WARN 한 줄이 뜬다. 맨 아래 고친 뒤 캐시 뷰 줄에서는 같은 7126 알림이 장부에서 다시 싣기를 부르고, 7125(빨강) · 7126 · 7127이 장부에서 내려와 실린 뒤 7125에 청록 GAP 표가 붙고 목록 끝 막대가 7127 뒤로 옮겨 가며 청록 이름표 7125에 GAP · 목록 이어짐이 뜬다",
+    "sha256": "afccf8110b865722761e440311e6343c7a17880f589e443e026b29f49f278d0a",
+    "bytes": 265425,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 12,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-rewind-cache-deadlock-ledger-reload-poster.jpg",
+    "mobile": {
+      "sha256": "d20902485bd1a369d1b123c81c0328b236b397407f1f44701099e6405d887dbb",
+      "bytes": 265759,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 12,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-rewind-cache-deadlock-ledger-reload-mobile-poster.jpg"
+    }
+  },
   "pokeclip-round-vod-round-document": {
     "scene": "RoundDocument",
     "alt": "한 회차(약 2시간)를 나타낸 띠에서 7.66초 조각 자리에 빨간 선이 서며 목록이 seq 4–1626과 seq 1627–1733 둘로 갈린다. 고치기 전 줄에는 다시보기 문서가 목록마다 하나씩 둘 생기고, 회차 API가 준 다시보기는 마지막 문서 B의 7.5분뿐이다. 고친 뒤 줄에서는 회차 문서 하나가 회차 전체 폭으로 자라고, 갈린 자리에 DISCONTINUITY 한 줄이 서며, 회차 API가 준 다시보기가 회차 전체 약 2시간을 덮는다",

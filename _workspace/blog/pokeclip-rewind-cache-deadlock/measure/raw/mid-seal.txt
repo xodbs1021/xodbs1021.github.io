@@ -1,0 +1,13 @@
+$ (cd rewindw-mid/media) go test -count=1 -race -p 1 -v -run '^TestRMSealRace' ./cmd/segment-indexer/
+=== RUN   TestRMSealRaceNoPush
+    rm_seal_race_test.go:44: RESULT push=false seals=[s1/S] first_seal_at=5.5s ends=[s1/S] owner_state=ending loads=0 published_seq=3
+    rm_seal_race_test.go:47: 회차 종료 = [s1/S], want 없음 — 장부에는 4–6 이 있는데 봉인이 복구보다 먼저 왔다
+    rm_seal_race_test.go:50: 발행본 PublishedSeq = 3, want 6
+--- FAIL: TestRMSealRaceNoPush (0.00s)
+=== RUN   TestRMSealRaceWithPush
+    rm_seal_race_test.go:44: RESULT push=true seals=[] first_seal_at=-1ns ends=[] owner_state=live loads=1 published_seq=6
+--- PASS: TestRMSealRaceWithPush (0.00s)
+FAIL
+FAIL	github.com/3K-PokeClip/pokeclip-mono/media/cmd/segment-indexer	0.271s
+FAIL
+exit=1

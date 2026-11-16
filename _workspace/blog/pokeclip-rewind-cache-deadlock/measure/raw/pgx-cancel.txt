@@ -1,0 +1,14 @@
+$ (cd pgxcancel) go run . -dsn <가림> -rounds 5
+server_version=17.10 (Debian 17.10-1.pgdg13+1) client_connection_check_interval=0 statement_timeout=0 read_timeout=500ms
+mode round err_after_ms row_lock_free_after_ms victim_backend_alive_at_limit free_after_locker_commit_ms err
+default 1 501 7 false - "timeout: context deadline exceeded"
+default 2 501 7 false - "timeout: context deadline exceeded"
+default 3 501 9 false - "timeout: context deadline exceeded"
+default 4 501 7 false - "timeout: context deadline exceeded"
+default 5 501 8 false - "timeout: context deadline exceeded"
+nocancel 1 501 >5000 true 10 "timeout: context deadline exceeded"
+nocancel 2 501 >5000 true 3 "timeout: context deadline exceeded"
+nocancel 3 501 >5000 true 7 "timeout: context deadline exceeded"
+nocancel 4 501 >5000 true 3 "timeout: context deadline exceeded"
+nocancel 5 500 >5000 true 4 "timeout: context deadline exceeded"
+exit=0

@@ -1,0 +1,14 @@
+$ (cd rewindw-after/media) go test -count=1 -race -p 1 -v -run '^(TestWatchAloneRecoversNewSessionBeyondStuckRow|TestStallSealOnTimeWhenRenewHeldLaneBefore|TestStallSealKeepsGapRetryBeforeSeal|TestStallSealLedgerFailedRetriesEachTickWarnsOnce|TestStallSealOffSealsNothing)$' ./cmd/segment-indexer/
+=== RUN   TestWatchAloneRecoversNewSessionBeyondStuckRow
+--- PASS: TestWatchAloneRecoversNewSessionBeyondStuckRow (0.00s)
+=== RUN   TestStallSealOnTimeWhenRenewHeldLaneBefore
+--- PASS: TestStallSealOnTimeWhenRenewHeldLaneBefore (0.00s)
+=== RUN   TestStallSealKeepsGapRetryBeforeSeal
+--- PASS: TestStallSealKeepsGapRetryBeforeSeal (0.00s)
+=== RUN   TestStallSealLedgerFailedRetriesEachTickWarnsOnce
+--- PASS: TestStallSealLedgerFailedRetriesEachTickWarnsOnce (0.00s)
+=== RUN   TestStallSealOffSealsNothing
+--- PASS: TestStallSealOffSealsNothing (0.00s)
+PASS
+ok  	github.com/3K-PokeClip/pokeclip-mono/media/cmd/segment-indexer	1.291s
+exit=0

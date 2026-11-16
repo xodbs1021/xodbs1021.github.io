@@ -1,0 +1,24 @@
+$ (cd rewindw-after/media) go test -count=1 -race -p 1 -v -run '^(TestLadderAlarmSplitsViewBehindFromNoRow|TestLadderAlarmEscalatesOnlyToViewBehind|TestLadderNoSealWhileViewBehind)$' ./internal/rewind/publish/
+=== RUN   TestLadderNoSealWhileViewBehind
+=== RUN   TestLadderNoSealWhileViewBehind/방송_종료_구간
+=== RUN   TestLadderNoSealWhileViewBehind/뷰가_장부보다_뒤처짐
+--- PASS: TestLadderNoSealWhileViewBehind (0.00s)
+    --- PASS: TestLadderNoSealWhileViewBehind/방송_종료_구간 (0.00s)
+    --- PASS: TestLadderNoSealWhileViewBehind/뷰가_장부보다_뒤처짐 (0.00s)
+=== RUN   TestLadderAlarmEscalatesOnlyToViewBehind
+=== RUN   TestLadderAlarmEscalatesOnlyToViewBehind/뒤처짐을_알게_됨
+=== RUN   TestLadderAlarmEscalatesOnlyToViewBehind/다음_행이_와서_holding
+=== RUN   TestLadderAlarmEscalatesOnlyToViewBehind/ERROR_로_시작한_정체
+--- PASS: TestLadderAlarmEscalatesOnlyToViewBehind (0.00s)
+    --- PASS: TestLadderAlarmEscalatesOnlyToViewBehind/뒤처짐을_알게_됨 (0.00s)
+    --- PASS: TestLadderAlarmEscalatesOnlyToViewBehind/다음_행이_와서_holding (0.00s)
+    --- PASS: TestLadderAlarmEscalatesOnlyToViewBehind/ERROR_로_시작한_정체 (0.00s)
+=== RUN   TestLadderAlarmSplitsViewBehindFromNoRow
+=== RUN   TestLadderAlarmSplitsViewBehindFromNoRow/방송_종료_구간
+=== RUN   TestLadderAlarmSplitsViewBehindFromNoRow/뷰가_장부보다_뒤처짐
+--- PASS: TestLadderAlarmSplitsViewBehindFromNoRow (0.00s)
+    --- PASS: TestLadderAlarmSplitsViewBehindFromNoRow/방송_종료_구간 (0.00s)
+    --- PASS: TestLadderAlarmSplitsViewBehindFromNoRow/뷰가_장부보다_뒤처짐 (0.00s)
+PASS
+ok  	github.com/3K-PokeClip/pokeclip-mono/media/internal/rewind/publish	1.293s
+exit=0
