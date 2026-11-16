@@ -1,7 +1,7 @@
 ---
 title: "EXISTS와 일반 계획이 채팅 조회를 끝까지 훑게 했습니다"
 date: 2026-11-14T22:28:44+09:00
-lastmod: "2026-11-15T03:10:00+09:00"
+lastmod: "2026-11-16T21:33:10+09:00"
 categories: ["projects"]
 tags: ["PokeClip", "PostgreSQL", "실행 계획", "pgjdbc", "색인"]
 draft: false
@@ -66,7 +66,7 @@ COALESCE((SELECT y.start_wall_utc FROM public.stream_segments y
 
 [[fig-ledger-scan-stop]]에서 위 줄과 아래 줄이 언제 멈추는지 보면 됩니다.
 
-{{< motion scene="LedgerScanStop" id="fig-ledger-scan-stop" kind="재구성" caption="EXISTS 꼴 역행 검사는 표 전체(세 방송, 907,200행)를 읽고 「맞는 행 없음」에서 끝납니다. ORDER BY … LIMIT 1 꼴은 그 방송의 판 NULL 색인(stream_segments_legacy_wall_idx)을 파일명 시각이 늦은 쪽부터 읽어 첫 항목에서 멈춥니다. 버퍼 수는 판 NULL만 있는 방송 · 꼬리 시각 재측정 값이고, 칸 수는 설명용입니다." >}}
+{{< motion scene="LedgerScanStop" id="fig-ledger-scan-stop" kind="재구성" caption="EXISTS 꼴 역행 검사는 표 전체(세 방송, 907,200행)를 읽고 「맞는 행 없음」에서 끝납니다. ORDER BY … LIMIT 1 꼴은 그 방송의 판 NULL 색인(stream_segments_legacy_wall_idx)을 파일명 시각이 늦은 쪽부터 읽어 첫 항목에서 멈춥니다. 두 막대는 같은 선형 눈금이고 길이는 조회 전체가 읽은 버퍼 수(12,685 : 21, 약 600배)에 비례합니다. 아래 막대는 몇 픽셀뿐이라 앞 100 버퍼를 60배로 키운 칸을 함께 둡니다. 버퍼 수는 판 NULL만 있는 방송 · 꼬리 시각 재측정 값이고, 막대가 차오르는 속도는 설명용입니다." >}}
 
 바꾼 꼴은 꼬리 시각에서 21 버퍼, 0.055–0.064ms였고 롤백 방송도 21 버퍼였습니다.
 

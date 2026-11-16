@@ -2,6 +2,8 @@
 // 1080p30 화면 한 줄기가 원본(RGB) → 색 줄이기(YUV 4:2:0) → 압축(x264 6Mbps) → 송출 → 포장 → CDN 을 지나며
 // 초당 바이트가 186.6MB → 93.3MB → 0.77MB 로 줄고, CDN 에서 같은 조각이 여러 시청자에게 퍼진다.
 // 수치는 _workspace/blog/streaming-basics-from-scratch/measure/e1-bytes.txt 의 실측값(testsrc2 합성 입력), 흐름은 개념도.
+// 막대 길이는 186.6MB 를 꽉 찬 폭으로 둔 같은 선형 눈금의 비례 길이다. 0.77MB 는 데스크톱 약 7px · 휴대폰판 약 4px 이라
+// 최소 폭을 두지 않고 막대 옆 이름표(「← 0.77MB」)로 가리킨다.
 // layout="mobile" 은 1080×1350 휴대폰판(FrameToPlayerMobile) — 단계를 세로로 쌓는다.
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { Label } from "../../components/Timeline";
@@ -107,8 +109,9 @@ export const FrameToPlayer: React.FC<Props> = ({ layout = "desktop" }) => {
   // 막대 길이는 단계 사이에서 줄어들고, 숫자 이름표는 반쯤 왔을 때 바뀐다.
   const rateIdx = RATE_OF_STAGE[stage];
   const barRate = interpolate(pos, [0, 1, 2], [RATES[0][0], RATES[1][0], RATES[2][0]], CLAMP);
-  const barW = Math.max(10, (barRate / RATES[0][0]) * l.rate.barW);
+  const barW = (barRate / RATES[0][0]) * l.rate.barW;
   const compressed = rateIdx === 2;
+  const pointer = progress(frame, ARRIVE[2], 12);
 
   const lo = Math.floor(pos);
   const hi = Math.min(STAGES.length - 1, lo + 1);
@@ -131,9 +134,20 @@ export const FrameToPlayer: React.FC<Props> = ({ layout = "desktop" }) => {
       <div
         style={{
           position: "absolute", left: l.rate.x, top: l.rate.barY, width: barW, height: l.rate.barH,
-          borderRadius: 10, background: compressed ? COLOR.accent : COLOR.ink, opacity: intro,
+          borderRadius: Math.min(10, barW / 2), background: compressed ? COLOR.accent : COLOR.ink, opacity: intro,
         }}
       />
+      {/* 압축 뒤 막대는 몇 px 이라 길이를 늘리지 않고 옆 이름표로 가리킨다. */}
+      <Label
+        x={l.rate.x + barW + 18}
+        y={l.rate.barY + (l.rate.barH - l.text.small * 1.2) / 2}
+        size={l.text.small}
+        weight={760}
+        color={COLOR.accent}
+        opacity={intro * pointer}
+      >
+        {`← ${RATES[2][1].replace("초당 ", "")}`}
+      </Label>
       {/* 지나온 값의 눈금: 압축 전 두 값이 막대 어디까지였는지 남긴다. */}
       {RATES.slice(0, 2).map(([value, label], i) => {
         const shown = progress(frame, ARRIVE[i + 1], 12);
