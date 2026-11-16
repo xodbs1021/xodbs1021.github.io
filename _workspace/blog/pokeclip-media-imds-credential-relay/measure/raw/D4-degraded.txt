@@ -1,0 +1,48 @@
+### D4 first
+{"label": "D4-first", "status": 200, "ms": 87.5, "recv": "2026-11-15T22:29:42.269+00:00", "content_type": "application/json", "cache_control": "no-store", "expiration": "2026-11-15T22:32:41Z", "sent_left_s": 178.731, "fields": ["AccessKeyId", "SecretAccessKey", "Token"]}
+### D4 imds fail, 10초 간격 15회
+{"label": "D4#0", "status": 200, "ms": 3.1, "recv": "2026-11-15T22:29:42.626+00:00", "content_type": "application/json", "cache_control": "no-store", "expiration": "2026-11-15T22:32:41Z", "sent_left_s": 178.373, "fields": ["AccessKeyId", "SecretAccessKey", "Token"]}
+{"label": "D4#1", "status": 200, "ms": 2006.3, "recv": "2026-11-15T22:29:54.630+00:00", "content_type": "application/json", "cache_control": "no-store", "expiration": "2026-11-15T22:32:41Z", "sent_left_s": 166.369, "fields": ["AccessKeyId", "SecretAccessKey", "Token"]}
+{"label": "D4#2", "status": 200, "ms": 2006.9, "recv": "2026-11-15T22:30:04.634+00:00", "content_type": "application/json", "cache_control": "no-store", "expiration": "2026-11-15T22:32:41Z", "sent_left_s": 156.365, "fields": ["AccessKeyId", "SecretAccessKey", "Token"]}
+{"label": "D4#3", "status": 200, "ms": 0.5, "recv": "2026-11-15T22:30:12.627+00:00", "content_type": "application/json", "cache_control": "no-store", "expiration": "2026-11-15T22:32:41Z", "sent_left_s": 148.372, "fields": ["AccessKeyId", "SecretAccessKey", "Token"]}
+{"label": "D4#4", "status": 200, "ms": 2011.1, "recv": "2026-11-15T22:30:24.645+00:00", "content_type": "application/json", "cache_control": "no-store", "expiration": "2026-11-15T22:32:41Z", "sent_left_s": 136.355, "fields": ["AccessKeyId", "SecretAccessKey", "Token"]}
+{"label": "D4#5", "status": 200, "ms": 0.6, "recv": "2026-11-15T22:30:32.627+00:00", "content_type": "application/json", "cache_control": "no-store", "expiration": "2026-11-15T22:32:41Z", "sent_left_s": 128.372, "fields": ["AccessKeyId", "SecretAccessKey", "Token"]}
+{"label": "D4#6", "status": 200, "ms": 2010.9, "recv": "2026-11-15T22:30:44.644+00:00", "content_type": "application/json", "cache_control": "no-store", "expiration": "2026-11-15T22:32:41Z", "sent_left_s": 116.355, "fields": ["AccessKeyId", "SecretAccessKey", "Token"]}
+{"label": "D4#7", "status": 200, "ms": 1.0, "recv": "2026-11-15T22:30:52.629+00:00", "content_type": "application/json", "cache_control": "no-store", "expiration": "2026-11-15T22:32:41Z", "sent_left_s": 108.371, "fields": ["AccessKeyId", "SecretAccessKey", "Token"]}
+{"label": "D4#8", "status": 200, "ms": 2008.8, "recv": "2026-11-15T22:31:04.642+00:00", "content_type": "application/json", "cache_control": "no-store", "expiration": "2026-11-15T22:32:41Z", "sent_left_s": 96.357, "fields": ["AccessKeyId", "SecretAccessKey", "Token"]}
+{"label": "D4#9", "status": 200, "ms": 0.5, "recv": "2026-11-15T22:31:12.626+00:00", "content_type": "application/json", "cache_control": "no-store", "expiration": "2026-11-15T22:32:41Z", "sent_left_s": 88.373, "fields": ["AccessKeyId", "SecretAccessKey", "Token"]}
+{"label": "D4#10", "status": 200, "ms": 2005.7, "recv": "2026-11-15T22:31:24.634+00:00", "content_type": "application/json", "cache_control": "no-store", "expiration": "2026-11-15T22:32:41Z", "sent_left_s": 76.365, "fields": ["AccessKeyId", "SecretAccessKey", "Token"]}
+{"label": "D4#11", "status": 200, "ms": 2005.7, "recv": "2026-11-15T22:31:34.634+00:00", "content_type": "application/json", "cache_control": "no-store", "expiration": "2026-11-15T22:32:41Z", "sent_left_s": 66.365, "fields": ["AccessKeyId", "SecretAccessKey", "Token"]}
+{"label": "D4#12", "status": 503, "ms": 1.0, "recv": "2026-11-15T22:31:42.629+00:00", "content_type": "application/json", "cache_control": null, "code": "CredentialsUnavailable"}
+{"label": "D4#13", "status": 503, "ms": 2005.4, "recv": "2026-11-15T22:31:54.629+00:00", "content_type": "application/json", "cache_control": null, "code": "CredentialsUnavailable"}
+{"label": "D4#14", "status": 503, "ms": 2005.0, "recv": "2026-11-15T22:32:04.633+00:00", "content_type": "application/json", "cache_control": null, "code": "CredentialsUnavailable"}
+### D4 relay log
+{"time":"2026-11-15T22:29:41.631121507Z","level":"INFO","msg":"cred_relay_started","addr":"169.254.170.2:8080","callers":"indexer,janitor"}
+{"time":"2026-11-15T22:29:42.269039609Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":178,"source_expires_in_s":178,"from":"imds","refresh":"initial","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:29:42.626735686Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":178,"source_expires_in_s":178,"from":"cache","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:29:54.630376933Z","level":"ERROR","msg":"cred_source_failed","err_type":"deadline"}
+{"time":"2026-11-15T22:29:54.63039035Z","level":"WARN","msg":"cred_source_degraded","value":1}
+{"time":"2026-11-15T22:29:54.630402767Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":166,"source_expires_in_s":166,"from":"cache","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:30:04.634588421Z","level":"ERROR","msg":"cred_source_failed","err_type":"deadline"}
+{"time":"2026-11-15T22:30:04.634633379Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":156,"source_expires_in_s":156,"from":"cache","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:30:12.627783319Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":148,"source_expires_in_s":148,"from":"cache","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:30:24.644840585Z","level":"ERROR","msg":"cred_source_failed","err_type":"deadline"}
+{"time":"2026-11-15T22:30:24.644862669Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":136,"source_expires_in_s":136,"from":"cache","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:30:32.627411618Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":128,"source_expires_in_s":128,"from":"cache","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:30:44.644393261Z","level":"ERROR","msg":"cred_source_failed","err_type":"deadline"}
+{"time":"2026-11-15T22:30:44.644469803Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":116,"source_expires_in_s":116,"from":"cache","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:30:52.628902132Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":108,"source_expires_in_s":108,"from":"cache","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:31:04.642338966Z","level":"ERROR","msg":"cred_source_failed","err_type":"deadline"}
+{"time":"2026-11-15T22:31:04.642372174Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":96,"source_expires_in_s":96,"from":"cache","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:31:12.626782586Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":88,"source_expires_in_s":88,"from":"cache","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:31:24.634262065Z","level":"ERROR","msg":"cred_source_failed","err_type":"deadline"}
+{"time":"2026-11-15T22:31:24.634323107Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":76,"source_expires_in_s":76,"from":"cache","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:31:34.63430165Z","level":"ERROR","msg":"cred_source_failed","err_type":"deadline"}
+{"time":"2026-11-15T22:31:34.634324608Z","level":"INFO","msg":"cred_served","caller":"indexer","expires_in_s":66,"source_expires_in_s":66,"from":"cache","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:31:42.628795098Z","level":"ERROR","msg":"cred_unavailable","caller":"indexer","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:31:54.62930926Z","level":"ERROR","msg":"cred_source_failed","err_type":"deadline"}
+{"time":"2026-11-15T22:31:54.629323594Z","level":"ERROR","msg":"cred_unavailable","caller":"indexer","remote":"169.254.0.2"}
+{"time":"2026-11-15T22:32:04.633546235Z","level":"ERROR","msg":"cred_source_failed","err_type":"deadline"}
+{"time":"2026-11-15T22:32:04.633585236Z","level":"ERROR","msg":"cred_unavailable","caller":"indexer","remote":"169.254.0.2"}
+### D4 imds state
+{"expiration": "2026-11-15T22:32:41Z", "expires_s": 180, "started": "2026-11-15T22:29:41.377818+00:00", "mode": "fail", "counts": {"token": 1, "role_list": 10, "role_creds": 1, "role_creds_fail": 19}}

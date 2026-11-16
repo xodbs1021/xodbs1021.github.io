@@ -1,0 +1,15 @@
+/i:
+total 4
+-r--------    1 10001    10001           64 Nov 15 22:19 token
+
+/j:
+total 4
+-r--------    1 10002    10002           64 Nov 15 22:19 token
+
+/r:
+total 8
+-r--------    1 10001    10001           64 Nov 15 22:19 indexer
+-r--------    1 10001    10001           64 Nov 15 22:19 janitor
+       64 /i/token
+       64 /j/token
+      128 total

@@ -96,6 +96,7 @@ import { OFFLINE_RECORDING_GATE_FRAMES, OfflineRecordingGate } from "./scenes/me
 import { SHARED_DEFAULT_ALIAS_FRAMES, SharedDefaultAlias } from "./scenes/mediamtx-auth-defaults-normalization-and-clone/SharedDefaultAlias";
 import { LEDGER_SCAN_STOP_FRAMES, LedgerScanStop } from "./scenes/pokeclip-chat-ledger-query-plans/LedgerScanStop";
 import { SEEK_LOOP_TRUNCATION_FRAMES, SeekLoopTruncation } from "./scenes/pokeclip-editor-seek-loop/SeekLoopTruncation";
+import { HOP_LIMIT_RELAY_FRAMES, HopLimitRelay } from "./scenes/pokeclip-media-imds-credential-relay/HopLimitRelay";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
@@ -1053,6 +1054,16 @@ export const RemotionRoot: React.FC = () => (
       component={SeekLoopTruncation}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={SEEK_LOOP_TRUNCATION_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="HopLimitRelay" component={HopLimitRelay} durationInFrames={HOP_LIMIT_RELAY_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="HopLimitRelayMobile"
+      component={HopLimitRelay}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={HOP_LIMIT_RELAY_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}

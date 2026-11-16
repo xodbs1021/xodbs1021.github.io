@@ -1,0 +1,59 @@
+[A] 실제 만료별 창구가 보낸 만료(분)
+설정_초,응답때_실제_남은_초,보낸_만료까지_초,실제_분,보낸_분
+21600,21598.756,3600.000,359.98,60.00
+7200,7198.381,3600.000,119.97,60.00
+5400,5399.015,3600.000,89.98,60.00
+1800,1798.653,1798.653,29.98,29.98
+600,598.276,598.275,9.97,9.97
+
+[B] 요청별 응답
+B-no-auth,401,application/json,None
+B-wrong,401,application/json,None
+B-indexer,200,application/json,no-store
+B-janitor,200,application/json,no-store
+B-healthz,204,None,None
+B-post,405,application/json,None
+B-other,404,application/json,None
+B2-neighbor,401
+relay_log,cred_served,caller=indexer,remote=169.254.0.2
+relay_log,cred_denied,caller=-,remote=169.254.0.2
+
+[C1 · C2] SDK Retrieve 수 대 창구 cred_served 수
+C1,retrieve=13,relay_served=1,first_sdk_expires_in_s=3299
+C2,retrieve=16,relay_served=11,first_sdk_expires_in_s=58
+
+[D1 · D2] 3초 간격 14회 요청 동안 가짜 IMDS 역할 자격 호출 수
+refresh=initial cache cache cache window cache cache cache window cache cache cache window cache
+imds_counts={'token': 1, 'role_list': 4, 'role_creds': 4},expires_s=600
+refresh=initial cache cache cache cache cache cache cache cache cache cache cache cache cache
+imds_counts={'token': 1, 'role_list': 1, 'role_creds': 1},expires_s=21600
+
+[D3] 첫 원천 호출이 3초 걸릴 때
+D3-slow,503,2004.0ms
+
+[D4] 실제 만료 3분 · IMDS 실패 뒤 응답(실제 만료까지 남은 초)
+D4-first,200,87.5ms,real_left_s=178.7
+D4#0,200,3.1ms,real_left_s=178.4
+D4#1,200,2006.3ms,real_left_s=166.4
+D4#2,200,2006.9ms,real_left_s=156.4
+D4#3,200,0.5ms,real_left_s=148.4
+D4#4,200,2011.1ms,real_left_s=136.4
+D4#5,200,0.6ms,real_left_s=128.4
+D4#6,200,2010.9ms,real_left_s=116.4
+D4#7,200,1.0ms,real_left_s=108.4
+D4#8,200,2008.8ms,real_left_s=96.4
+D4#9,200,0.5ms,real_left_s=88.4
+D4#10,200,2005.7ms,real_left_s=76.4
+D4#11,200,2005.7ms,real_left_s=66.4
+D4#12,503,1.0ms,real_left_s=58.4
+D4#13,503,2005.4ms,real_left_s=46.4
+D4#14,503,2005.0ms,real_left_s=36.4
+imds_counts={"token": 1, "role_list": 10, "role_creds": 1, "role_creds_fail": 19}
+
+[E] 같은 망 칸 이웃의 엿보기(소켓 열림 · Authorization 머리 · 자격 JSON 이 보인 패킷 수)
+neighbor caps=default rep=1,open=True,err=-,auth=1,creds=1
+neighbor caps=default rep=2,open=True,err=-,auth=1,creds=1
+neighbor caps=default rep=3,open=True,err=-,auth=1,creds=1
+neighbor caps=drop-all rep=1,open=False,err=PermissionError errno=1,auth=-,creds=-
+neighbor caps=drop-all rep=2,open=False,err=PermissionError errno=1,auth=-,creds=-
+neighbor caps=drop-all rep=3,open=False,err=PermissionError errno=1,auth=-,creds=-

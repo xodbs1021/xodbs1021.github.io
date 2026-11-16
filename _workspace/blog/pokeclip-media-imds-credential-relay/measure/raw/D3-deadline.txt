@@ -1,0 +1,5 @@
+### D3 imds slow 3s, first request
+{"label": "D3-slow", "status": 503, "ms": 2004.0, "recv": "2026-11-15T22:29:40.924+00:00", "content_type": "application/json", "cache_control": null, "code": "CredentialsUnavailable"}
+### D3 relay log
+{"time":"2026-11-15T22:29:40.924454216Z","level":"ERROR","msg":"cred_source_failed","err_type":"role_list"}
+{"time":"2026-11-15T22:29:40.924515592Z","level":"ERROR","msg":"cred_unavailable","caller":"indexer","remote":"169.254.0.2"}

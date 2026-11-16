@@ -1,0 +1,21 @@
+### E neighbor caps=default rep=1
+{"label": "E-default-1", "status": 200, "ms": 94.8, "recv": "2026-11-15T23:07:17.143+00:00", "content_type": "application/json", "cache_control": "no-store", "expiration": "2026-11-16T00:07:17.143497907Z", "sent_left_s": 3600.0, "fields": ["AccessKeyId", "SecretAccessKey", "Token"]}
+{"sniff_open": true}
+{"packets": 29, "auth_header_packets": 1, "creds_json_packets": 1}
+### E neighbor caps=default rep=2
+{"label": "E-default-2", "status": 200, "ms": 5.5, "recv": "2026-11-15T23:07:23.739+00:00", "content_type": "application/json", "cache_control": "no-store", "expiration": "2026-11-16T00:07:23.739245502Z", "sent_left_s": 3600.0, "fields": ["AccessKeyId", "SecretAccessKey", "Token"]}
+{"sniff_open": true}
+{"packets": 12, "auth_header_packets": 1, "creds_json_packets": 1}
+### E neighbor caps=default rep=3
+{"label": "E-default-3", "status": 200, "ms": 6.9, "recv": "2026-11-15T23:07:30.447+00:00", "content_type": "application/json", "cache_control": "no-store", "expiration": "2026-11-16T00:07:30.446569855Z", "sent_left_s": 3600.0, "fields": ["AccessKeyId", "SecretAccessKey", "Token"]}
+{"sniff_open": true}
+{"packets": 10, "auth_header_packets": 1, "creds_json_packets": 1}
+### E neighbor caps=drop-all rep=1
+{"label": "E-drop-all-1", "status": 200, "ms": 7.3, "recv": "2026-11-15T23:07:37.010+00:00", "content_type": "application/json", "cache_control": "no-store", "expiration": "2026-11-16T00:07:37.009730577Z", "sent_left_s": 3599.999, "fields": ["AccessKeyId", "SecretAccessKey", "Token"]}
+{"sniff_open": false, "err": "PermissionError errno=1"}
+### E neighbor caps=drop-all rep=2
+{"label": "E-drop-all-2", "status": 200, "ms": 6.9, "recv": "2026-11-15T23:07:39.620+00:00", "content_type": "application/json", "cache_control": "no-store", "expiration": "2026-11-16T00:07:39.620561911Z", "sent_left_s": 3600.0, "fields": ["AccessKeyId", "SecretAccessKey", "Token"]}
+{"sniff_open": false, "err": "PermissionError errno=1"}
+### E neighbor caps=drop-all rep=3
+{"label": "E-drop-all-3", "status": 200, "ms": 4.9, "recv": "2026-11-15T23:07:42.187+00:00", "content_type": "application/json", "cache_control": "no-store", "expiration": "2026-11-16T00:07:42.187334703Z", "sent_left_s": 3600.0, "fields": ["AccessKeyId", "SecretAccessKey", "Token"]}
+{"sniff_open": false, "err": "PermissionError errno=1"}
