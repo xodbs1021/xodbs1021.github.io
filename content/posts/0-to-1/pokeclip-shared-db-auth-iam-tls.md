@@ -185,7 +185,7 @@ Java 앱 서버 네 대(auth, clip, chat-collector, chat-detector — Spring Boo
 - 20분 수용 창은 인스턴스 1대 · 1회 측정입니다. 다른 인스턴스 · 버전에서 같은지는 모릅니다.
 - Java 스파이크 환경의 TLS 연결에서는 호출자가 읽기 시한(10초)의 두 배를 기다렸습니다. 10초 시한이 걸린 뒤 드라이버가 TLS 소켓을 닫는데, JDK가 닫기 전에 남은 입력을 한 번 더 읽고 거기에도 같은 시한이 걸려 호출자는 20초를 기다렸습니다(스레드 덤프로 확인, [PR #336](https://github.com/3K-PokeClip/PokeClip-mono/pull/336)). IAM이 아니라 TLS 소켓을 닫는 경로 때문이고, 무한히 매달리지는 않습니다.
 - 실험 RDS에서 첫 IAM 로그인은 약 5.6초가 걸렸고([실측 요약](https://github.com/xodbs1021/xodbs1021.github.io/blob/main/_workspace/blog/pokeclip-shared-db-auth-iam-tls/measurements.md)), 그 뒤 로그인은 0.5초 안팎이었습니다. 원인은 재지 않았습니다.
-- 같은 네트워크 네임스페이스의 컨테이너는 인스턴스 메타데이터에서 같은 역할 자격을 얻을 수 있어, 두 DB 사용자의 토큰을 다 만들 수 있습니다. 11월 16일 병합한 대리 창구를 켠 상자에서는 이 범위가 창구 토큰을 받은 사이드카와 janitor 둘로 좁아집니다([IMDS 홉 상한 글](/posts/0-to-1/pokeclip-media-imds-credential-relay/)).
+- 같은 네트워크 네임스페이스의 컨테이너는 인스턴스 메타데이터에서 같은 역할 자격을 얻을 수 있어, 두 DB 사용자의 토큰을 다 만들 수 있습니다. 11월 16–17일 운영 Media 상자 둘에 대리 창구를 켠 뒤로 이 범위는 창구 토큰을 받은 사이드카와 janitor 둘로 좁아졌습니다([IMDS 홉 상한 글](/posts/0-to-1/pokeclip-media-imds-credential-relay/)).
 - 코드가 막을 수 없는 조건이 있습니다. 컨테이너에 정적 AWS 키 환경 변수가 있거나 `~/.aws`가 마운트되면 SDK가 인스턴스 역할보다 그것을 먼저 씁니다([AWS SDK for Go v2 문서](https://docs.aws.amazon.com/sdk-for-go/v2/developer-guide/configure-gosdk.html)). 배포 정의에서 이 둘이 없음을 지켜야 합니다.
 - 운영을 비밀번호로 되돌리는 일은 `POSTGRES_AUTH`를 비우는 것만으로 되지 않습니다. `rds_iam`을 가진 사용자는 IAM 인증이 우선이라 별도 절차가 필요합니다([AWS 문서](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.html), [README 「password 로 되돌리기」](https://github.com/3K-PokeClip/PokeClip-mono/blob/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/media/README.md?plain=1#L2511)).
 
