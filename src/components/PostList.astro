@@ -3,4 +3,20 @@ import Cover from './Cover.astro';
 import {categories,formatDate} from '../lib/posts.mjs';
 const {posts}=Astro.props;
 ---
-<div class="post-list">{posts.map(p=><article class="post-row"><a class="post-row-link" href={p.url}><div class="post-row-copy"><span class="category-label">{categories[p.category]?.title||p.category}</span>{p.relatedReason&&<span class="related-reason">{p.relatedReason}</span>}<h2>{p.title}</h2><p>{p.description}</p><div class="post-meta"><time datetime={p.date.toISOString()}>{formatDate(p.date)}</time><span>{p.minutes}분 읽기</span></div></div><Cover category={p.category} compact/></a></article>)}</div>
+<div class="post-list">{posts.map(p=><article class="post-row"><a class="post-row-link" href={p.url}><div class="post-row-copy"><span class="category-label">{categories[p.category]?.title||p.category}</span>{p.relatedReason&&<span class="related-reason">{p.relatedReason}</span>}<h2>{p.title}</h2><p>{p.description}</p><div class="post-meta"><time datetime={p.date.toISOString()}>{formatDate(p.date)}</time><span>{p.minutes}분 읽기</span><span class="view-count" data-list-views={p.slug} hidden>조회 <span></span></span></div></div><Cover category={p.category} compact/></a></article>)}</div>
+<script>
+// Counts are read in one batch per page and shown only when the read succeeds.
+const BATCH=50;
+const rows=[...document.querySelectorAll<HTMLElement>('[data-list-views]')];
+if(rows.length && location.hostname==='taeyun.blog'){
+ const slugs=[...new Set(rows.map(row=>row.dataset.listViews!))];
+ for(let i=0;i<slugs.length;i+=BATCH){
+  try{
+   const response=await fetch(`/api/views/?slugs=${encodeURIComponent(slugs.slice(i,i+BATCH).join(','))}`);
+   if(!response.ok)continue;
+   const {views}=await response.json();
+   for(const row of rows){const count=views[row.dataset.listViews!];if(count===undefined)continue;row.querySelector('span')!.textContent=Number(count).toLocaleString('ko-KR');row.hidden=false}
+  }catch{}
+ }
+}
+</script>
