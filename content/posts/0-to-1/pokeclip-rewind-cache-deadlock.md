@@ -5,18 +5,18 @@ categories: ["projects"]
 tags: ["PokeClip", "HLS", "DVR", "Go", "PostgreSQL", "pgx", "장애 대응"]
 draft: false
 author: "김태윤"
-description: "PokéClip 시험 방송에서 대기 상자의 확인용 루프백이 같은 시험 키로 0.3초짜리 영상만 조각을 공유 장부의 7125번에 먼저 넣었고, 송출 상자의 되감기 목록은 7124에서 약 35분 멈췄습니다. 캐시는 다음 번호의 알림만 싣고 감시는 바로 다음 행의 확정만 봐서 GAP · 캐시 회복 · 확정이 서로를 기다린 교착이었습니다. 빈 번호 뒤 알림을 받으면 장부에서 다시 싣고, 감시가 장부 끝을 직접 견주고, 봉인 직전에 같은 트랜잭션에서 장부 끝을 다시 보게 고친 과정. 고치기 전 FAIL · 고친 뒤 PASS 공개 재측정, pgx 취소 요청과 PostgreSQL 잠금 실측, 받아들인 한계 넷, 운영 반영 상태까지."
+description: "PokéClip 시험 방송에서 대기 상자의 확인용 루프백이 같은 시험 키로 0.3초짜리 영상만 조각을 공유 장부의 7125번에 먼저 넣었고, 송출 상자의 되감기 목록은 7124에서 약 35분 멈췄습니다. 캐시는 다음 번호의 알림만 싣고 감시는 바로 다음 행의 확정만 봐서 GAP · 캐시 회복 · 확정이 서로를 기다린 교착이었습니다. 빈 번호 뒤 알림을 받으면 장부에서 다시 싣고, 감시가 장부 끝을 직접 견주고, 봉인 직전에 같은 트랜잭션에서 장부 끝을 다시 보게 고쳤습니다. 공개 재측정, pgx 취소 요청과 PostgreSQL 잠금 실측, 받아들인 한계 넷. 고치기 전 커밋에서 실패하던 회귀 시험이 고친 뒤 통과했고, 운영 상자에 실린 뒤 새 경보는 아직 울리지 않았습니다."
 ---
 
-11월 16일 밤 PokéClip 시험 방송에서 방송 중 되감기(DVR, Digital Video Recording) 목록이 7124번 조각에서 약 35분 멈췄습니다. 대기 상자로 보낸 확인용 루프백이 같은 시험 키를 써서, 그 상자가 0.3초짜리 영상만 조각을 두 상자가 함께 쓰는 장부의 7125번에 먼저 넣었습니다. 진짜 4초 조각은 번호 충돌로 버려졌고, 소리가 없는 7125는 재생용 조각 업로드가 영구히 실패했습니다. 송출 상자의 되감기 캐시는 바로 다음 번호의 알림만 받아 싣고, 30초 감시는 바로 다음 행이 확정됐는지만 봤습니다. 그래서 GAP을 세울 수도 캐시를 되살릴 수도 없는 교착이 세션이 끝날 때까지 이어졌고, 경보는 WARN 한 줄이었습니다. 빈 번호 뒤의 알림을 받으면 장부에서 다시 읽어 캐시를 채우고(적재) 감시가 장부 끝을 직접 견주게 고친 뒤, 공개 저장소의 회귀 시험은 고치기 전 커밋에서 실패하고 고친 뒤 통과했습니다. 같은 장면에 30초 감시를 70번(35분) 돌려도 고치기 전 판은 7124 다음으로 넘어가지 못했고, 고친 판은 적재 한 번으로 이어 갔습니다.
+11월 16일 밤 PokéClip 시험 방송에서 방송 중 되감기(DVR, Digital Video Recording) 목록이 7124번 조각에서 약 35분 멈췄습니다. 대기 상자에서 보낸 확인용 루프백이 같은 시험 키를 써서, 그 상자가 0.3초짜리 영상만 조각을 두 상자가 함께 쓰는 장부의 7125번에 먼저 넣었습니다. 진짜 4초 조각은 번호 충돌로 버려졌고, 소리가 없는 7125는 재생용 조각 업로드가 영구히 실패했습니다. 송출 상자의 되감기 캐시는 바로 다음 번호의 알림만 받아 싣고, 30초 감시는 바로 다음 행이 확정됐는지만 봤습니다. 그래서 그 조각을 없는 것으로 확정해 건너뛰는 표시(GAP)를 세울 수도 캐시를 되살릴 수도 없는 교착이 세션이 끝날 때까지 이어졌고, 경보는 WARN 한 줄이었습니다. 빈 번호 뒤의 알림을 받으면 장부에서 다시 읽어 캐시를 채우고(적재) 감시가 장부 끝을 직접 견주게 고친 뒤, 공개 저장소의 회귀 시험은 고치기 전 커밋에서 실패하고 고친 뒤 통과했습니다. 같은 장면에 30초 감시를 70번(35분) 돌려도 고치기 전 판은 7124 다음으로 넘어가지 못했고, 고친 판은 적재 한 번으로 이어 갔습니다.
 
-고칠 범위와 받아들일 한계는 제가 정했습니다. 캐시를 지금 고치는 것, 경보를 「캐시가 장부보다 뒤처진 경우」만 ERROR로 올리는 범위, AI 리뷰에서 나온 봉인 쪽 위험을 같은 PR에서 고치는 것, 봉인 직전 확인을 fence 뒤 같은 트랜잭션에 두고 시한을 0.5초로 한 것과 그로 인한 최악 9.5초, 아래 한계 넷, 같은 키 이중 송출은 운영 규칙과 별도 설계로 다루는 것, 조건부 머지 승인이 그 결정입니다. 조사 · 구현 · 시험 · 리뷰는 AI 에이전트(Claude Code와 Codex)가 했습니다. 변경은 11월 17일 05:06 develop에 병합됐고([PokeClip-mono PR 529](https://github.com/3K-PokeClip/PokeClip-mono/pull/529), 머지 커밋 `00cfa2d6`), 같은 날 아침 그때 대기 중이던 상자 b에 실어 07:04부터 b가 송출을 받습니다.
+고칠 범위와 받아들일 한계는 제가 정했습니다. 캐시는 지금 고치고, 경보는 「캐시가 장부보다 뒤처진 경우」만 ERROR로 올렸습니다. AI 리뷰에서 나온 정체 마감(봉인) 쪽 위험도 같은 PR에서 고쳤습니다. 봉인 직전 확인은 발행 권한(fence)을 잡은 뒤 같은 트랜잭션에 두고 시한을 0.5초로 했으며, 그 대가인 최악 9.5초와 아래 한계 넷을 받아들였습니다. 같은 키 이중 송출은 운영 규칙과 별도 설계로 넘겼고, 머지는 조건부로 승인했습니다. 조사 · 구현 · 시험 · 리뷰는 AI 에이전트(Claude Code와 Codex)가 했습니다. 변경은 11월 17일 05:06 develop에 병합됐고([PokeClip-mono PR 529](https://github.com/3K-PokeClip/PokeClip-mono/pull/529), 머지 커밋 `00cfa2d6`), 같은 날 아침 그때 대기 중이던 상자 b에 실어 07:04부터 b가 송출을 받습니다.
 
 ## 시험 방송의 되감기 목록이 7124번에서 35분 멈췄습니다
 
 PokéClip의 Media 상자는 EC2 한 대에서 MediaMTX와 사이드카를 돌립니다. 송출을 받는 상자와 대기 상자 두 대가 있고, 둘의 사이드카는 같은 DB의 조각 장부에 씁니다. 사이드카의 인덱서는 녹화 파일이 생기면 「그 스트림 커서 꼬리 + 1」을 번호로 붙여 장부에 넣습니다. 두 쓰기자가 같은 번호를 쓰면 기본 키 충돌로 걸리고, 인덱서는 커서를 다시 읽은 뒤 한 번만 다시 시도합니다. 이때 먼저 커밋한 행이 이깁니다. 나중에 온 조각이 선점 행보다 이른 시각이면 번호 순서와 시간 순서를 지키려고 그 조각을 버립니다([`indexer.go` 753–771행](https://github.com/3K-PokeClip/PokeClip-mono/blob/0dc13a68be5c257dd7d6b85a2d528b018e3acac4/media/internal/indexer/indexer.go#L753-L771)).
 
-그날 일은 이 순서로 일어났습니다(비공개 기록에서 식별자를 빼고 옮김, [실측 요약](https://github.com/xodbs1021/xodbs1021.github.io/blob/main/_workspace/blog/pokeclip-rewind-cache-deadlock/measurements.md)).
+그날 일은 이 순서로 일어났습니다([실측 요약](https://github.com/xodbs1021/xodbs1021.github.io/blob/main/_workspace/blog/pokeclip-rewind-cache-deadlock/measurements.md)).
 
 | 시각(KST) | 상자 | 일 |
 |---|---|---|
@@ -56,9 +56,9 @@ flowchart TB
 
 ## 빈 번호 뒤 push는 버리지 않고 장부에서 다시 싣습니다
 
-이제 캐시가 뷰의 다음 번호보다 뒤인 push를 받으면 「장부에 그 행이 있다」를 기록하고 그 스트림의 적재를 요구합니다([고친 뒤 `cache.go` 264–291행](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/internal/rewind/cache/cache.go#L264-L291)). 뷰에 바로 붙이지는 않습니다. 빈자리를 잇지 않는 원칙은 그대로이고, 적재(많아야 10,000행)가 장부에서 7125까지 함께 실어 빈자리를 메웁니다. 행이 실리면 사다리가 업로드 실패 행에 GAP을 세우고 목록이 이어집니다. 캐시 행 없이 DB만 보고 GAP을 세우는 안도 있었지만, 창과 미디어 순번 계산이 캐시 행을 전제로 해 고칠 곳이 더 크고 위험해서 접었습니다.
+이제 캐시가 뷰의 다음 번호보다 뒤인 push를 받으면 「장부에 그 행이 있다」를 기록하고 (같은 빈자리에서 백오프 중이 아니면) 그 스트림의 적재를 요구합니다([고친 뒤 `cache.go` 264–291행](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/internal/rewind/cache/cache.go#L264-L291)). 뷰에 바로 붙이지는 않습니다. 빈자리를 잇지 않는 원칙은 그대로이고, 적재(많아야 10,000행)가 장부에서 7125까지 함께 실어 빈자리를 메웁니다. 행이 실리면 사다리가 업로드 실패 행에 GAP을 세우고 목록이 이어집니다. 캐시 행 없이 DB만 보고 GAP을 세우는 안도 있었지만, 창과 미디어 순번 계산이 캐시 행을 전제로 해 고칠 곳이 더 크고 위험해서 접었습니다.
 
-가운데 줄이 고치기 전, 아래 줄이 고친 뒤의 같은 캐시입니다. 같은 7126 push가 위에서는 버려지고 아래에서는 장부 적재를 부릅니다.
+가운데 줄이 고치기 전, 아래 줄이 고친 뒤의 같은 캐시입니다. 같은 7126 push가 가운데 줄에서는 버려지고 아래 줄에서는 장부 적재를 부릅니다.
 
 {{< motion scene="LedgerReload" id="fig-ledger-reload" kind="개념도" caption="장부에는 상자 a의 0.3초 소리 없는 조각이 7125로 먼저 들어가고 상자 b의 진짜 4초 조각은 버려집니다. 고치기 전 캐시는 7126 · 7127 push를 다음 번호가 아니라 버려 목록 끝(청록 막대)이 7124에 멈춥니다. 고친 캐시는 같은 push에 장부 적재를 요구해 7125 · 7126 · 7127을 싣고, 7125에 GAP을 세워 이어 갑니다. 번호는 사건 기록 그대로이고 시간 간격은 설명용입니다." >}}
 
@@ -68,13 +68,13 @@ flowchart TB
 |---|---|---|
 | [`TestLadderGapsRowWhosePushTheCacheMissed`](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/cmd/segment-indexer/publish_loop_ladder_test.go#L211-L261) | FAIL — 적재 0번 | PASS — 적재 1 · GAP 1 · 7까지 발행 |
 | [`TestLadderAlarmsViewBehindAfterMissedPush`](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/cmd/segment-indexer/publish_loop_ladder_test.go#L321-L335) | FAIL — WARN `gap=no_row` | PASS — ERROR `gap=view_behind` |
-| 감시 70번(35분, 재측정용) | FAIL — 적재 0 · 발행 3에서 정지 · WARN 한 줄 | PASS — 적재 1 · 발행 6 |
+| 감시 70번(35분, 재측정용) | FAIL — 적재 0 · 발행 3에서 정지 · WARN 한 줄 | PASS — 빈 번호 뒤 push로 적재 1 · 발행 6 |
 
 ## 감시가 장부 끝을 직접 견주고, 뒤처짐은 ERROR로 알립니다
 
 push 하나에 기대면 같은 구멍이 남습니다. 다른 상자가 뒤 행까지 모두 넣으면 이 상자로는 push가 하나도 오지 않습니다. 그래서 30초 감시가 그 스트림 장부의 마지막 번호를 함께 읽어, 그 번호가 뷰 끝 너머면 불일치로 셉니다([`drift.go` 61–115행](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/internal/rewind/cache/drift.go#L61-L115)). 처음에는 「머리+1 행이 뷰에 없음」만 더했습니다. 그런데 머리+1이 뷰 안의 미확정 행이고 그 세션이 이미 끝나 사다리가 꺼졌다면, 그 뒤 다른 프로세스가 연 새 세션은 머리+1 대조로 영영 보이지 않아 장부 끝 대조를 더했습니다. 연속 두 번 불일치면 적재하는 가드는 그대로라 push 없는 뒤처짐은 감시 두 번, 약 60초 뒤에 잡힙니다.
 
-장부 자체에 빈 번호가 있으면 적재가 그 자리에서 멈춰 뒤처짐이 풀리지 않습니다. 설계상 번호는 꼬리+1이라 빈자리가 없어야 하지만, 생기면 감시마다 적재가 되풀이됩니다. 그래서 같은 빈자리에 한해 적재까지의 감시 수를 2, 4, 8로 두 배씩 늘려 64(약 32분)에서 멈추고, 뷰가 장부를 따라잡거나 감시가 일치를 보면 2로 되돌립니다([같은 파일 15–42행](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/internal/rewind/cache/drift.go#L15-L42)).
+장부 자체에 빈 번호가 있으면 적재가 그 자리에서 멈춰 뒤처짐이 풀리지 않습니다. 설계상 번호는 꼬리+1이라 빈자리가 없어야 하지만, 생기면 감시마다 적재가 되풀이됩니다. 그래서 같은 빈자리에 한해 적재까지의 감시 수를 2, 4, 8로 두 배씩 늘려 64(약 32분)에서 멈추고, 뷰가 장부를 따라잡거나 감시가 일치를 보면 2로 되돌립니다([같은 파일 15–42행](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/internal/rewind/cache/drift.go#L15-L42)). 이 동안 `view_behind` ERROR는 정체마다 한 줄 남고 `cache_drift_repaired`가 백오프 간격으로 이어지며, 봉인 스위치를 켜 둔 상자에서도 봉인하지 않아 세션이 스스로 닫히지 않을 수 있습니다([README 2717–2724행](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/README.md?plain=1#L2717-L2724), [`ladder.go` 175–178행](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/internal/rewind/publish/ladder.go#L175-L178)).
 
 경보는 갈래를 나눴습니다. 머리+1이 캐시에 없는데 장부에 있다는 것을 캐시가 알면 `gap=view_behind` ERROR입니다. 방송 종료 구간의 `no_row` WARN은 그대로 두고 범위만 좁혔습니다. 감시 쪽 경로는 뒤처짐을 첫 감시에야 알므로, 같은 정체에서 `no_row` WARN을 먼저 남겼으면 ERROR를 한 줄 더 남깁니다([`ladder.go` 219–247행](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/internal/rewind/publish/ladder.go#L219-L247), [README 신호표 아래 메모](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/README.md?plain=1#L2711-L2739)).
 
@@ -92,7 +92,7 @@ push 하나에 기대면 같은 구멍이 남습니다. 다른 상자가 뒤 행
 
 이 스위치를 켠 경우의 위험이 하나 더 있었습니다(AI 리뷰에서 나온 지적). 다른 상자가 넣은 행이라 push가 없으면 캐시는 첫 30초 감시 전까지 뒤처짐을 모르고, 그동안 까닭은 `no_row`입니다. 봉인 문턱 5.5초가 감시보다 먼저 와서 복구 전에 세션을 닫습니다. 봉인 전 확인이 들어가기 전 판(PR의 셋째 커밋 `7c6f43c2`)에서 같은 장면을 다시 만들어 보니, push가 없으면 5.5초에 봉인되고 세션이 ending으로 가며 발행은 3에서 멈췄습니다. push 하나만 닿게 한 대조에서는 봉인 없이 적재 뒤 6까지 발행했습니다. 스위치는 기본으로 꺼져 있지만, 저는 이 위험을 같은 PR에서 고치기로 정했습니다.
 
-봉인 전용 경로 `EndlistIfCaughtUp`은 트랜잭션 하나에서 발행 권한(fence)을 잡은 뒤, 같은 트랜잭션에서 그 스트림 장부의 마지막 번호를 시한 0.5초로 읽습니다([`freeze.go` 277–343행](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/internal/rewind/publish/freeze.go#L277-L343)). 장부 끝이 캐시 뷰의 다음 번호 이상이면 되돌리고 `ledger_ahead`로 물러납니다. 루프는 그 값을 캐시에 알려 적재를 요구합니다. 머리 다음 행이 뷰에 없는 정체라면 다음 틱부터 까닭이 `view_behind`가 돼 봉인에서 빠지고, 그 밖의 정체는 적재가 따라잡을 때까지 봉인 작업이 틱마다 같은 확인에서 물러납니다. 못 읽으면 `ledger_failed`로 그 틱은 봉인하지 않고 다음 틱에 다시 냅니다([`stall_seal.go` 106–124행](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/cmd/segment-indexer/stall_seal.go#L106-L124)). 확인 없이 봉인하는 갈래는 없습니다. 고친 뒤 커밋에서 PR의 [`TestStallSealChecksLedgerAtSealTime`](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/cmd/segment-indexer/stall_seal_precheck_test.go#L52-L89)과 PostgreSQL 17 시험 다섯이 통과했습니다.
+봉인 전용 경로 `EndlistIfCaughtUp`은 트랜잭션 하나에서 발행 권한(fence)을 잡은 뒤, 같은 트랜잭션에서 그 스트림 장부의 마지막 번호를 시한 0.5초로 읽습니다([`freeze.go` 277–343행](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/internal/rewind/publish/freeze.go#L277-L343)). 장부 끝이 캐시 뷰의 다음 번호 이상이면 되돌리고 `ledger_ahead`로 물러납니다. 루프는 그 값을 캐시에 알려 (같은 빈자리에서 백오프 중이 아니면) 적재를 요구합니다. 머리 다음 행이 뷰에 없는 정체라면 다음 틱부터 까닭이 `view_behind`가 돼 봉인에서 빠지고, 그 밖의 정체는 적재가 따라잡을 때까지 봉인 작업이 틱마다 같은 확인에서 물러납니다. 못 읽으면 `ledger_failed`로 그 틱은 봉인하지 않고 다음 틱에 다시 냅니다([`stall_seal.go` 106–124행](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/cmd/segment-indexer/stall_seal.go#L106-L124)). 확인 없이 봉인하는 갈래는 없습니다. 고친 뒤 커밋에서 PR의 [`TestStallSealChecksLedgerAtSealTime`](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/cmd/segment-indexer/stall_seal_precheck_test.go#L52-L87)과 PostgreSQL 17 시험 다섯이 통과했습니다.
 
 확인 자리를 정하기까지 세 안을 접었습니다. 다음 감시를 기다리는 안은 진짜로 끝난 방송의 봉인이 최대 30초 늦어 5.5초 문턱을 깹니다. 봉인 1초 전에 따로 확인해 두고 그 결과를 봉인에 다시 쓰는 안은 확인과 봉인 사이에 많아야 1.8초 틈이 남았습니다. 또 그 스트림의 작업 차선(저장소를 부르는 작업을 한 번에 하나씩 돌리는 줄)이 다른 작업으로 바쁘면 진짜 끝을 닫는 최악 시간이 10초로 늘었고, 봉인 전 마지막 GAP 재시도를 밀어냈습니다. fence 획득 바로 앞에서 확인하는 안은 fence가 행 잠금을 기다리는 동안(재현에서 1.5초) 장부가 나아가도 몰랐습니다. 뒤의 두 안의 결함은 시험으로 재현했습니다. 그래서 확인을 fence 뒤 같은 트랜잭션에 넣었습니다.
 
@@ -125,16 +125,16 @@ sequenceDiagram
 
 PostgreSQL 17.10 컨테이너에서 이 차이를 쟀습니다. 세션 행을 UPDATE로 잠근 트랜잭션이 [ACCESS EXCLUSIVE](https://www.postgresql.org/docs/17/explicit-locking.html#LOCKING-TABLES)로 잠긴 장부 표를 시한 0.5초로 읽게 하고, 다른 연결이 그 행을 `FOR UPDATE NOWAIT`로 잡을 수 있게 되는 때를 봤습니다. 대조군은 취소 요청용 다이얼만 막았습니다.
 
-| 경우(각 5회) | 읽기 시작부터 오류까지(시한 0.5초) | 오류 뒤 행 잠금이 풀리기까지 | 5초 뒤 서버 백엔드 |
+| 경우(각 5회) | 읽기 시작부터 오류까지(시한 0.5초) | 오류 뒤 행 잠금이 풀리기까지 | 탐침이 끝난 때 서버 백엔드 |
 |---|---|---|---|
-| pgx 기본(취소 요청 보냄) | 501ms | 7–9ms | 없음 |
-| 취소 요청만 막음 | 500–501ms | 5초 안에 안 풀림 | 남음 — 표 잠금을 쥔 연결이 끝나고 3–10ms 뒤 풀림 |
+| pgx 기본(취소 요청 보냄) | 501ms | 7–9ms | 없음(오류 뒤 약 10ms) |
+| 취소 요청만 막음 | 500–501ms | 5초 안에 안 풀림 | 남음(5초 뒤) — 표 잠금을 쥔 연결이 끝나고 3–10ms 뒤 풀림 |
 
-PR에서는 pgx 소스와 아래 PG 시험으로 서버가 조회를 끊는 것을 확인하고 서버 쪽 `statement_timeout`을 따로 두지 않았습니다. 위 표는 글을 쓰며 취소 요청만 막은 대조군을 더해 다시 잰 것입니다. PR의 [`TestEndlistIfCaughtUpCheckTimesOutOnServer`](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/internal/rewind/publish/freeze_pg_test.go#L417-L452)가 이 동작을 회귀 시험으로 지키므로, pgx가 취소를 보내지 않게 바뀌면 이 시험이 실패합니다. 확인이 장부 앞섬을 보고 되돌릴 때는, 연결이 멎어도 그 스트림의 작업 차선이 막히지 않도록 되돌림 문장에도 시한을 걸었습니다.
+PR에서는 pgx 소스와 아래 PG 시험으로 서버가 조회를 끊는 것을 확인하고 서버 쪽 `statement_timeout`을 따로 두지 않았습니다. 위 표는 글을 쓰며 취소 요청만 막은 대조군을 더해 다시 잰 것입니다. PR의 [`TestEndlistIfCaughtUpCheckTimesOutOnServer`](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/internal/rewind/publish/freeze_pg_test.go#L417-L452)가 이 동작을 회귀 시험으로 지키므로, pgx가 취소를 보내지 않게 바뀌면 이 시험이 실패합니다. 확인 뒤 트랜잭션을 되돌릴 때는, 연결이 멎어도 그 스트림의 작업 차선이 막히지 않도록 되돌림 문장에도 시한을 걸었습니다.
 
 ## 받아들인 한계는 넷입니다
 
-모두 [`media/README.md`](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/README.md?plain=1#L2725-L2739)와 [`freeze.go` 주석](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/internal/rewind/publish/freeze.go#L285-L288)에 적었고, 제가 받아들이기로 정했습니다.
+모두 [`media/README.md`](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/README.md?plain=1#L2725-L2739)와 [`freeze.go` 주석](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/internal/rewind/publish/freeze.go#L285-L288)에 적었습니다.
 
 | 한계 | 크기 | 받아들인 이유 |
 |---|---|---|
@@ -147,7 +147,7 @@ PR에서는 pgx 소스와 아래 PG 시험으로 서버가 조회를 끊는 것�
 
 ## 운영 상자에 실었고, 새 경보는 아직 실물로 울린 적이 없습니다
 
-11월 16일 밤 송출을 a로 넘긴 뒤로는 b가 대기 상자였습니다. 11월 17일 아침, 이 수정과 PR 528을 함께 품은 develop 머리로 사이드카 이미지를 빌드해 대기 상자 b에 제자리 전환으로 실었습니다(06:52–06:53). 이미지 올리기, 대기 상자 전환, 송출 넘김은 제가 승인했고 운영 작업 에이전트가 실행했습니다. 소리 트랙이 든 루프백(06:54:55)은 루프백 전 확인을 거쳐 보냈고 통과했습니다. 자격 확인(업로드 5 · 실패 0)과 감시 판정도 통과했습니다. 송출 수신(07:03)과 HTTP 대상(07:04)을 b로 넘겨, 07:04부터 b가 송출을 받습니다(비공개 기록에서 식별자를 빼고 옮김).
+11월 16일 밤 송출을 a로 넘긴 뒤로는 b가 대기 상자였습니다. 11월 17일 아침, 이 수정과 PR 528을 함께 품은 develop 머리로 사이드카 이미지를 빌드해 대기 상자 b에 제자리 전환으로 실었습니다(06:52–06:53). 이미지 올리기, 대기 상자 전환, 송출 넘김은 제가 승인했고 운영 작업 에이전트가 실행했습니다. 소리 트랙이 든 루프백(06:54:55)은 루프백 전 확인을 거쳐 보냈고 통과했습니다. 자격 확인(업로드 5 · 실패 0)과 감시 판정도 통과했습니다. 송출 수신(07:03)과 HTTP 대상(07:04)을 b로 넘겨, 07:04부터 b가 송출을 받습니다.
 
 새 판 사이드카가 뜬 06:53부터 약 06:58까지의 로그에서 `view_behind` ERROR와 `cache_drift_repaired`, `stall_seal`은 0줄이었습니다. 되감기 정체 WARN 두 줄은 루프백 세션이 끝날 때 나온 `no_row` · `ending`으로, 유입이 멈춘 정상 종료 모양이었습니다. 같은 구간의 ERROR 두 줄은 `view_behind`가 아니라 `late_segment_skipped`였습니다. 11월 16일 7125 충돌 때 b가 버린 진짜 4초 조각 파일이 b의 디스크에 남아 있어, 재스캔 때마다 「늦은 조각」으로 건너뛴 줄입니다.
 
@@ -156,9 +156,9 @@ PR에서는 pgx 소스와 아래 PG 시험으로 서버가 조회를 끊는 것�
 ## 측정 조건
 
 - **사건 시간선(비공개 기록 요약).** 2026년 11월 16일 21:53–22:50 KST. 사이드카 · MediaMTX 로그와 DB 읽기 조회를 같은 날 23:05에 읽은 결과입니다. 스트림 키 · 시험 키 · 계정 · 상자 주소 · 세션 ID를 빼고 [실측 요약](https://github.com/xodbs1021/xodbs1021.github.io/blob/main/_workspace/blog/pokeclip-rewind-cache-deadlock/measurements.md)에 옮겼습니다.
-- **운영 반영 확인(비공개 기록 요약).** 2026년 11월 17일 06:18–07:04 KST. 운영 작업 에이전트가 런북의 확인 스크립트를 돌린 출력과 진행 기록입니다. 로그 개수는 새 판 기동(06:53:35)부터 약 06:58까지입니다. 계정 · 상자 · 대상 그룹 이름과 이미지 다이제스트를 빼고 옮겼습니다.
-- **공개 재측정.** AI(Claude Code)가 2026년 11월 17일 07:12–07:16 KST에 실행했습니다(원자료 시각은 07:12–07:14). MacBook Air(Apple M5, 32GB), macOS 27.0.1, Go 1.27.2 darwin/arm64, OrbStack(Docker Engine 29.8.2, Linux VM 커널 7.2.12-orbstack, aarch64), `postgres:17`(PostgreSQL 17.10, 다이제스트는 `raw/env-pg.txt`), pgx v5.10.0.
-- **커밋.** 3K-PokeClip/PokeClip-mono의 고치기 전 `0dc13a68`(PR 첫 커밋 `c0b7696a`의 부모), 봉인 전 확인 전 `7c6f43c2`(PR 셋째 커밋), 고친 뒤 `00cfa2d6`(develop 머지 커밋)를 `git archive`로 풀어 `go test -count=1 -race -p 1`로 한 번씩 돌렸습니다. PR 회귀 시험 둘은 머지 커밋의 시험 코드 203–261 · 320–335행을 고치기 전 트리에 그대로 옮겼습니다. 「감시 70번」과 봉인 재현은 이 저장소에만 있는 재측정용 시험(`rmtest/`)입니다. 시험 시계는 감시 한 번을 30초로 놓은 가짜 시계라, 실제 경과 시간을 잰 것은 아닙니다.
+- **운영 반영 확인(비공개 기록 요약).** 2026년 11월 17일 06:18–07:04 KST. 운영 작업 에이전트가 런북의 확인 스크립트를 돌린 출력과 진행 기록입니다. 계정 · 상자 · 대상 그룹 이름과 이미지 다이제스트를 빼고 [실측 요약](https://github.com/xodbs1021/xodbs1021.github.io/blob/main/_workspace/blog/pokeclip-rewind-cache-deadlock/measurements.md)에 옮겼습니다.
+- **공개 재측정.** AI(Claude Code)가 2026년 11월 17일 07:12–07:16 KST에 실행했습니다(원자료 시각 07:12). MacBook Air(Apple M5, 32GB), macOS 27.0.1, Go 1.27.2 darwin/arm64, OrbStack(Docker Engine 29.8.2, Linux VM 커널 7.2.12-orbstack, aarch64), `postgres:17`(PostgreSQL 17.10, 다이제스트는 `raw/env-pg.txt`), pgx v5.10.0.
+- **커밋.** 3K-PokeClip/PokeClip-mono의 고치기 전 `0dc13a68`(PR 첫 커밋 `c0b7696a`의 부모), 봉인 전 확인 전 `7c6f43c2`(PR 셋째 커밋), 고친 뒤 `00cfa2d6`(develop 머지 커밋)를 `git archive`로 풀어 `go test -count=1 -race -p 1`로 한 번씩 돌렸습니다. PR 회귀 시험 둘은 머지 커밋의 시험 코드 203–261 · 320–335행을 고치기 전 트리에 그대로 옮겼습니다. 「감시 70번」과 봉인 재현은 이 저장소에만 있는 재측정용 시험(`rmtest/`)입니다. 시험 시계는 감시 한 번을 30초로 놓은 가짜 시계라, 실제 경과 시간을 잰 것은 아닙니다. 감시 70번 시험에서 고친 뒤 회복은 빈 번호 뒤 push 경로이고, 시험의 감시 대역은 장부 끝을 싣지 않습니다. 장부 끝 대조는 PR 시험 [`TestWatchAloneRecoversNewSessionBeyondStuckRow`](https://github.com/3K-PokeClip/PokeClip-mono/blob/00cfa2d6e3f63594c5ab8aac9a26fd83d874b951/media/cmd/segment-indexer/publish_loop_ladder_test.go#L263-L319)가 지킵니다.
 - **pgx 탐침.** PostgreSQL 17.10 컨테이너 하나(라벨 `com.techblog.bench=rewind`, 데이터 tmpfs)에서 경우마다 5회 돌렸습니다. 서버 설정은 `client_connection_check_interval=0`, `statement_timeout=0`이고, 「풀리기까지」는 탐침 연결을 여는 시간을 포함합니다.
 - **명령.** `measure/` 폴더에서 `MONO_DIR=<PokeClip-mono 클론> ./run.sh extract` → `./run.sh unit <결과 폴더>` → `./run.sh pg-up` → `./run.sh pg <결과 폴더>` → `./run.sh down`(라벨 컨테이너와 `/tmp/rewindw-*`만 지움). 커밋된 원자료를 덮지 않으려면 결과 폴더를 새로 주십시오. 스크립트 · 시험 · 원자료는 [저장소 `_workspace/blog/pokeclip-rewind-cache-deadlock/measure/`](https://github.com/xodbs1021/xodbs1021.github.io/tree/main/_workspace/blog/pokeclip-rewind-cache-deadlock/measure)에 있습니다.
 

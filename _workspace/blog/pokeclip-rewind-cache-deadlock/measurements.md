@@ -70,7 +70,8 @@
 
 ## 2. 공개 재측정
 
-- 실행: AI(Claude Code), 2026-11-17 07:12–07:16 KST.
+- 실행: AI(Claude Code), 2026-11-17 07:12–07:16 KST(원자료 시각 07:12).
+- `raw/env.txt` 는 이번 실행에서 `run.sh unit` 이 쓴 `env-unit.txt`(Go 판 · 시각 · 커밋)에 Docker · macOS · CPU · 메모리 줄을 같은 세션에서 손으로 더해 합친 파일이다. 지금 `run.sh` 는 그 줄까지 `env.txt` 에 직접 쓴다.
 - 환경: MacBook Air(Apple M5, 32GB), macOS 27.0.1, Go 1.27.2 darwin/arm64, OrbStack(Docker Engine 29.8.2, Linux VM 커널 7.2.12-orbstack, aarch64).
 - PostgreSQL: `postgres:17` 이미지(`postgres@sha256:a426e44bac0b759c95894d68e1a0ac03ecc20b619f498a91aae373bf06d8508d`), 서버 17.10. 라벨 `com.techblog.bench=rewind` 컨테이너 하나, 데이터는 tmpfs.
 - pgx: v5.10.0(PokeClip-mono `media/go.mod` 와 같은 판).
@@ -78,7 +79,7 @@
   - 고치기 전 `0dc13a68be5c257dd7d6b85a2d528b018e3acac4` — PR 529 첫 커밋 `c0b7696a` 의 부모
   - 봉인 전 확인 전 `7c6f43c252453ee5178c45d21d32a1c3c70194ec` — PR 529 셋째 커밋(캐시 재적재 · 감시 대조는 있음)
   - 고친 뒤 `00cfa2d6e3f63594c5ab8aac9a26fd83d874b951` — PR 529 develop 머지 커밋
-- 명령: `measure/` 에서 `MONO_DIR=<PokeClip-mono 클론> ./run.sh extract` → `./run.sh unit "$PWD/raw"` → `./run.sh pg-up` → `./run.sh pg "$PWD/raw"` → `./run.sh down`.
+- 명령: `measure/` 에서 `MONO_DIR=<PokeClip-mono 클론> ./run.sh extract` → `./run.sh unit "$PWD/raw-new"` → `./run.sh pg-up` → `./run.sh pg "$PWD/raw-new"` → `./run.sh down`.
 - 시험은 모두 `go test -count=1 -race -p 1` 이고 한 번씩 돌렸다. pgx 탐침은 경우마다 5번이다.
 
 ### 2.1 캐시 교착 — 고치기 전 FAIL, 고친 뒤 PASS
@@ -122,10 +123,10 @@ PR 의 회귀 시험 두 개는 머지 커밋의 `media/cmd/segment-indexer/publ
 
 `measure/pgxcancel/` — 「피해자」 연결이 트랜잭션에서 세션 행(fence 자리)을 UPDATE(행 잠금) 한 뒤, 다른 연결이 ACCESS EXCLUSIVE 로 잠근 장부 표를 시한 0.5초로 읽는다. 시한 뒤 세 번째 연결이 50ms 마다 그 행을 `FOR UPDATE NOWAIT` 로 잡아 본다(최대 5초). 대조군은 피해자 연결의 두 번째 다이얼(취소 요청용)만 거부한다. 서버 설정: `client_connection_check_interval=0`, `statement_timeout=0`.
 
-| 경우 | 회차 | 읽기 시작부터 오류까지(시한 0.5초) | 오류 뒤 행 잠금이 풀리기까지 | 5초 뒤 피해자 백엔드 | 표 잠금을 쥔 연결이 끝난 뒤 풀리기까지 |
+| 경우 | 반복 | 읽기 시작부터 오류까지(시한 0.5초) | 오류 뒤 행 잠금이 풀리기까지 | 탐침이 끝난 때 피해자 백엔드 | 표 잠금을 쥔 연결이 끝난 뒤 풀리기까지 |
 |---|---|---|---|---|---|
-| pgx 기본(취소 요청 보냄) | 5 | 501ms ×5 | 7 · 7 · 9 · 7 · 8ms | 없음 ×5 | – |
-| 취소 요청만 막음 | 5 | 501 · 501 · 501 · 501 · 500ms | 5초 안에 안 풀림 ×5 | 남아 있음 ×5 | 10 · 3 · 7 · 3 · 4ms |
+| pgx 기본(취소 요청 보냄) | 5 | 501ms ×5 | 7 · 7 · 9 · 7 · 8ms | 없음 ×5(오류 뒤 약 10ms) | – |
+| 취소 요청만 막음 | 5 | 501 · 501 · 501 · 501 · 500ms | 5초 안에 안 풀림 ×5 | 남아 있음 ×5(5초 뒤) | 10 · 3 · 7 · 3 · 4ms |
 
 오류 문장은 열 번 모두 `timeout: context deadline exceeded` 였다. 「풀리기까지」 는 탐침 연결을 여는 시간을 포함한다. 원자료: `raw/pgx-cancel.txt` · `raw/env-pg.txt`.
 

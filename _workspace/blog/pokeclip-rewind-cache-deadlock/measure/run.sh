@@ -54,7 +54,11 @@ run_go() { # 이름 트리 패키지 실행정규식 → raw/<이름>.txt (종�
 cmd_unit() {
   local out=${1:?raw 폴더}
   mkdir -p "$out"
-  { go version; date '+%Y-%m-%dT%H:%M:%S%z'; uname -mrs; cat /tmp/rewindw-trees.txt; } > "$out/env-unit.txt"
+  { go version; date '+%Y-%m-%dT%H:%M:%S%z'; uname -mrs; cat /tmp/rewindw-trees.txt
+    echo "docker_server=$(docker version --format '{{.Server.Version}}')"
+    docker info --format 'os={{.OperatingSystem}} kernel={{.KernelVersion}} arch={{.Architecture}}' 2>/dev/null
+    if command -v sw_vers >/dev/null; then echo "macOS=$(sw_vers -productVersion)"; echo "cpu=$(sysctl -n machdep.cpu.brand_string)"; echo "mem_gb=$(( $(sysctl -n hw.memsize) / 1073741824 ))"; fi
+    echo "pgx=v5.10.0 (pgxcancel/go.mod)"; } > "$out/env.txt"
   local loop='^(TestLadderGapsRowWhosePushTheCacheMissed|TestLadderAlarmsViewBehindAfterMissedPush|TestRMWatchDoesNotBreakDeadlock)$'
   run_go before-loop "$(tree before)" ./cmd/segment-indexer/ "$loop" "$out"
   run_go after-loop  "$(tree after)"  ./cmd/segment-indexer/ "$loop" "$out"
