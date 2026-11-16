@@ -16,3 +16,11 @@ test('quota exhaustion returns 429 and Redis failure never reports false zero',a
  const req={method:'POST',url:`/?slug=${slug}`,headers:{origin:'https://taeyun.blog','x-vercel-forwarded-for':'203.0.113.7'}};
  for(const [redis,status]of[[{eval:async()=>[-1,0]},429],[{eval:async()=>{throw Error()}},503]]){const r=response();await createHandler({getRedis:()=>redis,getSecret:()=> 'test'})(req,r);assert.equal(r.code,status);assert.equal(r.data.views,undefined)}
 });
+test('batch GET reads many counts in one MGET without counting a view',async()=>{
+ const [a,b]=[...allowedSlugs];let asked,evals=0;const redis={mget:async(...k)=>{asked=k;return[5,null]},eval:async()=>{evals++}};const h=createHandler({getRedis:()=>redis});
+ let r=response();await h({method:'GET',url:`/?slugs=${encodeURIComponent(`${a},${b},evil`)}`,headers:{}},r);
+ assert.equal(r.code,200);assert.deepEqual(r.data.views,{[a]:5,[b]:0});assert.deepEqual(asked,[`views:v1:${a}`,`views:v1:${b}`]);assert.equal(evals,0);assert.match(r.headers['Cache-Control'],/s-maxage=300/);
+ r=response();await h({method:'GET',url:'/?slugs=evil',headers:{}},r);assert.equal(r.code,404);
+ r=response();await h({method:'GET',url:`/?slugs=${Array(61).fill(a).join(',')}`,headers:{}},r);assert.equal(r.code,400);
+ r=response();await h({method:'POST',url:`/?slugs=${a}`,headers:{origin:'https://taeyun.blog'}},r);assert.equal(r.code,405);
+});

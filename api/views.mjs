@@ -17,18 +17,35 @@ if fresh then return {1, redis.call('INCR', KEYS[4])} end
 return {0, tonumber(redis.call('GET', KEYS[4]) or '0')}
 `;
 export function identity(secret,ip,day){return createHmac('sha256',secret).update(`${day}:${ip}`).digest('hex').slice(0,32)}
+// A post list page shows at most this many rows; larger requests are refused.
+const MAX_BATCH=60;
+const READ_CACHE='public, max-age=30, s-maxage=300, stale-while-revalidate=600';
 export function createHandler({getRedis=()=>new Redis({url:process.env.KV_REST_API_URL||process.env.UPSTASH_REDIS_REST_URL,token:process.env.KV_REST_API_TOKEN||process.env.UPSTASH_REDIS_REST_TOKEN}),getSecret=()=>process.env.VIEWS_HASH_SECRET,now=()=>new Date()}={}){
+ // Post lists read many counts in one MGET; reading never counts a view.
+ async function readMany(req,res,send,requested){
+  if(req.method!=='GET'){res.setHeader('Allow','GET');return send(405,{error:'Method not allowed'})}
+  if(requested.length>MAX_BATCH)return send(400,{error:'Too many articles'});
+  const known=[...new Set(requested)].filter(s=>allowedSlugs.has(s));
+  if(!known.length)return send(404,{error:'Unknown article'});
+  try{
+   const counts=await getRedis().mget(...known.map(s=>`views:v1:${s}`));
+   res.setHeader('Cache-Control',READ_CACHE);
+   return send(200,{views:Object.fromEntries(known.map((s,i)=>[s,Number(counts[i]||0)]))});
+  }catch{return send(503,{error:'View counts temporarily unavailable'})}
+ }
  return async function handler(req,res){
   res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');
   const send=(code,data)=>res.status(code).json(data);
   if(!['GET','POST'].includes(req.method)){res.setHeader('Allow','GET, POST');return send(405,{error:'Method not allowed'})}
-  const slug=new URL(req.url,'https://taeyun.blog').searchParams.get('slug');
+  const params=new URL(req.url,'https://taeyun.blog').searchParams;
+  if(params.has('slugs'))return readMany(req,res,send,params.get('slugs').split(','));
+  const slug=params.get('slug');
   if(!slug||!allowedSlugs.has(slug))return send(404,{error:'Unknown article'});
   if(req.method==='POST' && (req.headers.origin!=='https://taeyun.blog'||Number(req.headers['content-length']||0)>256))return send(403,{error:'Request not allowed'});
   if(req.method==='POST' && /bot|crawler|spider|preview|linkedin|facebookexternalhit/i.test(req.headers['user-agent']||''))return send(204,{});
   try{
    const redis=getRedis();
-   if(req.method==='GET'){const views=Number(await redis.get(`views:v1:${slug}`)||0);res.setHeader('Cache-Control','public, max-age=30, s-maxage=300, stale-while-revalidate=600');return send(200,{views})}
+   if(req.method==='GET'){const views=Number(await redis.get(`views:v1:${slug}`)||0);res.setHeader('Cache-Control',READ_CACHE);return send(200,{views})}
    const secret=getSecret();if(!secret)throw new Error('Missing counter secret');
    const ip=(req.headers['x-vercel-forwarded-for']||req.headers['x-forwarded-for']||'').split(',')[0].trim();
    if(!ip)return send(400,{error:'Missing client address'});
