@@ -1,0 +1,16 @@
+$ (cd rewindw-before/media) go test -count=1 -race -p 1 -v -run '^(TestLadderGapsRowWhosePushTheCacheMissed|TestLadderAlarmsViewBehindAfterMissedPush|TestRMWatchDoesNotBreakDeadlock)$' ./cmd/segment-indexer/
+=== RUN   TestRMWatchDoesNotBreakDeadlock
+    rm_watch_deadlock_test.go:64: RESULT watches=70 loads=0 published_seq=3 resumed_at_watch=-1 stall_lines=1 drift_repaired=0
+    rm_watch_deadlock_test.go:74: LOG WARN rewind_publish_stall_seconds gap=no_row state=<nil>
+    rm_watch_deadlock_test.go:78: 감시 70번(35분) 뒤 발행본 PublishedSeq = 3, want 6 이상 — 교착이 풀리지 않았다
+--- FAIL: TestRMWatchDoesNotBreakDeadlock (0.00s)
+=== RUN   TestLadderGapsRowWhosePushTheCacheMissed
+    zz_pr529_regression_test.go:40: 적재 = 0번, want 1(빈 seq 뒤 push 가 요구)
+--- FAIL: TestLadderGapsRowWhosePushTheCacheMissed (0.00s)
+=== RUN   TestLadderAlarmsViewBehindAfterMissedPush
+    zz_pr529_regression_test.go:86: L4 = map[gap:no_row last_abort: seconds:7.5 session:S stream:s1], want ERROR 한 줄(gap=view_behind)
+--- FAIL: TestLadderAlarmsViewBehindAfterMissedPush (0.00s)
+FAIL
+FAIL	github.com/3K-PokeClip/pokeclip-mono/media/cmd/segment-indexer	0.446s
+FAIL
+exit=1

@@ -1,0 +1,20 @@
+$ (cd after/media) REQUIRE_PG=1 PG_DSN=<가림> PG_TEST_DB=rmtest go test -count=1 -race -p 1 -v -run '^TestEndlistIfCaughtUp' ./internal/rewind/publish/
+=== RUN   TestEndlistIfCaughtUpSealsOnlyWhenLedgerIsCaughtUp
+=== RUN   TestEndlistIfCaughtUpSealsOnlyWhenLedgerIsCaughtUp/장부_앞섬
+=== RUN   TestEndlistIfCaughtUpSealsOnlyWhenLedgerIsCaughtUp/따라잡음
+=== RUN   TestEndlistIfCaughtUpSealsOnlyWhenLedgerIsCaughtUp/DB_를_못_씀
+--- PASS: TestEndlistIfCaughtUpSealsOnlyWhenLedgerIsCaughtUp (0.13s)
+    --- PASS: TestEndlistIfCaughtUpSealsOnlyWhenLedgerIsCaughtUp/장부_앞섬 (0.06s)
+    --- PASS: TestEndlistIfCaughtUpSealsOnlyWhenLedgerIsCaughtUp/따라잡음 (0.04s)
+    --- PASS: TestEndlistIfCaughtUpSealsOnlyWhenLedgerIsCaughtUp/DB_를_못_씀 (0.03s)
+=== RUN   TestEndlistIfCaughtUpChecksAfterFenceWait
+--- PASS: TestEndlistIfCaughtUpChecksAfterFenceWait (0.06s)
+=== RUN   TestEndlistIfCaughtUpCheckTimesOut
+--- PASS: TestEndlistIfCaughtUpCheckTimesOut (0.54s)
+=== RUN   TestEndlistIfCaughtUpCheckTimesOutOnServer
+--- PASS: TestEndlistIfCaughtUpCheckTimesOutOnServer (0.55s)
+=== RUN   TestEndlistIfCaughtUpRollbackIsBounded
+--- PASS: TestEndlistIfCaughtUpRollbackIsBounded (0.35s)
+PASS
+ok  	github.com/3K-PokeClip/pokeclip-mono/media/internal/rewind/publish	2.898s
+exit=0
