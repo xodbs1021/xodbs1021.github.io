@@ -810,7 +810,7 @@
     "post": "sdl2-compat-textinput-null-push",
     "kind": "video",
     "posterFrame": 320,
-    "alt": "세 칸이 나란히 있다. 앱 · SDL2 API, sdl2-compat · Event2to3, SDL3 · SDL_PushEvent. 위 줄에서 SDL_KEYDOWN 카드가 가운데 칸에서 SDL_EVENT_KEY_DOWN으로 바뀌어 오른쪽 칸에 닿고 큐에 들어감 이름표가 뜬다. 아래 줄에서 SDL_TEXTINPUT text[32] = \"a\" 카드는 가운데 칸에서 빨간 NULL 카드로 바뀌고 짝 없음 → NULL 이름표가 뜬 뒤, 그대로 오른쪽 칸으로 넘어가 SIGSEGV · 주소 0x8 이름표가 뜨며 카드가 기울어 떨어진다",
+    "alt": "세 칸이 나란히 있다. 앱 · SDL2 API, sdl2-compat · Event2to3, SDL3 · SDL_PushEvent. 위 줄에서 SDL_KEYDOWN 카드가 가운데 칸에서 KEY_DOWN · SDL3 이벤트로 바뀌어 오른쪽 칸에 닿고 큐에 들어감 이름표가 뜬다. 아래 줄에서 SDL_TEXTINPUT text[32] = \"a\" 카드는 가운데 칸에서 빨간 NULL 카드로 바뀌고 짝 없음 → NULL 이름표가 뜬 뒤, 그대로 오른쪽 칸으로 넘어가 SIGSEGV · 주소 0x8 이름표가 뜨고 카드가 기울어 떨어진다. 떠난 자리에는 원래 카드가 옅게 남는다",
     "mobile": true
   }
 ]

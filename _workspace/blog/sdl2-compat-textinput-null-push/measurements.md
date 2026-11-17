@@ -1,6 +1,6 @@
 # 공개 재측정 — sdl2-compat 에 SDL_TEXTINPUT 을 넣으면
 
-수행: AI(Claude Code), 2026-11-18 03:29(SIP) · 03:44(행렬) KST. 게임 · 자산 없이 최소 C 프로그램만 썼다.
+수행: AI(Claude Code), 2026-11-18 03:29(SIP) · 03:44(행렬) KST. 최소 C 프로그램만 썼다.
 
 ## 환경
 
@@ -41,7 +41,7 @@
   - 1 libSDL2-2.0.0.dylib `SDL_PushEvent_REAL` (sdl2_compat.c:2636 / 2683 / 2734)
   - 2 push_and_report → 3 main
   - Homebrew 판은 기호만 있고 소스 행 없음.
-- peep 스택: `_platform_strlcpy` ← `Event3to2`(sdl2_compat.c:2276 / 2329 / 2372) ← `SDL_WaitEventTimeout_REAL` ← `SDL_PollEvent`. 잘못된 주소 0x0(글자 "a"), 글자 "abcdefghijkl" 이면 0x6c6b6a6968676660(글자 바이트 "efghijkl" 가 포인터 자리에 들어감).
+- peep 스택: `_platform_strlcpy` ← `Event3to2`(sdl2_compat.c:2276 / 2329 / 2372) ← `SDL_WaitEventTimeout_REAL` ← `SDL_PollEvent`. 잘못된 주소 0x0(글자 "a"), 글자 "abcdefghijkl" 이면 포인터 자리에 "efghijkl" 바이트가 들어가 포인터 값 0x6c6b6a6968676665(리틀엔디언), 보고된 잘못된 주소는 strlcpy 가 16바이트 단위로 내려 읽은 0x6c6b6a6968676660.
 
 ## lldb 를 쓰지 못한 이유
 
@@ -62,7 +62,7 @@
 ## 다시 돌리기
 
 ```sh
-measure/build.sh                 # /tmp/sdlw-work 에 소스 받고 빌드(약 5분, 10코어)
+measure/build.sh                 # /tmp/sdlw-work 에 소스 받고 빌드(약 5분, 10코어). main 은 측정 때 커밋으로 고정(SDL_MAIN_REF · COMPAT_MAIN_REF 로 바꿀 수 있음)
 OUT=/tmp/sdlw-out measure/run.sh # 결과 표 출력, OUT 에 원자료
 measure/sip-probe.sh             # /tmp/sdlw-sip
 ```

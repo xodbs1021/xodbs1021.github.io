@@ -5,15 +5,15 @@
 #   sdl2-2.32.10     SDL release-2.32.10         (정식 SDL2)
 #   sdl3-3.4.12      SDL release-3.4.12          (2.32.70 과 함께 쓰던 SDL3)
 #   sdl3-3.4.20      SDL release-3.4.20          (측정일 최신 SDL3 릴리스)
-#   sdl3-main        SDL main                    (SDL_MAIN_REF 로 고정 가능)
+#   sdl3-main        SDL main                    (기본은 측정 때 커밋 4cc7adca, SDL_MAIN_REF 로 바꿀 수 있음)
 #   compat-2.32.70   sdl2-compat release-2.32.70
 #   compat-2.32.74   sdl2-compat release-2.32.74 (측정일 최신 릴리스)
-#   compat-main      sdl2-compat main            (COMPAT_MAIN_REF 로 고정 가능)
+#   compat-main      sdl2-compat main            (기본은 측정 때 커밋 2758e13e, COMPAT_MAIN_REF 로 바꿀 수 있음)
 set -eu
 ROOT=${SDLW_ROOT:-/tmp/sdlw-work}
 JOBS=${JOBS:-8}
-SDL_MAIN_REF=${SDL_MAIN_REF:-origin/main}
-COMPAT_MAIN_REF=${COMPAT_MAIN_REF:-origin/main}
+SDL_MAIN_REF=${SDL_MAIN_REF:-4cc7adcaee482b63b4e1a0de77f52e200aa87b90}
+COMPAT_MAIN_REF=${COMPAT_MAIN_REF:-2758e13e84d333b43063af505272ff1c8fd9eca4}
 mkdir -p "$ROOT/src" "$ROOT/wt" "$ROOT/build" "$ROOT/inst" "$ROOT/logs"
 
 clone() { # url dir

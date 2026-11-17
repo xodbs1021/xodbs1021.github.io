@@ -2,7 +2,7 @@
 // 앱이 SDL2 API 로 넣은 이벤트가 sdl2-compat 의 Event2to3 를 거쳐 SDL3 의 SDL_PushEvent 로 간다.
 // 위 줄: SDL_KEYDOWN 은 SDL3 KEY_DOWN 으로 바뀌어 큐에 들어간다.
 // 아래 줄: SDL_TEXTINPUT 은 바꿀 짝이 없어 Event2to3 가 NULL 을 돌려주고, 그 NULL 이 그대로 SDL3 로 넘어가
-//          첫 필드(timestamp, 오프셋 8)를 읽다 SIGSEGV 로 떨어진다. 주소 0x8 은 lldb 재현 값이다.
+//          첫 필드(timestamp, 오프셋 8)를 읽다 SIGSEGV 로 떨어진다. 주소 0x8 은 크래시 보고서 값이다.
 // layout="mobile" 은 1080×1350 휴대폰판(TextInputNullMobile) — 단계를 세로로 쌓고 두 줄을 좌우로 둔다. 글자 48px 이상.
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { Node } from "../../components/Flow";
@@ -58,7 +58,7 @@ const DESKTOP: Layout = {
   arrowAxis: "x",
   queuedTag: [1580, 410],
   nullTag: [960, 810],
-  crashTag: [1580, 530],
+  crashTag: [1600, 935],
   fall: [20, 110],
   tilt: 10,
 };
