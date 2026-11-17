@@ -1,6 +1,6 @@
 ---
 title: "SDL_TEXTINPUT 넣자 sdl2-compat이 죽었습니다"
-date: 2026-11-18T03:50:50+09:00
+date: 2026-11-18T04:19:57+09:00
 description: "SDL2 프로그램이 SDL_PushEvent로 SDL_TEXTINPUT을 넣으면 sdl2-compat에서는 SDL3 안에서 주소 0x8을 읽다 SIGSEGV로 죽습니다. Event2to3가 이 이벤트에 NULL을 돌려주고 SDL_PushEvent가 그대로 넘기기 때문입니다. 정식 SDL 2.32.10은 정상이었고 sdl2-compat 2.32.70 · 2.32.74 · main은 모두 죽었습니다. 이 코드가 생긴 이력, SDL_PeepEvents 경로, 회피책, make에 준 DYLD_LIBRARY_PATH를 SIP가 지운 이유를 공개 재측정과 소스로 정리했습니다."
 categories: ["technical-notes"]
 tags: ["SDL2", "SDL3", "sdl2-compat", "SDL_PushEvent", "macOS", "SIP"]
