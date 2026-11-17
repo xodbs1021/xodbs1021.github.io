@@ -2,7 +2,7 @@
 // 정체 사다리의 두 축(개념도 — 값은 코드의 설계 상수, 실측이 아니다).
 // 위 축 holdAge: 머리 다음 조각이 캐시에 있을 때, 그 조각이 실렸어야 할 때(PDT + 길이 + E2E_BUDGET 2초)부터 잰다.
 //   0.5초 L1 업로드 재시도 당김 → 2초 L2 GAP.
-// 아래 축 stallAge: GAP 을 세울 수 없을 때(조각 없음 · 부적격 · GAP 틱 실패), 마지막 발행 성공부터 잰다.
+// 아래 축 stallAge: GAP 이 서지 않은 동안 마지막 발행 성공부터 잰다(L4 는 holding 포함, L2′ 은 GAP 을 세울 수 없을 때만).
 //   5.5초 L2′ 봉인(스위치 · 기본 끔) → 7.5초 L4 경보.
 // 재생점이 위 축을 먼저, 아래 축을 다음에 지나며 단계가 차례로 켜진다. 두 축의 0 은 서로 다른 시각이다.
 // layout="mobile" 은 1080×1350 휴대폰판(StallLadderMobile) — 글자 48px 이상.
@@ -75,7 +75,7 @@ const DESKTOP: Layout = {
     ],
   },
   bottom: {
-    title: "GAP을 세울 수 없을 때",
+    title: "GAP이 서지 않은 동안",
     sub: "stallAge",
     titleY: 560,
     subY: 560,
@@ -113,7 +113,7 @@ const MOBILE: Layout = {
     ],
   },
   bottom: {
-    title: "GAP을 세울 수 없을 때",
+    title: "GAP이 서지 않은 동안",
     sub: "stallAge",
     titleY: 660,
     subY: 730,

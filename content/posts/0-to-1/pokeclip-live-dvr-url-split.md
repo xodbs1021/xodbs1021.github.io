@@ -139,8 +139,8 @@ EC2 하나가 죽으면 라이브도 함께 멈춥니다. 오리진 대체 설�
 - [경로 규칙 표 스크립트 · 결과](https://github.com/xodbs1021/xodbs1021.github.io/tree/main/_workspace/blog/pokeclip-live-dvr-url-split/measure)
 
 이어지는 글
-- [서명 쿠키는 종류별로 나누고 1시간 창은 엣지에서 막았습니다](/posts/0-to-1/pokeclip-dvr-cookie-edge-floor/) — 이 시리즈의 다음 편
-- [사이드카는 4초 조각마다 HLS 되감기 목록을 이렇게 만듭니다](/posts/0-to-1/pokeclip-sidecar-rewind-playlist/) — 이 시리즈의 2편, `/dvr` 목록을 쓰는 사이드카
+- [서명 쿠키는 종류별로 나누고 1시간 창은 엣지에서 막았습니다](/posts/0-to-1/pokeclip-dvr-cookie-edge-floor/) — 1편 둘째 글
+- [사이드카는 4초 조각마다 HLS 되감기 목록을 이렇게 만듭니다](/posts/0-to-1/pokeclip-sidecar-rewind-playlist/) — 2편, `/dvr` 목록을 쓰는 사이드카
 - [HLS 라이브와 DVR 목록을 나누자 넘김 조건이 생겼습니다](/posts/0-to-1/pokeclip-live-dvr-separation-handoff/) — 900조각 목록 · 넘김 조건
 - [LL-HLS 라이브 창은 지연이 아니라 복귀 여유를 정했습니다](/posts/0-to-1/pokeclip-live-window-without-fork/) — 28초 창
 - [늦게 끝난 발행이 새 HLS 목록을 덮지 못하게 했습니다](/posts/0-to-1/pokeclip-database-authoritative-manifest-publishing/) — 되감기 목록의 S3 정적 발행

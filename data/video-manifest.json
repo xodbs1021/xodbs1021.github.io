@@ -1991,9 +1991,9 @@
   },
   "pokeclip-sidecar-rewind-playlist-stall-ladder": {
     "scene": "StallLadder",
-    "alt": "두 가로축이 위아래로 있다. 위 축은 다음 조각이 캐시에 있을 때의 holdAge로, 0은 조각 끝에서 2초 뒤 실렸어야 할 때다. 재생점이 0에서 오른쪽으로 가며 축이 청록으로 차고, 0.5초 눈금을 지나면 L1 재시도 당김 이름표가, 2초 눈금을 지나면 L2 GAP 이름표가 청록으로 켜진다. 이어 아래 축은 GAP을 세울 수 없을 때의 stallAge로, 0은 마지막 발행 성공이다. 재생점이 지나가며 5.5초 눈금에서 L2′ 봉인(스위치) 이름표가 회색으로, 7.5초 눈금에서 L4 경보 이름표가 빨갛게 켜진다",
-    "sha256": "37219c7820e5b34b0e45da078102825f9dbf75db1c0972887d338b8a4e832cc0",
-    "bytes": 160215,
+    "alt": "두 가로축이 위아래로 있다. 위 축은 다음 조각이 캐시에 있을 때의 holdAge로, 0은 조각 끝에서 2초 뒤 실렸어야 할 때다. 재생점이 0에서 오른쪽으로 가며 축이 청록으로 차고, 0.5초 눈금을 지나면 L1 재시도 당김 이름표가, 2초 눈금을 지나면 L2 GAP 이름표가 청록으로 켜진다. 이어 아래 축은 GAP이 서지 않은 동안의 stallAge로, 0은 마지막 발행 성공이다. 재생점이 지나가며 5.5초 눈금에서 L2′ 봉인(스위치) 이름표가 회색으로, 7.5초 눈금에서 L4 경보 이름표가 빨갛게 켜진다",
+    "sha256": "5ab64f5f23d109b81e386696bd0ca86c80ca6cdf30e7f614d23c2a8fa2d10bdf",
+    "bytes": 159535,
     "codec": "h264",
     "pixFmt": "yuv420p",
     "width": 1920,
@@ -2003,8 +2003,8 @@
     "faststart": true,
     "poster": "/images/pokeclip-sidecar-rewind-playlist-stall-ladder-poster.jpg",
     "mobile": {
-      "sha256": "ec5883dcafff3c66797bbb3df55d19aa5c00884434a54e5fb541973bfafa7714",
-      "bytes": 151020,
+      "sha256": "032de3d68055b93072806c7ab659e18589adae1a5e9ce9b0736532ef0d80288b",
+      "bytes": 152326,
       "codec": "h264",
       "pixFmt": "yuv420p",
       "width": 1080,

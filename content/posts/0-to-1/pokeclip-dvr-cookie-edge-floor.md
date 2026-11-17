@@ -140,8 +140,8 @@ sequenceDiagram
 - [함수 시험 · 하한 결정 표 · 와일드카드 시연 스크립트와 원자료](https://github.com/xodbs1021/xodbs1021.github.io/tree/main/_workspace/blog/pokeclip-dvr-cookie-edge-floor/measure)
 
 이어지는 글
-- [CDN 하나에서 라이브는 EC2로, 되감기는 S3로 보냈습니다](/posts/0-to-1/pokeclip-live-dvr-url-split/) — 이 시리즈의 앞 편
-- [사이드카는 4초 조각마다 HLS 되감기 목록을 이렇게 만듭니다](/posts/0-to-1/pokeclip-sidecar-rewind-playlist/) — 이 시리즈의 2편, 하한을 알리는 목록 발행
+- [CDN 하나에서 라이브는 EC2로, 되감기는 S3로 보냈습니다](/posts/0-to-1/pokeclip-live-dvr-url-split/) — 1편
+- [사이드카는 4초 조각마다 HLS 되감기 목록을 이렇게 만듭니다](/posts/0-to-1/pokeclip-sidecar-rewind-playlist/) — 2편, 하한을 알리는 목록 발행
 - [되감기 중 사라진 HLS 조각, 재생 목록을 다시 받아 풀었습니다](/posts/projects/rewind-missing-segment/) — 플레이어가 엣지 404를 받는 쪽
 - [nginx는 경로의 방송과 쿼리의 방송이 같을 때만 넘깁니다](/posts/0-to-1/pokeclip-nginx-playback-request-boundary/) — 정책이 못 막는 쿼리
 - [2시간 방송이 다시보기에서 7.5분만 보였던 이유](/posts/projects/pokeclip-round-vod/) — 회차 · 사슬 · 다시보기 문서

@@ -314,6 +314,15 @@
       "bytes": 20585
     }
   },
+  "706e205a8799d3e0": {
+    "source": "content/posts/0-to-1/pokeclip-sidecar-rewind-playlist.md",
+    "wide": {
+      "file": "706e205a8799d3e0-wide.svg",
+      "width": 344,
+      "height": 724,
+      "bytes": 25513
+    }
+  },
   "70f76eb873d6b0c8": {
     "source": "content/posts/0-to-1/media-ci-path-filter-required-check-tradeoff.md",
     "wide": {
@@ -591,15 +600,6 @@
       "width": 392,
       "height": 741,
       "bytes": 24531
-    }
-  },
-  "ca103d7aca9efc06": {
-    "source": "content/posts/0-to-1/pokeclip-sidecar-rewind-playlist.md",
-    "wide": {
-      "file": "ca103d7aca9efc06-wide.svg",
-      "width": 392,
-      "height": 1111,
-      "bytes": 26393
     }
   },
   "cdcadbe82a42dd03": {

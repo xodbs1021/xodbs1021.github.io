@@ -46,6 +46,11 @@
 | 512KiB · 크기 실측 · 설계 어림 90KB/10KB | `validate.go` 22–25, `raw/size.txt`, 설계서 4.0 크기 표 | 실측 + 설계 | 공개 재측정 |
 | /dvr 에 compress 없음 · 캐시 정책 gzip 없음 · 정적 사이트엔 compress = true | `cdn_media/main.tf` 59–64, `policies.tf` 83–103, `cdn_static_site/main.tf` 157, AWS 문서 | 코드 + 문헌 | 저장소 원문 기준(배포된 설정 아님) |
 | 조건부 PUT(IfAbsent · IfMatch) · Cache-Control 1초 | `tick.go` 140–160 · 458–463, `s3store.go` 27–44 | 코드 | – |
+| 틱 순서 P0(세대 예약) → 렌더 → 검사 → PUT → 확정, S6 이 예약 세대를 봄 · sha 비교는 P0 뒤 | `tick.go` 139–155 · 208–243 | 코드 | 리뷰 지적으로 고침 |
+| 틱은 dirty · 재발행 표지 · L2 스트림에만 | `rewind_publish.go` 19–38 | 코드 | 리뷰 지적으로 고침 |
+| L4 = 「L2 가 아직 서지 않음」(holding 포함) · A′ 의 holding ERROR 는 설계된 동작 | `ladder.go` 14, `ladder_test.go` `TestLadderAlarmLevelFollowsBlockedReason`/`GAP_HOLD_앞`, 설계 사다리 표 | 코드 + 시험 | 처음 판의 「재측정에서 드러난 모양」 표현을 거둠 |
+| L1 = `Uploader.Expedite` 가 백오프 대기만 없앰 | `guard.go` 427–436 | 코드 | – |
+| compress 키가 경로 규칙 블록에도 없음 | `cdn_media/main.tf` 161–185 | 코드 | 배포된 배포판 설정은 확인하지 않음 |
 | 동결 = 장부 재적재 · Render · Validate · ENDLIST | `freeze.go` 153–161 · 183–215 | 코드 | – |
 | 봉인 = Get · sha 대조 · 한 줄 · If-Match, 쓰는 곳 셋 | `seal.go` 22–43, `freeze.go` 233–261, `finalize.go` 7–10 | 코드 | – |
 | ENDLIST 인 까닭(같은 본문 재PUT 은 의무 못 지움) · fence 필수로 바뀜 | RFC 6.2.1, 설계서 정체 마감 절(fence 예외 판 → fence 필수 저울) | 문헌 + 설계 | – |

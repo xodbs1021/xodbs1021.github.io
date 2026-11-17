@@ -55,4 +55,6 @@
 | D′ 같은 장면 · 봉인 켬 | L1 · L2′ 봉인 | 5.50 | 0.50 | |
 | E 캐시 뒤처짐 · 봉인 켬 | L4(봉인 없음) | 7.50 | – | ERROR gap=view_behind |
 
-A′ 는 재측정에서 드러난 모양이다: 두 축이 따로라 holdAge = stallAge + delta − 6 이고, delta < 0.5초면 L4(stallAge 7.5)가 L2(holdAge 2.0 ⇔ stallAge 8 − delta)보다 먼저 선다. 운영 루프는 1초 틱이라 그 사이 0.5 − delta 초 안에 틱이 떨어질 때만 보인다. 코드 수정은 제안하지 않았다(보고만).
+A′ 는 결함이 아니라 설계된 동작이다: 두 축이 따로라 holdAge = stallAge + delta − 6 이고, delta < 0.5초면 L4(stallAge 7.5)가 L2(holdAge 2.0 ⇔ stallAge 8 − delta)보다 먼저 온다. 운영 루프는 1초 틱이라 그 사이 0.5 − delta 초 안에 틱이 떨어질 때만 보인다. L4 의 정의는 「L2 가 아직 서지 않음」(holding 포함)이고(`ladder.go` 14행 머리 주석, 설계 사다리 표), 저장소 시험 `TestLadderAlarmLevelFollowsBlockedReason` 의 `GAP_HOLD_앞` 사례가 holding 을 ERROR 로 고정한다. 이때는 GAP 을 세워도 발행 예산을 더하면 9초를 넘길 수 있어 경보가 가리키는 위험은 실제다. delta < 0.5초가 운영에서 얼마나 되는지는 재지 않았다.
+
+글에는 장면 A · A′ · C · D 만 실었다(C′ · E 는 이 표와 `raw/ladder.txt` 에만 있다).
