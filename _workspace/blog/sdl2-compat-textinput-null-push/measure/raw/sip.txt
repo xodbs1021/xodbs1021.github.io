@@ -1,0 +1,24 @@
+2026-11-18T03:29:46+0900
+## system
+ProductName:		macOS
+ProductVersion:		27.0.1
+BuildVersion:		26A434
+arm64
+System Integrity Protection status: enabled.
+## file flags (restricted = SIP 보호)
+-rwxr-xr-x   1 root  wheel  restricted,compressed 166576  9월 24 16:10 /bin/sh
+-rwxr-xr-x   1 root  wheel  compressed             69456 10월 20 10:58 /Library/Developer/CommandLineTools/usr/bin/make
+-rwxr-xr-x  78 root  wheel  restricted,compressed 200560  9월 24 16:10 /usr/bin/make
+## 1. 직접 실행
+direct: DYLD_LIBRARY_PATH=/tmp/sdlw-sip/fake-lib-dir
+## 2. /bin/sh -c
+child-of-bin-sh: DYLD_LIBRARY_PATH=(unset)
+## 3. /usr/bin/make (xcrun 심)
+recipe-direct-exec: DYLD_LIBRARY_PATH=(unset)
+recipe-via-sh: DYLD_LIBRARY_PATH=(unset)
+## 4. /Library/Developer/CommandLineTools/usr/bin/make (보호 안 됨)
+recipe-direct-exec: DYLD_LIBRARY_PATH=/tmp/sdlw-sip/fake-lib-dir
+recipe-via-sh: DYLD_LIBRARY_PATH=(unset)
+## 5. make 명령줄 변수
+recipe-direct-exec: DYLD_LIBRARY_PATH=/tmp/sdlw-sip/fake-lib-dir
+recipe-via-sh: DYLD_LIBRARY_PATH=(unset)

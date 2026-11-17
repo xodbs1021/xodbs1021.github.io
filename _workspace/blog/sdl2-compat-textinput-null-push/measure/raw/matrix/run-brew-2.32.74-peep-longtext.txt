@@ -1,0 +1,9 @@
+compiled-against SDL 2.32.10
+linked SDL_GetVersion 2.32.74
+SDL_GetRevision SDL-2.32.74-no-vcs
+sizeof(SDL_Event) 56, sizeof(SDL_TextInputEvent) 44
+mode peep, init EVENTS
+SDL_EventState(SDL_TEXTINPUT) 1
+poll: 0 matching event(s)
+calling SDL_PeepEvents(SDL_ADDEVENT, type=0x303)
+SDL_PeepEvents returned 1

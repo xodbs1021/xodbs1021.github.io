@@ -1,0 +1,12 @@
+compiled-against SDL 2.32.10
+linked SDL_GetVersion 2.32.10
+SDL_GetRevision SDL-release-2.32.10-0-g5d2495703
+sizeof(SDL_Event) 56, sizeof(SDL_TextInputEvent) 44
+mode keydown, init EVENTS
+SDL_EventState(SDL_TEXTINPUT) 0
+poll: 0 matching event(s)
+calling SDL_PushEvent(type=0x300)
+SDL_PushEvent returned 1
+poll: SDL_KEYDOWN sym=0x61
+poll: 1 matching event(s)
+exit normally

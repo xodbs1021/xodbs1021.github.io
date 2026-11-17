@@ -1,0 +1,3 @@
+/tmp/sdlw-work/bin/textinput_push-compat-2.32.70:
+	@rpath/libSDL2-2.0.0.dylib (compatibility version 3201.0.0, current version 3201.70.0)
+	/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1359.40.3)

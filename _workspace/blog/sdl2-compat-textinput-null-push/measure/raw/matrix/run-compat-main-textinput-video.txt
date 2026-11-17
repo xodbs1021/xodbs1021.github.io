@@ -1,0 +1,8 @@
+compiled-against SDL 2.32.10
+linked SDL_GetVersion 2.32.75
+SDL_GetRevision SDL-2.32.75-no-vcs
+sizeof(SDL_Event) 56, sizeof(SDL_TextInputEvent) 44
+mode textinput, init VIDEO
+SDL_EventState(SDL_TEXTINPUT) 1
+poll: 0 matching event(s)
+calling SDL_PushEvent(type=0x303)

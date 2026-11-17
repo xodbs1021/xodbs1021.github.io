@@ -1,0 +1,12 @@
+exception EXC_BAD_ACCESS SIGSEGV KERN_INVALID_ADDRESS at 0x6c6b6a6968676660
+far 0x6c6b6a6968676660  esr (Data Abort) byte read Translation fault
+x0 0x16ef7aacc
+os macOS 27.0.1 26A434
+frames:
+  0 libsystem_platform.dylib _platform_strlcpy + 32
+  1 libSDL2-2.0.0.dylib Event3to2 + 2908  (sdl2_compat.c:2276)
+  2 libSDL2-2.0.0.dylib SDL_WaitEventTimeout_REAL + 52  (sdl2_compat.c:3073)
+  3 libSDL2-2.0.0.dylib SDL_PollEvent_REAL + 88  (sdl2_compat.c:3081)
+  4 textinput_push-compat-2.32.70 drain + 44  (textinput_push.c:41)
+  5 textinput_push-compat-2.32.70 main + 1072  (textinput_push.c:135)
+  6 dyld start + 6688

@@ -2275,6 +2275,32 @@
       "poster": "/images/rtmp-still-alive-chunk-interleave-mobile-poster.jpg"
     }
   },
+  "sdl2-compat-textinput-null-push-text-input-null": {
+    "scene": "TextInputNull",
+    "alt": "세 칸이 나란히 있다. 앱 · SDL2 API, sdl2-compat · Event2to3, SDL3 · SDL_PushEvent. 위 줄에서 SDL_KEYDOWN 카드가 가운데 칸에서 SDL_EVENT_KEY_DOWN으로 바뀌어 오른쪽 칸에 닿고 큐에 들어감 이름표가 뜬다. 아래 줄에서 SDL_TEXTINPUT text[32] = \"a\" 카드는 가운데 칸에서 빨간 NULL 카드로 바뀌고 짝 없음 → NULL 이름표가 뜬 뒤, 그대로 오른쪽 칸으로 넘어가 SIGSEGV · 주소 0x8 이름표가 뜨며 카드가 기울어 떨어진다",
+    "sha256": "436f52a376c6d67cb16e4fd893d45e41e3653d3acaf8c3c8ea62451faf0b4a80",
+    "bytes": 257248,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/sdl2-compat-textinput-null-push-text-input-null-poster.jpg",
+    "mobile": {
+      "sha256": "dcca54766a439aece9860fdf7fa7935f1c30c69c6afbdf3023ff925521a11b53",
+      "bytes": 255079,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/sdl2-compat-textinput-null-push-text-input-null-mobile-poster.jpg"
+    }
+  },
   "shakedown-bounded-ai-image-generation-generation-and-plan-gates": {
     "scene": "GenerationAndPlanGates",
     "alt": "왼쪽 「이미지 생성」 열에 기존 Dockerfile · 지원 스택 규칙 · Claude 1회 · 형식 · 금지 요소 검사 · 별도 사본에서 빌드 상자가 위에서 아래로 있다. 점이 내려가며 기존 Dockerfile은 「없음」, 규칙은 「규칙 밖」으로 회색이 되고, Claude 1회에 「3.679초」, 검사에 「통과」, 빌드에 「HTTP 200」이 강조색으로 뜬다. 오른쪽 「규모 선택」 열에서 「150 RPS · 높은 가용성 · 급증 가능」이 「최소 등급 large」로 이어진 뒤, small 선택은 위험색 「HTTP 400」에서 멈추고 large 선택은 강조색 「200 · 저장」으로 끝나는 장면",
