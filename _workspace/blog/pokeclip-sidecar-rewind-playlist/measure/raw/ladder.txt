@@ -1,0 +1,22 @@
+=== RUN   TestDVR2LadderTimeline
+설계값: L1 500ms · L2(GAP_HOLD) 2s · E2E_BUDGET 2s · L2′(D_act) 5.5s · L4(갱신 의무 − T_edge) 7.5s
+
+| 장면 | 일 | stallAge(초) | holdAge(초) | 신호 |
+|---|---|---|---|---|
+| A 행 6 있음 · 업로드 막힘 | L1 업로드 재시도 당김 | 5.50 | 0.50 |  |
+| A 행 6 있음 · 업로드 막힘 | L2 GAP 틱 | 7.00 | 2.00 |  |
+| A′ 같은 장면 · 직전 발행이 0.3초 뒤 | L1 업로드 재시도 당김 | 6.20 | 0.50 |  |
+| A′ 같은 장면 · 직전 발행이 0.3초 뒤 | L4 경보 | 7.50 | 1.80 | ERROR gap=holding |
+| A′ 같은 장면 · 직전 발행이 0.3초 뒤 | L2 GAP 틱 | 7.70 | 2.00 |  |
+| B GAP 틱이 서지 않음 · 봉인 켬 | L1 업로드 재시도 당김 | 5.50 | 0.50 |  |
+| B GAP 틱이 서지 않음 · 봉인 켬 | L2′ 봉인 | 7.00 | 2.00 |  |
+| C 행 6 없음(no_row) · 봉인 끔 | L4 경보 | 7.50 | – | WARN gap=no_row |
+| C′ 행 6 없음(no_row) · 봉인 켬 | L2′ 봉인 | 5.50 | – |  |
+| D 행 6 부적격(키 없음) · 봉인 끔 | L1 업로드 재시도 당김 | 5.50 | 0.50 |  |
+| D 행 6 부적격(키 없음) · 봉인 끔 | L4 경보 | 7.50 | 2.50 | ERROR gap=incomplete |
+| D′ 행 6 부적격(키 없음) · 봉인 켬 | L1 업로드 재시도 당김 | 5.50 | 0.50 |  |
+| D′ 행 6 부적격(키 없음) · 봉인 켬 | L2′ 봉인 | 5.50 | 0.50 |  |
+| E 캐시 뒤처짐(view_behind) · 봉인 켬 | L4 경보 | 7.50 | – | ERROR gap=view_behind |
+--- PASS: TestDVR2LadderTimeline (0.02s)
+PASS
+ok  	github.com/3K-PokeClip/pokeclip-mono/media/internal/rewind/publish	0.233s

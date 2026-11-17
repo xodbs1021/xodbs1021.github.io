@@ -102,6 +102,7 @@ import { TWO_DELETE_PATHS_FRAMES, TwoDeletePaths } from "./scenes/pokeclip-prod-
 import { PIPELINE_STOP_FRAMES, PipelineStop } from "./scenes/pokeclip-live-dvr-url-split/PipelineStop";
 import { WILDCARD_MATCH_FRAMES, WildcardMatch } from "./scenes/pokeclip-dvr-cookie-edge-floor/WildcardMatch";
 import { TEXT_INPUT_NULL_FRAMES, TextInputNull } from "./scenes/sdl2-compat-textinput-null-push/TextInputNull";
+import { STALL_LADDER_FRAMES, StallLadder } from "./scenes/pokeclip-sidecar-rewind-playlist/StallLadder";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
@@ -1119,6 +1120,16 @@ export const RemotionRoot: React.FC = () => (
       component={TextInputNull}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={TEXT_INPUT_NULL_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="StallLadder" component={StallLadder} durationInFrames={STALL_LADDER_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="StallLadderMobile"
+      component={StallLadder}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={STALL_LADDER_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}

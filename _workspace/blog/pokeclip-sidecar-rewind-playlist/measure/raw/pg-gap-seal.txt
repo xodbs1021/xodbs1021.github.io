@@ -1,0 +1,447 @@
+=== RUN   TestGapTxFailedLogsOncePerStage
+--- PASS: TestGapTxFailedLogsOncePerStage (0.04s)
+=== RUN   TestAuditFrozenSkipsOldFreezes
+--- PASS: TestAuditFrozenSkipsOldFreezes (0.02s)
+=== RUN   TestAuditFrozenPassesSealedDVRAtBodyLimit
+--- PASS: TestAuditFrozenPassesSealedDVRAtBodyLimit (0.02s)
+=== RUN   TestStaleSealCannotOverrideSuccessor
+=== RUN   TestStaleSealCannotOverrideSuccessor/좀비_나중
+=== RUN   TestStaleSealCannotOverrideSuccessor/좀비_먼저
+--- PASS: TestStaleSealCannotOverrideSuccessor (0.04s)
+=== RUN   TestFreezeDVRSealsLedgerTail
+--- PASS: TestFreezeDVRSealsLedgerTail (0.02s)
+=== RUN   TestFreezeDVRCreatesClosedListWhenNeverPublished
+--- PASS: TestFreezeDVRCreatesClosedListWhenNeverPublished (0.02s)
+=== RUN   TestFreezeDVRWithoutRowsIsEmptyFreeze
+--- PASS: TestFreezeDVRWithoutRowsIsEmptyFreeze (0.01s)
+=== RUN   TestFreezeDVRYieldsToHeldFence
+--- PASS: TestFreezeDVRYieldsToHeldFence (0.02s)
+=== RUN   TestFreezeDVRPutFailureRetries
+=== RUN   TestFreezeDVRPutFailureRetries/412
+=== RUN   TestFreezeDVRPutFailureRetries/503
+--- PASS: TestFreezeDVRPutFailureRetries (0.04s)
+=== RUN   TestFreezeDVRKeepsHeaderSource
+--- PASS: TestFreezeDVRKeepsHeaderSource (0.13s)
+=== RUN   TestEndlistKeepsPublishedBytes
+--- PASS: TestEndlistKeepsPublishedBytes (0.02s)
+=== RUN   TestEndlistIfCaughtUpSealsOnlyWhenLedgerIsCaughtUp
+=== RUN   TestEndlistIfCaughtUpSealsOnlyWhenLedgerIsCaughtUp/장부_앞섬
+=== RUN   TestEndlistIfCaughtUpSealsOnlyWhenLedgerIsCaughtUp/따라잡음
+=== RUN   TestEndlistIfCaughtUpSealsOnlyWhenLedgerIsCaughtUp/DB_를_못_씀
+--- PASS: TestEndlistIfCaughtUpSealsOnlyWhenLedgerIsCaughtUp (0.05s)
+=== RUN   TestEndlistIfCaughtUpChecksAfterFenceWait
+--- PASS: TestEndlistIfCaughtUpChecksAfterFenceWait (0.03s)
+=== RUN   TestEndlistIfCaughtUpCheckTimesOut
+--- PASS: TestEndlistIfCaughtUpCheckTimesOut (0.52s)
+=== RUN   TestEndlistIfCaughtUpCheckTimesOutOnServer
+--- PASS: TestEndlistIfCaughtUpCheckTimesOutOnServer (0.55s)
+=== RUN   TestEndlistIfCaughtUpRollbackIsBounded
+--- PASS: TestEndlistIfCaughtUpRollbackIsBounded (0.34s)
+=== RUN   TestEndlistWithoutPublishedListIsEmptyFreeze
+--- PASS: TestEndlistWithoutPublishedListIsEmptyFreeze (0.04s)
+=== RUN   TestGapTickRecordsGapBeforePut
+--- PASS: TestGapTickRecordsGapBeforePut (0.03s)
+=== RUN   TestGapTickRechecksUploadInDB
+--- PASS: TestGapTickRechecksUploadInDB (0.02s)
+=== RUN   TestGapTickIneligibleRowRecordsNothing
+=== RUN   TestGapTickIneligibleRowRecordsNothing/행_없음
+=== RUN   TestGapTickIneligibleRowRecordsNothing/회차_NULL
+=== RUN   TestGapTickIneligibleRowRecordsNothing/PDT_NULL
+=== RUN   TestGapTickIneligibleRowRecordsNothing/③_키_NULL
+=== RUN   TestGapTickIneligibleRowRecordsNothing/길이_0
+=== RUN   TestGapTickIneligibleRowRecordsNothing/컷오프_아래
+--- PASS: TestGapTickIneligibleRowRecordsNothing (0.09s)
+=== RUN   TestGapTickMismatchedStreamRecordsNothing
+=== RUN   TestGapTickMismatchedStreamRecordsNothing/적격_행
+=== RUN   TestGapTickMismatchedStreamRecordsNothing/원장_행_이미_있음
+=== RUN   TestGapTickMismatchedStreamRecordsNothing/uploaded_행
+--- PASS: TestGapTickMismatchedStreamRecordsNothing (0.05s)
+=== RUN   TestGapTickReusesExistingGap
+--- PASS: TestGapTickReusesExistingGap (0.02s)
+=== RUN   TestGapTickP0FailureRollsBack
+=== RUN   TestGapTickP0FailureRollsBack/0행
+=== RUN   TestGapTickP0FailureRollsBack/오류
+--- PASS: TestGapTickP0FailureRollsBack (0.03s)
+=== RUN   TestGapTickSourceMismatchCommitsWithoutGap
+--- PASS: TestGapTickSourceMismatchCommitsWithoutGap (0.02s)
+=== RUN   TestUnstoodGapTickKeepsNextWindowValid
+--- PASS: TestUnstoodGapTickKeepsNextWindowValid (0.02s)
+=== RUN   TestGapTickLockOrderWithInitMismatch
+--- PASS: TestGapTickLockOrderWithInitMismatch (0.03s)
+=== RUN   TestGapTickFailedInsertRollsBack
+--- PASS: TestGapTickFailedInsertRollsBack (0.02s)
+=== RUN   TestGapTickUnknownCommitDemandsLoad
+--- PASS: TestGapTickUnknownCommitDemandsLoad (0.02s)
+=== RUN   TestGapTickBeginFailureIsErr
+--- PASS: TestGapTickBeginFailureIsErr (0.02s)
+=== RUN   TestGapTickRollsBackWithLiveContext
+=== RUN   TestGapTickRollsBackWithLiveContext/문장_시한_지남
+=== RUN   TestGapTickRollsBackWithLiveContext/루프_ctx_끝남
+--- PASS: TestGapTickRollsBackWithLiveContext (0.28s)
+=== RUN   TestGapTickTakesM0BeforeBegin
+--- PASS: TestGapTickTakesM0BeforeBegin (0.03s)
+=== RUN   TestNormalTickSendsNoGapTransaction
+--- PASS: TestNormalTickSendsNoGapTransaction (0.02s)
+=== RUN   TestP4ConfirmsRecordedGapsInPublishedRange
+--- PASS: TestP4ConfirmsRecordedGapsInPublishedRange (0.02s)
+=== RUN   TestP4RefusalLeavesGapsRecorded
+=== RUN   TestP4RefusalLeavesGapsRecorded/0행
+=== RUN   TestP4RefusalLeavesGapsRecorded/오류
+--- PASS: TestP4RefusalLeavesGapsRecorded (0.03s)
+=== RUN   TestRestartFirstP4ConfirmsRecordedGaps
+--- PASS: TestRestartFirstP4ConfirmsRecordedGaps (0.01s)
+=== RUN   TestGapTickStandsOnFailedUpload
+--- PASS: TestGapTickStandsOnFailedUpload (0.01s)
+=== RUN   TestGapTickStandsAtCutoff
+--- PASS: TestGapTickStandsAtCutoff (0.02s)
+=== RUN   TestGapTickLedgerRowOutranksUpload
+--- PASS: TestGapTickLedgerRowOutranksUpload (0.02s)
+=== RUN   TestLadderSealsStalledOwnerL2Prime
+=== RUN   TestLadderSealsStalledOwnerL2Prime/행_없음_문턱
+=== RUN   TestLadderSealsStalledOwnerL2Prime/행_없음_문턱_앞
+=== RUN   TestLadderSealsStalledOwnerL2Prime/스위치_끔
+=== RUN   TestLadderSealsStalledOwnerL2Prime/발행_이력_없음
+=== RUN   TestLadderSealsStalledOwnerL2Prime/holding_은_L2_를_기다림
+=== RUN   TestLadderSealsStalledOwnerL2Prime/적격_GAP_이_먼저
+=== RUN   TestLadderSealsStalledOwnerL2Prime/직전_GAP_틱이_서지_않음
+=== RUN   TestLadderSealsStalledOwnerL2Prime/부적격_행
+--- PASS: TestLadderSealsStalledOwnerL2Prime (0.00s)
+=== RUN   TestLadderNoSealForEndingOwner
+--- PASS: TestLadderNoSealForEndingOwner (0.00s)
+=== RUN   TestDefaultOptionsDActAndSealOff
+--- PASS: TestDefaultOptionsDActAndSealOff (0.00s)
+=== RUN   TestLadderNoSealWhileViewBehind
+=== RUN   TestLadderNoSealWhileViewBehind/방송_종료_구간
+=== RUN   TestLadderNoSealWhileViewBehind/뷰가_장부보다_뒤처짐
+--- PASS: TestLadderNoSealWhileViewBehind (0.00s)
+=== RUN   TestLadderHoldAgeThresholds
+=== RUN   TestLadderHoldAgeThresholds/음수
+=== RUN   TestLadderHoldAgeThresholds/L1_바로_앞
+=== RUN   TestLadderHoldAgeThresholds/L1_문턱
+=== RUN   TestLadderHoldAgeThresholds/L2_바로_앞
+=== RUN   TestLadderHoldAgeThresholds/L2_문턱
+--- PASS: TestLadderHoldAgeThresholds (0.00s)
+=== RUN   TestLadderStageOneLeadsByPDTLag
+=== RUN   TestLadderStageOneLeadsByPDTLag/L1_바로_앞
+=== RUN   TestLadderStageOneLeadsByPDTLag/L1_문턱_140ms_일찍
+=== RUN   TestLadderStageOneLeadsByPDTLag/L2_바로_앞
+=== RUN   TestLadderStageOneLeadsByPDTLag/L2_문턱_140ms_일찍
+--- PASS: TestLadderStageOneLeadsByPDTLag (0.00s)
+=== RUN   TestLadderNeedsHeadNextRowWithPDTAndLength
+=== RUN   TestLadderNeedsHeadNextRowWithPDTAndLength/행_없음
+=== RUN   TestLadderNeedsHeadNextRowWithPDTAndLength/행_없음_뒤_행_있음
+=== RUN   TestLadderNeedsHeadNextRowWithPDTAndLength/비귀속_NULL_행
+=== RUN   TestLadderNeedsHeadNextRowWithPDTAndLength/길이_0
+--- PASS: TestLadderNeedsHeadNextRowWithPDTAndLength (0.00s)
+=== RUN   TestLadderGapNeedsEligibleRow
+=== RUN   TestLadderGapNeedsEligibleRow/회차_없음
+=== RUN   TestLadderGapNeedsEligibleRow/③_키_없음
+=== RUN   TestLadderGapNeedsEligibleRow/컷오프_아래
+--- PASS: TestLadderGapNeedsEligibleRow (0.00s)
+=== RUN   TestLadderGapAtCutoff
+--- PASS: TestLadderGapAtCutoff (0.00s)
+=== RUN   TestLadderTargetsPrefixSessionRow
+--- PASS: TestLadderTargetsPrefixSessionRow (0.00s)
+=== RUN   TestLadderStageOneGapIgnoresStallAge
+--- PASS: TestLadderStageOneGapIgnoresStallAge (0.00s)
+=== RUN   TestLadderAlarmsOncePerStall
+--- PASS: TestLadderAlarmsOncePerStall (0.00s)
+=== RUN   TestLadderAlarmLevelFollowsBlockedReason
+=== RUN   TestLadderAlarmLevelFollowsBlockedReason/행_없음
+=== RUN   TestLadderAlarmLevelFollowsBlockedReason/행_불완전
+=== RUN   TestLadderAlarmLevelFollowsBlockedReason/컷오프_아래
+=== RUN   TestLadderAlarmLevelFollowsBlockedReason/GAP_HOLD_앞
+=== RUN   TestLadderAlarmLevelFollowsBlockedReason/GAP_서지_않음
+--- PASS: TestLadderAlarmLevelFollowsBlockedReason (0.00s)
+=== RUN   TestLadderAlarmEscalatesOnlyToViewBehind
+=== RUN   TestLadderAlarmEscalatesOnlyToViewBehind/뒤처짐을_알게_됨
+=== RUN   TestLadderAlarmEscalatesOnlyToViewBehind/다음_행이_와서_holding
+=== RUN   TestLadderAlarmEscalatesOnlyToViewBehind/ERROR_로_시작한_정체
+--- PASS: TestLadderAlarmEscalatesOnlyToViewBehind (0.00s)
+=== RUN   TestLadderAlarmSplitsViewBehindFromNoRow
+=== RUN   TestLadderAlarmSplitsViewBehindFromNoRow/방송_종료_구간
+=== RUN   TestLadderAlarmSplitsViewBehindFromNoRow/뷰가_장부보다_뒤처짐
+--- PASS: TestLadderAlarmSplitsViewBehindFromNoRow (0.00s)
+=== RUN   TestLadderAlarmNamesIncompleteRow
+=== RUN   TestLadderAlarmNamesIncompleteRow/PDT_없음
+=== RUN   TestLadderAlarmNamesIncompleteRow/길이_0
+--- PASS: TestLadderAlarmNamesIncompleteRow (0.00s)
+=== RUN   TestLadderAlarmNamesHoldingAndBeforeCutoffRows
+=== RUN   TestLadderAlarmNamesHoldingAndBeforeCutoffRows/GAP_HOLD_앞
+=== RUN   TestLadderAlarmNamesHoldingAndBeforeCutoffRows/컷오프_아래
+--- PASS: TestLadderAlarmNamesHoldingAndBeforeCutoffRows (0.00s)
+=== RUN   TestLadderAlarmYieldsToGap
+--- PASS: TestLadderAlarmYieldsToGap (0.00s)
+=== RUN   TestLadderAlarmsWhenGapDoesNotStand
+--- PASS: TestLadderAlarmsWhenGapDoesNotStand (0.00s)
+=== RUN   TestLadderUnstoodGapNeedsSameRowAndStall
+=== RUN   TestLadderUnstoodGapNeedsSameRowAndStall/같은_행_문턱
+=== RUN   TestLadderUnstoodGapNeedsSameRowAndStall/같은_행_문턱_앞
+=== RUN   TestLadderUnstoodGapNeedsSameRowAndStall/머리가_넘어감
+=== RUN   TestLadderUnstoodGapNeedsSameRowAndStall/k_보다_큰_값
+--- PASS: TestLadderUnstoodGapNeedsSameRowAndStall (0.00s)
+=== RUN   TestLadderUnstoodGapNeedsDecidedGap
+--- PASS: TestLadderUnstoodGapNeedsDecidedGap (0.00s)
+=== RUN   TestLadderAlarmNeedsPublishHistory
+=== RUN   TestLadderAlarmNeedsPublishHistory/ⓐ_발행_이력_없음
+=== RUN   TestLadderAlarmNeedsPublishHistory/ⓑ_발행_성공
+=== RUN   TestLadderAlarmNeedsPublishHistory/ⓑ_화해가_되살린_P
+--- PASS: TestLadderAlarmNeedsPublishHistory (0.00s)
+=== RUN   TestLadderOffForEndingOwner
+=== RUN   TestLadderOffForEndingOwner/머리_다음_행_정체
+=== RUN   TestLadderOffForEndingOwner/머리_다음_행_없음
+--- PASS: TestLadderOffForEndingOwner (0.00s)
+=== RUN   TestLadderOffWithoutCutoff
+--- PASS: TestLadderOffWithoutCutoff (0.00s)
+=== RUN   TestLadderWarnsEndingSessionOnce
+--- PASS: TestLadderWarnsEndingSessionOnce (0.00s)
+=== RUN   TestLadderQuietOnNormalPath
+--- PASS: TestLadderQuietOnNormalPath (0.00s)
+=== RUN   TestLadderVerdictIsPure
+--- PASS: TestLadderVerdictIsPure (0.00s)
+=== RUN   TestWithGapOverlaysOneRow
+--- PASS: TestWithGapOverlaysOneRow (0.00s)
+=== RUN   TestRecoverOrphanSealsStrandedList
+--- PASS: TestRecoverOrphanSealsStrandedList (0.02s)
+=== RUN   TestFreezeDVRAndAuditCarryTimingTag
+--- PASS: TestFreezeDVRAndAuditCarryTimingTag (0.02s)
+=== RUN   TestFreezeVODCarriesTimingTagThroughFillGap
+--- PASS: TestFreezeVODCarriesTimingTagThroughFillGap (0.02s)
+=== RUN   TestFreezeDVRRowsCarryTimingVersion
+--- PASS: TestFreezeDVRRowsCarryTimingVersion (0.00s)
+=== RUN   TestVODPlanKeepsTimingVersionThroughFillGap
+--- PASS: TestVODPlanKeepsTimingVersionThroughFillGap (0.00s)
+=== RUN   TestFreezeVODPassesPDTCheckAcrossUnattributedRows
+--- PASS: TestFreezeVODPassesPDTCheckAcrossUnattributedRows (0.03s)
+=== RUN   TestFreezeVODOwnerSessionDropsInherits
+=== RUN   TestFreezeVODOwnerSessionDropsInherits/머리가_다른_회차_세션을_계승
+=== RUN   TestFreezeVODOwnerSessionDropsInherits/M6_전_부모_컷오프가_계승_세션_첫_행
+=== RUN   TestFreezeVODOwnerSessionDropsInherits/컷오프가_계승_세션_첫_행
+--- PASS: TestFreezeVODOwnerSessionDropsInherits (0.06s)
+=== RUN   TestFreezeVODWritesChainDocumentOnce
+--- PASS: TestFreezeVODWritesChainDocumentOnce (0.02s)
+=== RUN   TestFreezeVODFillsUnattributedRowWithGap
+--- PASS: TestFreezeVODFillsUnattributedRowWithGap (0.02s)
+=== RUN   TestFreezeVODGapKeyFollowsRoundForm
+--- PASS: TestFreezeVODGapKeyFollowsRoundForm (0.02s)
+=== RUN   TestFreezeVODRejectsForeignSessionRow
+--- PASS: TestFreezeVODRejectsForeignSessionRow (0.02s)
+=== RUN   TestFreezeVODWaitsForSettlementUnlessAbandoned
+=== RUN   TestFreezeVODWaitsForSettlementUnlessAbandoned/정산_중
+=== RUN   TestFreezeVODWaitsForSettlementUnlessAbandoned/포기
+--- PASS: TestFreezeVODWaitsForSettlementUnlessAbandoned (0.04s)
+=== RUN   TestFreezeVODUnlandedDVRGapsWaitUnlessAbandoned
+=== RUN   TestFreezeVODUnlandedDVRGapsWaitUnlessAbandoned/정산_중
+=== RUN   TestFreezeVODUnlandedDVRGapsWaitUnlessAbandoned/포기
+--- PASS: TestFreezeVODUnlandedDVRGapsWaitUnlessAbandoned (0.04s)
+=== RUN   TestFreezeVODWithoutRowsIsEmptyFreeze
+--- PASS: TestFreezeVODWithoutRowsIsEmptyFreeze (0.01s)
+=== RUN   TestFreezeVODRejectsChangedChain
+--- PASS: TestFreezeVODRejectsChangedChain (0.02s)
+=== RUN   TestFreezeVODPutFailureRetries
+--- PASS: TestFreezeVODPutFailureRetries (0.02s)
+=== RUN   TestFreezeVODAdoptsSameBodyAfter412
+--- PASS: TestFreezeVODAdoptsSameBodyAfter412 (0.02s)
+=== RUN   TestFreezeVODRefusesDifferentBodyAfter412
+--- PASS: TestFreezeVODRefusesDifferentBodyAfter412 (0.02s)
+=== RUN   TestFreezeVODConfirmsWholeChainOrNothing
+--- PASS: TestFreezeVODConfirmsWholeChainOrNothing (0.02s)
+=== RUN   TestFreezeVODWritesThreeSessionChain
+--- PASS: TestFreezeVODWritesThreeSessionChain (0.02s)
+=== RUN   TestFreezeVODWritesChainLongerThanOneHour
+--- PASS: TestFreezeVODWritesChainLongerThanOneHour (0.14s)
+=== RUN   TestFreezeVODRejectsEmptySessionIDs
+--- PASS: TestFreezeVODRejectsEmptySessionIDs (0.01s)
+=== RUN   TestFreezeVODWritesRoundDocumentForTwoChains
+--- PASS: TestFreezeVODWritesRoundDocumentForTwoChains (0.02s)
+=== RUN   TestFreezeVODRoundKeyIgnoresChainKeyObject
+--- PASS: TestFreezeVODRoundKeyIgnoresChainKeyObject (0.02s)
+=== RUN   TestFreezeVODTreatsFrontRowsAsSettled
+--- PASS: TestFreezeVODTreatsFrontRowsAsSettled (0.02s)
+=== RUN   TestFreezeVODWaitsWhileRoundOpen
+--- PASS: TestFreezeVODWaitsWhileRoundOpen (0.02s)
+=== RUN   TestRoundPlaybackEndedWhenLastChainFreezeFailed
+--- PASS: TestRoundPlaybackEndedWhenLastChainFreezeFailed (0.01s)
+=== RUN   TestFreezeVODRoundMatchesTDSplitGolden
+--- PASS: TestFreezeVODRoundMatchesTDSplitGolden (0.23s)
+=== RUN   TestFreezeVODGoldenLastChainMatchesRoundTail
+--- PASS: TestFreezeVODGoldenLastChainMatchesRoundTail (0.03s)
+=== RUN   TestFreezeVODRoundTargetDurationTakesLargerFront
+--- PASS: TestFreezeVODRoundTargetDurationTakesLargerFront (0.02s)
+=== RUN   TestFreezeVODSingleChainRoundKeepsChainDocument
+=== RUN   TestFreezeVODSingleChainRoundKeepsChainDocument/회원_하나
+=== RUN   TestFreezeVODSingleChainRoundKeepsChainDocument/앞_세션_행_없음
+=== RUN   TestFreezeVODSingleChainRoundKeepsChainDocument/앞_사슬_컷오프_아래
+=== RUN   TestFreezeVODSingleChainRoundKeepsChainDocument/열린_회차_사슬_하나
+--- PASS: TestFreezeVODSingleChainRoundKeepsChainDocument (0.07s)
+=== RUN   TestFreezeVODRoundAndChainWritersOverlap
+=== RUN   TestFreezeVODRoundAndChainWritersOverlap/회차_등재_전_사슬_먼저
+=== RUN   TestFreezeVODRoundAndChainWritersOverlap/회차_PUT_뒤_사슬_먼저
+=== RUN   TestFreezeVODRoundAndChainWritersOverlap/사슬_등재_전_회차_먼저
+=== RUN   TestFreezeVODRoundAndChainWritersOverlap/사슬_PUT_뒤_회차_먼저
+--- PASS: TestFreezeVODRoundAndChainWritersOverlap (0.09s)
+=== RUN   TestFreezeChainVODAdoptingRoundDocKeepsLastChainGaps
+--- PASS: TestFreezeChainVODAdoptingRoundDocKeepsLastChainGaps (0.02s)
+=== RUN   TestFreezeVODWaitsForFrontFreeze
+--- PASS: TestFreezeVODWaitsForFrontFreeze (0.02s)
+=== RUN   TestFreezeVODFallsBackWhenFrontHasNoDocument
+=== RUN   TestFreezeVODFallsBackWhenFrontHasNoDocument/앞_freeze_failed
+=== RUN   TestFreezeVODFallsBackWhenFrontHasNoDocument/앞_문서_없는_frozen
+--- PASS: TestFreezeVODFallsBackWhenFrontHasNoDocument (0.04s)
+=== RUN   TestFreezeVODRoundFailureFallsBackWithChainReason
+--- PASS: TestFreezeVODRoundFailureFallsBackWithChainReason (0.02s)
+=== RUN   TestFreezeVODRoundUnsettledStaysOnRoundPath
+--- PASS: TestFreezeVODRoundUnsettledStaysOnRoundPath (0.02s)
+=== RUN   TestFreezeVODRoundAndChainWritersConverge
+=== RUN   TestFreezeVODRoundAndChainWritersConverge/사슬_먼저
+=== RUN   TestFreezeVODRoundAndChainWritersConverge/회차_먼저
+--- PASS: TestFreezeVODRoundAndChainWritersConverge (0.04s)
+=== RUN   TestFreezeVODRoundUnattributedRowsKeepJanitorRule
+--- PASS: TestFreezeVODRoundUnattributedRowsKeepJanitorRule (0.02s)
+=== RUN   TestFreezeVODRoundAbandonUpdatesLastChainOnly
+--- PASS: TestFreezeVODRoundAbandonUpdatesLastChainOnly (0.02s)
+=== RUN   TestFreezeVODRoundReportsLastChainGaps
+=== RUN   TestFreezeVODRoundReportsLastChainGaps/앞_사슬에만_GAP
+=== RUN   TestFreezeVODRoundReportsLastChainGaps/마지막_사슬에_DVR_GAP
+--- PASS: TestFreezeVODRoundReportsLastChainGaps (0.04s)
+=== RUN   TestFreezeVODRejudgesScopeUnderTailLock
+=== RUN   TestFreezeVODRejudgesScopeUnderTailLock/앞_사슬이_freeze_failed_로
+=== RUN   TestFreezeVODRejudgesScopeUnderTailLock/회차가_다시_열림
+--- PASS: TestFreezeVODRejudgesScopeUnderTailLock (0.04s)
+=== RUN   TestFreezeVODWithPreM6ChainHead
+=== RUN   TestFreezeVODWithPreM6ChainHead/범위_안
+=== RUN   TestFreezeVODWithPreM6ChainHead/범위_밖
+--- PASS: TestFreezeVODWithPreM6ChainHead (0.04s)
+=== RUN   TestFreezeVODCutoffInsideLaterChain
+=== RUN   TestFreezeVODCutoffInsideLaterChain/AB_사슬_B_중간
+=== RUN   TestFreezeVODCutoffInsideLaterChain/ABC_사슬_B_중간
+--- PASS: TestFreezeVODCutoffInsideLaterChain (0.04s)
+=== RUN   TestRoundDocumentsHaveNoHolesAfterFreeze
+--- PASS: TestRoundDocumentsHaveNoHolesAfterFreeze (0.02s)
+=== RUN   TestFreezeVODRereadsLedgerUnderTailLock
+--- PASS: TestFreezeVODRereadsLedgerUnderTailLock (0.02s)
+=== RUN   TestFreezeVODTailLockOrdersWriters
+--- PASS: TestFreezeVODTailLockOrdersWriters (0.03s)
+=== RUN   TestFreezeVODTailLockTimeoutRetries
+--- PASS: TestFreezeVODTailLockTimeoutRetries (5.02s)
+=== RUN   TestFreezeVODConfirmLocksChainInRoundOrder
+--- PASS: TestFreezeVODConfirmLocksChainInRoundOrder (0.05s)
+=== RUN   TestFreezeVODTailLockDoesNotBlockSegmentInsert
+--- PASS: TestFreezeVODTailLockDoesNotBlockSegmentInsert (0.03s)
+=== RUN   TestFreezeVODRereadsOnSingleConnectionPool
+--- PASS: TestFreezeVODRereadsOnSingleConnectionPool (0.02s)
+=== RUN   TestVODGapKeyFollowsPrevRowForm
+=== RUN   TestVODGapKeyFollowsPrevRowForm/옛_꼴
+=== RUN   TestVODGapKeyFollowsPrevRowForm/회차_꼴
+=== RUN   TestVODGapKeyFollowsPrevRowForm/섞임
+--- PASS: TestVODGapKeyFollowsPrevRowForm (0.00s)
+=== RUN   TestVODSettleDeadlineGapWithNullKeyIsLegacyForm
+--- PASS: TestVODSettleDeadlineGapWithNullKeyIsLegacyForm (0.00s)
+=== RUN   TestVODGapKeyIsEmptyWhenKeyCannotBeDerived
+--- PASS: TestVODGapKeyIsEmptyWhenKeyCannotBeDerived (0.00s)
+=== RUN   TestDVR2LadderTimeline
+--- SKIP: TestDVR2LadderTimeline (0.00s)
+PASS
+ok  	github.com/3K-PokeClip/pokeclip-mono/media/internal/rewind/publish	9.550s
+=== RUN   TestNoteStepLogsReasonOfFailedFreeze
+--- PASS: TestNoteStepLogsReasonOfFailedFreeze (0.00s)
+=== RUN   TestFastPathFreezesEndedSessionWithoutScan
+--- PASS: TestFastPathFreezesEndedSessionWithoutScan (0.00s)
+=== RUN   TestSettleAbandonedFollowsLastChainGaps
+=== RUN   TestSettleAbandonedFollowsLastChainGaps/회차_앞_사슬만_GAP
+=== RUN   TestSettleAbandonedFollowsLastChainGaps/회차_마지막_사슬_GAP
+=== RUN   TestSettleAbandonedFollowsLastChainGaps/사슬_경로
+--- PASS: TestSettleAbandonedFollowsLastChainGaps (0.00s)
+=== RUN   TestSessionFreezeOmitsEmptyScope
+=== RUN   TestSessionFreezeOmitsEmptyScope/DVR_섬
+=== RUN   TestSessionFreezeOmitsEmptyScope/VOD_판정_전_실패
+--- PASS: TestSessionFreezeOmitsEmptyScope (0.00s)
+=== RUN   TestFreezeVODDoneCarriesRoundWake
+--- PASS: TestFreezeVODDoneCarriesRoundWake (0.05s)
+=== RUN   TestGapRunEndsLedgerSessionThroughAssembly
+--- PASS: TestGapRunEndsLedgerSessionThroughAssembly (0.02s)
+=== RUN   TestGapRunEndsSessionAfterThreeConsecutiveGapsL3
+--- PASS: TestGapRunEndsSessionAfterThreeConsecutiveGapsL3 (0.00s)
+=== RUN   TestGapRunCountsOnlyContiguousGapsOfOneSessionL3
+=== RUN   TestGapRunCountsOnlyContiguousGapsOfOneSessionL3/사이에_③
+=== RUN   TestGapRunCountsOnlyContiguousGapsOfOneSessionL3/회차_바뀜
+--- PASS: TestGapRunCountsOnlyContiguousGapsOfOneSessionL3 (0.00s)
+=== RUN   TestGapRunEndFailureRetriesAfterBackoffL3
+--- PASS: TestGapRunEndFailureRetriesAfterBackoffL3 (0.00s)
+=== RUN   TestGapRunResetsWhenPlaybackUploadArrivesAfterFailedEndL3
+--- PASS: TestGapRunResetsWhenPlaybackUploadArrivesAfterFailedEndL3 (0.00s)
+=== RUN   TestGapRunEndWiredOnlyWhenSwitchOn
+--- PASS: TestGapRunEndWiredOnlyWhenSwitchOn (0.00s)
+=== RUN   TestOfflineLoopCheckGapBlocksOnUnresolvedLateFile
+=== RUN   TestOfflineLoopCheckGapBlocksOnUnresolvedLateFile/확인_stat_오류
+=== RUN   TestOfflineLoopCheckGapBlocksOnUnresolvedLateFile/측정_중_크기_계속_변함
+=== RUN   TestOfflineLoopCheckGapBlocksOnUnresolvedLateFile/측정_stat_오류
+=== RUN   TestOfflineLoopCheckGapBlocksOnUnresolvedLateFile/길이_0
+=== RUN   TestOfflineLoopCheckGapBlocksOnUnresolvedLateFile/poison
+=== RUN   TestOfflineLoopCheckGapBlocksOnUnresolvedLateFile/구멍
+--- PASS: TestOfflineLoopCheckGapBlocksOnUnresolvedLateFile (0.03s)
+=== RUN   TestOfflineLoopPermanentCheckGapHoldsUntilFileGone
+--- PASS: TestOfflineLoopPermanentCheckGapHoldsUntilFileGone (0.00s)
+=== RUN   TestPublishLoopUnknownGapCommitEndToEnd
+--- PASS: TestPublishLoopUnknownGapCommitEndToEnd (25.66s)
+=== RUN   TestPublishLoopStalledRowRepeatsL1AndUnstoodGapTicks
+--- PASS: TestPublishLoopStalledRowRepeatsL1AndUnstoodGapTicks (27.60s)
+=== RUN   TestGapTickUploadedSeqReflectedAsPlaybackUploaded
+--- PASS: TestGapTickUploadedSeqReflectedAsPlaybackUploaded (0.00s)
+=== RUN   TestUnstoodGapSeqLifetimeAndOverlapTail
+--- PASS: TestUnstoodGapSeqLifetimeAndOverlapTail (0.00s)
+=== RUN   TestUnknownGapCommitHoldsTicksUntilLoad
+=== RUN   TestUnknownGapCommitHoldsTicksUntilLoad/결과_뒤_도착
+=== RUN   TestUnknownGapCommitHoldsTicksUntilLoad/도는_중_도착_병합
+--- PASS: TestUnknownGapCommitHoldsTicksUntilLoad (0.00s)
+=== RUN   TestLadderEvaluatedOncePerStreamPerHoldTick
+--- PASS: TestLadderEvaluatedOncePerStreamPerHoldTick (0.00s)
+=== RUN   TestLadderL1ExpeditesAndL2SendsGapTick
+=== RUN   TestLadderL1ExpeditesAndL2SendsGapTick/L1
+=== RUN   TestLadderL1ExpeditesAndL2SendsGapTick/L2
+=== RUN   TestLadderL1ExpeditesAndL2SendsGapTick/L2_게이트_닫힘
+--- PASS: TestLadderL1ExpeditesAndL2SendsGapTick (0.00s)
+=== RUN   TestLadderAlarmsForRestoredPrevOnlySession
+--- PASS: TestLadderAlarmsForRestoredPrevOnlySession (0.00s)
+=== RUN   TestLadderWarnsNonLiveOwnerOnceWithoutL1OrL2
+--- PASS: TestLadderWarnsNonLiveOwnerOnceWithoutL1OrL2 (0.00s)
+=== RUN   TestLadderStallLevelFollowsReasonInLoop
+--- PASS: TestLadderStallLevelFollowsReasonInLoop (0.00s)
+=== RUN   TestLadderCacheEligibleDBIneligibleAlarmsUnstood
+--- PASS: TestLadderCacheEligibleDBIneligibleAlarmsUnstood (0.00s)
+=== RUN   TestLadderGapsRowWhosePushTheCacheMissed
+--- PASS: TestLadderGapsRowWhosePushTheCacheMissed (0.00s)
+=== RUN   TestLadderAlarmsViewBehindAfterMissedPush
+--- PASS: TestLadderAlarmsViewBehindAfterMissedPush (0.00s)
+=== RUN   TestNormalPathRaisesNoLadderAction
+--- PASS: TestNormalPathRaisesNoLadderAction (0.00s)
+=== RUN   TestStallSealEndsLedgerSessionThroughAssembly
+--- PASS: TestStallSealEndsLedgerSessionThroughAssembly (0.04s)
+=== RUN   TestStallSealChecksLedgerAtSealTime
+--- PASS: TestStallSealChecksLedgerAtSealTime (0.00s)
+=== RUN   TestStallSealSealsTrueEndOnTime
+--- PASS: TestStallSealSealsTrueEndOnTime (0.00s)
+=== RUN   TestStallSealOnTimeWhenRenewHeldLaneBefore
+--- PASS: TestStallSealOnTimeWhenRenewHeldLaneBefore (0.00s)
+=== RUN   TestStallSealKeepsGapRetryBeforeSeal
+--- PASS: TestStallSealKeepsGapRetryBeforeSeal (0.00s)
+=== RUN   TestStallSealLedgerFailedRetriesEachTickWarnsOnce
+--- PASS: TestStallSealLedgerFailedRetriesEachTickWarnsOnce (0.00s)
+=== RUN   TestStallSealOffSealsNothing
+--- PASS: TestStallSealOffSealsNothing (0.00s)
+=== RUN   TestStallSealSealsThenEndsSessionL2Prime
+--- PASS: TestStallSealSealsThenEndsSessionL2Prime (0.00s)
+=== RUN   TestStallSealUnstoodSealDoesNotEndL2Prime
+=== RUN   TestStallSealUnstoodSealDoesNotEndL2Prime/retry_는_다음_틱
+=== RUN   TestStallSealUnstoodSealDoesNotEndL2Prime/failed_는_30초_쉼
+--- PASS: TestStallSealUnstoodSealDoesNotEndL2Prime (0.00s)
+=== RUN   TestStallSealEndFailureRetriesAfterBackoffL2Prime
+--- PASS: TestStallSealEndFailureRetriesAfterBackoffL2Prime (0.00s)
+=== RUN   TestStallSealOffDoesNothingL2Prime
+=== RUN   TestStallSealOffDoesNothingL2Prime/문턱_0
+=== RUN   TestStallSealOffDoesNothingL2Prime/손잡이_없음
+--- PASS: TestStallSealOffDoesNothingL2Prime (0.00s)
+=== RUN   TestStallSealWiredOnlyWhenSwitchOn
+--- PASS: TestStallSealWiredOnlyWhenSwitchOn (0.00s)
+PASS
+ok  	github.com/3K-PokeClip/pokeclip-mono/media/cmd/segment-indexer	53.828s

@@ -812,5 +812,13 @@
     "posterFrame": 320,
     "alt": "세 칸이 나란히 있다. 앱 · SDL2 API, sdl2-compat · Event2to3, SDL3 · SDL_PushEvent. 위 줄에서 SDL_KEYDOWN 카드가 가운데 칸에서 KEY_DOWN · SDL3 이벤트로 바뀌어 오른쪽 칸에 닿고 큐에 들어감 이름표가 뜬다. 아래 줄에서 SDL_TEXTINPUT text[32] = \"a\" 카드는 가운데 칸에서 빨간 NULL 카드로 바뀌고 짝 없음 → NULL 이름표가 뜬 뒤, 그대로 오른쪽 칸으로 넘어가 SIGSEGV · 주소 0x8 이름표가 뜨고 카드가 기울어 떨어진다. 떠난 자리에는 원래 카드가 옅게 남는다",
     "mobile": true
+  },
+  {
+    "id": "StallLadder",
+    "post": "pokeclip-sidecar-rewind-playlist",
+    "kind": "video",
+    "posterFrame": 340,
+    "alt": "두 가로축이 위아래로 있다. 위 축은 다음 조각이 캐시에 있을 때의 holdAge로, 0은 조각 끝에서 2초 뒤 실렸어야 할 때다. 재생점이 0에서 오른쪽으로 가며 축이 청록으로 차고, 0.5초 눈금을 지나면 L1 재시도 당김 이름표가, 2초 눈금을 지나면 L2 GAP 이름표가 청록으로 켜진다. 이어 아래 축은 GAP을 세울 수 없을 때의 stallAge로, 0은 마지막 발행 성공이다. 재생점이 지나가며 5.5초 눈금에서 L2′ 봉인(스위치) 이름표가 회색으로, 7.5초 눈금에서 L4 경보 이름표가 빨갛게 켜진다",
+    "mobile": true
   }
 ]

@@ -1,0 +1,139 @@
+=== RUN   TestWatcherStartFailureFeedsNullObjectAdopter
+--- PASS: TestWatcherStartFailureFeedsNullObjectAdopter (0.00s)
+=== RUN   TestLoopSurvivesWatcherDegraded
+--- PASS: TestLoopSurvivesWatcherDegraded (0.04s)
+=== RUN   TestLoopReattachesWatcher
+--- PASS: TestLoopReattachesWatcher (0.10s)
+=== RUN   TestWatcherDegradedClearKeepsErrorLevel
+--- PASS: TestWatcherDegradedClearKeepsErrorLevel (0.04s)
+=== RUN   TestAssembleWatcherFailurePoints
+--- PASS: TestAssembleWatcherFailurePoints (0.00s)
+=== RUN   TestStartEdgeBoundsWithoutARNReportsLedgerRowsPG
+--- SKIP: TestStartEdgeBoundsWithoutARNReportsLedgerRowsPG (0.00s)
+=== RUN   TestStartEdgeBoundsWithoutARNDeletesSettledReleasedRowsPG
+--- SKIP: TestStartEdgeBoundsWithoutARNDeletesSettledReleasedRowsPG (0.00s)
+=== RUN   TestEdgeBoundsWithoutARNReportsUnreleasedRows
+--- PASS: TestEdgeBoundsWithoutARNReportsUnreleasedRows (0.02s)
+=== RUN   TestEdgeBoundsWithoutARNNoRowsNoSignal
+--- PASS: TestEdgeBoundsWithoutARNNoRowsNoSignal (0.00s)
+=== RUN   TestEdgeBoundsUnreleasedProbeFailureWarnsOnce
+--- PASS: TestEdgeBoundsUnreleasedProbeFailureWarnsOnce (0.02s)
+=== RUN   TestEdgeBoundsWithoutWriterDeletesSettledReleasedRows
+--- PASS: TestEdgeBoundsWithoutWriterDeletesSettledReleasedRows (0.00s)
+=== RUN   TestEdgeBoundsReleasedDeleteFailureKeepsUnreleasedSignal
+--- PASS: TestEdgeBoundsReleasedDeleteFailureKeepsUnreleasedSignal (0.03s)
+=== RUN   TestEdgeBoundsReleasedDeleteRecoveryEndsFailureInterval
+--- PASS: TestEdgeBoundsReleasedDeleteRecoveryEndsFailureInterval (0.00s)
+=== RUN   TestEdgeBoundsProbeCanceledIsNotFailure
+--- PASS: TestEdgeBoundsProbeCanceledIsNotFailure (0.00s)
+=== RUN   TestEdgeBoundsConfigInvalidLogsReasonOnly
+--- PASS: TestEdgeBoundsConfigInvalidLogsReasonOnly (0.00s)
+=== RUN   TestEdgeBoundsWithARNStartsWriter
+--- PASS: TestEdgeBoundsWithARNStartsWriter (0.05s)
+=== RUN   TestEdgeBoundsOptionsDefaultsNilLogger
+--- PASS: TestEdgeBoundsOptionsDefaultsNilLogger (0.00s)
+=== RUN   TestEdgeBoundsStoreFailureDegrades
+--- PASS: TestEdgeBoundsStoreFailureDegrades (0.00s)
+=== RUN   TestFinalizeScanAndWatchBothRunEachCycleD66
+--- PASS: TestFinalizeScanAndWatchBothRunEachCycleD66 (0.00s)
+=== RUN   TestGapRunEndsLedgerSessionThroughAssembly
+--- SKIP: TestGapRunEndsLedgerSessionThroughAssembly (0.00s)
+=== RUN   TestGapRunEndsSessionAfterThreeConsecutiveGapsL3
+--- PASS: TestGapRunEndsSessionAfterThreeConsecutiveGapsL3 (0.00s)
+=== RUN   TestGapRunCountsOnlyContiguousGapsOfOneSessionL3
+=== RUN   TestGapRunCountsOnlyContiguousGapsOfOneSessionL3/사이에_③
+=== RUN   TestGapRunCountsOnlyContiguousGapsOfOneSessionL3/회차_바뀜
+--- PASS: TestGapRunCountsOnlyContiguousGapsOfOneSessionL3 (0.00s)
+=== RUN   TestGapRunEndFailureRetriesAfterBackoffL3
+--- PASS: TestGapRunEndFailureRetriesAfterBackoffL3 (0.00s)
+=== RUN   TestGapRunResetsWhenPlaybackUploadArrivesAfterFailedEndL3
+--- PASS: TestGapRunResetsWhenPlaybackUploadArrivesAfterFailedEndL3 (0.00s)
+=== RUN   TestGapRunEndWiredOnlyWhenSwitchOn
+--- PASS: TestGapRunEndWiredOnlyWhenSwitchOn (0.00s)
+=== RUN   TestLoopStopsWhenWatcherDies
+--- PASS: TestLoopStopsWhenWatcherDies (0.00s)
+=== RUN   TestAssembledWatchUsesSeedAlarmWindow
+=== RUN   TestAssembledWatchUsesSeedAlarmWindow/두_배가_10분보다_길면_두_배
+=== RUN   TestAssembledWatchUsesSeedAlarmWindow/두_배가_짧으면_10분
+--- PASS: TestAssembledWatchUsesSeedAlarmWindow (0.00s)
+=== RUN   TestPublishLoopLostInitResultRecoveredByWatch
+--- SKIP: TestPublishLoopLostInitResultRecoveredByWatch (0.00s)
+=== RUN   TestAuditRunsEachWatchPeriodBesideStuckWatch
+--- PASS: TestAuditRunsEachWatchPeriodBesideStuckWatch (0.01s)
+=== RUN   TestPrevMismatchHaltsAndDemandsReloadAtWatchCadence
+--- PASS: TestPrevMismatchHaltsAndDemandsReloadAtWatchCadence (0.00s)
+=== RUN   TestLadderEvaluatedOncePerStreamPerHoldTick
+--- PASS: TestLadderEvaluatedOncePerStreamPerHoldTick (0.00s)
+=== RUN   TestLadderL1ExpeditesAndL2SendsGapTick
+=== RUN   TestLadderL1ExpeditesAndL2SendsGapTick/L1
+=== RUN   TestLadderL1ExpeditesAndL2SendsGapTick/L2
+=== RUN   TestLadderL1ExpeditesAndL2SendsGapTick/L2_게이트_닫힘
+--- PASS: TestLadderL1ExpeditesAndL2SendsGapTick (0.00s)
+=== RUN   TestLadderAlarmsForRestoredPrevOnlySession
+--- PASS: TestLadderAlarmsForRestoredPrevOnlySession (0.00s)
+=== RUN   TestLadderWarnsNonLiveOwnerOnceWithoutL1OrL2
+--- PASS: TestLadderWarnsNonLiveOwnerOnceWithoutL1OrL2 (0.00s)
+=== RUN   TestLadderStallLevelFollowsReasonInLoop
+--- PASS: TestLadderStallLevelFollowsReasonInLoop (0.00s)
+=== RUN   TestLadderCacheEligibleDBIneligibleAlarmsUnstood
+--- PASS: TestLadderCacheEligibleDBIneligibleAlarmsUnstood (0.00s)
+=== RUN   TestLadderGapsRowWhosePushTheCacheMissed
+--- PASS: TestLadderGapsRowWhosePushTheCacheMissed (0.00s)
+=== RUN   TestWatchAloneRecoversNewSessionBeyondStuckRow
+--- PASS: TestWatchAloneRecoversNewSessionBeyondStuckRow (0.00s)
+=== RUN   TestLadderAlarmsViewBehindAfterMissedPush
+--- PASS: TestLadderAlarmsViewBehindAfterMissedPush (0.00s)
+=== RUN   TestNormalPathRaisesNoLadderAction
+--- PASS: TestNormalPathRaisesNoLadderAction (0.00s)
+=== RUN   TestWatchQuietWhenCacheMatchesDB
+--- PASS: TestWatchQuietWhenCacheMatchesDB (0.00s)
+=== RUN   TestPlaylistMissDemandsLoadOncePerWatchPeriod
+--- PASS: TestPlaylistMissDemandsLoadOncePerWatchPeriod (0.00s)
+=== RUN   TestWatchEveryPeriodWithProbesAfterDirty
+--- PASS: TestWatchEveryPeriodWithProbesAfterDirty (0.00s)
+=== RUN   TestMergedWatchRerunsOnceAfterSlowWatch
+--- PASS: TestMergedWatchRerunsOnceAfterSlowWatch (0.00s)
+=== RUN   TestBootWatchLoadsLiveCutoffStreamsThenPublishes
+--- PASS: TestBootWatchLoadsLiveCutoffStreamsThenPublishes (0.00s)
+=== RUN   TestFirstWatchFailureDefersBootListToNextWatch
+--- PASS: TestFirstWatchFailureDefersBootListToNextWatch (0.00s)
+=== RUN   TestWatchFailureSkipsReconcileAbsentAndForget
+--- PASS: TestWatchFailureSkipsReconcileAbsentAndForget (0.00s)
+=== RUN   TestWatchDriftTwiceDemandsRepairLoad
+--- PASS: TestWatchDriftTwiceDemandsRepairLoad (0.00s)
+=== RUN   TestLoadFailureKeepsLoadingAndRetriesAfterWatchPeriod
+--- PASS: TestLoadFailureKeepsLoadingAndRetriesAfterWatchPeriod (0.00s)
+=== RUN   TestWatchReconcileRestoresLostInitWithRevocation
+--- PASS: TestWatchReconcileRestoresLostInitWithRevocation (0.00s)
+=== RUN   TestPublishStatusWarmAfterBootWatch
+--- PASS: TestPublishStatusWarmAfterBootWatch (0.00s)
+=== RUN   TestStallSealEndsLedgerSessionThroughAssembly
+--- SKIP: TestStallSealEndsLedgerSessionThroughAssembly (0.00s)
+=== RUN   TestStallSealChecksLedgerAtSealTime
+--- PASS: TestStallSealChecksLedgerAtSealTime (0.00s)
+=== RUN   TestStallSealSealsTrueEndOnTime
+--- PASS: TestStallSealSealsTrueEndOnTime (0.00s)
+=== RUN   TestStallSealOnTimeWhenRenewHeldLaneBefore
+--- PASS: TestStallSealOnTimeWhenRenewHeldLaneBefore (0.00s)
+=== RUN   TestStallSealKeepsGapRetryBeforeSeal
+--- PASS: TestStallSealKeepsGapRetryBeforeSeal (0.00s)
+=== RUN   TestStallSealLedgerFailedRetriesEachTickWarnsOnce
+--- PASS: TestStallSealLedgerFailedRetriesEachTickWarnsOnce (0.00s)
+=== RUN   TestStallSealOffSealsNothing
+--- PASS: TestStallSealOffSealsNothing (0.00s)
+=== RUN   TestStallSealSealsThenEndsSessionL2Prime
+--- PASS: TestStallSealSealsThenEndsSessionL2Prime (0.00s)
+=== RUN   TestStallSealUnstoodSealDoesNotEndL2Prime
+=== RUN   TestStallSealUnstoodSealDoesNotEndL2Prime/retry_는_다음_틱
+=== RUN   TestStallSealUnstoodSealDoesNotEndL2Prime/failed_는_30초_쉼
+--- PASS: TestStallSealUnstoodSealDoesNotEndL2Prime (0.00s)
+=== RUN   TestStallSealEndFailureRetriesAfterBackoffL2Prime
+--- PASS: TestStallSealEndFailureRetriesAfterBackoffL2Prime (0.00s)
+=== RUN   TestStallSealOffDoesNothingL2Prime
+=== RUN   TestStallSealOffDoesNothingL2Prime/문턱_0
+=== RUN   TestStallSealOffDoesNothingL2Prime/손잡이_없음
+--- PASS: TestStallSealOffDoesNothingL2Prime (0.00s)
+=== RUN   TestStallSealWiredOnlyWhenSwitchOn
+--- PASS: TestStallSealWiredOnlyWhenSwitchOn (0.00s)
+PASS
+ok  	github.com/3K-PokeClip/pokeclip-mono/media/cmd/segment-indexer	1.861s
