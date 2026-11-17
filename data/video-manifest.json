@@ -1989,6 +1989,32 @@
       "poster": "/images/pokeclip-shared-db-login-privileges-search-path-hijack-mobile-poster.jpg"
     }
   },
+  "pokeclip-sidecar-rewind-playlist-stall-ladder": {
+    "scene": "StallLadder",
+    "alt": "두 가로축이 위아래로 있다. 위 축은 다음 조각이 캐시에 있을 때의 holdAge로, 0은 조각 끝에서 2초 뒤 실렸어야 할 때다. 재생점이 0에서 오른쪽으로 가며 축이 청록으로 차고, 0.5초 눈금을 지나면 L1 재시도 당김 이름표가, 2초 눈금을 지나면 L2 GAP 이름표가 청록으로 켜진다. 이어 아래 축은 GAP이 서지 않은 동안의 stallAge로, 0은 마지막 발행 성공이다. 재생점이 지나가며 5.5초 눈금에서 L2′ 봉인(스위치) 이름표가 회색으로, 7.5초 눈금에서 L4 경보 이름표가 빨갛게 켜진다",
+    "sha256": "5ab64f5f23d109b81e386696bd0ca86c80ca6cdf30e7f614d23c2a8fa2d10bdf",
+    "bytes": 159535,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 12,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-sidecar-rewind-playlist-stall-ladder-poster.jpg",
+    "mobile": {
+      "sha256": "032de3d68055b93072806c7ab659e18589adae1a5e9ce9b0736532ef0d80288b",
+      "bytes": 152326,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 12,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-sidecar-rewind-playlist-stall-ladder-mobile-poster.jpg"
+    }
+  },
   "pokeclip-six-track-input-contract-six-track-funnel": {
     "scene": "SixTrackFunnel",
     "alt": "왼쪽 소스 10개(마이크 · 게임 · 디스코드 · BGM · 알림 · 브라우저 · 미디어 · 데스크탑 · 인트로 영상 · 효과음)가 처음에는 각자 트랙 1–10 점선 칸으로 선을 긋고 7–10칸에 빨간 「OBS 믹서 밖」 이름표가 뜬다. 점선 칸이 사라지고 OBS 믹서 6칸이 서며, 모든 소스가 트랙 1 「본방 믹스」로 모이고 마이크 · 게임 · 디스코드 · BGM은 트랙 2–5, 나머지 여섯은 트랙 6 「기타」로 이어진 뒤 오른쪽에 audio1–audio6과 「믹스 1 + 소스별 5」 이름표가 뜨는 장면",
