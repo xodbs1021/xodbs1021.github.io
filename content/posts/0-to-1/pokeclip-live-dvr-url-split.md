@@ -1,6 +1,6 @@
 ---
 title: "CDN 하나에서 라이브는 EC2로, 되감기는 S3로 보냈습니다"
-date: "2026-11-18T03:27:26+09:00"
+date: "2026-11-18T03:26:26+09:00"
 categories: ["projects"]
 tags: ["PokeClip", "HLS", "LL-HLS", "DVR", "CloudFront", "CDN", "설계"]
 draft: false
