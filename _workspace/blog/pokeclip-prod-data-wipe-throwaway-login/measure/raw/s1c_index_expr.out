@@ -1,0 +1,22 @@
+### s1c_index_expr
+Pager usage is off.
+BEGIN
+GRANT ROLE
+SET
+--- INSERT ---
+psql:/tmp/s1c_index_expr.sql:8: NOTICE:  index-expr tag(mike): current_user=app_x session_user=master_x
+INSERT 0 1
+--- UPDATE ---
+psql:/tmp/s1c_index_expr.sql:10: NOTICE:  index-expr tag(india-2): current_user=app_x session_user=master_x
+UPDATE 1
+--- DELETE ---
+DELETE 1
+--- SELECT ---
+ count 
+-------
+     1
+(1 row)
+
+RESET
+REVOKE ROLE
+COMMIT

@@ -1,0 +1,29 @@
+### s1d_partial_select
+Pager usage is off.
+BEGIN
+GRANT ROLE
+SET
+psql:/tmp/s1d_partial_select.sql:6: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1d_partial_select.sql:6: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1d_partial_select.sql:6: NOTICE:  vol_write(gate): RESET ROLE -> INSERT master_only OK as master_x
+psql:/tmp/s1d_partial_select.sql:6: NOTICE:  vol_write(gate): role restored to app_x
+ rows 
+------
+    3
+(1 row)
+
+ after_query 
+-------------
+ app_x
+(1 row)
+
+RESET
+REVOKE ROLE
+COMMIT
+--- master_only.members ---
+         who         
+---------------------
+ gate as master_x
+ trigger as master_x
+(2 rows)
+

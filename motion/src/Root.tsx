@@ -98,6 +98,7 @@ import { LEDGER_SCAN_STOP_FRAMES, LedgerScanStop } from "./scenes/pokeclip-chat-
 import { SEEK_LOOP_TRUNCATION_FRAMES, SeekLoopTruncation } from "./scenes/pokeclip-editor-seek-loop/SeekLoopTruncation";
 import { HOP_LIMIT_RELAY_FRAMES, HopLimitRelay } from "./scenes/pokeclip-media-imds-credential-relay/HopLimitRelay";
 import { LEDGER_RELOAD_FRAMES, LedgerReload } from "./scenes/pokeclip-rewind-cache-deadlock/LedgerReload";
+import { TWO_DELETE_PATHS_FRAMES, TwoDeletePaths } from "./scenes/pokeclip-prod-data-wipe-throwaway-login/TwoDeletePaths";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
@@ -1075,6 +1076,16 @@ export const RemotionRoot: React.FC = () => (
       component={LedgerReload}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={LEDGER_RELOAD_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="TwoDeletePaths" component={TwoDeletePaths} durationInFrames={TWO_DELETE_PATHS_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="TwoDeletePathsMobile"
+      component={TwoDeletePaths}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={TWO_DELETE_PATHS_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}

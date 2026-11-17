@@ -1,0 +1,5 @@
+--- 두 번째 동시 연결 ---
+psql: error: FATAL:  too many connections for role "oneoff_x"
+--- VALID UNTIL 이 지난 비밀번호로 로그인 ---
+psql: error: FATAL:  password authentication failed for user "oneoff_x"
+password retrieved from file "/tmp/wipe-pgpass"

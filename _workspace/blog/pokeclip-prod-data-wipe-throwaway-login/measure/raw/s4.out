@@ -1,0 +1,31 @@
+대상 행(juliet · kilo) 처음: 2
+--- 꼴 1: psql -X -1 -v ON_ERROR_STOP=1 -f s4_delete.sql ---
+GRANT ROLE
+SET
+DELETE 1
+RESET
+REVOKE ROLE
+server closed the connection unexpectedly
+	This probably means the server terminated abnormally
+	before or while processing the request.
+connection to server was lost
+psql_exit=2
+재접속해 센 kilo 남은 수: 0
+--- 꼴 2: psql -X -c 'BEGIN; … DELETE …; COMMIT;' ---
+BEGIN
+GRANT ROLE
+SET
+DELETE 1
+RESET
+REVOKE ROLE
+server closed the connection unexpectedly
+	This probably means the server terminated abnormally
+	before or while processing the request.
+connection to server was lost
+psql_exit=2
+재접속해 센 juliet 남은 수: 0
+표 전체 행 수: 2
+--- 프록시 기록 ---
+proxy: listening on :6543 -> wipe-pg:5432
+proxy: COMMIT CommandComplete seen -> dropping ack
+proxy: COMMIT CommandComplete seen -> dropping ack

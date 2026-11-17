@@ -1,0 +1,42 @@
+CREATE ROLE
+GRANT
+CREATE ROLE
+GRANT ROLE
+CREATE ROLE
+CREATE SCHEMA
+CREATE TABLE
+BEGIN
+GRANT ROLE
+CREATE SCHEMA
+SET
+CREATE TABLE
+INSERT 0 3
+CREATE TABLE
+INSERT 0 4
+CREATE TABLE
+INSERT 0 3
+CREATE TABLE
+CREATE TABLE
+RESET
+REVOKE ROLE
+COMMIT
+--- 준비 끝: 마스터가 app_x 에 가진 멤버십 행(만든 쪽이 받는 ADMIN 만 남고 SET · INHERIT 는 없어야) ---
+ admin_option | inherit_option | set_option 
+--------------+----------------+------------
+ t            | f              | f
+(1 row)
+
+--- 앱 표 relacl(NULL = 소유자만) · 마스터의 직접 SELECT 권한 ---
+ relname | relacl_null | master_can_select 
+---------+-------------+-------------------
+ table_a | t           | f
+ table_b | t           | f
+ table_c | t           | f
+ table_i | t           | f
+ table_p | t           | f
+(5 rows)
+
+--- 마스터가 앱 역할 없이 앱 표를 직접 읽으면 ---
+psql:/tmp/s0_master.sql:45: ERROR:  permission denied for schema app_x
+LINE 1: SELECT count(*) FROM app_x.table_a;
+                             ^

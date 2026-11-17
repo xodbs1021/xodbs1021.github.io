@@ -1,0 +1,24 @@
+### s1e_partial_readonly
+Pager usage is off.
+GRANT ROLE
+BEGIN
+SET
+psql:/tmp/s1e_partial_readonly.sql:7: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1e_partial_readonly.sql:7: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1e_partial_readonly.sql:7: NOTICE:  vol_write(gate): cannot execute INSERT in a read-only transaction (as app_x)
+ rows 
+------
+    2
+(1 row)
+
+RESET
+COMMIT
+REVOKE ROLE
+--- master_only.members ---
+         who         
+---------------------
+ gate as master_x
+ gate as master_x
+ trigger as master_x
+(3 rows)
+

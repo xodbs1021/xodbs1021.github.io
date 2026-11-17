@@ -1,0 +1,32 @@
+Pager usage is off.
+ current_user | session_user 
+--------------+--------------
+ oneoff_x     | oneoff_x
+(1 row)
+
+--- 부분 색인 표 SELECT (조건 함수가 일회용 계정으로 돈다) ---
+psql:/tmp/s2_as_oneoff.sql:5: NOTICE:  partial-index gate(): current_user=oneoff_x session_user=oneoff_x
+psql:/tmp/s2_as_oneoff.sql:5: NOTICE:  vol_write(gate): enter current_user=oneoff_x session_user=oneoff_x
+psql:/tmp/s2_as_oneoff.sql:5: NOTICE:  vol_write(gate): permission denied for schema master_only (as oneoff_x)
+ rows 
+------
+    2
+(1 row)
+
+--- DELETE (권한 있음) ---
+psql:/tmp/s2_as_oneoff.sql:7: NOTICE:  definer-trigger: current_user=app_x session_user=oneoff_x
+psql:/tmp/s2_as_oneoff.sql:7: NOTICE:  definer-trigger: INSERT app_x.table_d -> OK
+psql:/tmp/s2_as_oneoff.sql:7: NOTICE:  definer-trigger: INSERT master_only -> permission denied for schema master_only
+psql:/tmp/s2_as_oneoff.sql:7: NOTICE:  trigger: enter current_user=oneoff_x session_user=oneoff_x
+psql:/tmp/s2_as_oneoff.sql:7: NOTICE:  trigger: SET ROLE other_x -> permission denied to set role "other_x"
+psql:/tmp/s2_as_oneoff.sql:7: NOTICE:  trigger: SET ROLE app_x -> permission denied to set role "app_x"
+psql:/tmp/s2_as_oneoff.sql:7: NOTICE:  trigger: after RESET ROLE current_user=oneoff_x
+psql:/tmp/s2_as_oneoff.sql:7: NOTICE:  trigger: INSERT master_only -> permission denied for schema master_only
+DELETE 1
+--- INSERT (권한 없음) ---
+psql:/tmp/s2_as_oneoff.sql:9: ERROR:  permission denied for table table_a
+--- 앱 소유 표 table_d 에 직접 INSERT (권한 없음) ---
+psql:/tmp/s2_as_oneoff.sql:11: ERROR:  permission denied for table table_d
+--- 직접 SET ROLE 시도 ---
+psql:/tmp/s2_as_oneoff.sql:13: ERROR:  permission denied to set role "app_x"
+psql:/tmp/s2_as_oneoff.sql:14: ERROR:  permission denied to set role "master_x"

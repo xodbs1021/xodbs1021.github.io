@@ -1,0 +1,27 @@
+Pager usage is off.
+ALTER ROLE
+--- 권한을 거두기 전 DROP ROLE ---
+psql:/tmp/s2_close.sql:5: ERROR:  role "oneoff_x" cannot be dropped because some objects depend on it
+DETAIL:  privileges for schema app_x
+privileges for table app_x.table_a
+privileges for table app_x.table_p
+--- 권한 회수(소유자 신분은 같은 트랜잭션 안에서만) ---
+BEGIN
+GRANT ROLE
+SET
+REVOKE
+REVOKE
+RESET
+REVOKE ROLE
+COMMIT
+--- 회수 뒤 DROP ROLE ---
+DROP ROLE
+ oneoff_left 
+-------------
+           0
+(1 row)
+
+--- master_only.members (s2 뒤) ---
+gate as master_x, gate as master_x, gate as master_x, gate as master_x, gate as master_x, gate as master_x, gate as master_x, gate as master_x, gate as master_x, gate as master_x, gate as master_x, trigger as master_x
+--- app_x.table_d (앱 소유 DEFINER 트리거가 쓴 줄) ---
+definer-trigger as app_x for master_x | definer-trigger as app_x for oneoff_x

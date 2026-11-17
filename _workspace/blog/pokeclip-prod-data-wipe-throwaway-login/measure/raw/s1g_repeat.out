@@ -1,0 +1,48 @@
+### s1g_repeat
+Pager usage is off.
+BEGIN
+GRANT ROLE
+SET
+ start: gate_calls=0
+
+psql:/tmp/s1g_repeat.sql:10: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1g_repeat.sql:10: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1g_repeat.sql:10: NOTICE:  vol_write(gate): RESET ROLE -> INSERT master_only OK as master_x
+psql:/tmp/s1g_repeat.sql:10: NOTICE:  vol_write(gate): role restored to app_x
+ SELECT 1 rows=2
+
+ after SELECT 1: gate_calls=1
+
+psql:/tmp/s1g_repeat.sql:12: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1g_repeat.sql:12: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1g_repeat.sql:12: NOTICE:  vol_write(gate): RESET ROLE -> INSERT master_only OK as master_x
+psql:/tmp/s1g_repeat.sql:12: NOTICE:  vol_write(gate): role restored to app_x
+ SELECT 2 rows=2
+
+ after SELECT 2: gate_calls=2
+
+psql:/tmp/s1g_repeat.sql:14: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1g_repeat.sql:14: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+ SELECT 3 rows=2
+
+ after SELECT 3: gate_calls=3
+
+psql:/tmp/s1g_repeat.sql:14: NOTICE:  vol_write(gate): RESET ROLE -> INSERT master_only OK as master_x
+psql:/tmp/s1g_repeat.sql:14: NOTICE:  vol_write(gate): role restored to app_x
+psql:/tmp/s1g_repeat.sql:16: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1g_repeat.sql:16: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1g_repeat.sql:16: NOTICE:  vol_write(gate): RESET ROLE -> INSERT master_only OK as master_x
+psql:/tmp/s1g_repeat.sql:16: NOTICE:  vol_write(gate): role restored to app_x
+DELETE 0
+ after DELETE: gate_calls=4
+
+psql:/tmp/s1g_repeat.sql:18: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1g_repeat.sql:18: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1g_repeat.sql:18: NOTICE:  vol_write(gate): RESET ROLE -> INSERT master_only OK as master_x
+psql:/tmp/s1g_repeat.sql:18: NOTICE:  vol_write(gate): role restored to app_x
+UPDATE 0
+ after UPDATE: gate_calls=5
+
+RESET
+REVOKE ROLE
+COMMIT

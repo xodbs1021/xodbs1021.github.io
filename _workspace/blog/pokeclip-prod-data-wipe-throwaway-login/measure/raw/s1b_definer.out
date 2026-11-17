@@ -1,0 +1,15 @@
+### s1b_definer
+Pager usage is off.
+BEGIN
+GRANT ROLE
+SET
+psql:/tmp/s1b_definer.sql:6: NOTICE:  definer: current_user=app_x session_user=master_x
+psql:/tmp/s1b_definer.sql:6: NOTICE:  definer: RESET ROLE -> cannot set parameter "role" within security-definer function
+ probe_definer 
+---------------
+ 
+(1 row)
+
+RESET
+REVOKE ROLE
+COMMIT

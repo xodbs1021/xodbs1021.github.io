@@ -1,0 +1,30 @@
+Pager usage is off.
+BEGIN
+CREATE ROLE
+GRANT ROLE
+SET
+GRANT
+GRANT
+GRANT
+RESET
+REVOKE ROLE
+COMMIT
+--- oneoff_x 속성 ---
+ rolcanlogin | rolconnlimit | has_valid_until 
+-------------+--------------+-----------------
+ t           |            1 | t
+(1 row)
+
+--- 멤버십: oneoff_x 가 속한 역할 수 · 커밋 뒤 마스터에게 남은 app_x 의 SET · INHERIT 멤버십 ---
+ oneoff_memberships | master_set_or_inherit 
+--------------------+-----------------------
+                  0 |                     0
+(1 row)
+
+--- oneoff_x 의 app_x.table_a 권한(마스터는 스키마 USAGE 가 없어 이름 대신 oid 로 묻는다) ---
+ can_select | can_delete | can_insert | can_update 
+------------+------------+------------+------------
+ t          | t          | f          | f
+(1 row)
+
+stored as SCRAM verifier: true

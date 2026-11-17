@@ -1,0 +1,33 @@
+### s1a_setrole_delete
+Pager usage is off.
+  before  | session_user 
+----------+--------------
+ master_x | master_x
+(1 row)
+
+BEGIN
+GRANT ROLE
+SET
+ in_setrole 
+------------
+ app_x
+(1 row)
+
+DELETE 1
+psql:/tmp/s1a_setrole_delete.sql:8: NOTICE:  definer-trigger: current_user=app_x session_user=master_x
+psql:/tmp/s1a_setrole_delete.sql:8: NOTICE:  definer-trigger: INSERT app_x.table_d -> OK
+psql:/tmp/s1a_setrole_delete.sql:8: NOTICE:  definer-trigger: INSERT master_only -> permission denied for schema master_only
+psql:/tmp/s1a_setrole_delete.sql:8: NOTICE:  trigger: enter current_user=app_x session_user=master_x
+psql:/tmp/s1a_setrole_delete.sql:8: NOTICE:  trigger: SET ROLE other_x -> OK current_user=other_x
+psql:/tmp/s1a_setrole_delete.sql:8: NOTICE:  trigger: SET ROLE app_x -> OK current_user=app_x
+psql:/tmp/s1a_setrole_delete.sql:8: NOTICE:  trigger: after RESET ROLE current_user=master_x
+psql:/tmp/s1a_setrole_delete.sql:8: NOTICE:  trigger: INSERT master_only -> OK
+RESET
+REVOKE ROLE
+COMMIT
+--- master_only.members (트리거가 남긴 줄) ---
+         who         
+---------------------
+ trigger as master_x
+(1 row)
+

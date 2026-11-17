@@ -1,0 +1,42 @@
+BEGIN
+GRANT ROLE
+SET
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TABLE
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE INDEX
+psql:/tmp/s1_plant.sql:104: NOTICE:  index-expr tag(india): current_user=app_x session_user=master_x
+psql:/tmp/s1_plant.sql:104: NOTICE:  index-expr tag(juliet): current_user=app_x session_user=master_x
+psql:/tmp/s1_plant.sql:104: NOTICE:  index-expr tag(kilo): current_user=app_x session_user=master_x
+psql:/tmp/s1_plant.sql:104: NOTICE:  index-expr tag(lima): current_user=app_x session_user=master_x
+CREATE FUNCTION
+psql:/tmp/s1_plant.sql:116: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1_plant.sql:116: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1_plant.sql:116: NOTICE:  vol_write(gate): cannot set parameter "role" within security-restricted operation (as app_x)
+psql:/tmp/s1_plant.sql:116: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1_plant.sql:116: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1_plant.sql:116: NOTICE:  vol_write(gate): cannot set parameter "role" within security-restricted operation (as app_x)
+psql:/tmp/s1_plant.sql:116: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+CREATE INDEX
+psql:/tmp/s1_plant.sql:116: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1_plant.sql:116: NOTICE:  vol_write(gate): cannot set parameter "role" within security-restricted operation (as app_x)
+CREATE FUNCTION
+CREATE TABLE
+INSERT 0 1
+psql:/tmp/s1_plant.sql:127: NOTICE:  partial-index gate_naive(): current_user=app_x session_user=master_x
+psql:/tmp/s1_plant.sql:127: NOTICE:  vol_write_naive(gate_naive): cannot set parameter "role" within security-restricted operation (as app_x)
+psql:/tmp/s1_plant.sql:127: NOTICE:  partial-index gate_naive(): current_user=app_x session_user=master_x
+psql:/tmp/s1_plant.sql:127: NOTICE:  vol_write_naive(gate_naive): cannot set parameter "role" within security-restricted operation (as app_x)
+psql:/tmp/s1_plant.sql:127: NOTICE:  partial-index gate_naive(): current_user=app_x session_user=master_x
+psql:/tmp/s1_plant.sql:127: NOTICE:  vol_write_naive(gate_naive): cannot set parameter "role" within security-restricted operation (as app_x)
+CREATE INDEX
+RESET
+REVOKE ROLE
+COMMIT
+TRUNCATE TABLE

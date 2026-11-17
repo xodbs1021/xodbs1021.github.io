@@ -1,0 +1,21 @@
+### s1d_partial_delete
+Pager usage is off.
+BEGIN
+GRANT ROLE
+SET
+psql:DELETE 1
+RESET
+REVOKE ROLE
+COMMIT
+--- master_only.members ---
+/tmp/s1d_partial_delete.sql:6: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1d_partial_delete.sql:6: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1d_partial_delete.sql:6: NOTICE:  vol_write(gate): RESET ROLE -> INSERT master_only OK as master_x
+psql:/tmp/s1d_partial_delete.sql:6: NOTICE:  vol_write(gate): role restored to app_x
+         who         
+---------------------
+ gate as master_x
+ gate as master_x
+ trigger as master_x
+(3 rows)
+

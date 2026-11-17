@@ -1,0 +1,19 @@
+### s1d_partial_naive
+Pager usage is off.
+BEGIN
+GRANT ROLE
+SET
+psql:/tmp/s1d_partial_naive.sql:6: NOTICE:  partial-index gate_naive(): current_user=app_x session_user=master_x
+psql:/tmp/s1d_partial_naive.sql:6: NOTICE:  vol_write_naive(gate_naive): RESET ROLE -> INSERT master_only OK as master_x (role not restored)
+psql:/tmp/s1d_partial_naive.sql:6: ERROR:  permission denied for table table_q
+psql:/tmp/s1d_partial_naive.sql:7: ERROR:  current transaction is aborted, commands ignored until end of transaction block
+psql:/tmp/s1d_partial_naive.sql:8: ERROR:  current transaction is aborted, commands ignored until end of transaction block
+ROLLBACK
+--- master_only.members ---
+         who         
+---------------------
+ gate as master_x
+ gate as master_x
+ trigger as master_x
+(3 rows)
+
