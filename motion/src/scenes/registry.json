@@ -788,5 +788,21 @@
     "posterFrame": 128,
     "alt": "두 열이 같은 DELETE 를 다른 신분으로 한다. 왼쪽은 마스터가 SET ROLE app_x 로 앱 표를 지우자 아래로 화살표가 이어지고, 앱이 심은 트리거가 RESET ROLE 로 마스터로 돌아가 붉은 상자 마스터 권한으로 돎 과 권한 상승 이름표가 뜬다. 오른쪽은 멤버십 없이 표 권한만 받은 일회용 로그인이 DELETE 는 되지만 INSERT 거부 · 상승 없음 회색 상자와 트리거가 돌아갈 곳은 일회용 계정뿐 상자가 뜨고, 1시간 뒤 로그인 만료 이름표와 함께 일회용 로그인 상자가 흐려지는 장면",
     "mobile": true
+  },
+  {
+    "id": "PipelineStop",
+    "post": "pokeclip-live-dvr-url-split",
+    "kind": "video",
+    "posterFrame": 270,
+    "alt": "OBS 송출이 MediaMTX로 들어가 두 갈래로 나뉜다. 위 갈래는 /live · Media 상자(라이브 창 28초)를 지나 플레이어로, 아래 갈래는 사이드카(재포장 · 업로드)와 S3(/dvr · /vod)를 지나 플레이어로 청록 패킷이 흐른다. 잠시 뒤 사이드카 상자가 빨갛게 바뀌며 멈춤 이름표가 뜨고 MediaMTX에서 사이드카를 거쳐 S3로 가는 선의 패킷이 멈춰 회색이 되지만, S3에서 플레이어로 가는 선과 위 갈래의 패킷은 계속 흐르고 라이브는 계속 · 되감기 머리가 멈춤 이름표가 뜬다",
+    "mobile": true
+  },
+  {
+    "id": "WildcardMatch",
+    "post": "pokeclip-dvr-cookie-edge-floor",
+    "kind": "video",
+    "posterFrame": 280,
+    "alt": "두 줄이 같은 요청 {base}/live/B/index.m3u8?x=/A/ 를 정책과 견준다. 위 줄 옛 정책 {base}/*/A/* 에서는 첫 * 가 청록으로 칠해지고 요청의 live/B/index.m3u8?x= 가 왼쪽부터 청록 바탕으로 차오른 뒤 /A/ 가 밑줄로 맞물리고, 빨간 이름표 일치 · 남의 방송이 열림이 뜬다. 아래 줄 종류별 정책 {base}/live/A/* 에서는 {base}/live/ 가 밑줄로 맞물리다가 정책의 A 와 요청의 B 칸이 빨갛게 어긋나고, 청록 이름표 불일치 · 403 이 뜬다",
+    "mobile": true
   }
 ]

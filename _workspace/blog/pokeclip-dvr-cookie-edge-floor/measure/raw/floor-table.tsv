@@ -1,0 +1,18 @@
+경우	메서드	경로	KVS	장애	결정	cache-control	KVS 호출(exists/get)	함수 로그
+하한 아래	GET	/dvr/s1/r1/seg/001199.m4s	{"s1/r1":"1200"}	{}	막음 404	no-store	1/1	DVR FLOOR DENY s1 r1 1199 floor=1200
+하한과 같음	GET	/dvr/s1/r1/seg/001200.m4s	{"s1/r1":"1200"}	{}	넘김		1/1	
+하한 위	GET	/dvr/s1/r1/seg/001201.m4s	{"s1/r1":"1200"}	{}	넘김		1/1	
+키 없음(회차 닫힘 · 아직 안 씀)	GET	/dvr/s1/r1/seg/000001.m4s	{}	{}	넘김		1/0	
+KVS 읽기 실패(exists)	GET	/dvr/s1/r1/seg/000001.m4s	{"s1/r1":"1200"}	{"failExists":true}	넘김		1/0	DVR FLOOR KVS ERROR s1 r1
+KVS 읽기 실패(get)	GET	/dvr/s1/r1/seg/000001.m4s	{"s1/r1":"1200"}	{"failGet":true}	넘김		1/1	DVR FLOOR KVS ERROR s1 r1
+값 이상(앞자리 0)	GET	/dvr/s1/r1/seg/000001.m4s	{"s1/r1":"01200"}	{}	넘김		1/1	DVR FLOOR VALUE INVALID s1 r1
+값 이상(숫자 아님)	GET	/dvr/s1/r1/seg/000001.m4s	{"s1/r1":"abc"}	{}	넘김		1/1	DVR FLOOR VALUE INVALID s1 r1
+경로 변조 표시 — 퍼센트	GET	/dvr/s1/r1/seg/%30%30%30001.m4s	{"s1/r1":"1200"}	{}	막음 404	no-store	0/0	DVR FLOOR MALFORMED
+경로 변조 표시 — 점 구간	GET	/dvr/s1/x/../r1/seg/000001.m4s	{"s1/r1":"1200"}	{}	막음 404	no-store	0/0	DVR FLOOR MALFORMED
+경로 변조 표시 — 빈 구간	GET	/dvr/s1//r1/seg/000001.m4s	{"s1/r1":"1200"}	{}	막음 404	no-store	0/0	DVR FLOOR MALFORMED
+경로 변조 표시 — 역슬래시	GET	/dvr/s1\r1/seg/000001.m4s	{"s1/r1":"1200"}	{}	막음 404	no-store	0/0	DVR FLOOR MALFORMED
+안전 정수 밖 seq	GET	/dvr/s1/r1/seg/9999999999999999999.m4s	{"s1/r1":"1200"}	{}	막음 404	no-store	0/0	DVR FLOOR MALFORMED
+옛 꼴 조각(회차 없음)	GET	/dvr/s1/seg/000001.m4s	{"s1/r1":"1200"}	{}	넘김		0/0	
+되감기 목록	GET	/dvr/s1/sess1/index.m3u8	{"s1/r1":"1200"}	{}	넘김		0/0	
+init	GET	/dvr/s1/init/sess1.mp4	{"s1/r1":"1200"}	{}	넘김		0/0	
+OPTIONS(사전 요청)	OPTIONS	/dvr/s1/r1/seg/000001.m4s	{"s1/r1":"1200"}	{}	넘김		0/0	

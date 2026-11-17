@@ -99,6 +99,8 @@ import { SEEK_LOOP_TRUNCATION_FRAMES, SeekLoopTruncation } from "./scenes/pokecl
 import { HOP_LIMIT_RELAY_FRAMES, HopLimitRelay } from "./scenes/pokeclip-media-imds-credential-relay/HopLimitRelay";
 import { LEDGER_RELOAD_FRAMES, LedgerReload } from "./scenes/pokeclip-rewind-cache-deadlock/LedgerReload";
 import { TWO_DELETE_PATHS_FRAMES, TwoDeletePaths } from "./scenes/pokeclip-prod-data-wipe-throwaway-login/TwoDeletePaths";
+import { PIPELINE_STOP_FRAMES, PipelineStop } from "./scenes/pokeclip-live-dvr-url-split/PipelineStop";
+import { WILDCARD_MATCH_FRAMES, WildcardMatch } from "./scenes/pokeclip-dvr-cookie-edge-floor/WildcardMatch";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
@@ -1086,6 +1088,26 @@ export const RemotionRoot: React.FC = () => (
       component={TwoDeletePaths}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={TWO_DELETE_PATHS_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="PipelineStop" component={PipelineStop} durationInFrames={PIPELINE_STOP_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="PipelineStopMobile"
+      component={PipelineStop}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={PIPELINE_STOP_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="WildcardMatch" component={WildcardMatch} durationInFrames={WILDCARD_MATCH_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="WildcardMatchMobile"
+      component={WildcardMatch}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={WILDCARD_MATCH_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}
