@@ -1,0 +1,30 @@
+### s1h_update
+Pager usage is off.
+BEGIN
+GRANT ROLE
+SET
+psql:/tmp/s1h_update.sql:7: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1h_update.sql:7: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1h_update.sql:7: NOTICE:  vol_write(gate): RESET ROLE -> INSERT master_only OK as master_x
+psql:/tmp/s1h_update.sql:7: NOTICE:  vol_write(gate): role restored to app_x
+psql:/tmp/s1h_update.sql:7: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1h_update.sql:7: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1h_update.sql:7: NOTICE:  vol_write(gate): RESET ROLE -> INSERT master_only OK as master_x
+psql:/tmp/s1h_update.sql:7: NOTICE:  vol_write(gate): role restored to app_x
+psql:/tmp/s1h_update.sql:9: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+UPDATE 1
+ after UPDATE: gate_calls=2
+
+psql:/tmp/s1h_update.sql:9: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1h_update.sql:9: NOTICE:  vol_write(gate): RESET ROLE -> INSERT master_only OK as master_x
+psql:/tmp/s1h_update.sql:9: NOTICE:  vol_write(gate): role restored to app_x
+psql:/tmp/s1h_update.sql:9: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1h_update.sql:9: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1h_update.sql:9: NOTICE:  vol_write(gate): RESET ROLE -> INSERT master_only OK as master_x
+psql:/tmp/s1h_update.sql:9: NOTICE:  vol_write(gate): role restored to app_x
+UPDATE 1
+ after UPDATE 2: gate_calls=4
+
+RESET
+REVOKE ROLE
+COMMIT

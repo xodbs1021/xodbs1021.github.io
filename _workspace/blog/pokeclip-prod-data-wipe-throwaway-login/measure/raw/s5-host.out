@@ -1,0 +1,7 @@
+--- 호스트 bash: 부른 쪽이 받는 종료 상태 ---
+./run.sh: line 182:  1631 Terminated: 15          bash -c 'kill -TERM $$'
+SIGTERM: 143
+./run.sh: line 182:  1632 Hangup: 1               bash -c 'kill -HUP $$'
+SIGHUP:  129
+./run.sh: line 182:  1633 Killed: 9               bash -c 'kill -KILL $$'
+SIGKILL: 137

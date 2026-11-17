@@ -1,0 +1,25 @@
+### s1f_grant_only
+Pager usage is off.
+ members_before 
+----------------
+              3
+(1 row)
+
+CREATE ROLE
+BEGIN
+GRANT ROLE
+SET
+GRANT
+GRANT
+REVOKE
+REVOKE
+RESET
+REVOKE ROLE
+COMMIT
+DROP ROLE
+ members_after 
+---------------
+             3
+(1 row)
+
+(이 파일 출력에 trigger · index-expr · gate · vol_write NOTICE 가 없으면 깨어나지 않은 것)

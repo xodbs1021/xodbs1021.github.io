@@ -1,0 +1,41 @@
+Pager usage is off.
+CREATE ROLE
+--- 처음 ---
+ relname | relacl | is_null 
+---------+--------+---------
+ table_b |        | t
+ table_c |        | t
+(2 rows)
+
+BEGIN
+GRANT ROLE
+SET
+GRANT
+REVOKE
+RESET
+REVOKE ROLE
+COMMIT
+--- table_b GRANT 뒤 · table_c 회수만 한 뒤 ---
+ relname |                    relacl                    | is_null 
+---------+----------------------------------------------+---------
+ table_b | {app_x=arwdDxtm/app_x,probe_grantee=d/app_x} | f
+ table_c | {app_x=arwdDxtm/app_x}                       | f
+(2 rows)
+
+BEGIN
+GRANT ROLE
+SET
+REVOKE
+RESET
+REVOKE ROLE
+COMMIT
+DROP ROLE
+--- table_b 회수 · 받은 역할 DROP 뒤 ---
+ relname |         relacl         | is_null 
+---------+------------------------+---------
+ table_b | {app_x=arwdDxtm/app_x} | f
+ table_c | {app_x=arwdDxtm/app_x} | f
+(2 rows)
+
+--- 마스터가 카탈로그를 직접 NULL 로 고치려 하면 ---
+psql:/tmp/s3_relacl.sql:34: ERROR:  permission denied for table pg_class

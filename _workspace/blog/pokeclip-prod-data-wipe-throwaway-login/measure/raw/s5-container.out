@@ -1,0 +1,21 @@
+부모 bash(자식 fg) 를 SIGTERM — 부른 쪽(docker exec)이 받은 종료 상태: 143
+자식 psql 출력:
+ pg_sleep 
+----------
+ 
+(1 row)
+
+CREATE ROLE
+child psql: CREATE ROLE 완료
+남은 역할 orphan_x: 1
+
+부모 bash(자식 bg) 를 SIGTERM — 부른 쪽(docker exec)이 받은 종료 상태: 143
+자식 psql 출력:
+ pg_sleep 
+----------
+ 
+(1 row)
+
+CREATE ROLE
+child psql: CREATE ROLE 완료
+남은 역할 orphan_bg_x: 1

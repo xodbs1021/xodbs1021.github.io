@@ -1,0 +1,520 @@
+== env ==
+date(KST): 2026-11-17T12:17:07+0900
+host: Darwin arm64 · macOS 27.0.1
+docker: 29.8.2
+host bash: GNU bash, version 3.2.57(1)-release (arm64-apple-darwin26)
+pg image: postgres@sha256:a426e44bac0b759c95894d68e1a0ac03ecc20b619f498a91aae373bf06d8508d
+proxy image: python:3.13-slim linux/amd64 (Python 3.13.18)
+== up ==
+server: 17.10 (Debian 17.10-1.pgdg13+1)
+psql: psql (PostgreSQL) 17.10 (Debian 17.10-1.pgdg13+1)
+container bash: GNU bash, version 5.2.37(1)-release (aarch64-unknown-linux-gnu)
+== s0 준비 ==
+CREATE ROLE
+GRANT
+CREATE ROLE
+GRANT ROLE
+CREATE ROLE
+CREATE SCHEMA
+CREATE TABLE
+BEGIN
+GRANT ROLE
+CREATE SCHEMA
+SET
+CREATE TABLE
+INSERT 0 3
+CREATE TABLE
+INSERT 0 4
+CREATE TABLE
+INSERT 0 3
+CREATE TABLE
+CREATE TABLE
+RESET
+REVOKE ROLE
+COMMIT
+--- 준비 끝: 마스터가 app_x 에 가진 멤버십 행(만든 쪽이 받는 ADMIN 만 남고 SET · INHERIT 는 없어야) ---
+ admin_option | inherit_option | set_option 
+--------------+----------------+------------
+ t            | f              | f
+(1 row)
+
+--- 앱 표 relacl(NULL = 소유자만) · 마스터의 직접 SELECT 권한 ---
+ relname | relacl_null | master_can_select 
+---------+-------------+-------------------
+ table_a | t           | f
+ table_b | t           | f
+ table_c | t           | f
+ table_i | t           | f
+ table_p | t           | f
+(5 rows)
+
+--- 마스터가 앱 역할 없이 앱 표를 직접 읽으면 ---
+psql:/tmp/s0_master.sql:45: ERROR:  permission denied for schema app_x
+LINE 1: SELECT count(*) FROM app_x.table_a;
+                             ^
+== s1 마스터 경로: 앱 코드가 도는 신분 ==
+REVOKE ROLE
+COMMIT
+TRUNCATE TABLE
+### s1a_setrole_delete
+Pager usage is off.
+  before  | session_user 
+----------+--------------
+ master_x | master_x
+(1 row)
+
+BEGIN
+GRANT ROLE
+SET
+ in_setrole 
+------------
+ app_x
+(1 row)
+
+DELETE 1
+psql:/tmp/s1a_setrole_delete.sql:8: NOTICE:  definer-trigger: current_user=app_x session_user=master_x
+psql:/tmp/s1a_setrole_delete.sql:8: NOTICE:  definer-trigger: INSERT app_x.table_d -> OK
+psql:/tmp/s1a_setrole_delete.sql:8: NOTICE:  definer-trigger: INSERT master_only -> permission denied for schema master_only
+psql:/tmp/s1a_setrole_delete.sql:8: NOTICE:  trigger: enter current_user=app_x session_user=master_x
+psql:/tmp/s1a_setrole_delete.sql:8: NOTICE:  trigger: SET ROLE other_x -> OK current_user=other_x
+psql:/tmp/s1a_setrole_delete.sql:8: NOTICE:  trigger: SET ROLE app_x -> OK current_user=app_x
+psql:/tmp/s1a_setrole_delete.sql:8: NOTICE:  trigger: after RESET ROLE current_user=master_x
+psql:/tmp/s1a_setrole_delete.sql:8: NOTICE:  trigger: INSERT master_only -> OK
+RESET
+REVOKE ROLE
+COMMIT
+--- master_only.members (트리거가 남긴 줄) ---
+         who         
+---------------------
+ trigger as master_x
+(1 row)
+
+### s1b_definer
+Pager usage is off.
+BEGIN
+GRANT ROLE
+SET
+psql:/tmp/s1b_definer.sql:6: NOTICE:  definer: current_user=app_x session_user=master_x
+psql:/tmp/s1b_definer.sql:6: NOTICE:  definer: RESET ROLE -> cannot set parameter "role" within security-definer function
+ probe_definer 
+---------------
+ 
+(1 row)
+
+RESET
+REVOKE ROLE
+COMMIT
+### s1c_index_expr
+Pager usage is off.
+BEGIN
+GRANT ROLE
+SET
+--- INSERT ---
+psql:/tmp/s1c_index_expr.sql:8: NOTICE:  index-expr tag(mike): current_user=app_x session_user=master_x
+INSERT 0 1
+--- UPDATE ---
+psql:/tmp/s1c_index_expr.sql:10: NOTICE:  index-expr tag(india-2): current_user=app_x session_user=master_x
+UPDATE 1
+--- DELETE ---
+DELETE 1
+--- SELECT ---
+ count 
+-------
+     1
+(1 row)
+
+RESET
+REVOKE ROLE
+COMMIT
+### s1d_partial_select
+Pager usage is off.
+BEGIN
+GRANT ROLE
+SET
+psql:/tmp/s1d_partial_select.sql:6: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1d_partial_select.sql:6: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1d_partial_select.sql:6: NOTICE:  vol_write(gate): RESET ROLE -> INSERT master_only OK as master_x
+psql:/tmp/s1d_partial_select.sql:6: NOTICE:  vol_write(gate): role restored to app_x
+ rows 
+------
+    3
+(1 row)
+
+ after_query 
+-------------
+ app_x
+(1 row)
+
+RESET
+REVOKE ROLE
+COMMIT
+--- master_only.members ---
+         who         
+---------------------
+ gate as master_x
+ trigger as master_x
+(2 rows)
+
+### s1d_partial_delete
+Pager usage is off.
+BEGIN
+GRANT ROLE
+SET
+psql:DELETE 1
+RESET
+REVOKE ROLE
+COMMIT
+--- master_only.members ---
+/tmp/s1d_partial_delete.sql:6: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1d_partial_delete.sql:6: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1d_partial_delete.sql:6: NOTICE:  vol_write(gate): RESET ROLE -> INSERT master_only OK as master_x
+psql:/tmp/s1d_partial_delete.sql:6: NOTICE:  vol_write(gate): role restored to app_x
+         who         
+---------------------
+ gate as master_x
+ gate as master_x
+ trigger as master_x
+(3 rows)
+
+### s1d_partial_naive
+Pager usage is off.
+BEGIN
+GRANT ROLE
+SET
+psql:/tmp/s1d_partial_naive.sql:6: NOTICE:  partial-index gate_naive(): current_user=app_x session_user=master_x
+psql:/tmp/s1d_partial_naive.sql:6: NOTICE:  vol_write_naive(gate_naive): RESET ROLE -> INSERT master_only OK as master_x (role not restored)
+psql:/tmp/s1d_partial_naive.sql:6: ERROR:  permission denied for table table_q
+psql:/tmp/s1d_partial_naive.sql:7: ERROR:  current transaction is aborted, commands ignored until end of transaction block
+psql:/tmp/s1d_partial_naive.sql:8: ERROR:  current transaction is aborted, commands ignored until end of transaction block
+ROLLBACK
+--- master_only.members ---
+         who         
+---------------------
+ gate as master_x
+ gate as master_x
+ trigger as master_x
+(3 rows)
+
+### s1e_partial_readonly
+Pager usage is off.
+GRANT ROLE
+BEGIN
+SET
+psql:/tmp/s1e_partial_readonly.sql:7: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1e_partial_readonly.sql:7: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1e_partial_readonly.sql:7: NOTICE:  vol_write(gate): cannot execute INSERT in a read-only transaction (as app_x)
+ rows 
+------
+    2
+(1 row)
+
+RESET
+COMMIT
+REVOKE ROLE
+--- master_only.members ---
+         who         
+---------------------
+ gate as master_x
+ gate as master_x
+ trigger as master_x
+(3 rows)
+
+### s1f_grant_only
+Pager usage is off.
+ members_before 
+----------------
+              3
+(1 row)
+
+CREATE ROLE
+BEGIN
+GRANT ROLE
+SET
+GRANT
+GRANT
+REVOKE
+REVOKE
+RESET
+REVOKE ROLE
+COMMIT
+DROP ROLE
+ members_after 
+---------------
+             3
+(1 row)
+
+(이 파일 출력에 trigger · index-expr · gate · vol_write NOTICE 가 없으면 깨어나지 않은 것)
+### s1g_repeat
+Pager usage is off.
+BEGIN
+GRANT ROLE
+SET
+ start: gate_calls=0
+
+psql:/tmp/s1g_repeat.sql:10: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1g_repeat.sql:10: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1g_repeat.sql:10: NOTICE:  vol_write(gate): RESET ROLE -> INSERT master_only OK as master_x
+psql:/tmp/s1g_repeat.sql:10: NOTICE:  vol_write(gate): role restored to app_x
+ SELECT 1 rows=2
+
+ after SELECT 1: gate_calls=1
+
+psql:/tmp/s1g_repeat.sql:12: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1g_repeat.sql:12: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1g_repeat.sql:12: NOTICE:  vol_write(gate): RESET ROLE -> INSERT master_only OK as master_x
+psql:/tmp/s1g_repeat.sql:12: NOTICE:  vol_write(gate): role restored to app_x
+ SELECT 2 rows=2
+
+ after SELECT 2: gate_calls=2
+
+psql:/tmp/s1g_repeat.sql:14: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1g_repeat.sql:14: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+ SELECT 3 rows=2
+
+ after SELECT 3: gate_calls=3
+
+psql:/tmp/s1g_repeat.sql:14: NOTICE:  vol_write(gate): RESET ROLE -> INSERT master_only OK as master_x
+psql:/tmp/s1g_repeat.sql:14: NOTICE:  vol_write(gate): role restored to app_x
+psql:/tmp/s1g_repeat.sql:16: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1g_repeat.sql:16: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1g_repeat.sql:16: NOTICE:  vol_write(gate): RESET ROLE -> INSERT master_only OK as master_x
+psql:/tmp/s1g_repeat.sql:16: NOTICE:  vol_write(gate): role restored to app_x
+DELETE 0
+ after DELETE: gate_calls=4
+
+psql:/tmp/s1g_repeat.sql:18: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1g_repeat.sql:18: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1g_repeat.sql:18: NOTICE:  vol_write(gate): RESET ROLE -> INSERT master_only OK as master_x
+psql:/tmp/s1g_repeat.sql:18: NOTICE:  vol_write(gate): role restored to app_x
+UPDATE 0
+ after UPDATE: gate_calls=5
+
+RESET
+REVOKE ROLE
+COMMIT
+### s1h_update
+Pager usage is off.
+BEGIN
+GRANT ROLE
+SET
+psql:/tmp/s1h_update.sql:7: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1h_update.sql:7: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1h_update.sql:7: NOTICE:  vol_write(gate): RESET ROLE -> INSERT master_only OK as master_x
+psql:/tmp/s1h_update.sql:7: NOTICE:  vol_write(gate): role restored to app_x
+psql:/tmp/s1h_update.sql:7: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1h_update.sql:7: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1h_update.sql:7: NOTICE:  vol_write(gate): RESET ROLE -> INSERT master_only OK as master_x
+psql:/tmp/s1h_update.sql:7: NOTICE:  vol_write(gate): role restored to app_x
+psql:/tmp/s1h_update.sql:9: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+UPDATE 1
+ after UPDATE: gate_calls=2
+
+psql:/tmp/s1h_update.sql:9: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1h_update.sql:9: NOTICE:  vol_write(gate): RESET ROLE -> INSERT master_only OK as master_x
+psql:/tmp/s1h_update.sql:9: NOTICE:  vol_write(gate): role restored to app_x
+psql:/tmp/s1h_update.sql:9: NOTICE:  partial-index gate(): current_user=app_x session_user=master_x
+psql:/tmp/s1h_update.sql:9: NOTICE:  vol_write(gate): enter current_user=app_x session_user=master_x
+psql:/tmp/s1h_update.sql:9: NOTICE:  vol_write(gate): RESET ROLE -> INSERT master_only OK as master_x
+psql:/tmp/s1h_update.sql:9: NOTICE:  vol_write(gate): role restored to app_x
+UPDATE 1
+ after UPDATE 2: gate_calls=4
+
+RESET
+REVOKE ROLE
+COMMIT
+== s2 일회용 로그인 ==
+Pager usage is off.
+BEGIN
+CREATE ROLE
+GRANT ROLE
+SET
+GRANT
+GRANT
+GRANT
+RESET
+REVOKE ROLE
+COMMIT
+--- oneoff_x 속성 ---
+ rolcanlogin | rolconnlimit | has_valid_until 
+-------------+--------------+-----------------
+ t           |            1 | t
+(1 row)
+
+--- 멤버십: oneoff_x 가 속한 역할 수 · 커밋 뒤 마스터에게 남은 app_x 의 SET · INHERIT 멤버십 ---
+ oneoff_memberships | master_set_or_inherit 
+--------------------+-----------------------
+                  0 |                     0
+(1 row)
+
+--- oneoff_x 의 app_x.table_a 권한(마스터는 스키마 USAGE 가 없어 이름 대신 oid 로 묻는다) ---
+ can_select | can_delete | can_insert | can_update 
+------------+------------+------------+------------
+ t          | t          | f          | f
+(1 row)
+
+stored as SCRAM verifier: true
+Pager usage is off.
+ current_user | session_user 
+--------------+--------------
+ oneoff_x     | oneoff_x
+(1 row)
+
+--- 부분 색인 표 SELECT (조건 함수가 일회용 계정으로 돈다) ---
+psql:/tmp/s2_as_oneoff.sql:5: NOTICE:  partial-index gate(): current_user=oneoff_x session_user=oneoff_x
+psql:/tmp/s2_as_oneoff.sql:5: NOTICE:  vol_write(gate): enter current_user=oneoff_x session_user=oneoff_x
+psql:/tmp/s2_as_oneoff.sql:5: NOTICE:  vol_write(gate): permission denied for schema master_only (as oneoff_x)
+ rows 
+------
+    2
+(1 row)
+
+--- DELETE (권한 있음) ---
+psql:/tmp/s2_as_oneoff.sql:7: NOTICE:  definer-trigger: current_user=app_x session_user=oneoff_x
+psql:/tmp/s2_as_oneoff.sql:7: NOTICE:  definer-trigger: INSERT app_x.table_d -> OK
+psql:/tmp/s2_as_oneoff.sql:7: NOTICE:  definer-trigger: INSERT master_only -> permission denied for schema master_only
+psql:/tmp/s2_as_oneoff.sql:7: NOTICE:  trigger: enter current_user=oneoff_x session_user=oneoff_x
+psql:/tmp/s2_as_oneoff.sql:7: NOTICE:  trigger: SET ROLE other_x -> permission denied to set role "other_x"
+psql:/tmp/s2_as_oneoff.sql:7: NOTICE:  trigger: SET ROLE app_x -> permission denied to set role "app_x"
+psql:/tmp/s2_as_oneoff.sql:7: NOTICE:  trigger: after RESET ROLE current_user=oneoff_x
+psql:/tmp/s2_as_oneoff.sql:7: NOTICE:  trigger: INSERT master_only -> permission denied for schema master_only
+DELETE 1
+--- INSERT (권한 없음) ---
+psql:/tmp/s2_as_oneoff.sql:9: ERROR:  permission denied for table table_a
+--- 앱 소유 표 table_d 에 직접 INSERT (권한 없음) ---
+psql:/tmp/s2_as_oneoff.sql:11: ERROR:  permission denied for table table_d
+--- 직접 SET ROLE 시도 ---
+psql:/tmp/s2_as_oneoff.sql:13: ERROR:  permission denied to set role "app_x"
+psql:/tmp/s2_as_oneoff.sql:14: ERROR:  permission denied to set role "master_x"
+--- 두 번째 동시 연결 ---
+psql: error: FATAL:  too many connections for role "oneoff_x"
+--- VALID UNTIL 이 지난 비밀번호로 로그인 ---
+psql: error: FATAL:  password authentication failed for user "oneoff_x"
+password retrieved from file "/tmp/wipe-pgpass"
+Pager usage is off.
+ALTER ROLE
+--- 권한을 거두기 전 DROP ROLE ---
+psql:/tmp/s2_close.sql:5: ERROR:  role "oneoff_x" cannot be dropped because some objects depend on it
+DETAIL:  privileges for schema app_x
+privileges for table app_x.table_a
+privileges for table app_x.table_p
+--- 권한 회수(소유자 신분은 같은 트랜잭션 안에서만) ---
+BEGIN
+GRANT ROLE
+SET
+REVOKE
+REVOKE
+RESET
+REVOKE ROLE
+COMMIT
+--- 회수 뒤 DROP ROLE ---
+DROP ROLE
+ oneoff_left 
+-------------
+           0
+(1 row)
+
+== s3 relacl ==
+Pager usage is off.
+CREATE ROLE
+--- 처음 ---
+ relname | relacl | is_null 
+---------+--------+---------
+ table_b |        | t
+ table_c |        | t
+(2 rows)
+
+BEGIN
+GRANT ROLE
+SET
+GRANT
+REVOKE
+RESET
+REVOKE ROLE
+COMMIT
+--- table_b GRANT 뒤 · table_c 회수만 한 뒤 ---
+ relname |                    relacl                    | is_null 
+---------+----------------------------------------------+---------
+ table_b | {app_x=arwdDxtm/app_x,probe_grantee=d/app_x} | f
+ table_c | {app_x=arwdDxtm/app_x}                       | f
+(2 rows)
+
+BEGIN
+GRANT ROLE
+SET
+REVOKE
+RESET
+REVOKE ROLE
+COMMIT
+DROP ROLE
+--- table_b 회수 · 받은 역할 DROP 뒤 ---
+ relname |         relacl         | is_null 
+---------+------------------------+---------
+ table_b | {app_x=arwdDxtm/app_x} | f
+ table_c | {app_x=arwdDxtm/app_x} | f
+(2 rows)
+
+--- 마스터가 카탈로그를 직접 NULL 로 고치려 하면 ---
+psql:/tmp/s3_relacl.sql:34: ERROR:  permission denied for table pg_class
+== s4 COMMIT 응답 끊김 ==
+대상 행(juliet · kilo) 처음: 2
+--- 꼴 1: psql -X -1 -v ON_ERROR_STOP=1 -f s4_delete.sql ---
+GRANT ROLE
+SET
+DELETE 1
+RESET
+REVOKE ROLE
+server closed the connection unexpectedly
+	This probably means the server terminated abnormally
+	before or while processing the request.
+connection to server was lost
+psql_exit=2
+재접속해 센 kilo 남은 수: 0
+--- 꼴 2: psql -X -c 'BEGIN; … DELETE …; COMMIT;' ---
+BEGIN
+GRANT ROLE
+SET
+DELETE 1
+RESET
+REVOKE ROLE
+server closed the connection unexpectedly
+	This probably means the server terminated abnormally
+	before or while processing the request.
+connection to server was lost
+psql_exit=2
+재접속해 센 juliet 남은 수: 0
+표 전체 행 수: 2
+--- 프록시 기록 ---
+proxy: listening on :6543 -> wipe-pg:5432
+proxy: COMMIT CommandComplete seen -> dropping ack
+proxy: COMMIT CommandComplete seen -> dropping ack
+== s5 셸이 신호로 죽을 때 ==
+--- 호스트 bash: 부른 쪽이 받는 종료 상태 ---
+./run.sh: line 182:  1631 Terminated: 15          bash -c 'kill -TERM $$'
+SIGTERM: 143
+./run.sh: line 182:  1632 Hangup: 1               bash -c 'kill -HUP $$'
+SIGHUP:  129
+./run.sh: line 182:  1633 Killed: 9               bash -c 'kill -KILL $$'
+SIGKILL: 137
+부모 bash(자식 fg) 를 SIGTERM — 부른 쪽(docker exec)이 받은 종료 상태: 143
+자식 psql 출력:
+ pg_sleep 
+----------
+ 
+(1 row)
+
+CREATE ROLE
+child psql: CREATE ROLE 완료
+남은 역할 orphan_x: 1
+
+부모 bash(자식 bg) 를 SIGTERM — 부른 쪽(docker exec)이 받은 종료 상태: 143
+자식 psql 출력:
+ pg_sleep 
+----------
+ 
+(1 row)
+
+CREATE ROLE
+child psql: CREATE ROLE 완료
+남은 역할 orphan_bg_x: 1
+== 정리 ==
+DONE
