@@ -1,0 +1,12 @@
+요청	URL	옛 정책 */A/* 일치	앞 * 가 먹은 글자	종류별 정책 중 일치	브라우저가 보낼 쿠키 셋(Path)
+내 방송 라이브 목록	https://media.example.com/live/A/index.m3u8?_HLS_msn=3	일치	"live"	live	/live/A
+내 방송 되감기 조각	https://media.example.com/dvr/A/r1/seg/001201.m4s	일치	"dvr"	dvr	/dvr/A
+남의 방송 — 쿼리에 내 번호	https://media.example.com/live/B/index.m3u8?x=/A/	일치	"live/B/index.m3u8?x="	없음	없음
+남의 방송 — 경로 끝에 내 번호	https://media.example.com/vod/B/x/A/index.m3u8	일치	"vod/B/x"	없음	없음
+남의 방송 — 그대로	https://media.example.com/live/B/index.m3u8	불일치	-	없음	없음
+내 녹화 경로 + 남의 path 쿼리	https://media.example.com/playback/A/list?path=B	일치	"playback"	playback	/playback/A
+
+# 양성 대조 — AWS 문서 예시 Resource 와 「would include」 로 든 세 주소
+일치	https://d111111abcdef8.cloudfront.net/game_download.zip
+일치	https://d111111abcdef8.cloudfront.net/example_game_download.zip?license=yes
+일치	https://d111111abcdef8.cloudfront.net/test_game_download.zip?license=temp

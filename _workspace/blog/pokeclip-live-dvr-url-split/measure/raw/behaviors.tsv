@@ -1,0 +1,12 @@
+순서	경로 패턴	원본	서명 쿠키	함수	캐시 정책
+1	/api/ingest/*	Media 상자(내부 ALB · VPC 원본)	아니오	없음	no_cache
+2	/live/*.m3u8	Media 상자(내부 ALB · VPC 원본)	예(키 그룹)	live-auth(viewer-request)	live_playlist
+3	/live/*	Media 상자(내부 ALB · VPC 원본)	예(키 그룹)	live-auth(viewer-request)	live_segment
+4	/dvr/*	S3 되감기 버킷(OAC)	예(키 그룹)	dvr-floor(viewer-request · 스위치)	dvr_vod
+5	/vod/*	S3 되감기 버킷(OAC)	예(키 그룹)	없음	dvr_vod
+6	/api/streams/*/rewind	Media 상자(내부 ALB · VPC 원본)	아니오	없음	rewind_api
+7	/playback/*	Media 상자(내부 ALB · VPC 원본)	예(키 그룹)	없음	no_cache
+기본	*	Media 상자(내부 ALB · VPC 원본) — 함수가 먼저 404	예(키 그룹)	deny-default(viewer-request)	no_cache
+
+# 원본 블록 2개: local.media_alb_origin_id, local.rewind_origin_id · 오리진 그룹(origin_group) 0개
+# 배포 리소스(aws_cloudfront_distribution) 1개

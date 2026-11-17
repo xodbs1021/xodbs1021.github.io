@@ -1,0 +1,14 @@
+$ node --test infra/terraform/modules/cdn_media/functions/test/*.test.mjs
+✔ OPTIONS 는 미디어 경로면 넘기고 비미디어 경로면 403 이다 (0.102208ms)
+✔ 쿼리는 검사하지 않는다(값에 %2e · .. 가 있어도 넘긴다) (0.090583ms)
+✔ KVS 장애여도 나쁜 경로는 503 이 아니라 403 이다 (0.058166ms)
+✔ cloudfront-js-2.0 이 지원하지 않는 문법을 쓰지 않는다 (0.505292ms)
+ℹ tests 246
+ℹ suites 0
+ℹ pass 246
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 83.627625
+exit=0
