@@ -101,6 +101,7 @@ import { LEDGER_RELOAD_FRAMES, LedgerReload } from "./scenes/pokeclip-rewind-cac
 import { TWO_DELETE_PATHS_FRAMES, TwoDeletePaths } from "./scenes/pokeclip-prod-data-wipe-throwaway-login/TwoDeletePaths";
 import { PIPELINE_STOP_FRAMES, PipelineStop } from "./scenes/pokeclip-live-dvr-url-split/PipelineStop";
 import { WILDCARD_MATCH_FRAMES, WildcardMatch } from "./scenes/pokeclip-dvr-cookie-edge-floor/WildcardMatch";
+import { TEXT_INPUT_NULL_FRAMES, TextInputNull } from "./scenes/sdl2-compat-textinput-null-push/TextInputNull";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
@@ -1108,6 +1109,16 @@ export const RemotionRoot: React.FC = () => (
       component={WildcardMatch}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={WILDCARD_MATCH_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="TextInputNull" component={TextInputNull} durationInFrames={TEXT_INPUT_NULL_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="TextInputNullMobile"
+      component={TextInputNull}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={TEXT_INPUT_NULL_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}

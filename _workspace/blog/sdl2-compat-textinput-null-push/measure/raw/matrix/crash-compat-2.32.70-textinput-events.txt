@@ -1,0 +1,10 @@
+exception EXC_BAD_ACCESS SIGSEGV KERN_INVALID_ADDRESS at 0x0000000000000008
+far 0x8  esr (Data Abort) byte read Translation fault
+x0 0x0
+os macOS 27.0.1 26A434
+frames:
+  0 libSDL3.0.dylib SDL_PushEvent_REAL + 16  (SDL_events.c:1804)
+  1 libSDL2-2.0.0.dylib SDL_PushEvent_REAL + 52  (sdl2_compat.c:2636)
+  2 textinput_push-compat-2.32.70 push_and_report + 68  (textinput_push.c:63)
+  3 textinput_push-compat-2.32.70 main + 640  (textinput_push.c:105)
+  4 dyld start + 6688

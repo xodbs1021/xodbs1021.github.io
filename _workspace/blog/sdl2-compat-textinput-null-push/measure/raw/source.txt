@@ -1,0 +1,97 @@
+# sdl2-compat Event2to3 TEXT_INPUT / SDL_PushEvent — 판별 위치 (2026-11-18)
+## release-2.32.70 a53b6ad90ecd2d0ccfe01d5cfd2059793acf8c12
+2496:static SDL_Event *Event2to3(const SDL2_Event *event2, SDL_Event *event3)
+2508:        /* We shouldn't be getting text input events this direction */
+2636:    if (SDL3_PushEvent(Event2to3(event2, &event3))) {
+2509:         /* We shouldn't be getting text input events this direction */
+2509:         return NULL;
+## release-2.32.74 e4df8a55f20da762290a78c2bbe8f8d89d01486a
+2543:static SDL_Event *Event2to3(const SDL2_Event *event2, SDL_Event *event3)
+2555:        /* We shouldn't be getting text input events this direction */
+2683:    if (SDL3_PushEvent(Event2to3(event2, &event3))) {
+2556:         /* We shouldn't be getting text input events this direction */
+2556:         return NULL;
+## origin/main 2758e13e84d333b43063af505272ff1c8fd9eca4
+2594:static SDL_Event *Event2to3(const SDL2_Event *event2, SDL_Event *event3)
+2606:        /* We shouldn't be getting text input events this direction */
+2734:    if (SDL3_PushEvent(Event2to3(event2, &event3))) {
+2607:         /* We shouldn't be getting text input events this direction */
+2607:         return NULL;
+## diff release-2.32.70..origin/main 의 Event2to3 TEXT_INPUT · SDL_PushEvent 본문
+c117be16e25178084fab0eca107c4a75
+c117be16e25178084fab0eca107c4a75
+c117be16e25178084fab0eca107c4a75
+## blame (origin/main)
+eb998ef6 (Sam Lantinga 2024-07-26 21:15:17 -0700 2605)     case SDL_EVENT_TEXT_INPUT:
+eb998ef6 (Sam Lantinga 2024-07-26 21:15:17 -0700 2606)         /* We shouldn't be getting text input events this direction */
+c58706e9 (Sam Lantinga 2024-08-26 21:31:25 -0700 2607)         return NULL;
+8be719e9 (Ryan C. Gordon 2022-12-24 02:51:39 -0500 2731) SDL_PushEvent(SDL2_Event *event2)
+8be719e9 (Ryan C. Gordon 2022-12-24 02:51:39 -0500 2732) {
+8be719e9 (Ryan C. Gordon 2022-12-24 02:51:39 -0500 2733)     SDL_Event event3;
+6dbcdcd7 (Sam Lantinga   2024-08-26 20:20:34 -0700 2734)     if (SDL3_PushEvent(Event2to3(event2, &event3))) {
+6dbcdcd7 (Sam Lantinga   2024-08-26 20:20:34 -0700 2735)         return 1;
+6dbcdcd7 (Sam Lantinga   2024-08-26 20:20:34 -0700 2736)     } else if (*SDL_GetError() == '\0') {
+6dbcdcd7 (Sam Lantinga   2024-08-26 20:20:34 -0700 2737)         return 0;
+6dbcdcd7 (Sam Lantinga   2024-08-26 20:20:34 -0700 2738)     } else {
+6dbcdcd7 (Sam Lantinga   2024-08-26 20:20:34 -0700 2739)         return -1;
+6dbcdcd7 (Sam Lantinga   2024-08-26 20:20:34 -0700 2740)     }
+8be719e9 (Ryan C. Gordon 2022-12-24 02:51:39 -0500 2741) }
+## 2024-07-26 eb998ef 바뀐 부분
+22-     /* mouse coords became floats in SDL3: */
+23-     switch (event2->type) {
+24:-    case SDL_EVENT_TEXT_INPUT: {
+25--        const size_t len = SDL3_strlen(event2->text.text) + 1;
+26--        event3->text.text = (char *)SDL3_AllocateTemporaryMemory(len);
+27--        if (event3->text.text) {
+28--            SDL3_memcpy((char *)event3->text.text, event3->text.text, len);
+29--        }
+30--        break;
+31--    }
+32-+    case SDL_EVENT_TEXT_INPUT:
+33-+        /* We shouldn't be getting text input events this direction */
+34-+        return SDL_FALSE;
+## c58706e SDL_FALSE -> NULL
+     case SDL_EVENT_TEXT_INPUT:
+         /* We shouldn't be getting text input events this direction */
+-        return SDL_FALSE;
++        return NULL;
+     case SDL_EVENT_KEY_DOWN:
+## first tag containing eb998ef
+release-2.30.50
+2025-01-21 12:41:19 -0800
+## SDL3 538adc52 / 4f5527157
+538adc52d2503e7171165492565c81a04b858e2c 2024-07-26 21:10:47 -0700 Removed the temporary memory symbols from the public API
+4f55271571fbaf63fc8c1c0924512628fb6ed970 2024-07-26 20:59:14 -0700 Removed temporary memory from the API
+## SDL3 SDL_PushEvent 첫 줄(timestamp 읽기)
+release-3.4.12 f87239e71e42da91ca317a12eefb82cfbf3393eb
+1802:bool SDL_PushEvent(SDL_Event *event)
+1803-{
+1804-    if (!event->common.timestamp) {
+release-3.4.18 829a65d769d935c4852f8159e964312c0957260a
+1806:bool SDL_PushEvent(SDL_Event *event)
+1807-{
+1808-    if (!event->common.timestamp) {
+release-3.4.20 f00dc919ca35b9756316e86c4777392de442f9b2
+1806:bool SDL_PushEvent(SDL_Event *event)
+1807-{
+1808-    if (!event->common.timestamp) {
+origin/main 4cc7adcaee482b63b4e1a0de77f52e200aa87b90
+1884:bool SDL_PushEvent(SDL_Event *event)
+1885-{
+1886-    if (!event->common.timestamp) {
+## SDL3 SDL_TextInputEvent text 필드(release-3.4.20)
+426-typedef struct SDL_TextInputEvent
+427-{
+428-    SDL_EventType type; /**< SDL_EVENT_TEXT_INPUT */
+429-    Uint32 reserved;
+430-    Uint64 timestamp;   /**< In nanoseconds, populated using SDL_GetTicksNS() */
+431-    SDL_WindowID windowID; /**< The window with keyboard focus, if any */
+432:    const char *text;   /**< The input text, UTF-8 encoded */
+## SDL2 SDL_TextInputEvent(release-2.32.10)
+typedef struct SDL_TextInputEvent
+{
+    Uint32 type;                              /**< SDL_TEXTINPUT */
+    Uint32 timestamp;                         /**< In milliseconds, populated using SDL_GetTicks() */
+    Uint32 windowID;                          /**< The window with keyboard focus, if any */
+    char text[SDL_TEXTINPUTEVENT_TEXT_SIZE];  /**< The input text; UTF-8 encoded. */
+} SDL_TextInputEvent;

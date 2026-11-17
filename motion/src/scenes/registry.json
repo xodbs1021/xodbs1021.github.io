@@ -804,5 +804,13 @@
     "posterFrame": 280,
     "alt": "두 줄이 같은 요청 {base}/live/B/index.m3u8?x=/A/ 를 정책과 견준다. 위 줄 옛 정책 {base}/*/A/* 에서는 첫 * 가 청록으로 칠해지고 요청의 live/B/index.m3u8?x= 가 왼쪽부터 청록 바탕으로 차오른 뒤 /A/ 가 밑줄로 맞물리고, 빨간 이름표 일치 · 남의 방송이 열림이 뜬다. 아래 줄 종류별 정책 {base}/live/A/* 에서는 {base}/live/ 가 밑줄로 맞물리다가 정책의 A 와 요청의 B 칸이 빨갛게 어긋나고, 청록 이름표 불일치 · 403 이 뜬다",
     "mobile": true
+  },
+  {
+    "id": "TextInputNull",
+    "post": "sdl2-compat-textinput-null-push",
+    "kind": "video",
+    "posterFrame": 320,
+    "alt": "세 칸이 나란히 있다. 앱 · SDL2 API, sdl2-compat · Event2to3, SDL3 · SDL_PushEvent. 위 줄에서 SDL_KEYDOWN 카드가 가운데 칸에서 KEY_DOWN · SDL3 이벤트로 바뀌어 오른쪽 칸에 닿고 큐에 들어감 이름표가 뜬다. 아래 줄에서 SDL_TEXTINPUT text[32] = \"a\" 카드는 가운데 칸에서 빨간 NULL 카드로 바뀌고 짝 없음 → NULL 이름표가 뜬 뒤, 그대로 오른쪽 칸으로 넘어가 SIGSEGV · 주소 0x8 이름표가 뜨고 카드가 기울어 떨어진다. 떠난 자리에는 원래 카드가 옅게 남는다",
+    "mobile": true
   }
 ]

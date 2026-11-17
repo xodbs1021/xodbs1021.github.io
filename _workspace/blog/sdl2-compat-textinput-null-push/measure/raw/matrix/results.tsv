@@ -1,0 +1,36 @@
+variant	mode	init	exit	verdict
+sdl2-2.32.10	keydown	events	0	ok
+sdl2-2.32.10	keydown	video	0	ok
+sdl2-2.32.10	textinput	events	0	ok
+sdl2-2.32.10	textinput	video	0	ok
+sdl2-2.32.10	peep	events	0	ok
+sdl2-2.32.10	user	events	0	ok
+sdl2-2.32.10	peep-longtext	events	0	ok
+compat-2.32.70	keydown	events	0	ok
+compat-2.32.70	keydown	video	0	ok
+compat-2.32.70	textinput	events	139	signal 11
+compat-2.32.70	textinput	video	139	signal 11
+compat-2.32.70	peep	events	139	signal 11
+compat-2.32.70	user	events	0	ok
+compat-2.32.70	peep-longtext	events	139	signal 11
+compat-2.32.74	keydown	events	0	ok
+compat-2.32.74	keydown	video	0	ok
+compat-2.32.74	textinput	events	139	signal 11
+compat-2.32.74	textinput	video	139	signal 11
+compat-2.32.74	peep	events	139	signal 11
+compat-2.32.74	user	events	0	ok
+compat-2.32.74	peep-longtext	events	139	signal 11
+brew-2.32.74	keydown	events	0	ok
+brew-2.32.74	keydown	video	0	ok
+brew-2.32.74	textinput	events	139	signal 11
+brew-2.32.74	textinput	video	139	signal 11
+brew-2.32.74	peep	events	139	signal 11
+brew-2.32.74	user	events	0	ok
+brew-2.32.74	peep-longtext	events	139	signal 11
+compat-main	keydown	events	0	ok
+compat-main	keydown	video	0	ok
+compat-main	textinput	events	139	signal 11
+compat-main	textinput	video	139	signal 11
+compat-main	peep	events	139	signal 11
+compat-main	user	events	0	ok
+compat-main	peep-longtext	events	139	signal 11
