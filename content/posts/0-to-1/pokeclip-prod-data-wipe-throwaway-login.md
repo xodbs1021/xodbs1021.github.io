@@ -1,6 +1,6 @@
 ---
 title: "운영 DB를 지우는 데 마스터 대신 일회용 계정을 썼습니다"
-date: 2026-11-17T10:55:47+09:00
+date: 2026-11-17T12:22:21+09:00
 categories: ["projects"]
 tags: ["PokeClip", "PostgreSQL", "RDS", "권한", "SET ROLE", "psql", "운영", "삭제"]
 draft: false
