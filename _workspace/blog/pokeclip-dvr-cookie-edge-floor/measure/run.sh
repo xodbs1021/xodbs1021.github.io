@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
-# 공개 재측정 — 「와일드카드가 구분자를 넘어 서명 쿠키를 종류별로 나눴습니다」
+# 공개 재측정 — 「서명 쿠키는 종류별로 나누고 1시간 창은 엣지에서 막았습니다」
 #
-#   MONO_DIR=<3K-PokeClip/PokeClip-mono 클론> ./run.sh extract   # 고정 커밋을 /tmp/dvrurl-mono 로 풀기(git archive — 클론은 읽기만)
+#   MONO_DIR=<3K-PokeClip/PokeClip-mono 클론> ./run.sh extract   # 고정 커밋을 /tmp/dvrurl-run-mono 로 풀기(git archive — 클론은 읽기만)
 #   ./run.sh all "$PWD/raw"                                      # 함수 시험 · 하한 결정 표 · 와일드카드 시연
-#   ./run.sh down                                                # /tmp/dvrurl-* 지우기
+#   ./run.sh down                                                # 이 스크립트가 만든 /tmp/dvrurl-run-* 만 지우기
 #
 # AWS 는 부르지 않는다. docker 도 쓰지 않는다.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SHA=627fb5a20ecb9d221fcc030c26adcbbcbe12c04e   # PokeClip-mono develop(2026-11-17)
-TREE=/tmp/dvrurl-mono
+TREE=/tmp/dvrurl-run-mono
 
 cmd_extract() {
   : "${MONO_DIR:?MONO_DIR 에 PokeClip-mono 클론 경로를 주십시오}"
@@ -36,8 +36,8 @@ cmd_all() {
 }
 
 cmd_down() {
-  rm -rf /tmp/dvrurl-*
-  ls -d /tmp/dvrurl-* 2>/dev/null || echo "left=0"
+  rm -rf "$TREE"
+  ls -d /tmp/dvrurl-run-* 2>/dev/null || echo "left=0"
 }
 
 case "${1:-}" in

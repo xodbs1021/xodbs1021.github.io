@@ -1,6 +1,7 @@
 // 콘티: _workspace/blog/pokeclip-live-dvr-url-split/storyboard.md 「PipelineStop」
 // 되감기 · 녹화 공정(사이드카)이 멈춰도 라이브 갈래는 계속 흐른다(개념도 — 수치 없음).
 // 위 갈래: MediaMTX → /live(Media 상자) → 플레이어. 아래 갈래: MediaMTX → 사이드카 → S3(/dvr · /vod) → 플레이어.
+// 사이드카가 멈추면 MediaMTX → 사이드카 → S3 만 멈추고, 이미 올린 조각은 S3 → 플레이어로 계속 나간다.
 // layout="mobile" 은 1080×1350 휴대폰판 — 왼쪽 열이 라이브, 오른쪽 열이 되감기, 글자 48px 이상.
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { Node } from "../../components/Flow";
@@ -103,7 +104,7 @@ const MOBILE: Layout = {
   },
   liveTag: { x: 270, y: 690 },
   stopTag: { x: 940, y: 436 },
-  headTag: { x: 810, y: 960 },
+  headTag: { x: 810, y: 688 },
 };
 
 const LAYOUTS = { desktop: DESKTOP, mobile: MOBILE } as const;
@@ -142,7 +143,7 @@ export const PipelineStop: React.FC<Props> = ({ layout = "desktop" }) => {
       {flow(L.paths.livePlayer)}
       {flow(L.paths.mtxSide, T.stop, lowerColor)}
       {flow(L.paths.sideS3, T.stop, lowerColor)}
-      {flow(L.paths.s3Player, T.stop, lowerColor)}
+      {flow(L.paths.s3Player)}
 
       <Node x={L.obs.x} y={L.obs.y} width={L.obs.w} height={L.obs.h} size={L.text} opacity={boxes}>
         OBS 송출
@@ -161,7 +162,7 @@ export const PipelineStop: React.FC<Props> = ({ layout = "desktop" }) => {
         y={L.s3.y}
         width={L.s3.w}
         height={L.s3.h}
-        tone={frame >= T.stop ? "muted" : "ink"}
+        tone="ink"
         size={L.text}
         opacity={boxes}
       >

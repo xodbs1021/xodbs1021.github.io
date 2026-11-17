@@ -4,16 +4,16 @@
 //
 // AWS 를 부르지 않는다. 매처는 AWS 문서 「Set signed cookies using a custom policy」 의 Resource 규칙
 // (`*` = 0자 이상 아무 글자, `?` = 정확히 한 글자, 「anywhere in the string」, 「The base URL including your
-// query strings」)을 글자 그대로 옮긴 것이고, PokeClip-mono 의 clip 시험(PlaybackAccessControllerTest.cloudFrontMatches)
+// query strings」, 「a wildcard can't match across a literal semicolon」)을 글자 그대로 옮긴 것이고, PokeClip-mono 의 clip 시험(PlaybackAccessControllerTest.cloudFrontMatches)
 // 과 같은 규칙이다. 주소 · 방송 번호는 지어낸 값이다.
 //
 // 브라우저가 어느 쿠키 셋을 보내는지는 RFC 6265 5.1.4 「path-match」 로 셈한다.
 
-/** 정책 Resource 를 정규식으로 — `*` → `.*`, `?` → `.`, 나머지는 글자 그대로. */
+/** 정책 Resource 를 정규식으로 — `*` → `[^;]*`(리터럴 세미콜론은 넘지 못함), `?` → `.`, 나머지는 글자 그대로. */
 export function cloudFrontMatches(resource, url) {
   let re = '^';
   for (const c of resource) {
-    if (c === '*') re += '.*';
+    if (c === '*') re += '[^;]*';
     else if (c === '?') re += '.';
     else re += c.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
   }
@@ -26,7 +26,7 @@ function firstStarCapture(resource, url) {
   if (i < 0) return null;
   let re = '^';
   for (const [k, c] of [...resource].entries()) {
-    if (c === '*') re += k === i ? '(.*)' : '.*';
+    if (c === '*') re += k === i ? '([^;]*)' : '[^;]*';
     else if (c === '?') re += '.';
     else re += c.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
   }

@@ -1339,9 +1339,9 @@
   },
   "pokeclip-live-dvr-url-split-pipeline-stop": {
     "scene": "PipelineStop",
-    "alt": "OBS 송출이 MediaMTX로 들어가 두 갈래로 나뉜다. 위 갈래는 /live · Media 상자(라이브 창 28초)를 지나 플레이어로, 아래 갈래는 사이드카(재포장 · 업로드)와 S3(/dvr · /vod)를 지나 플레이어로 청록 패킷이 흐른다. 잠시 뒤 사이드카 상자가 빨갛게 바뀌며 멈춤 이름표가 뜨고 아래 갈래의 패킷이 멈춰 선이 회색이 되지만, 위 갈래의 패킷은 계속 흐르고 라이브는 계속 · 되감기 머리가 멈춤 이름표가 뜬다",
-    "sha256": "56dca26bb0c63abbfb27f762d349d380de30989419ef6aebc6cd0c20440402ef",
-    "bytes": 198702,
+    "alt": "OBS 송출이 MediaMTX로 들어가 두 갈래로 나뉜다. 위 갈래는 /live · Media 상자(라이브 창 28초)를 지나 플레이어로, 아래 갈래는 사이드카(재포장 · 업로드)와 S3(/dvr · /vod)를 지나 플레이어로 청록 패킷이 흐른다. 잠시 뒤 사이드카 상자가 빨갛게 바뀌며 멈춤 이름표가 뜨고 MediaMTX에서 사이드카를 거쳐 S3로 가는 선의 패킷이 멈춰 회색이 되지만, S3에서 플레이어로 가는 선과 위 갈래의 패킷은 계속 흐르고 라이브는 계속 · 되감기 머리가 멈춤 이름표가 뜬다",
+    "sha256": "f7b74f52417f11484dc19b53ba9f7b461da4d63fed8318feb64726bcc35cae56",
+    "bytes": 206077,
     "codec": "h264",
     "pixFmt": "yuv420p",
     "width": 1920,
@@ -1351,8 +1351,8 @@
     "faststart": true,
     "poster": "/images/pokeclip-live-dvr-url-split-pipeline-stop-poster.jpg",
     "mobile": {
-      "sha256": "d78268009e5a6b93737deb7a02d683ce7dc69291418617c213181d33c86d2c9f",
-      "bytes": 219181,
+      "sha256": "0d49b990e12730bd46f0e78c51d6b80b4e1ccf3fa43b8130aa8de404c262edfb",
+      "bytes": 222080,
       "codec": "h264",
       "pixFmt": "yuv420p",
       "width": 1080,
