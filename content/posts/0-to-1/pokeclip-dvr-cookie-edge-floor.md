@@ -1,6 +1,6 @@
 ---
 title: "서명 쿠키는 종류별로 나누고 1시간 창은 엣지에서 막았습니다"
-date: 2026-11-18T02:58:51+09:00
+date: "2026-11-18T03:28:26+09:00"
 categories: ["projects"]
 tags: ["PokeClip", "CloudFront", "서명 쿠키", "CloudFront Functions", "KeyValueStore", "DVR", "HLS"]
 draft: false
