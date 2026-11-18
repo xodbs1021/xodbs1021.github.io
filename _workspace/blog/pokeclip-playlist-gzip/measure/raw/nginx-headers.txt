@@ -1,0 +1,106 @@
+### (a) nginx 정적 파일 — :18080/dvr/index.m3u8 via=없음
+HTTP/1.1 200 OK
+Server: nginx
+Date: Wed, 18 Nov 2026 09:24:49 GMT
+Content-Type: application/vnd.apple.mpegurl
+Content-Length: 137945
+Last-Modified: Wed, 18 Nov 2026 09:24:49 GMT
+Connection: keep-alive
+ETag: "6afd6ee1-21ad9"
+Accept-Ranges: bytes
+
+### 상류 직접 · 2,048B — :18888/bytes/2048.m3u8 via=없음
+HTTP/1.1 200 OK
+Cache-Control: no-cache
+Content-Type: application/vnd.apple.mpegurl
+Date: Wed, 18 Nov 2026 09:24:49 GMT
+Content-Length: 2048
+
+### 상류 직접 · 2,049B — :18888/bytes/2049.m3u8 via=없음
+HTTP/1.1 200 OK
+Cache-Control: no-cache
+Content-Type: application/vnd.apple.mpegurl
+Date: Wed, 18 Nov 2026 09:24:49 GMT
+Transfer-Encoding: chunked
+
+### 상류 직접 · 1시간 목록 — :18888/full.m3u8 via=없음
+HTTP/1.1 200 OK
+Cache-Control: no-cache
+Content-Type: application/vnd.apple.mpegurl
+Date: Wed, 18 Nov 2026 09:24:49 GMT
+Transfer-Encoding: chunked
+
+### (b) 프록시 · buffering off · 2,048B — :18081/bytes/2048.m3u8 via=없음
+HTTP/1.1 200 OK
+Server: nginx
+Date: Wed, 18 Nov 2026 09:24:49 GMT
+Content-Type: application/vnd.apple.mpegurl
+Content-Length: 2048
+Connection: keep-alive
+Cache-Control: no-cache
+
+### (b) 프록시 · buffering off · 2,049B — :18081/bytes/2049.m3u8 via=없음
+HTTP/1.1 200 OK
+Server: nginx
+Date: Wed, 18 Nov 2026 09:24:49 GMT
+Content-Type: application/vnd.apple.mpegurl
+Transfer-Encoding: chunked
+Connection: keep-alive
+Cache-Control: no-cache
+
+### (b) 프록시 · buffering off · 1시간 목록 — :18081/full.m3u8 via=없음
+HTTP/1.1 200 OK
+Server: nginx
+Date: Wed, 18 Nov 2026 09:24:49 GMT
+Content-Type: application/vnd.apple.mpegurl
+Transfer-Encoding: chunked
+Connection: keep-alive
+Cache-Control: no-cache
+
+### (b) 대조 · buffering on · 2,049B — :18082/bytes/2049.m3u8 via=없음
+HTTP/1.1 200 OK
+Server: nginx
+Date: Wed, 18 Nov 2026 09:24:49 GMT
+Content-Type: application/vnd.apple.mpegurl
+Transfer-Encoding: chunked
+Connection: keep-alive
+Cache-Control: no-cache
+
+### (b) 대조 · buffering on · 1시간 목록 — :18082/full.m3u8 via=없음
+HTTP/1.1 200 OK
+Server: nginx
+Date: Wed, 18 Nov 2026 09:24:49 GMT
+Content-Type: application/vnd.apple.mpegurl
+Transfer-Encoding: chunked
+Connection: keep-alive
+Cache-Control: no-cache
+
+### (c) gzip on · gzip_proxied 기본 · Via 없음 — :18083/full.m3u8 via=없음
+HTTP/1.1 200 OK
+Server: nginx
+Date: Wed, 18 Nov 2026 09:24:49 GMT
+Content-Type: application/vnd.apple.mpegurl
+Transfer-Encoding: chunked
+Connection: keep-alive
+Cache-Control: no-cache
+Content-Encoding: gzip
+
+### (c) gzip on · gzip_proxied 기본 · Via 있음 — :18083/full.m3u8 via=1.1 example.cloudfront.net (CloudFront)
+HTTP/1.1 200 OK
+Server: nginx
+Date: Wed, 18 Nov 2026 09:24:49 GMT
+Content-Type: application/vnd.apple.mpegurl
+Transfer-Encoding: chunked
+Connection: keep-alive
+Cache-Control: no-cache
+
+### (c) gzip on · gzip_proxied any · Via 있음 — :18084/full.m3u8 via=1.1 example.cloudfront.net (CloudFront)
+HTTP/1.1 200 OK
+Server: nginx
+Date: Wed, 18 Nov 2026 09:24:49 GMT
+Content-Type: application/vnd.apple.mpegurl
+Transfer-Encoding: chunked
+Connection: keep-alive
+Cache-Control: no-cache
+Content-Encoding: gzip
+

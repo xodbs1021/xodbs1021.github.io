@@ -1,0 +1,10 @@
+=== RUN   TestGzipwPlaylistBodies
+body s08_gap1 rows=900 bytes=137945
+body s08_jitter30 rows=900 bytes=137934
+body s16 rows=900 bytes=152350
+body s32 rows=900 bytes=181182
+threshold 1000: rows=6 bytes=1152 (rows=5 는 999 B)
+threshold 2048: rows=12 bytes=2070 (rows=11 는 1917 B)
+--- PASS: TestGzipwPlaylistBodies (0.01s)
+PASS
+ok  	github.com/3K-PokeClip/pokeclip-mono/media/internal/rewind	0.287s

@@ -103,6 +103,7 @@ import { PIPELINE_STOP_FRAMES, PipelineStop } from "./scenes/pokeclip-live-dvr-u
 import { WILDCARD_MATCH_FRAMES, WildcardMatch } from "./scenes/pokeclip-dvr-cookie-edge-floor/WildcardMatch";
 import { TEXT_INPUT_NULL_FRAMES, TextInputNull } from "./scenes/sdl2-compat-textinput-null-push/TextInputNull";
 import { STALL_LADDER_FRAMES, StallLadder } from "./scenes/pokeclip-sidecar-rewind-playlist/StallLadder";
+import { GZIP_GATES_FRAMES, GzipGates } from "./scenes/pokeclip-playlist-gzip/GzipGates";
 
 // 장면 id 는 src/scenes/registry.json 과 같아야 한다(scripts/render.mjs 가 읽는다).
 export const RemotionRoot: React.FC = () => (
@@ -1130,6 +1131,16 @@ export const RemotionRoot: React.FC = () => (
       component={StallLadder}
       defaultProps={{ layout: "mobile" as const }}
       durationInFrames={STALL_LADDER_FRAMES}
+      fps={MOBILE_VIDEO.fps}
+      width={MOBILE_VIDEO.width}
+      height={MOBILE_VIDEO.height}
+    />
+    <Composition id="GzipGates" component={GzipGates} durationInFrames={GZIP_GATES_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition
+      id="GzipGatesMobile"
+      component={GzipGates}
+      defaultProps={{ layout: "mobile" as const }}
+      durationInFrames={GZIP_GATES_FRAMES}
       fps={MOBILE_VIDEO.fps}
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}
