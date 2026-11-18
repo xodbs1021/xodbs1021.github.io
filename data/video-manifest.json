@@ -1701,6 +1701,32 @@
       "poster": "/images/pokeclip-playback-producer-boundaries-three-axis-upload-mobile-poster.jpg"
     }
   },
+  "pokeclip-playlist-gzip-gzip-gates": {
+    "scene": "GzipGates",
+    "alt": "위에 CloudFront 압축 조건 넷이 열 머리로 있다. ① compress, ② gzip 허용, ③ Content-Length, ④ 1,000B 이상. 아래 세 줄의 선 위를 점이 왼쪽에서 오른쪽으로 가며 지나온 선이 칠해진다. 첫 줄 되감기 목록(/dvr/*.m3u8 규칙)은 청록 점이 관문 넷을 지나며 칸이 차례로 청록 ✓로 바뀌고, 줄 끝에 gzip 이름표와 138→5.5KB가 뜬다. 둘째 줄 라이브 목록은 켜더라도 ①② 가 점선 ✓이고, 점이 ③ Content-Length 칸 앞에서 멈추며 점 · 선과 ③ 칸이 빨갛게 바뀌어 ✕가 되고 길이 없음 이름표와 chunked가 뜬다. 셋째 줄 조각(/dvr/* 규칙)은 관문 칸이 처음부터 점선 회색 –이고 회색 점이 그대로 지나 압축 안 함 회색 이름표와 목록 규칙 밖이 뜬다",
+    "sha256": "997fd4e40f6ce160f9c244c5b4dc389b218f5d20d426f57fceadddd0b5f8f74d",
+    "bytes": 216434,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 12,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-playlist-gzip-gzip-gates-poster.jpg",
+    "mobile": {
+      "sha256": "87e4eb72f195128d0af1b5191955e580a4f373f568012d1aa9872b4b7875aa5b",
+      "bytes": 237198,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 12,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-playlist-gzip-gzip-gates-mobile-poster.jpg"
+    }
+  },
   "pokeclip-prod-data-wipe-throwaway-login-two-delete-paths": {
     "scene": "TwoDeletePaths",
     "alt": "두 열이 같은 DELETE 를 다른 신분으로 한다. 왼쪽은 마스터가 SET ROLE app_x 로 앱 표를 지우자 아래로 화살표가 이어지고, 앱이 심은 트리거가 RESET ROLE 로 마스터로 돌아가 붉은 상자 마스터 권한으로 돎 과 권한 상승 이름표가 뜬다. 오른쪽은 멤버십 없이 표 권한만 받은 일회용 로그인이 DELETE 는 되지만 INSERT 거부 · 상승 없음 회색 상자와 트리거가 돌아갈 곳은 일회용 계정뿐 상자가 뜨고, 1시간 뒤 로그인 만료 이름표와 함께 일회용 로그인 상자가 흐려지는 장면",

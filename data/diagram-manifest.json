@@ -539,6 +539,15 @@
       "bytes": 20928
     }
   },
+  "ba79bff30e45bee8": {
+    "source": "content/posts/0-to-1/pokeclip-playlist-gzip.md",
+    "wide": {
+      "file": "ba79bff30e45bee8-wide.svg",
+      "width": 402,
+      "height": 696,
+      "bytes": 20566
+    }
+  },
   "bb3dde56e2c9d01b": {
     "source": "content/posts/tech-blurting/cmaf-deep-dive.md",
     "wide": {

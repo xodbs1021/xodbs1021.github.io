@@ -1,6 +1,7 @@
 ---
 title: "사이드카는 4초 조각마다 HLS 되감기 목록을 이렇게 만듭니다"
 date: "2026-11-18T05:14:58+09:00"
+lastmod: "2026-11-18T19:06:24+09:00"
 categories: ["projects"]
 tags: ["PokeClip", "HLS", "DVR", "EXT-X-GAP", "Go", "S3", "설계"]
 draft: false
@@ -153,7 +154,7 @@ VERSION 6은 설계의 9를 제가 고친 값입니다([RFC 8216bis-22 8절](htt
 | 회차 꼴 키 · 스트림 16자 | 152,350B | 5,509B | 29.1% | 169B |
 | 회차 꼴 키 · 스트림 32자 | 181,182B | 5,623B | 34.6% | 201B |
 
-원본이 어림보다 컸던 것은 조각 주소에 회차 ID가 들어가서입니다. 회차 ID는 세션 ID 꼴(`S-날짜-시각-스트림-번호`)이라 스트림 이름이 두 번 들어가고, 같은 스트림 이름에서 조각마다 회차 ID 길이(26B + 스트림 이름), 곧 34–58B가 늘었습니다. gzip은 길이가 다 같은 목록을 원본의 4% 안팎으로, 길이를 ±30ms 흔든 목록을 7%로 줄였고, 운영 목록은 그보다 클 수 있습니다. 다만 고정 커밋의 Terraform 원문에는 `/dvr/*` 규칙과 경로 규칙을 만드는 블록에 `compress` 키가 없고 캐시 정책도 gzip을 켜지 않습니다. 이 원문대로라면 CloudFront는 목록을 압축하지 않고 냅니다. 배포된 배포판 설정은 확인하지 않았습니다([`main.tf` 59–64행](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/infra/terraform/modules/cdn_media/main.tf#L59-L64) · [161–185행](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/infra/terraform/modules/cdn_media/main.tf#L161-L185) · [`policies.tf` 83–103행](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/infra/terraform/modules/cdn_media/policies.tf#L83-L103) · [AWS 「Serve compressed files」](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/ServingCompressedFiles.html)). 같은 저장소의 정적 사이트 배포에는 `compress = true`가 있습니다. 상한은 1시간을 1.05–1.38초 조각으로 채워야 닿았고, 그 판은 S5가 막았습니다.
+원본이 어림보다 컸던 것은 조각 주소에 회차 ID가 들어가서입니다. 회차 ID는 세션 ID 꼴(`S-날짜-시각-스트림-번호`)이라 스트림 이름이 두 번 들어가고, 같은 스트림 이름에서 조각마다 회차 ID 길이(26B + 스트림 이름), 곧 34–58B가 늘었습니다. gzip은 길이가 다 같은 목록을 원본의 4% 안팎으로, 길이를 ±30ms 흔든 목록을 7%로 줄였고, 운영 목록은 그보다 클 수 있습니다. 다만 고정 커밋의 Terraform 원문에는 `/dvr/*` 규칙과 경로 규칙을 만드는 블록에 `compress` 키가 없고 캐시 정책도 gzip을 켜지 않아, PokeClip-mono PR 537 전까지 목록은 압축 없이 나갔습니다([`main.tf` 59–64행](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/infra/terraform/modules/cdn_media/main.tf#L59-L64) · [161–185행](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/infra/terraform/modules/cdn_media/main.tf#L161-L185) · [`policies.tf` 83–103행](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/infra/terraform/modules/cdn_media/policies.tf#L83-L103) · [AWS 「Serve compressed files」](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/ServingCompressedFiles.html)). 그 뒤 [PokeClip-mono PR 537](https://github.com/3K-PokeClip/PokeClip-mono/pull/537)(머지 `31f2f32d`)에서 목록 경로 규칙 둘(`/dvr/*.m3u8` · `/vod/*.m3u8`)을 따로 두어 `compress = true`와 gzip만 허용하는 캐시 정책을 붙였고, 나머지 규칙은 `compress = false`입니다([목록 gzip 글](/posts/0-to-1/pokeclip-playlist-gzip/)). 상한은 1시간을 1.05–1.38초 조각으로 채워야 닿았고, 그 판은 S5가 막았습니다.
 
 틱은 세대 예약(P0) → 렌더 → 검사 → 조건부 PUT → 확정 CAS 순서로 돕니다. 검사 S6이 예약한 세대를 보기 때문입니다. 첫 판은 없을 때만, 다음 판은 직전 판의 ETag와 같을 때만 쓰고, 목록의 `Cache-Control`은 1초입니다([`tick.go` 140–160행](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/media/internal/rewind/publish/tick.go#L140-L160) · [`s3store.go` 27–44행](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/media/internal/rewind/publish/s3store.go#L27-L44)). fence · 세대 · 412 처리와 실제 S3 시험은 [발행 정합성 글](/posts/0-to-1/pokeclip-database-authoritative-manifest-publishing/)에 있습니다.
 
@@ -169,7 +170,7 @@ VERSION 6은 설계의 9를 제가 고친 값입니다([RFC 8216bis-22 8절](htt
 
 갱신 의무 9초는 모든 경우에 지켜지지 않습니다. 9월 1일 저는 S3 장애로 PUT을 못 하는 동안의 위반을 관리형 서비스 의존의 예외로 받아들였고, 상한은 없습니다. PUT이 실패한 틱이 결과를 「발행 없음 · 오류 없음」으로 남기면 목록이 다음 조각까지 한 틱 늦고, 방송 끝에서는 마지막 조각이 실리지 않을 수 있는 것도 받아들였습니다. 꼬리 조각이 교정으로 6.5초를 넘으면 그 목록은 S5에 걸려 최대 1시간 멈춥니다([`media/README.md` 「발행과 경보」 한계 표](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/media/README.md?plain=1#L2914-L2926)).
 
-종단 예산 2초와 엣지 1.5초는 실측 전 가정값이라, 사다리의 마감 두 스위치는 실측 전까지 기본으로 꺼 두었습니다. 목록 압축도 설계는 필수로 적었지만 고정 커밋의 CDN 설정에는 없습니다. 비슷한 정적 발행을 설계한다면 갱신 의무에서 거꾸로 센 마감을 먼저 정하고, 「업로드를 기다리는 시간」과 「목록이 멈춘 시간」을 다른 축으로 재십시오. 한 축으로 재면 기다려야 할 조각에 GAP을 세우거나, 세울 수 없는 GAP을 기다리다 의무를 넘깁니다.
+종단 예산 2초와 엣지 1.5초는 실측 전 가정값이라, 사다리의 마감 두 스위치는 실측 전까지 기본으로 꺼 두었습니다. 목록 압축은 설계가 필수로 적었지만 고정 커밋의 CDN 설정에는 없었고, 그 뒤 되감기 · VOD 목록에만 gzip을 켰습니다([목록 gzip 글](/posts/0-to-1/pokeclip-playlist-gzip/)). 라이브 목록은 아직 압축되지 않고, 적용 직후 gzip 변형의 첫 요청은 MISS입니다. 비슷한 정적 발행을 설계한다면 갱신 의무에서 거꾸로 센 마감을 먼저 정하고, 「업로드를 기다리는 시간」과 「목록이 멈춘 시간」을 다른 축으로 재십시오. 한 축으로 재면 기다려야 할 조각에 GAP을 세우거나, 세울 수 없는 GAP을 기다리다 의무를 넘깁니다.
 
 ## 측정 조건
 
@@ -204,3 +205,4 @@ VERSION 6은 설계의 9를 제가 고친 값입니다([RFC 8216bis-22 8절](htt
 - [다른 상자가 먼저 넣은 조각 하나에 되감기 목록이 멈췄습니다](/posts/0-to-1/pokeclip-rewind-cache-deadlock/) — 캐시 push · 감시 · 봉인 직전 확인
 - [HLS 재생 목록은 연속으로 확정된 조각까지만 공개했습니다](/posts/0-to-1/pokeclip-manifest-window-boundaries/) — 창의 머리 · DISC-SEQ
 - [늦게 끝난 발행이 새 HLS 목록을 덮지 못하게 했습니다](/posts/0-to-1/pokeclip-database-authoritative-manifest-publishing/) — fence · 세대 · 조건부 PUT
+- [되감기 목록만 gzip으로 압축하고 라이브 목록은 미뤘습니다](/posts/0-to-1/pokeclip-playlist-gzip/) — 목록 압축 · CloudFront 조건
