@@ -5,10 +5,10 @@ categories: ["projects"]
 tags: ["PokeClip", "HLS", "CloudFront", "gzip", "nginx", "CDN", "DVR"]
 draft: false
 author: "김태윤"
-description: "PokéClip 미디어 CDN은 4초마다 다시 받는 1시간 되감기 목록(약 138KB)을 압축 없이 보내고 있었습니다. CloudFront 압축의 네 조건 중 경로 규칙의 compress와 캐시 정책의 gzip 허용이 꺼져 있었습니다. 되감기 · VOD 목록만 별도 경로 규칙으로 떼어 gzip만 켰고, 로컬 재측정에서 시청자 한 명이 받는 목록 전송량은 약 276kbps에서 11kbps로 줄어듭니다. 운영 반영 뒤 시험 방송에서는 8,727B 되감기 목록이 응답 머리까지 합쳐 1.3KB 안팎으로 나가는 것을 CloudFront 로그로 확인했습니다. 라이브 목록은 MediaMTX가 2,048B를 넘으면 Content-Length 없이 보내 CloudFront가 압축할 수 없어, 상자 nginx의 gzip_proxied any 후속 작업으로 미뤘습니다."
+description: "PokéClip 미디어 CDN은 4초마다 다시 받는 1시간 되감기 목록(약 138KB)을 압축 없이 보내고 있었습니다. CloudFront 압축의 네 조건 중 경로 규칙의 compress와 캐시 정책의 gzip 허용이 꺼져 있었습니다. 되감기 · VOD 목록만 별도 경로 규칙으로 떼어 gzip만 켰고, 로컬 재측정에서 시청자 한 명이 받는 목록 전송량은 약 276kbps에서 11kbps로 줄어듭니다. 운영 반영 뒤 시험 방송에서는 8,727B 되감기 목록이 응답 머리까지 합쳐 1.3KB 안팎으로, 22,679B VOD 목록이 1.6KB 안팎으로 나가는 것을 CloudFront 로그로 확인했습니다. 라이브 목록은 MediaMTX가 2,048B를 넘으면 Content-Length 없이 보내 CloudFront가 압축할 수 없어, 상자 nginx의 gzip_proxied any 후속 작업으로 미뤘습니다."
 ---
 
-PokéClip의 되감기 목록은 사이드카가 S3에 올리는 정적 파일이고, 플레이어는 4초마다 다시 받습니다. 1시간 창이 차면 약 138KB인데, 고치기 전 미디어 CDN(CloudFront)은 이 목록을 압축하지 않고 보냈습니다. 되감기 · VOD 목록만 따로 경로 규칙으로 떼어 gzip만 켰고, 로컬 재측정에서 1시간 목록은 137,945B에서 gzip 5,497B로 줄어 시청자 한 명의 목록 전송량이 약 276kbps에서 11kbps가 됩니다. 운영 시험 방송에서는 8,727B 목록이 응답 머리까지 합쳐 1,305–1,306B로 나간 것을 CloudFront 로그로 확인했습니다. 라이브 목록은 원본이 길이 머리(Content-Length) 없이 보내 CloudFront로는 압축할 수 없어 후속 작업으로 미뤘습니다.
+PokéClip의 되감기 목록은 사이드카가 S3에 올리는 정적 파일이고, 플레이어는 4초마다 다시 받습니다. 1시간 창이 차면 약 138KB인데, 고치기 전 미디어 CDN(CloudFront)은 이 목록을 압축하지 않고 보냈습니다. 되감기 · VOD 목록만 따로 경로 규칙으로 떼어 gzip만 켰고, 로컬 재측정에서 1시간 목록은 137,945B에서 gzip 5,497B로 줄어 시청자 한 명의 목록 전송량이 약 276kbps에서 11kbps가 됩니다. 운영 시험 방송에서는 8,727B 목록이 응답 머리까지 합쳐 1,305–1,306B로, 22,679B VOD 목록이 1,632–1,644B로 나간 것을 CloudFront 로그로 확인했습니다. 라이브 목록은 원본이 길이 머리(Content-Length) 없이 보내 CloudFront로는 압축할 수 없어 후속 작업으로 미뤘습니다.
 
 되감기 · VOD 목록만, gzip만 켜고 라이브 목록을 후속으로 미룬 범위와 머지는 제가 정했습니다. Terraform 구현 · 시험 · 적용 런북은 AI(Claude Code와 Codex)가 했고, 커밋은 제 계정으로 [PokeClip-mono PR 537](https://github.com/3K-PokeClip/PokeClip-mono/pull/537)에 들어갔습니다. 아래 재측정은 이 글을 쓰며 AI(Claude Code)가 했습니다.
 
@@ -95,12 +95,12 @@ flowchart TB
 
 되감기 · VOD 목록은 사이드카가 S3에 `Content-Type: application/vnd.apple.mpegurl`로 올린 객체입니다([`s3store.go` 28–30행](https://github.com/3K-PokeClip/PokeClip-mono/blob/31f2f32d77650c3f20ac5318cc3a95d875fc8cbf/media/internal/rewind/publish/s3store.go#L28-L30)). S3 `GetObject` 응답에는 `Content-Length`가 붙으므로([AWS S3 API 「GetObject」](https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html)) 꺼져 있던 것은 CloudFront 쪽 두 설정뿐이었습니다.
 
-크기 조건은 방송 첫머리에서만 걸립니다. 같은 `Render`로 재 보니 5조각 목록이 999B, 6조각 목록이 1,152B라, 첫 20초쯤의 되감기 목록은 압축되지 않습니다. VOD 목록은 `#EXT-X-PLAYLIST-TYPE:VOD`라 다시 받지 않으므로([RFC 8216bis-22 6.3.4](https://www.ietf.org/archive/id/draft-pantos-hls-rfc8216bis-22.txt) · [`render.go` 155행](https://github.com/3K-PokeClip/PokeClip-mono/blob/31f2f32d77650c3f20ac5318cc3a95d875fc8cbf/media/internal/rewind/render.go#L155)), 압축으로 줄어드는 것은 처음 한 번의 전송입니다. VOD 목록 크기는 재지 않았습니다.
+크기 조건은 방송 첫머리에서만 걸립니다. 같은 `Render`로 재 보니 5조각 목록이 999B, 6조각 목록이 1,152B라, 첫 20초쯤의 되감기 목록은 압축되지 않습니다. VOD 목록은 `#EXT-X-PLAYLIST-TYPE:VOD`라 다시 받지 않으므로([RFC 8216bis-22 6.3.4](https://www.ietf.org/archive/id/draft-pantos-hls-rfc8216bis-22.txt) · [`render.go` 155행](https://github.com/3K-PokeClip/PokeClip-mono/blob/31f2f32d77650c3f20ac5318cc3a95d875fc8cbf/media/internal/rewind/render.go#L155)), 압축으로 줄어드는 것은 처음 한 번의 전송입니다. 운영에서 잰 7분 56초 시험 방송의 VOD 목록은 22,679B였습니다.
 
 | 대상 | 경로 규칙 | ① compress | ② gzip 허용 | ③ Content-Length | ④ 크기 | 결과 |
 |---|---|---|---|---|---|---|
 | 되감기 목록 | `/dvr/*.m3u8` | 켬 | 켬 | 있음(S3) | 6조각부터 1,000B 이상 | gzip |
-| VOD 목록 | `/vod/*.m3u8` | 켬 | 켬 | 있음(S3) | 재지 않음 | gzip 예상(운영 미확인) |
+| VOD 목록 | `/vod/*.m3u8` | 켬 | 켬 | 있음(S3) | 7분 56초 방송 22,679B | gzip |
 | 라이브 목록 | `/live/*.m3u8` | 끔 | 끔 | 2,048B 넘으면 없음 | — | 압축 안 함(후속은 nginx) |
 | 조각 `.m4s` | `/dvr/*` · `/vod/*` | 끔 | 끔 | 있음(S3) | — | 압축 안 함 |
 
@@ -138,7 +138,7 @@ gzip만 허용하면 CloudFront는 `Accept-Encoding`을 `gzip` 하나로 정규�
 
 ## 적용 직후 gzip 변형의 첫 요청은 MISS입니다
 
-캐시 키에 `Accept-Encoding: gzip`이 들어가면서, 적용 직후 목록의 gzip 변형은 엣지에도 Origin Shield에도 없습니다. 그 첫 요청은 S3까지 가서 원본을 받고, CloudFront가 압축해 캐시에 넣습니다. 그래서 적용 직후 잠깐 S3 GET과 지연이 늘 수 있고, 새 변형을 처음 채우는 것이라 회귀로 보지 않기로 런북에 적었습니다([엣지 시험 런북 822–871행](https://github.com/3K-PokeClip/PokeClip-mono/blob/31f2f32d77650c3f20ac5318cc3a95d875fc8cbf/infra/terraform/runbooks/edge-tests.md?plain=1#L822-L871)). 운영 실측에서 되감기 목록 요청은 대부분 Miss였지만, 목록이 `max-age=1`이라 1초마다 다시 채우는 Miss와 첫 변형의 Miss는 로그로 가를 수 없습니다. 오래 캐시되는 VOD 목록(`max-age=3600`)의 첫 Miss는 재지 않았습니다.
+캐시 키에 `Accept-Encoding: gzip`이 들어가면서, 적용 직후 목록의 gzip 변형은 엣지에도 Origin Shield에도 없습니다. 그 첫 요청은 S3까지 가서 원본을 받고, CloudFront가 압축해 캐시에 넣습니다. 그래서 적용 직후 잠깐 S3 GET과 지연이 늘 수 있고, 새 변형을 처음 채우는 것이라 회귀로 보지 않기로 런북에 적었습니다([엣지 시험 런북 822–871행](https://github.com/3K-PokeClip/PokeClip-mono/blob/31f2f32d77650c3f20ac5318cc3a95d875fc8cbf/infra/terraform/runbooks/edge-tests.md?plain=1#L822-L871)). 운영 실측에서 되감기 목록 요청은 대부분 Miss였지만, 목록이 `max-age=1`이라 1초마다 다시 채우는 Miss와 첫 변형의 Miss는 로그로 가를 수 없습니다. 오래 캐시되는 VOD 목록(`max-age=3600`)은 19시 7분 54초의 첫 요청이 Miss, 19시 8분 17초의 두 요청이 Hit였습니다.
 
 ## 적용 절차에서는 세 가지를 조심했습니다
 
@@ -152,19 +152,23 @@ gzip만 허용하면 CloudFront는 `Accept-Encoding`을 `gzip` 하나로 정규�
 
 PR 537은 11월 18일 18시 10분에 develop에 머지됐고, 같은 날 18시 12–13분 edge apply로 운영 배포에 반영했습니다. plan은 기대한 두 줄(캐시 정책 생성 · 배포 변경)과 같았고, 밀린 칸도 모두 새 표와 맞았으며, 엣지 함수 연결은 하나 늘기만 했습니다. 결과는 생성 1 · 변경 1 · 삭제 0, 18시 13분 Deployed였고, 다시 뽑은 plan은 변경 0입니다.
 
-같은 날 18시 21–28분과 31–39분에 시험 방송을 띄웠습니다. 첫 방송에서는 브라우저가 응답 머리와 크기를 가려 판정 자료를 얻지 못했고, 둘째 방송에서 AI가 재생 중인 페이지 안의 `fetch`로 되감기 목록 · 조각 · 라이브 목록을 받았습니다. CloudFront 로그 20줄은 두 방송에 걸칩니다. 브라우저는 `Accept-Encoding: gzip`을 붙여 보내고, 판정은 받은 본문 크기와 로그를 견줘서 했습니다. 로그의 `sc-bytes`는 응답 머리를 포함해 보낸 전체 바이트이고, `sc-content-len`은 응답의 `Content-Length` 값입니다([AWS 「Standard logging reference」](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/standard-logs-reference.html#BasicDistributionFileFormat)).
+같은 날 18시 21–28분과 31–39분에 시험 방송을 띄웠습니다. 첫 방송에서는 브라우저가 응답 머리와 크기를 가려 판정 자료를 얻지 못했고, 둘째 방송에서 AI가 재생 중인 페이지 안의 `fetch`로 되감기 목록 · 조각 · 라이브 목록을 받았습니다. 되감기 목록의 CloudFront 로그 20줄은 두 방송에 걸칩니다. 둘째 방송이 다시보기가 된 뒤 19시 8분에는 그 VOD 목록도 같은 방법으로 받았습니다. 브라우저는 `Accept-Encoding: gzip`을 붙여 보내고, 판정은 받은 본문 크기와 로그를 견줘서 했습니다. 로그의 `sc-bytes`는 응답 머리를 포함해 보낸 전체 바이트이고, `sc-content-len`은 응답의 `Content-Length` 값입니다([AWS 「Standard logging reference」](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/standard-logs-reference.html#BasicDistributionFileFormat)).
 
 | 대상 | 풀린 본문 | 응답 `Content-Length` | CloudFront가 보낸 바이트 | 판정 |
 |---|---|---|---|---|
 | 되감기 목록 `/dvr/…/index.m3u8` | 8,727B | 없음(로그 `-`) | 1,305–1,306B(8,727B 판을 받은 18시 34분 44초의 두 요청, 머리 포함) · 같은 분의 다른 판 1,258–1,328B | 압축됨 |
+| VOD 목록 `/vod/…/index.m3u8` | 22,679B | 없음(로그 `-`) | 1,644B(19시 7분 54초, Miss) · 1,641 · 1,632B(19시 8분 17초, Hit) | 압축됨 |
+| 적용 전 VOD 목록(같은 경로 꼴, 다른 방송) | — | 9,674 · 132,481 | 10,272 · 133,216B(10시 18분 · 11시 35분) | 압축 안 됨 |
 | 조각 `/dvr/…/seg/….m4s` | 3,083,523B | 3,083,523 | 재지 않음 | 압축 안 됨 |
 | 라이브 `/live/…/index.m3u8` | 802B | 802 | 재지 않음 | 압축 안 됨 |
 
 되감기 목록은 머리를 합친 전송량이 본문의 약 7분의 1이라 압축 없이는 나올 수 없는 크기입니다. 원본 S3는 늘 길이를 주는데, 되감기 목록(index.m3u8) 요청 20줄(18시 22–34분)이 모두 `sc-content-len` 「-」였습니다. CloudFront가 압축한 응답을 길이 없이 보낸 것으로 봅니다. 18시 34분 37초와 44초에는 첫 요청이 Miss, 같은 초에 다시 보낸 요청이 Hit였고, 나머지는 `max-age=1`이라 Miss였습니다.
 
-조각은 받은 바이트가 `Content-Length`와 같아 설계대로 압축되지 않았습니다. 라이브 쪽에서 받은 것은 `max-age=30`이 붙은 다중 변형 목록(gohlslib의 `index.m3u8`, [`muxer.go` 701–738행](https://github.com/bluenviron/gohlslib/blob/v2.4.5/muxer.go#L701-L738))이었습니다. 802B라 CloudFront 하한 1,000B보다 작고, 2,048B 아래라 길이도 붙어 있어 위 설명과 맞습니다. 2,048B를 넘는 라이브 미디어 목록은 운영에서 재지 않았습니다.
+VOD 목록도 같은 모양입니다. 전송량이 본문의 약 7%이고 `Content-Length`가 없었습니다. 같은 경로 꼴의 VOD 목록이 적용 전 오전에는 `sc-content-len` 9,674 · 132,481로 길이를 달고 그보다 조금 큰 바이트로 나갔으니, 적용 전후로 길이 머리가 사라지고 전송량이 줄었습니다.
 
-확인하지 못한 것도 있습니다. 응답의 `Content-Encoding` · `Vary` 머리는 CORS로 페이지에 노출되지 않아 글자로 보지 못했고, 압축 여부는 크기로만 판정했습니다. VOD 목록은 이번 시험 방송의 다시보기가 생긴 뒤에야 받을 수 있어 아직 재지 않았습니다. VOD 목록 규칙은 되감기 목록 규칙과 같은 캐시 정책 · 같은 꼴입니다.
+조각은 받은 바이트가 `Content-Length`와 같아 설계대로 압축되지 않았습니다. VOD 플레이어도 조각은 `/dvr/…/seg/*.m4s`에서 받습니다. 라이브 쪽에서 받은 것은 `max-age=30`이 붙은 다중 변형 목록(gohlslib의 `index.m3u8`, [`muxer.go` 701–738행](https://github.com/bluenviron/gohlslib/blob/v2.4.5/muxer.go#L701-L738))이었습니다. 802B라 CloudFront 하한 1,000B보다 작고, 2,048B 아래라 길이도 붙어 있어 위 설명과 맞습니다. 2,048B를 넘는 라이브 미디어 목록은 운영에서 재지 않았습니다.
+
+확인하지 못한 것은 하나입니다. 응답의 `Content-Encoding` · `Vary` 머리는 CORS로 페이지에 노출되지 않아 글자로 보지 못했고, 압축 여부는 크기로만 판정했습니다.
 
 비슷한 CDN 앞에서 목록을 압축하려면 원본 응답에 `Content-Length`가 있는지부터 보십시오. 앞의 두 설정은 켜기만 하면 되지만, 길이가 없는 원본은 CDN이 아니라 원본 쪽에서 압축해야 합니다.
 
@@ -175,7 +179,7 @@ PR 537은 11월 18일 18시 10분에 develop에 머지됐고, 같은 날 18시 1
 - **전송률.** 크기 × 8 ÷ 4초로, 바뀐 목록을 4초마다 다시 받는다는 가정입니다. KB는 1,000B, kbps는 1,000bit/s입니다.
 - **압축 조건 재현.** `nginx:alpine`(nginx 1.29.7, 다이제스트 고정) 컨테이너 하나에 Go 상류를 함께 띄우고 `curl --http1.1`로 머리를 받았습니다. MediaMTX · CloudFront는 띄우지 않았고, 라벨 붙인 컨테이너는 측정 뒤 지웠습니다.
 - **운영 반영.** apply 결과(생성 1 · 변경 1 · 삭제 0) · 시각 · plan 대조 · 재plan은 운영 반영 기록(비공개)에서 옮겼습니다.
-- **운영 실측.** 2026년 11월 18일 18:21–18:28 · 18:31–18:39 KST 시험 방송 두 번. 둘째 방송의 브라우저 `fetch` 결과(상태 · 노출된 머리 · 풀린 바이트)와 두 방송에 걸친 되감기 목록(index.m3u8) 요청 20줄의 표준 로그를 견줬습니다. 비공개 기록이며 식별자와 주소는 옮기지 않았습니다.
+- **운영 실측.** 2026년 11월 18일 18:21–18:28 · 18:31–18:39 KST 시험 방송 두 번. 둘째 방송의 브라우저 `fetch` 결과(상태 · 노출된 머리 · 풀린 바이트)와 두 방송에 걸친 되감기 목록(index.m3u8) 요청 20줄의 표준 로그를 견줬습니다. VOD 목록은 19:08:17 KST에 같은 방법으로 두 번 받아, 같은 경로 꼴 VOD 목록 요청의 표준 로그(적용 전 10:18 · 11:35, 적용 뒤 19:07–19:08)와 견줬습니다. 비공개 기록이며 식별자와 주소는 옮기지 않았습니다.
 - **명령.** 실행 순서가 적힌 `run.sh`와 시험 · 상류 · nginx 설정 · 원자료는 [저장소 `_workspace/blog/pokeclip-playlist-gzip/measure/`](https://github.com/xodbs1021/xodbs1021.github.io/tree/main/_workspace/blog/pokeclip-playlist-gzip/measure)에 있습니다.
 
 ## 출처

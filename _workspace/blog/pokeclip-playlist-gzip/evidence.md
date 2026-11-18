@@ -42,13 +42,16 @@
 | 경로 규칙 아홉에 compress 명시, 기본 규칙은 명시 없음(provider 기본 false) | main.tf 213 · 228–240 | 코드 | – |
 | 첫 구현은 /live/*.m3u8 · /dvr/* · /vod/* 에 compress + gzip · brotli | 커밋 f80aae6e diff | 코드 | 기각안으로 서술 |
 | 시험이 compress 배열 · 목록 정책 gzip 만을 단언 | tftest 429–467 | 코드 | 시험은 다시 돌리지 않음 |
-| 적용 직후 gzip 변형 첫 요청 MISS | 런북 822–871, PR 본문 한계 | 코드 문서 | 운영에서는 max-age=1 Miss 와 가를 수 없음 · VOD 첫 Miss 미측정 |
+| 적용 직후 gzip 변형 첫 요청 MISS | 런북 822–871, PR 본문 한계 | 코드 문서 | 되감기 목록은 max-age=1 Miss 와 가를 수 없음 · VOD 목록은 19:07:54 Miss → 19:08:17 Hit 둘 |
 | 자리 밀림 대조 · 함수 연결 하나 늘고 줄지 않음 · 되돌림 거울 | 런북 822–871 | 코드 문서 | 자리 번호는 글에 쓰지 않음 |
 | DeleteCachePolicy 사전 판정 목록에 없음 → 「거부될 수 있다」 | 런북 845– | 코드 문서 | – |
 | 끄기 확인 기대값을 체크아웃 grep 으로 | 런북 2191–2206 | 코드 문서 | – |
 | apply 생성 1 · 변경 1 · 삭제 0 | apply 출력(`Apply complete! Resources: 1 added, 1 changed, 0 destroyed.`) | 운영 기록(비공개) | – |
 | apply 시각 18:12–13 · Deployed 18:13 · 재plan 0 · plan 두 줄 · 자리 대조 일치 · 함수 연결 추가 1 제거 0 | 운영 반영 기록(비공개) | 운영 기록 | apply 출력에는 시각 · 재plan 이 없다 |
 | 운영 실측: /dvr 목록 풀린 8,727B(Last-Modified 09:34:41 UTC) · Content-Length 없음 · 그 판을 받은 18:34:44 두 줄 1,306B Miss · 1,305B Hit · 같은 분 다른 판 1,258–1,328B · 20줄 sc-content-len「-」 | 브라우저 fetch 결과 · CDN 표준 로그 발췌(비공개) | 운영 실측 | 머리 글자(Content-Encoding · Vary)는 CORS 로 못 봄 — 글에 밝힘 |
+| 운영 실측: VOD 목록(18:31 방송, 화면 길이 7분 56초) 풀린 22,679B · Content-Length 없음(fetch 19:08:17 두 번) · 로그 1,644B Miss(19:07:54) · 1,641 · 1,632B Hit(19:08:17) · sc-content-len「-」 | 브라우저 fetch 결과 · CDN 표준 로그 발췌(비공개) | 운영 실측 | – |
+| 적용 전 VOD 목록(같은 경로 꼴, 다른 방송) sc-content-len 9,674 · 132,481 · sc-bytes 10,272 · 133,216(10:18 · 11:35 KST) | CDN 표준 로그 발췌(비공개) | 운영 실측 | 같은 경로 꼴 · 다른 방송이라는 것은 운영 실측 기록 요약을 따름(발췌에 경로 칸 없음) |
+| VOD 플레이어도 조각을 /dvr/…/seg/*.m4s 에서 받음 | 브라우저 리소스 목록(비공개) | 운영 관측 | 다시 받지 않음 |
 | 조각 3,083,523 = Content-Length · 라이브 index.m3u8 802 = Content-Length · max-age=30 | 브라우저 fetch 결과(비공개) | 운영 실측 | 라이브 쪽은 다중 변형 목록(gohlslib muxer.go 24 · 701–738) |
 | 시험 방송 18:21–18:28 · 18:31–18:39, 첫 방송은 브라우저가 머리 · 크기를 가려 판정 자료 없음, fetch 결과는 둘째 방송 | 송출 관측 로그 두 개 · 운영 실측 기록(비공개) | 운영 기록 | 둘째 로그에 정지 줄 없음 — 끝 시각은 운영 실측 기록 |
 
