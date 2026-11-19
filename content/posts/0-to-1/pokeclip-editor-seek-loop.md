@@ -10,11 +10,11 @@ description: "PokéClip 편집기 미리보기가 재생을 누르기 전까지 
 
 PokéClip 편집기에서 하이라이트 카드를 열면 미리보기가 재생을 누르기 전까지 검었습니다. 편집기의 숨은 영상 노드는 구간 시작(10.437초)을 약 21ms마다 다시 넣으며 시크를 되풀이했고, 재생을 누를 때까지 48초 동안 멈추지 않았습니다. Chrome은 멈춘 영상에 넣은 `currentTime`에서 µs(100만분의 1초) 아래를 버리고, 편집기의 반복 경계는 그렇게 깎인 위치를 구간 시작과 `<`로 비교해 「시작 앞」으로 봤습니다. 시작 판정에 1ms 여유를 둔 판을 운영에 반영한 뒤, 같은 카드의 위치 넣기는 1번으로 끝났고 미리보기는 재생 전에 그림을 보였습니다.
 
-고침 착수와 머지는 제가 정했고, 운영 반영도 제가 승인했습니다. 조사 · 원인 확정 · 구현 · 시험 · 실측은 AI 에이전트(Claude Code와 Codex)가 했습니다. 고침은 11월 16일 06시 54분 develop에 병합됐고([PokeClip-mono PR 520](https://github.com/3K-PokeClip/PokeClip-mono/pull/520)), 같은 날 운영 웹에 반영해 다시 쟀습니다.
+고침 착수와 머지는 제가 정했고, 운영 반영도 제가 승인했습니다. 조사 · 원인 확정 · 구현 · 시험 · 실측은 AI 에이전트(Claude Code와 Codex)가 했습니다. 고침은 11월 16일 06시 54분 develop에 병합됐고(PokeClip-mono PR 520), 같은 날 운영 웹에 반영해 다시 쟀습니다.
 
 ## 편집기 미리보기가 재생을 누르기 전까지 검었습니다
 
-편집기는 [방송 중에도 편집할 수 있게 나눈 경로](/posts/0-to-1/pokeclip-live-editing-boundaries/) 가운데 되감기 목록에서 영상을 받습니다. 구간 앞뒤 여유를 포함한 창의 조각을 받아 [mediabunny](https://mediabunny.dev/) 1.65.2로 다시 인코딩하지 않고 mp4 하나로 다시 싸고([`remuxWindow.ts`@2e989769](https://github.com/3K-PokeClip/PokeClip-mono/blob/2e9897692308c759a77fa97fcccc8305ae75f46d/web/src/features/clips/editor/source/remuxWindow.ts#L1-L25)), 그 결과를 Blob으로 만들어 `blob:` 주소로 숨은 `<video>`에 넣습니다([`useEditorVideoPlayback.ts`@2e989769](https://github.com/3K-PokeClip/PokeClip-mono/blob/2e9897692308c759a77fa97fcccc8305ae75f46d/web/src/features/clips/editor/useEditorVideoPlayback.ts#L305-L313)). 같은 Blob을 노드 둘이 씁니다. 재생 노드는 미리보기 화면을 맡고, 필름띠 노드는 아래 타임라인의 작은 그림을 뽑습니다. 편집기를 열면 재생 노드는 메타데이터를 받은 뒤 구간 시작으로 한 번 옮겨 그 자리 그림을 보여 줘야 합니다.
+편집기는 [방송 중에도 편집할 수 있게 나눈 경로](/posts/0-to-1/pokeclip-live-editing-boundaries/) 가운데 되감기 목록에서 영상을 받습니다. 구간 앞뒤 여유를 포함한 창의 조각을 받아 [mediabunny](https://mediabunny.dev/) 1.65.2로 다시 인코딩하지 않고 mp4 하나로 다시 싸고(`remuxWindow.ts`@2e989769), 그 결과를 Blob으로 만들어 `blob:` 주소로 숨은 `<video>`에 넣습니다(`useEditorVideoPlayback.ts`@2e989769). 같은 Blob을 노드 둘이 씁니다. 재생 노드는 미리보기 화면을 맡고, 필름띠 노드는 아래 타임라인의 작은 그림을 뽑습니다. 편집기를 열면 재생 노드는 메타데이터를 받은 뒤 구간 시작으로 한 번 옮겨 그 자리 그림을 보여 줘야 합니다.
 
 11월 16일 04시 34분, 바로 전 변경을 운영에서 확인한 측정의 망 기록에 `blob:` 읽기가 503으로 18건 찍혀 있었습니다. 재생은 정상이었습니다. 이 503을 좇아 05시 52분 운영 편집기에 계측 코드를 넣었을 때, 카드 하나의 편집기 미리보기가 약 20초 동안 검게 남는 것을 함께 봤습니다. 재생 노드의 `readyState`는 1(메타데이터만 있음)에 머물렀고, 재생을 누르자 그림이 바로 나왔습니다.
 
@@ -67,7 +67,7 @@ flowchart TB
 
 시크가 끝나 `readyState`가 4가 된 바로 그 순간 같은 값을 다시 넣어 새 시크가 시작되고, 이어서 오는 [`seeked`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/seeked_event) 처리 중에 한 번 더 넣습니다. 재생 직전 54바퀴는 평균 약 21ms 간격으로, 초당 약 47번 `seeked`가 난 셈입니다. 첫 시크부터 재생을 누를 때까지 48초 동안 이 순환이 끊기지 않았고, 그 사이 `muted` · `pause` · `play` · `playbackRate` 호출은 없었습니다. 재생을 누르자 위치가 구간 시작을 넘어가며 다시 넣기가 멈췄습니다.
 
-편집기 코드에서 이 꼴을 만드는 길은 하나였습니다. 편집기는 `seeked`도 `timeupdate` 처리기로 받고, 그 처리기는 위치를 편집기 초로 바꿔 반복 경계 판정 `boundaryAction`에 넘깁니다. 「구간 반복」이 켜져 있고 위치가 시작보다 작으면 판정은 시작으로 다시 옮기라고 답합니다([`useEditorVideoPlayback.ts`@2e989769 처리기](https://github.com/3K-PokeClip/PokeClip-mono/blob/2e9897692308c759a77fa97fcccc8305ae75f46d/web/src/features/clips/editor/useEditorVideoPlayback.ts#L693-L698) · [`seeked` 등록](https://github.com/3K-PokeClip/PokeClip-mono/blob/2e9897692308c759a77fa97fcccc8305ae75f46d/web/src/features/clips/editor/useEditorVideoPlayback.ts#L741-L743)). [HTML 표준의 시크 절차](https://html.spec.whatwg.org/multipage/media.html#seeking)는 시크 끝에 `timeupdate`와 `seeked`를 차례로 냅니다. 한 바퀴에 위치를 두 번 넣은 것도 이 두 사건 때문으로 봅니다. 추적 목록에 `timeupdate`가 빠져 있어서, 첫 넣기가 `timeupdate` 처리기에서 나왔다는 것은 코드와 맞춰 본 해석입니다. 남은 질문은 시작으로 옮긴 노드가 왜 매번 「시작 앞」에 있느냐였습니다.
+편집기 코드에서 이 꼴을 만드는 길은 하나였습니다. 편집기는 `seeked`도 `timeupdate` 처리기로 받고, 그 처리기는 위치를 편집기 초로 바꿔 반복 경계 판정 `boundaryAction`에 넘깁니다. 「구간 반복」이 켜져 있고 위치가 시작보다 작으면 판정은 시작으로 다시 옮기라고 답합니다(`useEditorVideoPlayback.ts`@2e989769 처리기 · `seeked` 등록). [HTML 표준의 시크 절차](https://html.spec.whatwg.org/multipage/media.html#seeking)는 시크 끝에 `timeupdate`와 `seeked`를 차례로 냅니다. 한 바퀴에 위치를 두 번 넣은 것도 이 두 사건 때문으로 봅니다. 추적 목록에 `timeupdate`가 빠져 있어서, 첫 넣기가 `timeupdate` 처리기에서 나왔다는 것은 코드와 맞춰 본 해석입니다. 남은 질문은 시작으로 옮긴 노드가 왜 매번 「시작 앞」에 있느냐였습니다.
 
 ## Chrome은 멈춘 영상의 currentTime에서 µs 아래를 버립니다
 
@@ -111,7 +111,7 @@ Chromium 소스도 같은 동작을 가리킵니다(Chrome 157.0.8103.51 태그)
 
 ## 시작 판정에 1ms 여유를 두었습니다
 
-고침은 판정 한 줄입니다. 반복 중이면 위치를 구간 시작에서 1ms를 뺀 값과 비교합니다. 끝 판정(`>= endSeconds`), 끝에서의 반복 되감기, 반복을 끈 상태의 앞쪽 시크는 그대로 뒀습니다([`editorPlayback.ts`@2e989769](https://github.com/3K-PokeClip/PokeClip-mono/blob/2e9897692308c759a77fa97fcccc8305ae75f46d/web/src/features/clips/editor/editorPlayback.ts#L25-L49)).
+고침은 판정 한 줄입니다. 반복 중이면 위치를 구간 시작에서 1ms를 뺀 값과 비교합니다. 끝 판정(`>= endSeconds`), 끝에서의 반복 되감기, 반복을 끈 상태의 앞쪽 시크는 그대로 뒀습니다(`editorPlayback.ts`@2e989769).
 
 ```ts
 // 발췌: web/src/features/clips/editor/editorPlayback.ts (주석 · 나머지 함수 생략)
@@ -139,7 +139,7 @@ export function boundaryAction(currentSeconds: number, bounds: PlaybackBounds): 
 | 시크 목표를 µs 단위로 올려 넣기 | 브라우저마다 깎는 단위가 다를 수 있어 한 브라우저에만 맞음 |
 | 재생 단추 판정까지 고치기 | 클릭당 한 번이라 되풀이가 아니고, 이번에 정한 고침 범위 밖 |
 
-시험은 두 층입니다. 단위 시험은 시작보다 0.9µs 앞은 그대로, 10ms 앞은 시작으로 되감기, 끝 바로 앞 0.5ms는 아직 구간 안이라고 단언합니다([`editorPlayback.test.ts`@2e989769](https://github.com/3K-PokeClip/PokeClip-mono/blob/2e9897692308c759a77fa97fcccc8305ae75f46d/web/src/features/clips/editor/editorPlayback.test.ts#L35-L42)). 훅 시험은 µs 아래를 버리는 노드와 조각마다 90kHz 틱 하나씩 밀리는 창을 함께 넣고, 메타데이터 뒤 위치 넣기가 1번인지 봅니다([`useEditorVideoPlayback.test.ts`@2e989769](https://github.com/3K-PokeClip/PokeClip-mono/blob/2e9897692308c759a77fa97fcccc8305ae75f46d/web/src/features/clips/editor/useEditorVideoPlayback.test.ts#L1171-L1223)). 되풀이 상한을 50으로 둔 이 시험은 고치기 전 판에서 99번으로 실패했고, 고친 뒤 1번으로 통과했습니다.
+시험은 두 층입니다. 단위 시험은 시작보다 0.9µs 앞은 그대로, 10ms 앞은 시작으로 되감기, 끝 바로 앞 0.5ms는 아직 구간 안이라고 단언합니다(`editorPlayback.test.ts`@2e989769). 훅 시험은 µs 아래를 버리는 노드와 조각마다 90kHz 틱 하나씩 밀리는 창을 함께 넣고, 메타데이터 뒤 위치 넣기가 1번인지 봅니다(`useEditorVideoPlayback.test.ts`@2e989769). 되풀이 상한을 50으로 둔 이 시험은 고치기 전 판에서 99번으로 실패했고, 고친 뒤 1번으로 통과했습니다.
 
 판정을 일부러 틀리게 바꿔 시험이 잡는지도 봤습니다. 여유 0, 깎임보다 작은 여유, 한 프레임을 넘는 여유, 부호 반대, 끝 판정에도 여유, `loop` 조건 제거는 모두 잡혔습니다. 여유를 1µs나 5ms로 바꾼 판은 살아남았습니다. 시험이 보장하는 것은 여유가 0.9µs보다 크고 10ms보다 작다는 것까지이고, 1ms라는 값 자체는 고정하지 않습니다.
 
@@ -166,7 +166,7 @@ export function boundaryAction(currentSeconds: number, bounds: PlaybackBounds): 
 
 - **더 거칠게 깎는 브라우저.** 1ms보다 거친 단위로 위치를 깎는 브라우저가 있다면 순환이 다시 날 수 있습니다. PR 520은 지문 방지 설정으로 시간 정밀도를 낮춘 Firefox를 예로 들었지만, 그런 동작은 확인하지 않았습니다. 현재 MDN은 브라우저가 `currentTime`에 타이머 반올림을 하지 않는다고 적습니다.
 - **Safari · Firefox는 재지 않았습니다.** 조사 당일과 공개 재측정 모두 Chrome만 쟀습니다. 재측정 스크립트는 Playwright의 Firefox · WebKit도 받지만, 그 빌드가 측정 기계에 깔려 있지 않아 돌리지 않았습니다.
-- **재생 단추 판정은 여전히 엄격 비교입니다.** 깎인 자리에서 재생을 누르면 같은 자리로 한 번 더 옮깁니다. 원래 동작이고 되풀이는 아니라 이번 고침 범위에서 뺐습니다([`useEditorVideoPlayback.ts`@2e989769](https://github.com/3K-PokeClip/PokeClip-mono/blob/2e9897692308c759a77fa97fcccc8305ae75f46d/web/src/features/clips/editor/useEditorVideoPlayback.ts#L788-L805)).
+- **재생 단추 판정은 여전히 엄격 비교입니다.** 깎인 자리에서 재생을 누르면 같은 자리로 한 번 더 옮깁니다. 원래 동작이고 되풀이는 아니라 이번 고침 범위에서 뺐습니다(`useEditorVideoPlayback.ts`@2e989769).
 - **시험은 범위만 보장합니다.** 1µs와 5ms 여유도 시험을 통과합니다.
 
 `currentTime`은 넣은 값을 그대로 돌려준다는 보장이 없습니다. 읽은 위치를 정확한 값과 `===` · `<` · `>=`로 견주는 자리라면, 깎일 수 있는 크기보다 넉넉하고 한 프레임보다 작은 여유를 이름 붙인 상수로 두는 편이 안전합니다. 그런 판정을 시험할 때는 「목표에 µs 아래 자릿수가 생기는 조건」과 「노드가 값을 깎는 조건」을 함께 넣어야 합니다. 이번 결함은 둘 중 하나만 넣은 시험을 모두 통과했습니다. 재생을 누르면 풀리는 검은 화면이라면 멈춘 영상에서만 도는 판정부터 의심해 볼 만합니다.
@@ -183,10 +183,10 @@ export function boundaryAction(currentSeconds: number, bounds: PlaybackBounds): 
 
 ## 출처
 
-코드 · 결정 기록(공개 저장소 3K-PokeClip/PokeClip-mono)
-- [PokeClip-mono PR 520](https://github.com/3K-PokeClip/PokeClip-mono/pull/520) — 반복 시작 판정의 1ms 여유, 원인 · 설계 · 기각한 대안 · 남은 한계 · 변이 결과(2026-11-16 develop 병합, 머지 커밋 `2e989769`)
-- [`editorPlayback.ts`@2e989769](https://github.com/3K-PokeClip/PokeClip-mono/blob/2e9897692308c759a77fa97fcccc8305ae75f46d/web/src/features/clips/editor/editorPlayback.ts#L25-L49) · [`useEditorVideoPlayback.ts`@2e989769](https://github.com/3K-PokeClip/PokeClip-mono/blob/2e9897692308c759a77fa97fcccc8305ae75f46d/web/src/features/clips/editor/useEditorVideoPlayback.ts#L661-L743) · [`remuxWindow.ts`@2e989769](https://github.com/3K-PokeClip/PokeClip-mono/blob/2e9897692308c759a77fa97fcccc8305ae75f46d/web/src/features/clips/editor/source/remuxWindow.ts)
-- 시험@2e989769 — [`editorPlayback.test.ts`](https://github.com/3K-PokeClip/PokeClip-mono/blob/2e9897692308c759a77fa97fcccc8305ae75f46d/web/src/features/clips/editor/editorPlayback.test.ts#L35-L42) · [`useEditorVideoPlayback.test.ts`](https://github.com/3K-PokeClip/PokeClip-mono/blob/2e9897692308c759a77fa97fcccc8305ae75f46d/web/src/features/clips/editor/useEditorVideoPlayback.test.ts#L1171-L1223)
+코드 · 결정 기록(프로젝트 저장소 3K-PokeClip/PokeClip-mono · 2026년 11월 20일부터 비공개)
+- PokeClip-mono PR 520 — 반복 시작 판정의 1ms 여유, 원인 · 설계 · 기각한 대안 · 남은 한계 · 변이 결과(2026-11-16 develop 병합, 머지 커밋 `2e989769`) (비공개 저장소)
+- `editorPlayback.ts`@2e989769 · `useEditorVideoPlayback.ts`@2e989769 · `remuxWindow.ts`@2e989769 (비공개 저장소)
+- 시험@2e989769 — `editorPlayback.test.ts` · `useEditorVideoPlayback.test.ts` (비공개 저장소)
 
 표준 · 문서
 - WHATWG HTML Living Standard, [4.8.11.9 Seeking](https://html.spec.whatwg.org/multipage/media.html#seeking) — 시크 절차, 끝에 `timeupdate` 다음 `seeked`

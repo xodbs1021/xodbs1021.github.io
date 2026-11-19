@@ -14,7 +14,7 @@ portfolio_edition: "2026-10-15-v2"
 
 OBS에서 소리를 6개로 나눠 보내도, 편집 단계에서 여섯 번째 소리만 꺼낼 수 있다는 보장은 없습니다. 녹화하는 muxer가 일부 트랙만 남길 수 있고, 파일에는 6개가 있어도 재생 목록에 선택지가 실리지 않거나 플레이어가 전환하지 못할 수 있습니다. 8월 3일 시험 네 번은 각자 다른 단계를 확인했습니다. 녹화 파일에 오디오 6개, 재생 목록에 대체 오디오 6개, 여섯 번째 오디오만 뽑은 결과 1개, OBS로 보낸 녹화 61파일과 DB 61행이 맞았고, 플레이어에서 여섯 번째 트랙(hls.js 번호 5, 목록 이름 audio7)으로 바꾼 요청은 200이었습니다. 다만 이 시험들은 트랙마다 다른 사인파를 싣고도 개수만 셌습니다. 트랙마다 의도한 소리가 남는지는 9월 말 팀원의 테스트 톤 시험이 확인했고(첫 트랙 하나는 9월 19일 재포장 실험에서 220Hz로 확인), 각 스템의 목표 대역은 −24.1dB, 빈 트랙은 −91.0dB였습니다.
 
-8월 3일 시험은 제 작업 세션에서 AI(Claude Code·Codex)가 돌렸습니다. 테스트 톤 시험은 OBS 플러그인을 구현한 팀원이 [PR #195](https://github.com/3K-PokeClip/PokeClip-mono/pull/195)에서 했습니다.
+8월 3일 시험은 제 작업 세션에서 AI(Claude Code·Codex)가 돌렸습니다. 테스트 톤 시험은 OBS 플러그인을 구현한 팀원이 PR #195에서 했습니다.
 
 ## 8월 3일 시험 네 번은 각자 다른 단계를 확인했습니다 {#첫-실험에서는-트랙의-개수와-선택-경로를-따라갔습니다}
 
@@ -53,7 +53,7 @@ PR #195의 첫 실측은 OBS 플러그인이 소스를 트랙에 나눠 앉힌 �
 
 [[fig-tone-bands]]에서 −24.1dB 점선 위에 있는 점이 각 트랙의 목표 대역입니다. 모양이 주파수 대역입니다.
 
-{{< chart id="fig-tone-bands" kind="실측" caption="녹화 조각의 트랙별 평균 음량(dB), 440 · 1,000 · 2,500Hz 대역 필터. 트랙 1(본방 믹스)은 세 대역 모두 −24.1dB, 트랙 2 · 3 · 4는 각자 맡은 톤의 대역만 −24.1dB이고 다른 대역은 −47.4 ~ −57.1dB, 빈 트랙 5 · 6은 −91.0dB입니다. 같은 값의 점은 위아래로 조금 비켜 그렸습니다. macOS OBS 32.2.2, 단순 출력 x264 1080p30, 로컬 MediaMTX, 팀원 측정." source="https://github.com/3K-PokeClip/PokeClip-mono/pull/195" height="360px" >}}
+{{< chart id="fig-tone-bands" kind="실측" caption="녹화 조각의 트랙별 평균 음량(dB), 440 · 1,000 · 2,500Hz 대역 필터. 트랙 1(본방 믹스)은 세 대역 모두 −24.1dB, 트랙 2 · 3 · 4는 각자 맡은 톤의 대역만 −24.1dB이고 다른 대역은 −47.4 ~ −57.1dB, 빈 트랙 5 · 6은 −91.0dB입니다. 같은 값의 점은 위아래로 조금 비켜 그렸습니다. macOS OBS 32.2.2, 단순 출력 x264 1080p30, 로컬 MediaMTX, 팀원 측정." source="프로젝트 저장소 PR #195(비공개)" height="360px" >}}
 {
   "grid": {"left": 8, "right": 24, "top": 68, "bottom": 8, "containLabel": true},
   "legend": {"top": 0, "data": ["440Hz 대역", "1,000Hz 대역", "2,500Hz 대역"]},
@@ -89,7 +89,7 @@ PR #195의 첫 실측은 OBS 플러그인이 소스를 트랙에 나눠 앉힌 �
 
 ## 출처
 
-- [3K-PokeClip/PokeClip-mono PR #195](https://github.com/3K-PokeClip/PokeClip-mono/pull/195) — 오디오 6트랙 자동 배정(2026-10-01 #179 브랜치에 머지). 첫 실측의 트랙별 대역 음량, 리뷰 2판의 본방 트랙 2 시험
+- 3K-PokeClip/PokeClip-mono PR #195 — 오디오 6트랙 자동 배정(2026-10-01 #179 브랜치에 머지). 첫 실측의 트랙별 대역 음량, 리뷰 2판의 본방 트랙 2 시험 (비공개 저장소)
 - [FFmpeg 문서: Stream selection](https://ffmpeg.org/ffmpeg.html#Stream-selection)
 - [FFmpeg 재포장은 조각마다 init이 달라 Go로 바꿨습니다](/posts/0-to-1/pokeclip-go-remux-same-io-benchmark/) · [오디오 자동 배정은 끌 때 원래 OBS 체크로 돌아가야 했습니다](/posts/0-to-1/pokeclip-audio-assignment-user-state/) · [소스 약 10개 대신 OBS 6트랙에 순서만 고정했습니다](/posts/0-to-1/pokeclip-six-track-input-contract/)
 - 팀 내부 실험 기록(비공개) — 8월 3일 멀티오디오 시험 1–3과 파이프라인 시험 4, 9월 19일 재포장 실험

@@ -12,13 +12,13 @@ portfolio_pages: [36]
 portfolio_edition: "2026-10-15-v2"
 ---
 
-2026년 10월 5일 PokeClip은 MediaMTX를 v1.20.1 포크에서 `v1.21.1-pokeclip.1`로 올리기로 하고, 이 버전에 기대는 전제 9곳을 모두 다시 확인했습니다. 상류 v1.21.1 위에 아직 열린 상류 PR 3건과 수정 1건을 얹은 포크입니다. 이미지 태그만 바꾸면 시험은 계속 옛 서버가 만든 녹화 파일을 읽기 때문입니다. 8곳은 그대로였고 HLS 서빙에서만 동작 차이 넷이 나왔습니다. 그중 하나는 세션이 살아 있어도 송출이 끊기면 30초 동안 404를 내는 동작입니다. 녹화 fixture를 새 서버로 다시 녹화해 기대값 6개를 고쳤고, 재포장 골든 출력은 init 1,159바이트, 조각 141,788바이트로 바이트 단위까지 같았습니다. 변경은 10월 7일 0시 13분 [PR #217](https://github.com/3K-PokeClip/PokeClip-mono/pull/217)로 머지됐습니다.
+2026년 10월 5일 PokeClip은 MediaMTX를 v1.20.1 포크에서 `v1.21.1-pokeclip.1`로 올리기로 하고, 이 버전에 기대는 전제 9곳을 모두 다시 확인했습니다. 상류 v1.21.1 위에 아직 열린 상류 PR 3건과 수정 1건을 얹은 포크입니다. 이미지 태그만 바꾸면 시험은 계속 옛 서버가 만든 녹화 파일을 읽기 때문입니다. 8곳은 그대로였고 HLS 서빙에서만 동작 차이 넷이 나왔습니다. 그중 하나는 세션이 살아 있어도 송출이 끊기면 30초 동안 404를 내는 동작입니다. 녹화 fixture를 새 서버로 다시 녹화해 기대값 6개를 고쳤고, 재포장 골든 출력은 init 1,159바이트, 조각 141,788바이트로 바이트 단위까지 같았습니다. 변경은 10월 7일 0시 13분 PR #217로 머지됐습니다.
 
 열린 상류 PR을 실은 포크로 제품과 dev 서버를 함께 올리자는 10월 5일 결정과 PR 머지는 제가 했습니다. 재포장 코드 자체를 고쳐야 하면 멈추라는 조건도 제가 걸었습니다. 전제 9곳을 다시 확인하는 방법과, 골든·기대값은 시험 대상이 아닌 별도 프로그램의 산출로만 고친다는 통과 조건은 AI가 정했습니다. 구현과 실측은 Claude Code, 리뷰는 Claude Code와 Codex가 했습니다.
 
 ## 버전에 묶인 전제 9곳 가운데 HLS 서빙 경계만 달라졌습니다 {#태그보다-먼저-확인한-것은-소비자의-전제였습니다}
 
-미디어 문서는 「고정한 버전이라서 참인 사실」에 기대는 자리 9곳을 적어 두고, 버전을 올릴 때마다 다시 확인합니다([`media/README.md` 「버전에 묶인 전제 9곳」](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/README.md?plain=1#L2820-L2836)). 이 목록이 생긴 이유는 [MediaMTX 도입 글](/posts/0-to-1/pokeclip-mediamtx-build-or-adopt/#버전을-올릴-때마다-같은-입력을-다시-통과시켜야-합니다)에 있습니다. 전제가 깨져도 오류는 나지 않습니다. 훅이 조용히 안 돌거나 조각 길이가 조용히 틀릴 뿐입니다.
+미디어 문서는 「고정한 버전이라서 참인 사실」에 기대는 자리 9곳을 적어 두고, 버전을 올릴 때마다 다시 확인합니다(`media/README.md` 「버전에 묶인 전제 9곳」). 이 목록이 생긴 이유는 [MediaMTX 도입 글](/posts/0-to-1/pokeclip-mediamtx-build-or-adopt/#버전을-올릴-때마다-같은-입력을-다시-통과시켜야-합니다)에 있습니다. 전제가 깨져도 오류는 나지 않습니다. 훅이 조용히 안 돌거나 조각 길이가 조용히 틀릴 뿐입니다.
 
 | 묶음 | 무엇을 전제하나 | 10월 5일 결과 |
 |---|---|---|
@@ -33,11 +33,11 @@ portfolio_edition: "2026-10-15-v2"
 
 fixture는 시험에 쓰는 고정 입력이고, 골든은 기대하는 출력입니다. 새 서버로 녹화하면 입력 파일의 세부 값은 달라질 수 있지만, 같은 입력을 재포장한 출력까지 달라져도 되는지는 별개의 질문입니다. 둘을 한꺼번에 새 결과로 덮으면 필요한 갱신 속에 회귀가 섞입니다.
 
-운영 형상과 같은 1080p 영상 1개와 소리 6개짜리 조각 `segment_1v6a.mp4`를 새 포크로 다시 녹화했습니다([`fixture_test.go` 21–31행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/playback/fixture_test.go#L21-L31)). 그 입력에서 읽는 기대값 6개(조각 위치 정보 mtxi 4개, 트랙 끝 시각 2개)를 고쳤습니다. 이 값은 시험 대상 코드가 아니라 별도 판독으로 얻은 값으로만 바꿨습니다.
+운영 형상과 같은 1080p 영상 1개와 소리 6개짜리 조각 `segment_1v6a.mp4`를 새 포크로 다시 녹화했습니다(`fixture_test.go` 21–31행). 그 입력에서 읽는 기대값 6개(조각 위치 정보 mtxi 4개, 트랙 끝 시각 2개)를 고쳤습니다. 이 값은 시험 대상 코드가 아니라 별도 판독으로 얻은 값으로만 바꿨습니다.
 
-재포장 골든은 손대지 않았습니다. 골든의 입력은 새 fixture가 아니라 8월 1일 MediaMTX 1.19.3이 녹화한 `segment_4s.mp4`입니다. 이 옛 입력을 새 라이브러리(mediacommon v2.9.5)로 다시 재포장했더니 init 1,159바이트, 조각 141,788바이트로 sha256까지 같았습니다([`producer_test.go` 640–661행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/playback/producer_test.go#L640-L661)). 「새 입력으로 녹화했는데 출력이 같았다」는 뜻이 아닙니다. 같은 입력에서 재포장 계약이 유지됐다는 뜻입니다.
+재포장 골든은 손대지 않았습니다. 골든의 입력은 새 fixture가 아니라 8월 1일 MediaMTX 1.19.3이 녹화한 `segment_4s.mp4`입니다. 이 옛 입력을 새 라이브러리(mediacommon v2.9.5)로 다시 재포장했더니 init 1,159바이트, 조각 141,788바이트로 sha256까지 같았습니다(`producer_test.go` 640–661행). 「새 입력으로 녹화했는데 출력이 같았다」는 뜻이 아닙니다. 같은 입력에서 재포장 계약이 유지됐다는 뜻입니다.
 
-골든만으로는 라이브러리 판이 바뀐 것을 잡지 못합니다. mediacommon v2.9.3, v2.9.4, v2.9.5의 산출이 이 입력에서는 모두 같았기 때문입니다. 그래서 재포장 라이브러리가 녹화기와 같은 판인지 대조하는 시험을 짝으로 둡니다([667–683행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/playback/producer_test.go#L667-L683)). 지금 판은 mediacommon v2.9.5, go-mp4 v1.7.3입니다([`media/go.mod`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/go.mod#L10-L18)).
+골든만으로는 라이브러리 판이 바뀐 것을 잡지 못합니다. mediacommon v2.9.3, v2.9.4, v2.9.5의 산출이 이 입력에서는 모두 같았기 때문입니다. 그래서 재포장 라이브러리가 녹화기와 같은 판인지 대조하는 시험을 짝으로 둡니다(667–683행). 지금 판은 mediacommon v2.9.5, go-mp4 v1.7.3입니다(`media/go.mod`).
 
 ## 세션이 살아 있어도 송출이 끊기면 30초 동안 404가 나옵니다
 
@@ -54,21 +54,21 @@ HLS 서빙의 동작 차이 넷은 상류 v1.21.0–v1.21.1에 들어간 PR에�
 
 {{< motion scene="HlsSessionAfterCut" id="fig-hls-session-after-cut" kind="재구성" caption="유효한 HLS 세션으로 같은 주소를 계속 요청하는 동안 송출을 끊으면, 끊김을 알아채기 전인 1–10초는 200, 11–40초는 세션이 살아 있어도 404, 41초부터는 401이 나옵니다. 요청이 이어져도 404 구간은 늘지 않습니다. PR #217 본문의 v1.21.1-pokeclip.1 실측값을 옮긴 그림입니다." >}}
 
-404 구간은 30초이고, 요청을 계속 보내도 늘어나지 않았습니다([PR #217](https://github.com/3K-PokeClip/PokeClip-mono/pull/217)). 요청 없이 둔 세션의 만료는 10초 주기로 검사해서, 마지막 요청 뒤 30–40초 사이에 끝납니다(35초 쉰 세션은 200, 45초 쉰 세션은 401). 그대로인 것은 첫 요청의 302 `cookieCheck`, 쿠키 속성, 쿠키 없는 `?session=` 폴백입니다. 응답 코드나 오류 문구로 상태를 판단하는 소비자가 있다면 이 차이를 함께 봐야 합니다.
+404 구간은 30초이고, 요청을 계속 보내도 늘어나지 않았습니다(PR #217). 요청 없이 둔 세션의 만료는 10초 주기로 검사해서, 마지막 요청 뒤 30–40초 사이에 끝납니다(35초 쉰 세션은 200, 45초 쉰 세션은 401). 그대로인 것은 첫 요청의 302 `cookieCheck`, 쿠키 속성, 쿠키 없는 `?session=` 폴백입니다. 응답 코드나 오류 문구로 상태를 판단하는 소비자가 있다면 이 차이를 함께 봐야 합니다.
 
 부수 변화도 하나 있었습니다. Control API의 교차 출처 허용 기본값 `apiAllowOrigins`가 `["*"]`에서 `[]`로 바뀌었습니다([#6165](https://github.com/bluenviron/mediamtx/pull/6165), [v1.21.1 `mediamtx.yml` 161행](https://github.com/bluenviron/mediamtx/blob/048255986f7e04b859b4c4efe651448ec785ecd4/mediamtx.yml#L161)). 제품 설정은 이 키를 적지 않으므로 다른 출처의 브라우저 페이지는 API 응답을 읽지 못합니다. 사이드카처럼 서버에서 부르는 호출에는 영향이 없습니다.
 
 ## 검사할 Dockerfile이 없으면 검사도 실패합니다 {#검사할-입력이-없어도-통과하는-검사는-피했습니다}
 
-이미지 태그와 시험 상수를 대조하는 검사는 두 값이 다를 때만 실패하면 부족합니다. Dockerfile을 찾지 못하거나 `FROM`에 태그가 없을 때 검사가 건너뛰어지면, 검증이 사라진 상황이 통과로 보입니다. 8월 4일 훅 스풀 PR([#33](https://github.com/3K-PokeClip/PokeClip-mono/pull/33))에서 만든 첫 판은 파일을 못 읽을 때, MediaMTX `FROM`이 없을 때, `FROM`이 두 곳 이상일 때, 태그가 없을 때 실패하게 했습니다.
+이미지 태그와 시험 상수를 대조하는 검사는 두 값이 다를 때만 실패하면 부족합니다. Dockerfile을 찾지 못하거나 `FROM`에 태그가 없을 때 검사가 건너뛰어지면, 검증이 사라진 상황이 통과로 보입니다. 8월 4일 훅 스풀 PR(#33)에서 만든 첫 판은 파일을 못 읽을 때, MediaMTX `FROM`이 없을 때, `FROM`이 두 곳 이상일 때, 태그가 없을 때 실패하게 했습니다.
 
-8월 30일에는 「`FROM`이 두 곳 이상이면 실패」를 「마지막 `FROM`만 본다」로 바꿨습니다. 여러 단계 빌드에서 쓰지 않는 스테이지에 포크를 적어 검사를 우회하는 경로를 막는 회귀 시험도 함께 뒀습니다. 지금 검사는 파일을 못 읽거나, 최종 스테이지가 포크가 아니거나, 다이제스트나 태그가 없으면 실패합니다([`version_contract_test.go` 238–330행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/mtxhook/version_contract_test.go#L238-L330)). 이 검사는 MediaMTX 자체의 보안 검사가 아니라, 우리 저장소가 정한 의존성 조합을 지키는 검사입니다.
+8월 30일에는 「`FROM`이 두 곳 이상이면 실패」를 「마지막 `FROM`만 본다」로 바꿨습니다. 여러 단계 빌드에서 쓰지 않는 스테이지에 포크를 적어 검사를 우회하는 경로를 막는 회귀 시험도 함께 뒀습니다. 지금 검사는 파일을 못 읽거나, 최종 스테이지가 포크가 아니거나, 다이제스트나 태그가 없으면 실패합니다(`version_contract_test.go` 238–330행). 이 검사는 MediaMTX 자체의 보안 검사가 아니라, 우리 저장소가 정한 의존성 조합을 지키는 검사입니다.
 
 ## 제품 핀은 지금도 .2이고 dev 서버 핀은 따로 올렸습니다 {#정식-릴리스와-제품-포크를-구분했습니다}
 
 상류 수정이 릴리스에 들어갔다는 사실과 우리 제품이 그 버전을 실제로 쓴다는 사실은 다릅니다. [[fig-mtx-pin-timeline]]이 10월 이후 핀의 흐름입니다.
 
-```mermaid {#fig-mtx-pin-timeline kind="재구성" caption="MediaMTX 핀의 흐름(한국 시각). 10월 7일 제품과 dev 서버가 v1.21.1-pokeclip.1로 함께 올랐고, 10월 12일 제품 핀이 .2로 바뀌었습니다. 같은 날 dev 서버 핀을 제품과 따로 올리도록 규칙을 바꿔, 10월 20일 dev 서버만 v1.21.2-pokeclip.1로 올렸습니다. 11월 3일 운영 상자는 .2로 기동했고(청록), dev 상자는 11월 6일 멈췄습니다. PokeClip-mono PR #217 · #231 · #296 · #466과 팀 작업 기록 재구성." source="https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/Dockerfile.mtxhook#L75-L85"}
+```mermaid {#fig-mtx-pin-timeline kind="재구성" caption="MediaMTX 핀의 흐름(한국 시각). 10월 7일 제품과 dev 서버가 v1.21.1-pokeclip.1로 함께 올랐고, 10월 12일 제품 핀이 .2로 바뀌었습니다. 같은 날 dev 서버 핀을 제품과 따로 올리도록 규칙을 바꿔, 10월 20일 dev 서버만 v1.21.2-pokeclip.1로 올렸습니다. 11월 3일 운영 상자는 .2로 기동했고(청록), dev 상자는 11월 6일 멈췄습니다. PokeClip-mono PR #217 · #231 · #296 · #466과 팀 작업 기록 재구성." source="프로젝트 저장소 media/Dockerfile.mtxhook(비공개)"}
 flowchart TB
   accTitle: MediaMTX 핀의 흐름
   accDescr: 10월 5일 포크로 제품과 dev를 함께 올리기로 정했다. 10월 7일 PR 217이 머지돼 v1.21.1-pokeclip.1이 되고 같은 날 dev 서버에 반영됐다. 10월 12일 PR 231로 제품 핀이 .2가 됐고 10월 19일 dev 서버에 반영됐다. 10월 20일 PR 296으로 dev 서버 핀만 v1.21.2-pokeclip.1로 올렸다. 11월 3일 운영 상자가 .2로 기동했고 11월 6일 dev 상자가 멈췄다.
@@ -83,9 +83,9 @@ flowchart TB
   style p5 fill:#0a0c08,stroke:#0a0c07,stroke-width:3px
 ```
 
-`.1`은 상류 v1.21.1(`04825598`) 위에 제가 올린 상류 PR 셋([#6206](https://github.com/bluenviron/mediamtx/pull/6206) · [#6259](https://github.com/bluenviron/mediamtx/pull/6259) · [#6261](https://github.com/bluenviron/mediamtx/pull/6261))과 훅 출력 로깅 수정 하나를 얹었습니다. 10월 12일 머지한 `.2`([PR #231](https://github.com/3K-PokeClip/PokeClip-mono/pull/231))는 여기에 상류에서 10월 6일 머지돼 v1.21.2에 들어간 [#6292](https://github.com/bluenviron/mediamtx/pull/6292)를 체리픽하고, 사용자별 SRT 암호 [#6306](https://github.com/bluenviron/mediamtx/pull/6306)을 더했습니다. 이 PR에서 dev 서버 핀을 제품 핀과 묶는 규칙을 없앴습니다. 그래서 10월 20일 [PR #296](https://github.com/3K-PokeClip/PokeClip-mono/pull/296)은 dev 서버만 `v1.21.2-pokeclip.1`로 올렸습니다. 이 판은 v1.21.2 태그가 아니라 상류 main `3f041257` 위에 열린 PR 5건을 얹은 것입니다. v1.21.2 태그 위에서는 패치가 충돌했습니다.
+`.1`은 상류 v1.21.1(`04825598`) 위에 제가 올린 상류 PR 셋([#6206](https://github.com/bluenviron/mediamtx/pull/6206) · [#6259](https://github.com/bluenviron/mediamtx/pull/6259) · [#6261](https://github.com/bluenviron/mediamtx/pull/6261))과 훅 출력 로깅 수정 하나를 얹었습니다. 10월 12일 머지한 `.2`(PR #231)는 여기에 상류에서 10월 6일 머지돼 v1.21.2에 들어간 [#6292](https://github.com/bluenviron/mediamtx/pull/6292)를 체리픽하고, 사용자별 SRT 암호 [#6306](https://github.com/bluenviron/mediamtx/pull/6306)을 더했습니다. 이 PR에서 dev 서버 핀을 제품 핀과 묶는 규칙을 없앴습니다. 그래서 10월 20일 PR #296은 dev 서버만 `v1.21.2-pokeclip.1`로 올렸습니다. 이 판은 v1.21.2 태그가 아니라 상류 main `3f041257` 위에 열린 PR 5건을 얹은 것입니다. v1.21.2 태그 위에서는 패치가 충돌했습니다.
 
-실린 PR의 처지도 바뀌었습니다. #6206은 닫혔고 메인테이너의 대체 수정 [#6326](https://github.com/bluenviron/mediamtx/pull/6326)이 v1.21.3에 들어갔습니다. #6261도 10월 25일 닫혔고 메인테이너가 다시 구현한 수정이 같은 판에 들어갔습니다. #6259와 훅 출력 로깅을 따로 낸 [#6380](https://github.com/bluenviron/mediamtx/pull/6380), #6306은 11월 11일에도 열려 있습니다. 상류는 v1.21.2(10월 9일)와 v1.21.3(10월 25일)을 냈지만 제품 핀은 그대로 `.2`입니다([`media/Dockerfile.mtxhook` 85행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/Dockerfile.mtxhook#L85)). 멈춘 dev 서버의 마지막 핀은 `v1.21.2-pokeclip.1`입니다([`infra/dev-media/compose.yml` 23행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/dev-media/compose.yml#L23)). 실린 수정이 모두 상류 릴리스에 들어가면 포크를 걷어낸다는 조건은 Dockerfile에 적혀 있습니다([75–84행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/Dockerfile.mtxhook#L75-L84)).
+실린 PR의 처지도 바뀌었습니다. #6206은 닫혔고 메인테이너의 대체 수정 [#6326](https://github.com/bluenviron/mediamtx/pull/6326)이 v1.21.3에 들어갔습니다. #6261도 10월 25일 닫혔고 메인테이너가 다시 구현한 수정이 같은 판에 들어갔습니다. #6259와 훅 출력 로깅을 따로 낸 [#6380](https://github.com/bluenviron/mediamtx/pull/6380), #6306은 11월 11일에도 열려 있습니다. 상류는 v1.21.2(10월 9일)와 v1.21.3(10월 25일)을 냈지만 제품 핀은 그대로 `.2`입니다(`media/Dockerfile.mtxhook` 85행). 멈춘 dev 서버의 마지막 핀은 `v1.21.2-pokeclip.1`입니다(`infra/dev-media/compose.yml` 23행). 실린 수정이 모두 상류 릴리스에 들어가면 포크를 걷어낸다는 조건은 Dockerfile에 적혀 있습니다(75–84행).
 
 포트폴리오 요약(2026-10-15판) 36쪽은 PR #217 병합일을 10월 6일로 적었지만 한국 시각으로는 10월 7일 0시 13분입니다. 전제 9곳의 재확인도 그 쪽에서는 제가 한 것으로 읽히지만, 재확인 방법과 실행은 AI가 했습니다. 통과 조건(골든·기대값을 별도 산출로만 고침)도 AI가 정했습니다. 「제품·개발 환경이 같은 버전을 바라보도록」은 `.1` 때만 참이었고, 10월 12일부터 두 핀은 따로 움직였습니다. 같은 쪽의 「194개 PASS·변형 오류 7/7 탐지」는 8월 4일 훅 스풀 PR의 값이고, 7/7은 그 PR 본문에 뮤턴트 사고실험으로 적혀 있습니다.
 
@@ -100,13 +100,13 @@ flowchart TB
 
 ## 출처
 
-- [3K-PokeClip/PokeClip-mono PR #217](https://github.com/3K-PokeClip/PokeClip-mono/pull/217) — v1.21.1-pokeclip.1 전환과 재검증(2026-10-07 머지)
-- [3K-PokeClip/PokeClip-mono PR #231](https://github.com/3K-PokeClip/PokeClip-mono/pull/231) · [PR #296](https://github.com/3K-PokeClip/PokeClip-mono/pull/296) — 제품 핀 .2, dev 핀 v1.21.2-pokeclip.1
-- [3K-PokeClip/PokeClip-mono PR #33](https://github.com/3K-PokeClip/PokeClip-mono/pull/33) — 훅 스풀과 첫 버전 계약 검사(2026-08-04)
-- [`media/README.md` 「버전에 묶인 전제 9곳」](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/README.md?plain=1#L2820-L2873) — 전제 목록과 재검증 기록
-- [`media/internal/playback/producer_test.go`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/playback/producer_test.go#L640-L683) — 골든과 판 일치 시험
-- [`media/internal/mtxhook/version_contract_test.go`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/mtxhook/version_contract_test.go#L238-L330) — 버전 계약 검사
-- [`media/Dockerfile.mtxhook`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/Dockerfile.mtxhook#L75-L85) — 제품 핀과 포크를 걷어낼 조건
+- 3K-PokeClip/PokeClip-mono PR #217 — v1.21.1-pokeclip.1 전환과 재검증(2026-10-07 머지) (비공개 저장소)
+- 3K-PokeClip/PokeClip-mono PR #231 · PR #296 — 제품 핀 .2, dev 핀 v1.21.2-pokeclip.1 (비공개 저장소)
+- 3K-PokeClip/PokeClip-mono PR #33 — 훅 스풀과 첫 버전 계약 검사(2026-08-04) (비공개 저장소)
+- `media/README.md` 「버전에 묶인 전제 9곳」 — 전제 목록과 재검증 기록 (비공개 저장소)
+- `media/internal/playback/producer_test.go` — 골든과 판 일치 시험 (비공개 저장소)
+- `media/internal/mtxhook/version_contract_test.go` — 버전 계약 검사 (비공개 저장소)
+- `media/Dockerfile.mtxhook` — 제품 핀과 포크를 걷어낼 조건 (비공개 저장소)
 - 상류 PR [bluenviron/mediamtx#6239](https://github.com/bluenviron/mediamtx/pull/6239) · [#6240](https://github.com/bluenviron/mediamtx/pull/6240) · [#6241](https://github.com/bluenviron/mediamtx/pull/6241) · [#6200](https://github.com/bluenviron/mediamtx/pull/6200) · [#6201](https://github.com/bluenviron/mediamtx/pull/6201) · [#6165](https://github.com/bluenviron/mediamtx/pull/6165) — HLS 서빙과 CORS 변화
 - 상류 PR [#6206](https://github.com/bluenviron/mediamtx/pull/6206) · [#6326](https://github.com/bluenviron/mediamtx/pull/6326) · [#6259](https://github.com/bluenviron/mediamtx/pull/6259) · [#6261](https://github.com/bluenviron/mediamtx/pull/6261) · [#6292](https://github.com/bluenviron/mediamtx/pull/6292) · [#6306](https://github.com/bluenviron/mediamtx/pull/6306) · [#6380](https://github.com/bluenviron/mediamtx/pull/6380) — 포크에 실린 수정과 그 처지
 - [MediaMTX v1.21.1 릴리스](https://github.com/bluenviron/mediamtx/releases/tag/v1.21.1)

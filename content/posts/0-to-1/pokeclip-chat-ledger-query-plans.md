@@ -11,17 +11,17 @@ description: "채팅 시각을 영상 위치로 바꾸는 녹화 장부 조회�
 
 PokéClip의 채팅 급증 판별기는 하이라이트 카드를 만들 때마다 채팅 수집기에 영상 위치를 한 번 묻습니다. 수집기는 그 답을 내려고 녹화 장부에서 조각 하나를 고르는데, 방송 셋을 담은 시험 장부(표 907,200행)에서 이 조회의 세 자리가 시각에 따라 7,246–12,685 버퍼를 읽었습니다. 같은 뜻을 다른 SQL 꼴로 바꾸고 한 조회의 서버 준비 문장을 끄자, 옛 역행 검사는 꼬리 시각에서 12,685 버퍼가 21 버퍼로, 판 2 후보 조회는 이른 시각의 일반 계획에서 7,246 버퍼가 4 버퍼로 줄었습니다. 첫 판 2 조각 바로 뒤 시각은 일반 계획을 강제했을 때의 7,249 버퍼 대신 바인딩 값 계획의 11 버퍼로 돌게 됐습니다. 판 2 행 한가운데 시각은 3,625 버퍼에서 3,629 버퍼로 거의 그대로 남았습니다. 수치는 2026년 11월 14일 PostgreSQL 17.12에서 공개 스크립트로 다시 잰 값입니다([측정 조건](#측정-조건)).
 
-어떤 꼴을 받아들일지, 어느 비용을 남길지는 제가 정했습니다. 조회 수정 · 시험 · 실측과 이 글의 재측정은 AI 에이전트(Claude Code와 Codex)가 했습니다. 바뀐 조회는 11월 14일 0시 30분 develop에 병합됐지만([PR 511](https://github.com/3K-PokeClip/PokeClip-mono/pull/511)) 아직 운영 채팅 이미지에 없고, 생산자가 더한 색인([PR 510](https://github.com/3K-PokeClip/PokeClip-mono/pull/510))도 운영 DB에 적용하기 전입니다.
+어떤 꼴을 받아들일지, 어느 비용을 남길지는 제가 정했습니다. 조회 수정 · 시험 · 실측과 이 글의 재측정은 AI 에이전트(Claude Code와 Codex)가 했습니다. 바뀐 조회는 11월 14일 0시 30분 develop에 병합됐지만(PR 511) 아직 운영 채팅 이미지에 없고, 생산자가 더한 색인(PR 510)도 운영 DB에 적용하기 전입니다.
 
 ## 채팅 시각을 영상 위치로 바꾸려면 장부에서 조각 하나를 골라야 합니다
 
 채팅 급증 판별기(chat-detector)는 [사건마다 첫 급증 창의 시각 하나로](/posts/0-to-1/chat-highlight-research-and-fallback/) 채팅 수집기(chat-collector)의 영상 위치 창구를 부릅니다. 수집기는 채팅 시각에서 보정값(기본 3,900ms)을 빼 시각 t를 만들고, 녹화 장부 `stream_segments`에서 t 이하의 기준 조각을 골라 영상 위치로 바꿉니다.
 
-장부 행에는 판(`timing_version`)이 있습니다. 판 NULL은 옛 규칙으로 쓴 행이고 파일명 시각(`start_wall_utc`, 수신 벽시각 칸)으로 조각을 고릅니다. 지금 운영 장부의 모든 행이 판 NULL입니다. 판 2는 새 규칙으로 쓴 행이고, `playback_pdt`(그 조각 영상 첫 표본의 벽시각)로 조각을 고릅니다. 판 2 행은 생산자의 판 2 쓰기 스위치를 켠 뒤에만 생깁니다([PR 511](https://github.com/3K-PokeClip/PokeClip-mono/pull/511) 각주). PDT(Program Date Time)와 장부가 왜 두 시각을 갖게 됐는지는 [미디어 시간축 글](/posts/projects/pokeclip-media-timeline-over-wall-clock/)에 있습니다.
+장부 행에는 판(`timing_version`)이 있습니다. 판 NULL은 옛 규칙으로 쓴 행이고 파일명 시각(`start_wall_utc`, 수신 벽시각 칸)으로 조각을 고릅니다. 지금 운영 장부의 모든 행이 판 NULL입니다. 판 2는 새 규칙으로 쓴 행이고, `playback_pdt`(그 조각 영상 첫 표본의 벽시각)로 조각을 고릅니다. 판 2 행은 생산자의 판 2 쓰기 스위치를 켠 뒤에만 생깁니다(PR 511 각주). PDT(Program Date Time)와 장부가 왜 두 시각을 갖게 됐는지는 [미디어 시간축 글](/posts/projects/pokeclip-media-timeline-over-wall-clock/)에 있습니다.
 
 그래서 조회는 두 갈래입니다. 판 NULL 행에서는 「파일명 시각이 t 이하인 행 가운데 가장 늦은 행」을 고르고, 그 조각보다 seq가 앞서는데 파일명 시각이 늦은 행이 있으면 벽시계가 거꾸로 갔다는 역행 신호를 함께 냅니다. 판 2 행에서는 「PDT가 t 이하인 판 2 행 가운데 seq 최대」를 고릅니다.
 
-비용은 PostgreSQL `EXPLAIN (ANALYZE, BUFFERS)`가 세는 버퍼로 쟀습니다. 버퍼 하나는 조회가 읽은 8KB 페이지 하나입니다. 시험 장부는 공개 시험 코드의 세 방송(판 2 행 30만, 판 NULL 행 30만, 판 2 행 30만 뒤 판 NULL 행 7,200인 롤백 방송)을 그대로 세웠습니다. 조각은 4초, PDT는 조각 순서대로 늘고, 파일명 시각은 PDT보다 200ms 이릅니다. 운영 장부(약 5,500행, [PR 510](https://github.com/3K-PokeClip/PokeClip-mono/pull/510) 본문)보다 훨씬 큰 시험입니다.
+비용은 PostgreSQL `EXPLAIN (ANALYZE, BUFFERS)`가 세는 버퍼로 쟀습니다. 버퍼 하나는 조회가 읽은 8KB 페이지 하나입니다. 시험 장부는 공개 시험 코드의 세 방송(판 2 행 30만, 판 NULL 행 30만, 판 2 행 30만 뒤 판 NULL 행 7,200인 롤백 방송)을 그대로 세웠습니다. 조각은 4초, PDT는 조각 순서대로 늘고, 파일명 시각은 PDT보다 200ms 이릅니다. 운영 장부(약 5,500행, PR 510 본문)보다 훨씬 큰 시험입니다.
 
 [[fig-ledger-buffers]]에서 회색 막대가 바꾸기 전, 청록 막대가 바꾼 뒤입니다. 눈금이 선형이라 바꾼 뒤의 21 · 4 · 11 버퍼는 막대가 거의 보이지 않습니다.
 
@@ -41,7 +41,7 @@ PokéClip의 채팅 급증 판별기는 하이라이트 카드를 만들 때마�
 
 ## 옛 역행 검사는 방송과 무관하게 표 전체를 읽었습니다
 
-역행 신호는 8월에 처음 들어온 조회에 있던 `EXISTS(… y.seq < s.seq AND y.start_wall_utc > s.start_wall_utc)`였습니다([`SegmentLedger.java`@5ad61a0c](https://github.com/3K-PokeClip/PokeClip-mono/blob/5ad61a0c27014144a50e5c68323de7d3c3ccdcc3/services/chat-collector/src/main/java/com/pokeclip/chat/collector/sync/SegmentLedger.java#L41-L60)). 그때 주석도 이 `EXISTS`가 Seq Scan을 탄다고 적고, 판별기가 붙으면 `(stream_id, start_wall_utc)` 색인이 필요하다고 적었습니다. 그 색인(`stream_segments_wall_idx`)이 있는 지금 장부에서도 이 꼴은 Seq Scan을 골랐습니다. 꼬리 시각에서 12,685 버퍼, 28.1–29.3ms였습니다.
+역행 신호는 8월에 처음 들어온 조회에 있던 `EXISTS(… y.seq < s.seq AND y.start_wall_utc > s.start_wall_utc)`였습니다(`SegmentLedger.java`@5ad61a0c). 그때 주석도 이 `EXISTS`가 Seq Scan을 탄다고 적고, 판별기가 붙으면 `(stream_id, start_wall_utc)` 색인이 필요하다고 적었습니다. 그 색인(`stream_segments_wall_idx`)이 있는 지금 장부에서도 이 꼴은 Seq Scan을 골랐습니다. 꼬리 시각에서 12,685 버퍼, 28.1–29.3ms였습니다.
 
 PR 511은 이 조회에 판 조건(`timing_version IS NULL`)을 더했습니다. 판 조건만 더하고 `EXISTS`를 그대로 둔 꼴도 12,685 버퍼, 36.7–38.9ms였습니다. 이 가운데 12,668 버퍼는 907,200행을 모두 걸러 내고도 맞는 행을 찾지 못한 Seq Scan 마디 하나가 읽었습니다.
 
@@ -49,7 +49,7 @@ PR 511은 이 조회에 판 조건(`timing_version IS NULL`)을 더했습니다.
 
 ## 최댓값 하나와 견주자 색인 끝에서 멈췄습니다
 
-11월 13일 15시 52분, 역행 검사를 다시 쓰기로 정했습니다. 「seq가 앞서는데 파일명 시각이 늦은 행이 있나」는 「seq가 앞서는 판 NULL 행 가운데 파일명 시각 최댓값이 기준 조각보다 늦은가」와 같은 뜻입니다. 앞선 행이 없으면 거짓입니다. 그래서 최댓값 하나를 `ORDER BY … LIMIT 1`로 꺼내 견주는 꼴이 됐습니다([`SegmentLedger.java`@7c3464e3](https://github.com/3K-PokeClip/PokeClip-mono/blob/7c3464e331c4e7730ad4eecc2ec15c84d4674d4b/services/chat-collector/src/main/java/com/pokeclip/chat/collector/sync/SegmentLedger.java#L63-L77)).
+11월 13일 15시 52분, 역행 검사를 다시 쓰기로 정했습니다. 「seq가 앞서는데 파일명 시각이 늦은 행이 있나」는 「seq가 앞서는 판 NULL 행 가운데 파일명 시각 최댓값이 기준 조각보다 늦은가」와 같은 뜻입니다. 앞선 행이 없으면 거짓입니다. 그래서 최댓값 하나를 `ORDER BY … LIMIT 1`로 꺼내 견주는 꼴이 됐습니다(`SegmentLedger.java`@7c3464e3).
 
 ```sql
 -- 바꾸기 전(판 조건을 더한 뒤): 맞는 행을 찾을 때까지 훑는다
@@ -86,7 +86,7 @@ COALESCE((SELECT y.start_wall_utc FROM public.stream_segments y
 | 수집기 캐시 | 채팅 수집기 안에 방송별 「판 2 최소 PDT」를 둔다 | 기각 |
 | 기록만 | 비용을 받아들이고 기록한다 | 기각(AI 추천안) |
 
-생산자는 `stream_segments_v2_pdt_idx (stream_id, playback_pdt DESC) WHERE timing_version = 2`를 더했습니다([PR 510](https://github.com/3K-PokeClip/PokeClip-mono/pull/510), [`ddl.go`@fc7dd91c](https://github.com/3K-PokeClip/PokeClip-mono/blob/fc7dd91c9a80fecdd06e12e4248c553cc2b3677e/media/internal/index/ddl.go#L611-L634)).
+생산자는 `stream_segments_v2_pdt_idx (stream_id, playback_pdt DESC) WHERE timing_version = 2`를 더했습니다(PR 510, `ddl.go`@fc7dd91c).
 
 색인만 깔고 조회를 그대로 두면 계획에 따라 결과가 갈렸습니다. 바인딩 값 계획은 t가 첫 PDT보다 이르다는 것을 알고 새 색인으로 빈 범위를 확인해 6 버퍼였습니다. 일반 계획은 t를 모르니 색인이 없을 때와 같이 seq 역순 훑기를 골라 7,246 버퍼였습니다.
 
@@ -96,7 +96,7 @@ COALESCE((SELECT y.start_wall_utc FROM public.stream_segments y
 
 PostgreSQL 플래너는 `EXISTS` 하위 조회를 첫 행만 가져오는 조회, 주석 표현으로 「just like a LIMIT 1」로 계획합니다([`subselect.c`](https://github.com/postgres/postgres/blob/REL_17_STABLE/src/backend/optimizer/plan/subselect.c#L191-L211)). 여기에 일반 계획이 `playback_pdt <= $4`가 꽤 많은 행에 맞는다고 어림해, 표를 앞에서부터 읽어도 곧 찾으리라 보고 Seq Scan을 골랐다는 것은 AI의 해석입니다. 맞는 행이 없으면 표 끝까지 읽습니다.
 
-그래서 확인을 `min`으로 바꿔 썼습니다([`SegmentLedger.java`@7c3464e3](https://github.com/3K-PokeClip/PokeClip-mono/blob/7c3464e331c4e7730ad4eecc2ec15c84d4674d4b/services/chat-collector/src/main/java/com/pokeclip/chat/collector/sync/SegmentLedger.java#L110-L118)).
+그래서 확인을 `min`으로 바꿔 썼습니다(`SegmentLedger.java`@7c3464e3).
 
 ```sql
 SELECT seq, start_pts_ms, start_wall_utc, playback_pdt, timing_version, duration_ms, is_discontinuity
@@ -116,7 +116,7 @@ SELECT seq, start_pts_ms, start_wall_utc, playback_pdt, timing_version, duration
 
 존재 확인은 「있나」만 빠르게 합니다. 답(seq 최대)은 여전히 `v2_seq_idx`를 seq 역순으로 타며 고릅니다. 답이 있고 그 뒤에 판 2 행이 많은 시각이면 본 조회가 그 행들을 지나야 답에 닿습니다. 판 2 행 약 15만 번째 조각 시각에서 3,629 버퍼, 8.8–9.4ms였고, 바인딩 값 계획과 일반 계획이 같았습니다. 바꾸기 전 꼴도 이 시각에 3,625 버퍼였습니다.
 
-PDT 색인으로 답까지 고르면 이 비용이 없어 보이지만, 그 지름길은 틀린 답을 냅니다. 판 2 PDT는 seq 순서대로 늘지 않습니다. 회차가 바뀌면 PDT가 뒤로 갈 수 있고, 장 경계에서는 1초 미만 겹칩니다. 공개 시험의 행으로 보면 이렇습니다([`VideoPositionV2Test`@7c3464e3](https://github.com/3K-PokeClip/PokeClip-mono/blob/7c3464e331c4e7730ad4eecc2ec15c84d4674d4b/services/chat-collector/src/test/java/com/pokeclip/chat/collector/sync/VideoPositionV2Test.java#L120-L131)).
+PDT 색인으로 답까지 고르면 이 비용이 없어 보이지만, 그 지름길은 틀린 답을 냅니다. 판 2 PDT는 seq 순서대로 늘지 않습니다. 회차가 바뀌면 PDT가 뒤로 갈 수 있고, 장 경계에서는 1초 미만 겹칩니다. 공개 시험의 행으로 보면 이렇습니다(`VideoPositionV2Test`@7c3464e3).
 
 | seq | 판 | PDT(기준 시각부터) |
 |---|---|---|
@@ -159,15 +159,15 @@ pgjdbc는 연결마다 같은 SQL의 실행 횟수를 세다가(앱이 호출마
 
 ## 그 조회 하나만 서버 준비 문장을 껐습니다
 
-11월 13일 21시 34분, 판 2 후보 조회 하나만 서버 준비 문장을 끄기로 했습니다. 문장마다 `setPrepareThreshold(0)`을 걸면 그 조회는 몇 번을 불러도 이름 없는 문장이고, 매번 바인딩 값으로 계획합니다([`SegmentLedger.java`@7c3464e3](https://github.com/3K-PokeClip/PokeClip-mono/blob/7c3464e331c4e7730ad4eecc2ec15c84d4674d4b/services/chat-collector/src/main/java/com/pokeclip/chat/collector/sync/SegmentLedger.java#L159-L171)). PR은 연결 풀이나 데이터소스 설정을 바꾸면 다른 조회의 계획까지 바뀐다는 점을 근거로 적었습니다. 대가는 호출마다 Parse 한 번입니다.
+11월 13일 21시 34분, 판 2 후보 조회 하나만 서버 준비 문장을 끄기로 했습니다. 문장마다 `setPrepareThreshold(0)`을 걸면 그 조회는 몇 번을 불러도 이름 없는 문장이고, 매번 바인딩 값으로 계획합니다(`SegmentLedger.java`@7c3464e3). PR은 연결 풀이나 데이터소스 설정을 바꾸면 다른 조회의 계획까지 바뀐다는 점을 근거로 적었습니다. 대가는 호출마다 Parse 한 번입니다.
 
-시험은 앱 경로로 이 조회를 열두 번 부른 뒤 그 연결의 `pg_prepared_statements`에 이 조회가 없다는 것만 단언하고, 기본 설정으로 부른 대조 문장은 올라가야 통과합니다([`SegmentLedgerPrepareTest`@7c3464e3](https://github.com/3K-PokeClip/PokeClip-mono/blob/7c3464e331c4e7730ad4eecc2ec15c84d4674d4b/services/chat-collector/src/test/java/com/pokeclip/chat/collector/sync/SegmentLedgerPrepareTest.java)). 앞의 11 버퍼는 앱 경로가 아니라 바인딩 값 계획으로 잰 `EXPLAIN` 값이고, 이 시험은 이번 재측정에서 돌리지 않았습니다.
+시험은 앱 경로로 이 조회를 열두 번 부른 뒤 그 연결의 `pg_prepared_statements`에 이 조회가 없다는 것만 단언하고, 기본 설정으로 부른 대조 문장은 올라가야 통과합니다(`SegmentLedgerPrepareTest`@7c3464e3). 앞의 11 버퍼는 앱 경로가 아니라 바인딩 값 계획으로 잰 `EXPLAIN` 값이고, 이 시험은 이번 재측정에서 돌리지 않았습니다.
 
 다른 조회는 기본 문턱 그대로입니다. 재측정에서 옛 역행 검사 조회를 일반 계획으로 강제하면 꼬리에서 먼 시각(첫 행 + 1초)에 14,806 버퍼였습니다. 바인딩 값 계획의 5,498 버퍼보다 많고, 늘어난 몫은 바꾸지 않은 후보 최대 seq 하위 조회(`max(x.seq)`)가 기본 키를 역순으로 훑은 것입니다. 바꾸기 전 꼴도 같은 시각 일반 계획에서 21,993 버퍼였으니 바꾼 꼴이 나빠진 것은 아닙니다. 이 조회가 운영에서 일반 계획으로 넘어가는지도 재지 않았습니다.
 
 ## 운영에는 아직 들어가지 않았습니다
 
-PR 511은 develop에 병합됐을 뿐 운영 채팅 이미지에 들어가지 않았습니다. PR 510의 색인도 운영 DB에 적용하기 전이고, 판 2 쓰기 스위치를 켜기 전에 적용해야 한다는 조건이 붙어 있습니다. 운영 장부는 지금 판 2 행이 없고 표는 약 5,500행입니다([PR 510](https://github.com/3K-PokeClip/PokeClip-mono/pull/510) 「배포」, [PR 511](https://github.com/3K-PokeClip/PokeClip-mono/pull/511) 「배포 · 운영 조건」).
+PR 511은 develop에 병합됐을 뿐 운영 채팅 이미지에 들어가지 않았습니다. PR 510의 색인도 운영 DB에 적용하기 전이고, 판 2 쓰기 스위치를 켜기 전에 적용해야 한다는 조건이 붙어 있습니다. 운영 장부는 지금 판 2 행이 없고 표는 약 5,500행입니다(PR 510 「배포」, PR 511 「배포 · 운영 조건」).
 
 색인 없이 판 2 행이 생기면 답은 같고 비용만 커집니다. 재측정에서 PR 510 색인을 지우고 `min` 꼴을 돌리면 꼬리 시각이 8 버퍼에서 4,530 버퍼로, 앱이 쓰는 바인딩 값 계획의 첫 PDT + 1ms가 11,771 버퍼로 늘었습니다. 판 2 행이 없는 방송도 계획에 따라 그 방송 행을 모두 읽어 4,241 버퍼였습니다. 판 2 행이 표에 하나도 없는 지금 운영과 같은 꼴(판 NULL 30만 행만 남긴 표)에서는 색인이 없어도 1 버퍼였습니다.
 
@@ -180,7 +180,7 @@ PR 511은 develop에 병합됐을 뿐 운영 채팅 이미지에 들어가지 �
 - 수행: AI(Claude Code)가 2026년 11월 14일 KST 12:48–12:49에 실행했습니다. load average(1분)는 회차별로 1.82–2.37이었고, 같은 기계에서 다른 작업의 컨테이너가 함께 돌았습니다. ms는 참고값이고 판단은 버퍼로 했습니다.
 - 기종: MacBook Air(Apple M5, 고성능 4 · 효율 6코어, 32GB, 팬 없음), macOS 27.0.1.
 - Docker 런타임: OrbStack(Docker Engine 29.8.2, Linux VM 커널 7.2.12-orbstack, VM CPU 10개). 이미지 `postgres:17.12`(`sha256:dbb9623d5121b5d2c2c9e2fba56e40193cbb3510d4af7f035b1ab1823aff3205`), `SELECT version()` = `PostgreSQL 17.12 (Debian 17.12-1.pgdg13+1) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit`. 설정은 이미지 기본값(shared_buffers 128MB, jit on)입니다.
-- 장부: [`SegmentLedgerIndexTest`@7c3464e3](https://github.com/3K-PokeClip/PokeClip-mono/blob/7c3464e331c4e7730ad4eecc2ec15c84d4674d4b/services/chat-collector/src/test/java/com/pokeclip/chat/collector/sync/SegmentLedgerIndexTest.java#L102-L134)의 `SEED_ROWS`와 같은 세 방송, 표 907,200행. 표 정의는 그 시험이 쓰는 사본(`StreamSegmentsFixture`)이라 운영 표의 다른 칸과 색인은 없습니다. 색인은 원 시험과 같은 넷(`v2_pdt_idx`는 PR 510)과 기본 키 · `local_path` 유일 색인입니다. 넣은 뒤 `ANALYZE`만 했습니다(원 시험과 같음). autovacuum은 켜 둔 채였고 측정 동안 돌지 않았습니다(`pg_stat_user_tables`). 마지막 「판 2 행 없는 표」 측정만 두 방송을 지우고 `VACUUM ANALYZE`한 뒤 쟀습니다.
+- 장부: `SegmentLedgerIndexTest`@7c3464e3의 `SEED_ROWS`와 같은 세 방송, 표 907,200행. 표 정의는 그 시험이 쓰는 사본(`StreamSegmentsFixture`)이라 운영 표의 다른 칸과 색인은 없습니다. 색인은 원 시험과 같은 넷(`v2_pdt_idx`는 PR 510)과 기본 키 · `local_path` 유일 색인입니다. 넣은 뒤 `ANALYZE`만 했습니다(원 시험과 같음). autovacuum은 켜 둔 채였고 측정 동안 돌지 않았습니다(`pg_stat_user_tables`). 마지막 「판 2 행 없는 표」 측정만 두 방송을 지우고 `VACUUM ANALYZE`한 뒤 쟀습니다.
 - 측정: 조회마다 새 psql 세션에서 `SET plan_cache_mode = force_custom_plan`(바인딩 값 계획) 또는 `force_generic_plan`(일반 계획) → `PREPARE` → `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) EXECUTE`. PostgreSQL 17은 `BUFFERS`가 기본으로 꺼져 있어 명시했습니다. 값은 맨 위 마디의 Shared Hit Blocks + Shared Read Blocks입니다. 경우마다 5회를 돌아가며 쟀고 버퍼는 모든 경우 5회 같은 값, ms는 최솟값–최댓값입니다.
 - 시각: 기준 T0 = 2026-11-13 00:00:00 UTC. 이른 시각 T0 − 1초, 첫 PDT + 1ms = T0 + 1ms, 중간 시각 = 약 15만 번째 조각 PDT, 꼬리 시각 = 모든 행 뒤, 첫 행 + 1초 = T0 + 1초.
 - 조회 글자: `5ad61a0c` · `7c3464e3`의 `SegmentLedger.java`와 동치 시험 두 개의 비교 상수에서 옮겼고, `EXISTS` 확인 꼴만 재구성입니다.
@@ -191,11 +191,11 @@ PR 511은 develop에 병합됐을 뿐 운영 채팅 이미지에 들어가지 �
 
 ## 출처
 
-코드 · 결정 기록(공개 저장소 3K-PokeClip/PokeClip-mono)
-- [PR 511](https://github.com/3K-PokeClip/PokeClip-mono/pull/511) — 판 2 장부 행의 채팅 위치, 역행 검사 재작성 · `min` 존재 확인 · 서버 준비 문장 끔(2026-11-14 develop 병합, 머지 커밋 `7c3464e3`)
-- [PR 510](https://github.com/3K-PokeClip/PokeClip-mono/pull/510) — 판 2 PDT 부분 색인(2026-11-13 develop 병합, 머지 커밋 `fc7dd91c`)
-- [`SegmentLedger.java`@7c3464e3](https://github.com/3K-PokeClip/PokeClip-mono/blob/7c3464e331c4e7730ad4eecc2ec15c84d4674d4b/services/chat-collector/src/main/java/com/pokeclip/chat/collector/sync/SegmentLedger.java) · [`SegmentLedger.java`@5ad61a0c](https://github.com/3K-PokeClip/PokeClip-mono/blob/5ad61a0c27014144a50e5c68323de7d3c3ccdcc3/services/chat-collector/src/main/java/com/pokeclip/chat/collector/sync/SegmentLedger.java) · [`ddl.go`@fc7dd91c](https://github.com/3K-PokeClip/PokeClip-mono/blob/fc7dd91c9a80fecdd06e12e4248c553cc2b3677e/media/internal/index/ddl.go#L611-L634)
-- 시험@7c3464e3 — [`SegmentLedgerIndexTest`](https://github.com/3K-PokeClip/PokeClip-mono/blob/7c3464e331c4e7730ad4eecc2ec15c84d4674d4b/services/chat-collector/src/test/java/com/pokeclip/chat/collector/sync/SegmentLedgerIndexTest.java) · [`SegmentLedgerInversionEquivalenceTest`](https://github.com/3K-PokeClip/PokeClip-mono/blob/7c3464e331c4e7730ad4eecc2ec15c84d4674d4b/services/chat-collector/src/test/java/com/pokeclip/chat/collector/sync/SegmentLedgerInversionEquivalenceTest.java) · [`SegmentLedgerPdtFloorEquivalenceTest`](https://github.com/3K-PokeClip/PokeClip-mono/blob/7c3464e331c4e7730ad4eecc2ec15c84d4674d4b/services/chat-collector/src/test/java/com/pokeclip/chat/collector/sync/SegmentLedgerPdtFloorEquivalenceTest.java) · [`SegmentLedgerPrepareTest`](https://github.com/3K-PokeClip/PokeClip-mono/blob/7c3464e331c4e7730ad4eecc2ec15c84d4674d4b/services/chat-collector/src/test/java/com/pokeclip/chat/collector/sync/SegmentLedgerPrepareTest.java) · [`VideoPositionV2Test`](https://github.com/3K-PokeClip/PokeClip-mono/blob/7c3464e331c4e7730ad4eecc2ec15c84d4674d4b/services/chat-collector/src/test/java/com/pokeclip/chat/collector/sync/VideoPositionV2Test.java#L120-L131)
+코드 · 결정 기록(프로젝트 저장소 3K-PokeClip/PokeClip-mono · 2026년 11월 20일부터 비공개)
+- PR 511 — 판 2 장부 행의 채팅 위치, 역행 검사 재작성 · `min` 존재 확인 · 서버 준비 문장 끔(2026-11-14 develop 병합, 머지 커밋 `7c3464e3`) (비공개 저장소)
+- PR 510 — 판 2 PDT 부분 색인(2026-11-13 develop 병합, 머지 커밋 `fc7dd91c`) (비공개 저장소)
+- `SegmentLedger.java`@7c3464e3 · `SegmentLedger.java`@5ad61a0c · `ddl.go`@fc7dd91c (비공개 저장소)
+- 시험@7c3464e3 — `SegmentLedgerIndexTest` · `SegmentLedgerInversionEquivalenceTest` · `SegmentLedgerPdtFloorEquivalenceTest` · `SegmentLedgerPrepareTest` · `VideoPositionV2Test` (비공개 저장소)
 
 공식 문서 · 소스
 - pgjdbc, [Server Prepared Statements](https://jdbc.postgresql.org/documentation/server-prepare/) — `prepareThreshold`(기본 5)와 0으로 끄기

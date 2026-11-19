@@ -49,7 +49,7 @@ VAD를 아예 버린 것은 아닙니다. 설계에는 음성 인식 안의 VAD 
 
 [[fig-two-paths]]는 두 경로와 11월 11일 기준 구현 상태입니다. 실선 강조가 구현된 것, 점선이 설계뿐인 것입니다.
 
-```mermaid {#fig-two-paths kind="개념도" caption="자막에 쓸 소리를 고르는 두 경로. 사람이 편집하는 경로의 구간 파형과 트랙별 미리듣기는 구현됐고, 고른 트랙을 음성 인식에 넘기는 단계는 설계뿐입니다. 원클릭 경로의 템플릿 트랙 지정과 렌더 전 무음 검사도 설계뿐입니다. 7월 20일 설계 기록과 PokeClip-mono develop 825a3dfe의 web 편집기 · workers 재구성." source="https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/clips/editor/trackAudio/useTrackPreview.ts#L10-L13"}
+```mermaid {#fig-two-paths kind="개념도" caption="자막에 쓸 소리를 고르는 두 경로. 사람이 편집하는 경로의 구간 파형과 트랙별 미리듣기는 구현됐고, 고른 트랙을 음성 인식에 넘기는 단계는 설계뿐입니다. 원클릭 경로의 템플릿 트랙 지정과 렌더 전 무음 검사도 설계뿐입니다. 7월 20일 설계 기록과 PokeClip-mono develop 825a3dfe의 web 편집기 · workers 재구성." source="프로젝트 저장소 web/src/features/clips/editor/trackAudio/useTrackPreview.ts(비공개)"}
 flowchart TB
   accTitle: 자막에 쓸 소리를 고르는 두 경로
   accDescr: 편집기에 사람이 있으면 구간 안 트랙별 파형과 트랙을 넣고 빼며 듣는 미리듣기가 구현돼 있고, 고른 트랙을 음성 인식에 넘기는 단계는 설계뿐이다. 사람이 없는 원클릭 경로는 템플릿의 지정 트랙과 렌더 전 무음 검사로 설계됐고 아직 구현되지 않았다.
@@ -68,11 +68,11 @@ flowchart TB
 
 ## 11월 코드에는 미리듣기와 파형만 들어갔습니다
 
-11월 11일 develop의 편집기는 사람이 고르는 경로의 앞 두 단계를 갖췄습니다. 미리듣기는 편집 영상이 받은 창(고른 구간 ± 여유)의 녹화 조각을 받아 트랙마다 풀고, 영상을 따라 재생합니다([`useTrackPreview.ts` 10–13행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/clips/editor/trackAudio/useTrackPreview.ts#L10-L13)). 타임라인의 트랙 줄마다 넣기·빼기와 음량이 있어, 다른 트랙을 빼면 한 트랙만 들을 수 있습니다([`TimelineTrackRow.tsx` 8–11행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/clips/editor/studio/TimelineTrackRow.tsx#L8-L11)). 설계에 적은 별도의 솔로 버튼은 없습니다.
+11월 11일 develop의 편집기는 사람이 고르는 경로의 앞 두 단계를 갖췄습니다. 미리듣기는 편집 영상이 받은 창(고른 구간 ± 여유)의 녹화 조각을 받아 트랙마다 풀고, 영상을 따라 재생합니다(`useTrackPreview.ts` 10–13행). 타임라인의 트랙 줄마다 넣기·빼기와 음량이 있어, 다른 트랙을 빼면 한 트랙만 들을 수 있습니다(`TimelineTrackRow.tsx` 8–11행). 설계에 적은 별도의 솔로 버튼은 없습니다.
 
-파형은 RMS가 아닙니다. 50ms 칸마다 가장 큰 표본 값을 재고, −60dB보다 작은 소리는 평평하게 그립니다([`trackLevels.ts` 14–19행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/clips/editor/trackAudio/trackLevels.ts#L14-L19)). 무음 트랙을 숨기는 기능은 코드에 없고, 무음 트랙은 평평한 줄로 보일 뿐입니다.
+파형은 RMS가 아닙니다. 50ms 칸마다 가장 큰 표본 값을 재고, −60dB보다 작은 소리는 평평하게 그립니다(`trackLevels.ts` 14–19행). 무음 트랙을 숨기는 기능은 코드에 없고, 무음 트랙은 평평한 줄로 보일 뿐입니다.
 
-자막을 만드는 쪽은 아직 비어 있습니다. 편집기의 AI 자막 화면은 목업 상태로, 실제 편집본으로 열면 버튼이 「준비 중」으로 잠깁니다([`useClipEditorMockState.ts` 1319행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/clips/editor/useClipEditorMockState.ts#L1319), [`SubtitleSection.tsx`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/clips/editor/sections/SubtitleSection.tsx#L19-L38)). 음성 인식을 맡을 일꾼 폴더에는 빈 자리 파일만 있습니다([`workers/ai`](https://github.com/3K-PokeClip/PokeClip-mono/tree/825a3dfe1f8dbef20255f85cea890a21505ae465/workers/ai)). 클립 렌더 일꾼은 구간이 없는 템플릿 레시피를 렌더하지 않으므로([`RecipeParser.java` 96–100행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/workers/render/src/main/java/com/pokeclip/render/recipe/RecipeParser.java#L96-L100)), 원클릭 경로의 템플릿 트랙과 무음 검사도 아직 없습니다.
+자막을 만드는 쪽은 아직 비어 있습니다. 편집기의 AI 자막 화면은 목업 상태로, 실제 편집본으로 열면 버튼이 「준비 중」으로 잠깁니다(`useClipEditorMockState.ts` 1319행, `SubtitleSection.tsx`). 음성 인식을 맡을 일꾼 폴더에는 빈 자리 파일만 있습니다(`workers/ai`). 클립 렌더 일꾼은 구간이 없는 템플릿 레시피를 렌더하지 않으므로(`RecipeParser.java` 96–100행), 원클릭 경로의 템플릿 트랙과 무음 검사도 아직 없습니다.
 
 포트폴리오 요약(2026-10-15판) 28쪽은 「선택 구간만 디코드 → 파형·RMS로 무음 후보 표시 → 솔로 미리듣기 → 선택 트랙만 자막 입력」을 채택한 설계로 적었습니다. 11월 11일 코드의 파형은 RMS가 아니라 칸별 최댓값이고, 무음 후보 표시와 솔로 버튼은 없으며, 자막 입력은 설계 단계입니다.
 
@@ -84,8 +84,8 @@ VAD를 넣을지 가른 기준은 모델의 정확도가 아니라 누가, 언�
 
 ## 출처
 
-- [PokeClip-mono `useTrackPreview.ts`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/clips/editor/trackAudio/useTrackPreview.ts#L10-L13) · [`trackLevels.ts`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/clips/editor/trackAudio/trackLevels.ts#L14-L19) · [`TimelineTrackRow.tsx`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/clips/editor/studio/TimelineTrackRow.tsx#L8-L11) — 트랙별 미리듣기와 파형(develop `825a3dfe`, 2026-11-11)
-- [PokeClip-mono `useClipEditorMockState.ts`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/clips/editor/useClipEditorMockState.ts#L1319) · [`SubtitleSection.tsx`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/clips/editor/sections/SubtitleSection.tsx#L19-L38) · [`workers/ai`](https://github.com/3K-PokeClip/PokeClip-mono/tree/825a3dfe1f8dbef20255f85cea890a21505ae465/workers/ai) · [`RecipeParser.java`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/workers/render/src/main/java/com/pokeclip/render/recipe/RecipeParser.java#L96-L100) — 자막 생성과 템플릿 렌더의 현재 상태
+- PokeClip-mono `useTrackPreview.ts` · `trackLevels.ts` · `TimelineTrackRow.tsx` — 트랙별 미리듣기와 파형(develop `825a3dfe`, 2026-11-11) (비공개 저장소)
+- PokeClip-mono `useClipEditorMockState.ts` · `SubtitleSection.tsx` · `workers/ai` · `RecipeParser.java` — 자막 생성과 템플릿 렌더의 현재 상태 (비공개 저장소)
 - [SYSTRAN/faster-whisper](https://github.com/SYSTRAN/faster-whisper) — `vad_filter`(Silero VAD)
 - [소스 약 10개 대신 OBS 6트랙에 순서만 고정했습니다](/posts/0-to-1/pokeclip-six-track-input-contract/)
 - 팀 내부 설계 기록(비공개) — 7월 20일 상시 VAD 제거 결정, 9월 3일 트랙 이름 고정

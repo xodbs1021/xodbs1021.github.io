@@ -82,7 +82,7 @@ IAM 쓰기는 AI 쪽에서 실행하지 못했습니다. Claude Code의 자동 �
 
 ## 배포 워크플로를 액세스 키에서 OIDC 역할로 옮겼습니다
 
-신뢰 조건이 맞으면 워크플로는 작게 바뀝니다. 이 워크플로는 원래 팀원이 맡은 파일이라, 같은 파일을 고칠 예정이던 팀원에게 이 전환은 제가 맡겠다고 알리고 진행했습니다([PR 279](https://github.com/3K-PokeClip/PokeClip-mono/pull/279)).
+신뢰 조건이 맞으면 워크플로는 작게 바뀝니다. 이 워크플로는 원래 팀원이 맡은 파일이라, 같은 파일을 고칠 예정이던 팀원에게 이 전환은 제가 맡겠다고 알리고 진행했습니다(PR 279).
 
 - `permissions`에 `id-token: write`를 더했습니다.
 - `aws-actions/configure-aws-credentials@v4`에서 액세스 키 두 입력을 지우고 `role-to-assume`을 넣었습니다. 역할 ARN에는 계정 번호가 들어 있어 저장소 비밀 `AWS_DEPLOY_ROLE_ARN`에 넣었습니다.
@@ -91,7 +91,7 @@ IAM 쓰기는 AI 쪽에서 실행하지 못했습니다. Claude Code의 자동 �
 
 역할 정책은 키 사용자와 같은 문서였습니다. 명령 실행(`ssm:SendCommand`)은 dev EC2 한 대로 제한돼 있었지만, 결과를 읽는 권한은 대상이 `Resource: "*"`였습니다. 그중 쓰지 않던 결과 목록 조회(`ssm:ListCommandInvocations`)는 뒤의 environment 1단계 IAM 스크립트에서 뺐습니다. 남은 `ssm:GetCommandInvocation`도 대상이 `*`라서 명령 ID와 인스턴스 ID를 알면 다른 명령의 결과를 읽을 수 있고, 이 범위는 지금도 그대로입니다.
 
-이 PR은 처음에 보안 검수 없이 PR 점검까지 갔습니다. 자격 증명과 IAM 신뢰를 바꾸는 변경인데 보안 검수 기록이 없다는 점을 PR 리뷰어가 HIGH로 지적했고, 보안 리뷰 에이전트와 Codex로 따로 검수해 둘 다 CRITICAL·HIGH 없이 통과했습니다. 머지 뒤 [첫 배포 실행](https://github.com/3K-PokeClip/PokeClip-mono/actions/runs/39033721053)에서 OIDC 로그인 스텝은 1초 만에 성공했고, 잡 전체는 9분 33초 만에 초록으로 끝났습니다.
+이 PR은 처음에 보안 검수 없이 PR 점검까지 갔습니다. 자격 증명과 IAM 신뢰를 바꾸는 변경인데 보안 검수 기록이 없다는 점을 PR 리뷰어가 HIGH로 지적했고, 보안 리뷰 에이전트와 Codex로 따로 검수해 둘 다 CRITICAL·HIGH 없이 통과했습니다. 머지 뒤 첫 배포 실행에서 OIDC 로그인 스텝은 1초 만에 성공했고, 잡 전체는 9분 33초 만에 초록으로 끝났습니다.
 
 ## develop 브랜치 단위 신뢰는 같은 브랜치의 다른 잡도 믿었습니다
 
@@ -105,7 +105,7 @@ IAM 쓰기는 AI 쪽에서 실행하지 못했습니다. Claude Code의 자동 �
 | 저장소 sub 템플릿에 워크플로 정보를 넣어 고정 | 특정 워크플로 | 저장소의 다른 OIDC 워크플로 sub도 모두 바뀜 |
 | 다른 워크플로에서 `id-token` 권한 제거 | 지금 있는 구멍 하나 | Claude Code 워크플로는 자기 인증에 OIDC가 필요해 멈춤. 신뢰 조건도 넓은 채로 남음 |
 
-저는 AI가 추천한 environment 방식을 택했습니다. AI가 `dev-deploy` environment를 만들고 배포 브랜치를 develop 하나로 제한했습니다. 같은 작업에서 `id-token: write`를 워크플로 맨 위에서 배포 잡으로 내려, 같은 파일에 잡이 추가돼도 그 잡이 역할을 자동으로 받지 않게 했습니다([PR 280](https://github.com/3K-PokeClip/PokeClip-mono/pull/280)). 아래는 그 뒤 워크플로의 발췌입니다. 잡에 `permissions`를 주면 맨 위 값을 물려받지 않으므로 `contents: read`를 다시 적었습니다.
+저는 AI가 추천한 environment 방식을 택했습니다. AI가 `dev-deploy` environment를 만들고 배포 브랜치를 develop 하나로 제한했습니다. 같은 작업에서 `id-token: write`를 워크플로 맨 위에서 배포 잡으로 내려, 같은 파일에 잡이 추가돼도 그 잡이 역할을 자동으로 받지 않게 했습니다(PR 280). 아래는 그 뒤 워크플로의 발췌입니다. 잡에 `permissions`를 주면 맨 위 값을 물려받지 않으므로 `contents: read`를 다시 적었습니다.
 
 ```yaml
 permissions:
@@ -130,13 +130,13 @@ environment 방식에는 함정이 하나 있습니다. 워크플로에 `environ
 
 | 시점 | 확인한 것 |
 |---|---|
-| PR 279 뒤 | [첫 배포](https://github.com/3K-PokeClip/PokeClip-mono/actions/runs/39033721053) 로그인 성공(브랜치 값) |
-| 1단계 | PR 280 [배포](https://github.com/3K-PokeClip/PokeClip-mono/actions/runs/39040383023) 성공, CloudTrail에서 실제 `sub`가 `environment:dev-deploy`로 끝남 |
-| 2단계 | PR 281 [배포](https://github.com/3K-PokeClip/PokeClip-mono/actions/runs/39042086329) 성공(environment 값 하나만 남은 상태) |
+| PR 279 뒤 | 첫 배포 로그인 성공(브랜치 값) |
+| 1단계 | PR 280 배포 성공, CloudTrail에서 실제 `sub`가 `environment:dev-deploy`로 끝남 |
+| 2단계 | PR 281 배포 성공(environment 값 하나만 남은 상태) |
 
 두 값을 받는 동안에는 옛 문제가 그대로 열려 있습니다. develop에서 도는 다른 OIDC 잡이 브랜치 값으로 들어올 수 있습니다. 보안 검수가 이 창을 HIGH로 지적했고, AI의 추천대로 1단계에 들어가기 전에 Claude Code 워크플로를 꺼 두기로 했습니다.
 
-1단계에서 두 값을 받게 하고 PR 280을 머지하자 첫 배포가 초록이었고, CloudTrail에서 그 로그인의 실제 `sub`가 `environment:dev-deploy`로 끝나는 것을 확인했습니다. 추론이 맞았습니다. 2단계에서 브랜치 값을 뺐고, 같은 날 Claude Code 워크플로를 다시 켰습니다. 주석만 고친 [PR 281](https://github.com/3K-PokeClip/PokeClip-mono/pull/281)의 배포로 environment 값 하나만 남은 상태에서도 로그인되는 것을 확인했습니다.
+1단계에서 두 값을 받게 하고 PR 280을 머지하자 첫 배포가 초록이었고, CloudTrail에서 그 로그인의 실제 `sub`가 `environment:dev-deploy`로 끝나는 것을 확인했습니다. 추론이 맞았습니다. 2단계에서 브랜치 값을 뺐고, 같은 날 Claude Code 워크플로를 다시 켰습니다. 주석만 고친 PR 281의 배포로 environment 값 하나만 남은 상태에서도 로그인되는 것을 확인했습니다.
 
 IAM 스크립트에는 "모르는 상태면 아무것도 쓰지 않는다"는 원칙을 넣었습니다. 1단계 스크립트는 문장 수·`Effect`·`Action`·공급자·조건 연산자·조건 키·`aud`가 예상과 하나라도 다르면 쓰기 전에 멈추고, 조건 전체를 덮어쓰지 않고 `sub` 값 하나만 바꿉니다. 이미 목표 상태면 건너뛰므로 중간에 멈춰도 다시 돌릴 수 있습니다. 처음 판은 조건 전체를 덮어썼는데, 리뷰가 이를 잡아 고쳤습니다.
 
@@ -154,7 +154,7 @@ OIDC로 배포가 세 번 초록이 된 뒤 액세스 키를 정리했습니다.
 
 이 신뢰의 실질적인 통제는 environment `dev-deploy`의 배포 브랜치 정책입니다. 그 밖의 장치는 약합니다. develop은 보호 브랜치라 강제 push와 삭제는 막혀 있지만 PR 필수 규칙과 필수 체크는 없고, 이번에 만든 `dev-deploy`에는 승인자를 두지 않았습니다. 관리자 우회 허용(`can_admins_bypass`)도 기본값인 켜짐으로 남아 있습니다. 그래서 develop에 직접 push할 수 있는 사람은 사실상 dev 배포 역할을 쓸 수 있습니다. AWS는 OIDC 정책에 environment를 쓴다면 environment에 보호 규칙을 두라고 강하게 권하고 그 방법으로 배포 브랜치 제한을 드는데([AWS IAM 문서](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html#idp_oidc_Create_GitHub)), 우리는 그 제한만 두었고 승인자나 PR 필수 규칙 같은 더 강한 장치는 아직 없습니다.
 
-10월 23일에는 v1을 낼 때 develop을 main에 병합하고 prod 배포는 main 기준 CI/CD로 돌리기로 정했습니다. 11월 3일 main 병합과 `v1.0.0` 태그는 끝났지만([PR 466](https://github.com/3K-PokeClip/PokeClip-mono/pull/466)), prod CI/CD는 아직 켜지 않았습니다. prod용 OIDC 역할을 만들 때는 신뢰 조건을 main 브랜치와 승인자가 있는 prod environment로 좁히고, `sub`도 처음부터 숫자 ID 형식으로 쓸 계획입니다. 이 부분은 아직 구현하지 않았습니다.
+10월 23일에는 v1을 낼 때 develop을 main에 병합하고 prod 배포는 main 기준 CI/CD로 돌리기로 정했습니다. 11월 3일 main 병합과 `v1.0.0` 태그는 끝났지만(PR 466), prod CI/CD는 아직 켜지 않았습니다. prod용 OIDC 역할을 만들 때는 신뢰 조건을 main 브랜치와 승인자가 있는 prod environment로 좁히고, `sub`도 처음부터 숫자 ID 형식으로 쓸 계획입니다. 이 부분은 아직 구현하지 않았습니다.
 
 ## OIDC가 거부되면 CloudTrail의 실제 sub부터 봐야 합니다
 
@@ -168,7 +168,7 @@ OIDC로 배포가 세 번 초록이 된 뒤 액세스 키를 정리했습니다.
 
 - 기간(KST): 원인 조사부터 environment 2단계(PR 281 배포)까지는 10월 17일, 액세스 키 삭제는 10월 18일, 남은 키 0개 확인은 10월 19일입니다.
 - CloudTrail: `AssumeRoleWithWebIdentity` 조회는 서울 리전 90일, 액세스 키 사용처 조회는 서울·us-east-1 관리 이벤트 90일입니다. 계정 번호와 사용자 이름은 글에서 뺐습니다.
-- 배포 시간: GitHub Actions 실행 기록의 스텝·잡 시간입니다(OIDC 로그인 스텝 1초, 잡 9분 33초는 PR 279 머지 뒤 [첫 실행](https://github.com/3K-PokeClip/PokeClip-mono/actions/runs/39033721053)).
+- 배포 시간: GitHub Actions 실행 기록의 스텝·잡 시간입니다(OIDC 로그인 스텝 1초, 잡 9분 33초는 PR 279 머지 뒤 첫 실행).
 - 저장소 설정과 보호 규칙: GitHub REST API로 2026년 11월 10일에 다시 확인했습니다(`use_immutable_subject: true`, `dev-deploy` 보호 규칙은 배포 브랜치 정책 하나·관리자 우회 허용, AWS 관련 저장소 비밀은 역할 ARN 하나).
 - 조사·스크립트·리뷰 기록은 비공개 작업 기록이고, 공개 근거는 아래 PR과 공식 문서입니다.
 
@@ -178,9 +178,9 @@ OIDC로 배포가 세 번 초록이 된 뒤 액세스 키를 정리했습니다.
 - GitHub Docs, 「OpenID Connect reference」 — `sub` 클레임 형식과 environment 규칙. https://docs.github.com/en/actions/reference/security/oidc
 - AWS IAM 사용 설명서, 「Create a role for OpenID Connect federation」 — `sub` 조건 필수 검사, environment 보호 규칙 권고. https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html#idp_oidc_Create_GitHub
 - `aws-actions/configure-aws-credentials` v4 README — `role-to-assume`, `role-duration-seconds`(기본 3600초), `id-token: write`. https://github.com/aws-actions/configure-aws-credentials/blob/v4/README.md
-- [PR 279](https://github.com/3K-PokeClip/PokeClip-mono/pull/279) — dev 배포를 액세스 키에서 OIDC 역할로 전환
-- [PR 280](https://github.com/3K-PokeClip/PokeClip-mono/pull/280) — 배포 잡을 environment `dev-deploy`로 묶고 `id-token` 권한을 잡 단위로
-- [PR 281](https://github.com/3K-PokeClip/PokeClip-mono/pull/281) — 2단계 뒤 머리 주석 정리
-- [PR 466](https://github.com/3K-PokeClip/PokeClip-mono/pull/466) — v1.0.0 main 병합
-- GitHub Actions 실행: [PR 279 뒤 첫 배포](https://github.com/3K-PokeClip/PokeClip-mono/actions/runs/39033721053), [PR 280 배포](https://github.com/3K-PokeClip/PokeClip-mono/actions/runs/39040383023), [PR 281 배포](https://github.com/3K-PokeClip/PokeClip-mono/actions/runs/39042086329)
+- PR 279 — dev 배포를 액세스 키에서 OIDC 역할로 전환 (비공개 저장소)
+- PR 280 — 배포 잡을 environment `dev-deploy`로 묶고 `id-token` 권한을 잡 단위로 (비공개 저장소)
+- PR 281 — 2단계 뒤 머리 주석 정리 (비공개 저장소)
+- PR 466 — v1.0.0 main 병합 (비공개 저장소)
+- GitHub Actions 실행: PR 279 뒤 첫 배포, PR 280 배포, PR 281 배포 (비공개 저장소)
 - 저장소 OIDC sub 설정(공개 API) — https://api.github.com/repos/3K-PokeClip/PokeClip-mono/actions/oidc/customization/sub (2026-11-10 확인, `use_immutable_subject: true`)

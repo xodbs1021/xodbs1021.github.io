@@ -81,13 +81,13 @@ C를 만든 실험 규칙은 다음과 같습니다. 실행 코드가 아니라 
 
 ## 실험 규칙은 생산 코드에서 「mtxi + 세션 보정값」이 됐습니다 {#고정-입력의-대조에서-생산-계층으로}
 
-실험 규칙은 첫 파일의 mtxi를 빼서 첫 조각을 0초에 놓았습니다. 생산 코드는 다르게 갑니다. 9월 19일 제가 낸 안대로, 되감기용 조각의 시각 도장은 「그 조각의 mtxi + 세션 보정값」입니다([`media/README.md` 「시간 도장」](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/README.md?plain=1#L1372-L1390)). 세션은 사이드카가 재생 목록 하나를 여닫는 단위입니다.
+실험 규칙은 첫 파일의 mtxi를 빼서 첫 조각을 0초에 놓았습니다. 생산 코드는 다르게 갑니다. 9월 19일 제가 낸 안대로, 되감기용 조각의 시각 도장은 「그 조각의 mtxi + 세션 보정값」입니다(`media/README.md` 「시간 도장」). 세션은 사이드카가 재생 목록 하나를 여닫는 단위입니다.
 
-- **평소.** 보정값은 0이므로 첫 도장은 그 조각의 mtxi 값입니다. 새 연결의 첫 조각이면 0 근처이고, 연결 도중 열린 세션이면 0이 아닙니다. 다만 세션 첫 조각의 mtxi가 음수면(소리가 영상보다 먼저 시작한 경우) 보정값을 −mtxi로 열어 첫 도장을 0에 둡니다([`chain.go` `startChain`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/indexer/chain.go#L79-L97)).
+- **평소.** 보정값은 0이므로 첫 도장은 그 조각의 mtxi 값입니다. 새 연결의 첫 조각이면 0 근처이고, 연결 도중 열린 세션이면 0이 아닙니다. 다만 세션 첫 조각의 mtxi가 음수면(소리가 영상보다 먼저 시작한 경우) 보정값을 −mtxi로 열어 첫 도장을 0에 둡니다(`chain.go` `startChain`).
 - **송출이 다시 붙을 때.** 위에서 본 대로 mtxi가 0으로 돌아가므로, 녹화기 표식이 바뀌거나 mtxi가 뒤로 가면 보정값을 올려 앞 조각에서 먼저 끝난 트랙 끝에 잇습니다.
 - **같은 녹화기 안 구멍.** mtxi가 예상 끝보다 50ms 넘게 앞서면 그 구멍을 압축해 잇습니다.
 
-8월 30일 대조 뒤에 남았던 경계도 각자 따로 확인했습니다. 같은 세션 안 재접속은 9월 19일 10분 녹화로 확인했습니다([재접속 경계 글](/posts/0-to-1/pokeclip-reconnect-audio-gap/)). 다시 포장한 init이 세션 init과 다르면 그 조각을 올리지 않고 세션을 `init_mismatch`로 끝냅니다([`axis_body.go` 225–233행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/upload/axis_body.go#L225-L233)). 창이 밀리는 되감기 목록은 [라이브와 되감기 목록을 나눈 글](/posts/0-to-1/pokeclip-live-dvr-separation-handoff/)이 다룹니다. 조각을 다시 포장하는 수단이 FFmpeg에서 Go로 바뀐 이유는 [재포장 글](/posts/0-to-1/pokeclip-go-remux-same-io-benchmark/)에 있습니다.
+8월 30일 대조 뒤에 남았던 경계도 각자 따로 확인했습니다. 같은 세션 안 재접속은 9월 19일 10분 녹화로 확인했습니다([재접속 경계 글](/posts/0-to-1/pokeclip-reconnect-audio-gap/)). 다시 포장한 init이 세션 init과 다르면 그 조각을 올리지 않고 세션을 `init_mismatch`로 끝냅니다(`axis_body.go` 225–233행). 창이 밀리는 되감기 목록은 [라이브와 되감기 목록을 나눈 글](/posts/0-to-1/pokeclip-live-dvr-separation-handoff/)이 다룹니다. 조각을 다시 포장하는 수단이 FFmpeg에서 Go로 바뀐 이유는 [재포장 글](/posts/0-to-1/pokeclip-go-remux-same-io-benchmark/)에 있습니다.
 
 비슷한 문제를 만난다면 init·태그·시각을 한꺼번에 고치지 말고, 바이트로 확인한 단일 변수 대조부터 만드십시오. 무엇이 재생을 바꿨는지 알아야 생산 코드가 책임질 범위를 좁힐 수 있습니다.
 
@@ -103,7 +103,7 @@ C를 만든 실험 규칙은 다음과 같습니다. 실행 코드가 아니라 
 
 - [MediaMTX 문서: Playback](https://mediamtx.org/docs/features/playback) — 녹화 파일을 이어 주는 공식 경로
 - [RFC 8216 HTTP Live Streaming](https://www.rfc-editor.org/rfc/rfc8216) — [3.3 fMP4 조각](https://www.rfc-editor.org/rfc/rfc8216#section-3.3) · [4.3.2.5 EXT-X-MAP](https://www.rfc-editor.org/rfc/rfc8216#section-4.3.2.5)
-- [PokeClip-mono `media/README.md` 「시간 도장」](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/README.md?plain=1#L1372-L1390) · [`chain.go`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/indexer/chain.go#L79-L97) · [`axis_body.go`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/upload/axis_body.go#L225-L233) — 생산 코드의 도장 규칙과 init 불일치 처리
+- PokeClip-mono `media/README.md` 「시간 도장」 · `chain.go` · `axis_body.go` — 생산 코드의 도장 규칙과 init 불일치 처리 (비공개 저장소)
 - [HLS 오류는 0건인데 녹화 142초 중 62초가 사라졌습니다](/posts/0-to-1/pokeclip-zero-errors-missing-playback/) — 8월 19일 재생 시험과 8월 28일 결정
 - [같은 세션 재접속에 HLS 끊김 표시를 달지 않은 이유](/posts/0-to-1/pokeclip-reconnect-audio-gap/) — 재접속 경계 확인
 - [FFmpeg 재포장은 조각마다 init이 달라 Go로 바꿨습니다](/posts/0-to-1/pokeclip-go-remux-same-io-benchmark/) — 재포장 수단

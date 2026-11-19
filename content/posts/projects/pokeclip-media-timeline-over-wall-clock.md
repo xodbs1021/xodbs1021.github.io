@@ -69,7 +69,7 @@ AI 에이전트가 새 설계 전인 11월 2일에 수행한 프로젝트 실측
 
 첫째는 **소비자마다 다른 보정식**이었습니다. 플레이어, 편집기, 렌더가 벽시각을 받아 각자 파일 좌표로 되돌렸습니다. 어떤 경로는 구성 시차를 더하고, 다른 경로는 먼저 시작한 오디오와 영상의 차이를 뺐습니다. 아래 그림의 위쪽이 예전 구조이고, 아래쪽이 바꾼 설계입니다.
 
-```mermaid {#fig-consumers kind="개념도" caption="예전에는 소비자마다 벽시각을 파일 좌표로 되돌렸습니다. 바꾼 설계에서는 클립·렌더가 조각과 조각 안 미디어 시각을 받고, 벽시각 변환은 공용 함수 한 곳에서 합니다(공용 모듈은 #470 머지, 클립·렌더 연결은 머지 전)." source="https://github.com/3K-PokeClip/PokeClip-mono/pull/470"}
+```mermaid {#fig-consumers kind="개념도" caption="예전에는 소비자마다 벽시각을 파일 좌표로 되돌렸습니다. 바꾼 설계에서는 클립·렌더가 조각과 조각 안 미디어 시각을 받고, 벽시각 변환은 공용 함수 한 곳에서 합니다(공용 모듈은 #470 머지, 클립·렌더 연결은 머지 전)." source="프로젝트 저장소 PR #470(비공개)"}
 flowchart TB
   accTitle: 보정식 구조의 전과 후
   accDescr: 예전에는 벽시각 장부를 플레이어, 편집기, 렌더가 각자의 보정식으로 파일 좌표로 바꿨다. 바꾼 설계에서는 편집기 컷과 장부가 공용 변환 함수를 거쳐 조각과 조각 안 미디어 시각이 되고, 클립과 렌더는 그 좌표만 쓴다. 장부의 벽시각은 표시와 넘김, 채팅에만 쓴다.
@@ -120,7 +120,7 @@ Unified Capture는 UTC(세계 협정시) 범위와 `--frame-accurate` 옵션을 
 
 ### 렌더 주문이 추정값을 거치지 않게 됩니다
 
-바꾼 설계에서는 벽시각 추정이 흔들려도 이미 고른 컷의 소재 위치가 바뀌지 않습니다. 재포장본과 원본의 대응은 재포장 때 옮긴 타임스탬프 이동량으로 계산하고, 구성 시차와 트랙 원점 차이까지 반영한 변환은 공용 모듈 한 곳에 모으기로 했습니다. 그 첫 단계로 장부 시각을 「조각 + 조각 안 위치」로 바꾸는 공용 모듈과 공유 시험 표가 [#470](https://github.com/3K-PokeClip/PokeClip-mono/pull/470)으로 들어갔습니다. 아직 부르는 서비스는 없고, 구성 시차와 재포장 이동량 반영도 아직입니다. 웹 플레이어는 [#468](https://github.com/3K-PokeClip/PokeClip-mono/pull/468)에서 되감기·다시보기 목록의 새 형식 조각을 영상 첫 표본 축으로 환산하도록 바뀌었고, 라이브 쪽 구성 시차 보정은 꺼 두었습니다.
+바꾼 설계에서는 벽시각 추정이 흔들려도 이미 고른 컷의 소재 위치가 바뀌지 않습니다. 재포장본과 원본의 대응은 재포장 때 옮긴 타임스탬프 이동량으로 계산하고, 구성 시차와 트랙 원점 차이까지 반영한 변환은 공용 모듈 한 곳에 모으기로 했습니다. 그 첫 단계로 장부 시각을 「조각 + 조각 안 위치」로 바꾸는 공용 모듈과 공유 시험 표가 #470으로 들어갔습니다. 아직 부르는 서비스는 없고, 구성 시차와 재포장 이동량 반영도 아직입니다. 웹 플레이어는 #468에서 되감기·다시보기 목록의 새 형식 조각을 영상 첫 표본 축으로 환산하도록 바뀌었고, 라이브 쪽 구성 시차 보정은 꺼 두었습니다.
 
 ### 편집기는 벽시각 컷을 그대로 보냅니다
 
@@ -220,7 +220,7 @@ VideoToolbox(macOS 하드웨어 인코더) 송출에서 생긴 212–512ms 겹�
 
 ## 소비자 쪽부터 들어갔고 생산자는 아직입니다
 
-11월 3일까지 웹 플레이어 환산([#468](https://github.com/3K-PokeClip/PokeClip-mono/pull/468)), 공용 변환 모듈과 공유 시험 표([#470](https://github.com/3K-PokeClip/PokeClip-mono/pull/470), 아직 부르는 서비스 없음), 그 시험 표로 플레이어 환산을 견주는 시험([#472](https://github.com/3K-PokeClip/PokeClip-mono/pull/472))이 머지됐습니다. 섞기 규칙을 적용할 생산자, 렌더, 클립 쪽은 11월 10일 기준 아직 머지되지 않았습니다([#475](https://github.com/3K-PokeClip/PokeClip-mono/pull/475) 등). 서비스는 v1.0.0으로 먼저 출시했고([#466](https://github.com/3K-PokeClip/PokeClip-mono/pull/466)), 새 시간축은 나중에 이미지 교체로 들어갑니다.
+11월 3일까지 웹 플레이어 환산(#468), 공용 변환 모듈과 공유 시험 표(#470, 아직 부르는 서비스 없음), 그 시험 표로 플레이어 환산을 견주는 시험(#472)이 머지됐습니다. 섞기 규칙을 적용할 생산자, 렌더, 클립 쪽은 11월 10일 기준 아직 머지되지 않았습니다(#475 등). 서비스는 v1.0.0으로 먼저 출시했고(#466), 새 시간축은 나중에 이미지 교체로 들어갑니다.
 
 여섯 번 고친 설계에서 배운 것은 보정식을 더 잘 쓰는 방법이 아니었습니다. 어떤 값이 어떤 정확도를 책임지는지 먼저 정해야 했습니다. 비슷한 설계를 한다면 「정밀 좌표」와 「사람에게 보여 줄 시각」을 처음부터 다른 값으로 두십시오.
 
@@ -255,5 +255,5 @@ AI 에이전트가 새 설계 전에 수행했습니다. OBS 32.2.2의 같은 �
 11. `bluenviron/mediamtx` 커밋 `847a6ee`의 [재생 시각 계산](https://github.com/bluenviron/mediamtx/blob/847a6ee/internal/playback/on_get.go), [조각 연결 조건](https://github.com/bluenviron/mediamtx/blob/847a6ee/internal/playback/segment_fmp4.go).
 12. `video-dev/hls.js` 커밋 `598ebdd`의 [조각 시작 시각 계산](https://github.com/video-dev/hls.js/blob/598ebdd/src/remux/passthrough-remuxer.ts), [PDT 정렬](https://github.com/video-dev/hls.js/blob/598ebdd/src/utils/discontinuities.ts).
 13. [bluenviron/mediamtx#5550의 2026-10-21 댓글](https://github.com/bluenviron/mediamtx/issues/5550#issuecomment-6307819009).
-14. PokeClip 구현 PR(공개 저장소): [#468](https://github.com/3K-PokeClip/PokeClip-mono/pull/468), [#470](https://github.com/3K-PokeClip/PokeClip-mono/pull/470), [#472](https://github.com/3K-PokeClip/PokeClip-mono/pull/472), [#475](https://github.com/3K-PokeClip/PokeClip-mono/pull/475).
+14. PokeClip 구현 PR(프로젝트 저장소): #468, #470, #472, #475. (비공개 저장소)
 15. 프로젝트 실측 기록(11월 2·3일), AI 에이전트가 수행·기록한 내부 자료. 원시 기록은 공개하지 않습니다.

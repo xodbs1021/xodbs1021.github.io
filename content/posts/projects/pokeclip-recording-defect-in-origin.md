@@ -10,7 +10,7 @@ draft: false
 
 11월 7일, 운영 환경에서 녹화한 시험 방송으로 다시보기 재생을 재던 중 조각 1624에서 Chrome 계열 브라우저만 재생이 멈췄습니다. 처음에는 새로 넣은 재생 목록의 끊김 표시나 우리 재포장 코드를 의심했습니다. 하지만 녹화 서버(MediaMTX)가 남긴 원본 조각에 이미 참조 프레임이 빠져 있었고, 원본과 우리 재포장본은 영상 표본 172개가 바이트까지 같았습니다. 같은 방송의 녹화기 오류 `too many reordered frames` 12건은 녹화기 교체 12건과 수가 맞았습니다. 우리 웹 플레이어는 이 조각에서 오류 알림 없이 7번 모두 굳었고, 매체를 다시 붙인 뒤 다음 조각 시작으로 옮기자 4번 모두 이어졌습니다. 대신 결함 조각의 나머지 약 5.4초를 건너뜁니다.
 
-저는 PokeClip 팀에서 이 조사를 어디까지 할지와 고칠 방향을 정했습니다. 운영 미디어 서버의 로그는 AI의 원격 실행이 자동 모드 분류기에 막혀 제가 읽기 전용으로 직접 실행해 받았습니다. 실험 설계·실행·분석과 PR 본문 작성은 AI(Claude Code 오케스트레이터와 하위 에이전트)가, PR 리뷰는 커밋마다 Claude Code와 Codex가 동시에 했습니다. 검증하던 회차 다시보기 고침([PR #492](https://github.com/3K-PokeClip/PokeClip-mono/pull/492))은 11월 10일 운영 미디어 서버에 반영했고, 운영에서 다시보기 재생까지 확인했습니다. 웹 플레이어 처리는 실험으로 확인한 제안이라 아직 저장소에 없습니다.
+저는 PokeClip 팀에서 이 조사를 어디까지 할지와 고칠 방향을 정했습니다. 운영 미디어 서버의 로그는 AI의 원격 실행이 자동 모드 분류기에 막혀 제가 읽기 전용으로 직접 실행해 받았습니다. 실험 설계·실행·분석과 PR 본문 작성은 AI(Claude Code 오케스트레이터와 하위 에이전트)가, PR 리뷰는 커밋마다 Claude Code와 Codex가 동시에 했습니다. 검증하던 회차 다시보기 고침(PR #492)은 11월 10일 운영 미디어 서버에 반영했고, 운영에서 다시보기 재생까지 확인했습니다. 웹 플레이어 처리는 실험으로 확인한 제안이라 아직 저장소에 없습니다.
 
 ## 회차 다시보기를 재다 조각 1624에서 Chrome만 멈췄습니다
 
@@ -20,7 +20,7 @@ PokeClip은 OBS가 SRT로 보낸 방송을 MediaMTX가 받아 약 4초 단위 fM
 
 의심할 곳은 셋이었습니다. 새로 단 끊김 표시, 실제 사용자와 다를 수 있는 헤드리스 브라우저, 그리고 우리 재포장 코드입니다. 그림 1에서 영상이 위에서 아래로 지나는 길과, 가설마다 어느 자리에서 기각했는지를 보면 됩니다.
 
-```mermaid {#fig-path kind="개념도" caption="영상이 송출에서 Chrome 복호기까지 지나는 길과 가설을 기각한 자리. 녹화 원본(②)에 결함이 이미 있었으므로 남은 후보는 그 앞 구간입니다." source="https://github.com/3K-PokeClip/PokeClip-mono/pull/492"}
+```mermaid {#fig-path kind="개념도" caption="영상이 송출에서 Chrome 복호기까지 지나는 길과 가설을 기각한 자리. 녹화 원본(②)에 결함이 이미 있었으므로 남은 후보는 그 앞 구간입니다." source="프로젝트 저장소 PR #492(비공개)"}
 flowchart TB
   accTitle: 결함 위치를 좁힌 경로
   accDescr: OBS 송출이 SRT로 MediaMTX 녹화기에 닿아 녹화 원본 조각이 되고, Go 재포장이 다시보기 조각과 재생 목록을 만들어 hls.js를 거쳐 Chrome 복호기로 간다. 재생 목록의 끊김 표시, hls.js, 헤드리스 Chrome, Go 재포장에서 각각 가설을 기각했고, 녹화 원본에 결함이 이미 있었다.
@@ -152,7 +152,7 @@ B2는 순서에 기댑니다. `recoverMediaError()` 바로 뒤 같은 처리기 
 
 - B2는 실험 사본에서만 확인했고 저장소에 넣지 않았습니다. 실제 웹 앱 전체, 세션 모드의 시크 경로, 라이브와 되감기 재생기, 실제 Safari, 다른 판의 Chrome, 마지막 조각이 결함인 경우는 재지 않았습니다. 1624의 둘째 키프레임(조각 시작 뒤 약 2초)으로 건너뛰면 덜 잃을 수 있지만, 그 뒤 프레임이 온전한지는 확인하지 않았습니다.
 - 회차 다시보기 고침(PR #492)은 11월 10일 운영에 반영했습니다. 이미 녹화된 11월 4일 방송의 결함 조각은 그대로 남습니다.
-- 녹화기 앞의 어느 구간에서 프레임이 빠졌는지는 여기서 가르지 않았습니다. OBS 플러그인의 SRT 지연 기본값을 1,000ms에서 3,000ms로 올린 변경은 [PR #493](https://github.com/3K-PokeClip/PokeClip-mono/pull/493)으로 들어갔고, 11월 10일 공개한 플러그인 0.2.1 설치본에 담겼습니다. 그 설치본으로 실제 송출한 시험은 아직 하지 않았습니다.
+- 녹화기 앞의 어느 구간에서 프레임이 빠졌는지는 여기서 가르지 않았습니다. OBS 플러그인의 SRT 지연 기본값을 1,000ms에서 3,000ms로 올린 변경은 PR #493으로 들어갔고, 11월 10일 공개한 플러그인 0.2.1 설치본에 담겼습니다. 그 설치본으로 실제 송출한 시험은 아직 하지 않았습니다.
 
 11월 8일 운영 경로로 보낸 시험 방송 세 번에서 같은 결손을 다시 일으킨 과정과 3,000ms를 고른 근거는 [2편](/posts/projects/pokeclip-srt-latency-late-retransmission/)에서 다룹니다.
 
@@ -167,8 +167,8 @@ B2는 순서에 기댑니다. `recoverMediaError()` 바로 뒤 같은 처리기 
 
 ## 출처
 
-- [3K-PokeClip/PokeClip-mono PR #492](https://github.com/3K-PokeClip/PokeClip-mono/pull/492) — 회차 단위 다시보기 고침과 조각 1624 별건 요약(2026-11-09 develop 머지)
-- [3K-PokeClip/PokeClip-mono PR #493](https://github.com/3K-PokeClip/PokeClip-mono/pull/493) — OBS 플러그인 SRT 지연 기본값 1,000ms → 3,000ms(2026-11-09 develop 머지)
+- 3K-PokeClip/PokeClip-mono PR #492 — 회차 단위 다시보기 고침과 조각 1624 별건 요약(2026-11-09 develop 머지) (비공개 저장소)
+- 3K-PokeClip/PokeClip-mono PR #493 — OBS 플러그인 SRT 지연 기본값 1,000ms → 3,000ms(2026-11-09 develop 머지) (비공개 저장소)
 - [bluenviron/mediacommon v2.9.5 `pkg/codecs/h264/dts_extractor.go`](https://github.com/bluenviron/mediacommon/blob/v2.9.5/pkg/codecs/h264/dts_extractor.go) — `maxReorderedFrames = 10`과 POC 기반 DTS 추출(2026-11-11 확인)
 - [bluenviron/mediacommon PR #394](https://github.com/bluenviron/mediacommon/pull/394) — 프레임 손실 때의 DTS 추출 고침 제안(열림)
 - [bluenviron/mediamtx PR #5714](https://github.com/bluenviron/mediamtx/pull/5714) — DTS 추출 실패 뒤 끊지 않고 이어 가는 제안(열림)

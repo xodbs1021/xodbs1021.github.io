@@ -14,17 +14,17 @@ portfolio_edition: "2026-10-15-v2"
 
 편집에서 소리를 따로 켜고 끄려면 소스마다 OBS 트랙 2–6 가운데 하나에만 체크돼 있어야 합니다. OBS는 새 소스를 트랙 1–6에 모두 켜 두므로, PokeClip 플러그인의 자동 배정이 이 체크를 대신 맞춥니다. 그런데 이 체크는 방송자가 짜 둔 설정이고 녹화도 같은 체크를 씁니다. 그래서 자동 배정은 기본으로 꺼 두고, 켜기 전 체크를 장면 컬렉션마다 남겨 두었다가 끄면 그대로 되돌리게 했습니다. 팀원의 OBS 실측에서 본방 트랙을 2로 둔 방송의 첫 오디오에는 본방 소리(440Hz)가 남았고, 컬렉션 A와 B는 자동 배정을 끄자 각자 원래 체크로 돌아왔습니다.
 
-자동 배정을 끄면 원래 체크로 되돌리기(9월 30일)와 자동 배정을 기본으로 꺼 두기(10월 1일)는 제가 정했습니다. 구현과 OBS 실측은 팀원이 [PR #195](https://github.com/3K-PokeClip/PokeClip-mono/pull/195)에서 했습니다. 이 PR은 develop이 아니라 그 바탕인 [PR #179](https://github.com/3K-PokeClip/PokeClip-mono/pull/179)의 브랜치에 10월 1일 병합됐고, 같은 날 #179와 함께 develop에 들어갔습니다.
+자동 배정을 끄면 원래 체크로 되돌리기(9월 30일)와 자동 배정을 기본으로 꺼 두기(10월 1일)는 제가 정했습니다. 구현과 OBS 실측은 팀원이 PR #195에서 했습니다. 이 PR은 develop이 아니라 그 바탕인 PR #179의 브랜치에 10월 1일 병합됐고, 같은 날 #179와 함께 develop에 들어갔습니다.
 
 ## 믹서 0을 첫 오디오로 두면 본방 트랙 2의 소리가 달라졌습니다 {#첫-오디오가-본방이려면-믹서-번호를-고정할-수-없었습니다}
 
 서버는 첫 오디오(`audio1`)에 시청자가 들은 본방 믹스가 오기를 기대합니다([6트랙 입력 계약 글](/posts/0-to-1/pokeclip-six-track-input-contract/)). OBS 단순 출력에서는 본방이 늘 트랙 1(믹서 0)을 쓰지만, 고급 출력에서는 방송자가 본방 트랙을 1–6 가운데에서 고릅니다. 본방 트랙이 2라면 본방은 믹서 1이고, 트랙 1은 방송자가 녹화용으로 따로 짠 믹스일 수 있습니다.
 
-PR #195의 리뷰 1판까지는 `audio1`을 믹서 0으로 만들었습니다. 리뷰에서 「방송 트랙이 1이 아니면 `audio1`이 본방과 다른 믹스」라는 지적이 나왔고, 리뷰 2판에서 본방 오디오 인코더를 믹서 번호와 상관없이 그대로 공유하게 고쳤습니다. 본방 코덱이 AAC가 아니면 같은 믹서로 AAC 인코더를 하나 더 만듭니다([`stream-target.cpp` 478–484행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/obs-plugin/src/stream-target.cpp#L478-L484)). 본방 트랙과 Twitch VOD 트랙은 자동 배정이 자리로 쓰지 않고 체크도 건드리지 않습니다.
+PR #195의 리뷰 1판까지는 `audio1`을 믹서 0으로 만들었습니다. 리뷰에서 「방송 트랙이 1이 아니면 `audio1`이 본방과 다른 믹스」라는 지적이 나왔고, 리뷰 2판에서 본방 오디오 인코더를 믹서 번호와 상관없이 그대로 공유하게 고쳤습니다. 본방 코덱이 AAC가 아니면 같은 믹서로 AAC 인코더를 하나 더 만듭니다(`stream-target.cpp` 478–484행). 본방 트랙과 Twitch VOD 트랙은 자동 배정이 자리로 쓰지 않고 체크도 건드리지 않습니다.
 
 [[fig-main-track-audio1]]은 본방 트랙이 2인 방송에서 각 오디오가 어느 믹서를 받는지입니다. 점선이 고치기 전의 경로입니다.
 
-```mermaid {#fig-main-track-audio1 kind="개념도" caption="고급 출력에서 본방 트랙을 OBS 트랙 2로 고른 경우. audio1은 본방 오디오 인코더(믹서 1)를 그대로 공유하므로 시청자가 들은 소리와 같습니다. 리뷰 1판까지는 audio1을 OBS 트랙 1(믹서 0)으로 만들어 본방과 다를 수 있었습니다. 본방 트랙은 자동 배정이 건드리지 않습니다. PR #195 본문과 PokeClip-mono develop 825a3dfe의 stream-target.cpp · audio-router.cpp 재구성." source="https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/obs-plugin/src/stream-target.cpp#L478-L535"}
+```mermaid {#fig-main-track-audio1 kind="개념도" caption="고급 출력에서 본방 트랙을 OBS 트랙 2로 고른 경우. audio1은 본방 오디오 인코더(믹서 1)를 그대로 공유하므로 시청자가 들은 소리와 같습니다. 리뷰 1판까지는 audio1을 OBS 트랙 1(믹서 0)으로 만들어 본방과 다를 수 있었습니다. 본방 트랙은 자동 배정이 건드리지 않습니다. PR #195 본문과 PokeClip-mono develop 825a3dfe의 stream-target.cpp · audio-router.cpp 재구성." source="프로젝트 저장소 obs-plugin/src/stream-target.cpp(비공개)"}
 flowchart TB
   accTitle: 본방 트랙이 OBS 트랙 2일 때 audio1이 되는 소리
   accDescr: 본방 오디오 인코더는 OBS 트랙 2, 믹서 1의 소리를 내고 그대로 audio1이 된다. 리뷰 1판까지는 OBS 트랙 1, 믹서 0이 audio1이었다. OBS 트랙 2는 본방 트랙이라 자동 배정이 건드리지 않고 audio2가 되며, 트랙 3–6은 자동 배정한 소스별 소리로 audio3–audio6이 된다.
@@ -43,7 +43,7 @@ flowchart TB
 
 자동 배정은 소리를 믹스로 넘기는 소스만 후보로 삼고, 새 자리는 지금 방송 화면에 나오는 소스에만 줍니다. 오디오가 없는 채팅창 같은 브라우저 소스나 다른 장면에만 있는 인트로 영상이 트랙을 먼저 차지하지 않게 하려는 것입니다. 한 번 앉은 소스는 다음 방송에도 같은 트랙을 쓰도록 설정 파일에 기억합니다. 방송·녹화·리플레이 버퍼가 도는 동안에는 지금 나가는 배정을 옮기지 않습니다.
 
-바꾸는 것만큼 되돌리는 것이 중요했습니다. 9월 30일 정한 규칙은 소스마다 처음 쓰기 전의 트랙 2–6 체크를 남겨 두고, 자동 배정을 끄거나 연결을 해제하면 그 값으로 되돌리는 것입니다. 방송·녹화·리플레이 버퍼 중이면 끝난 뒤에 되돌립니다. 리뷰 3판에서 이 백업이 장면 컬렉션을 모른다는 것이 드러났습니다. OBS는 데스크톱 소리·마이크 같은 전역 장치도 컬렉션마다 따로 저장하므로, A에서 남긴 값을 B에 되돌리면 또 다른 설정 변경이 됩니다. 그래서 백업 열쇠를 컬렉션별로 나누고, 끌 때는 지금 컬렉션의 소스만 되돌리고 다른 컬렉션은 그 컬렉션을 열 때 되돌리게 했습니다([`obs-plugin/README.md` 236행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/obs-plugin/README.md?plain=1#L236)).
+바꾸는 것만큼 되돌리는 것이 중요했습니다. 9월 30일 정한 규칙은 소스마다 처음 쓰기 전의 트랙 2–6 체크를 남겨 두고, 자동 배정을 끄거나 연결을 해제하면 그 값으로 되돌리는 것입니다. 방송·녹화·리플레이 버퍼 중이면 끝난 뒤에 되돌립니다. 리뷰 3판에서 이 백업이 장면 컬렉션을 모른다는 것이 드러났습니다. OBS는 데스크톱 소리·마이크 같은 전역 장치도 컬렉션마다 따로 저장하므로, A에서 남긴 값을 B에 되돌리면 또 다른 설정 변경이 됩니다. 그래서 백업 열쇠를 컬렉션별로 나누고, 끌 때는 지금 컬렉션의 소스만 되돌리고 다른 컬렉션은 그 컬렉션을 열 때 되돌리게 했습니다(`obs-plugin/README.md` 236행).
 
 영상에서 컬렉션 A와 B의 체크 격자가 자동 배정으로 바뀌었다가, 끈 뒤 각자의 원래 값으로 돌아오는 순서를 보십시오. 리플레이 버퍼가 도는 동안에는 되돌리기가 미뤄집니다.
 
@@ -97,11 +97,11 @@ PR #195의 오디오 배정 OBS 실측은 한 번이 아니라 리뷰를 거치�
 
 그래서 누를 때 만든 `eventId`(UUID)를 다시 보낼 때도 그대로 씁니다. 네트워크 오류, 5xx, 429, 서버가 아직 방송을 모른다는 응답은 1·2·4…초 간격으로 같은 `eventId`로 다시 보내고, 누른 지 10분이 지나면 버립니다. 키가 틀렸다는 응답처럼 다시 보내도 소용없는 응답은 바로 버립니다. PR #195의 실측은 계약대로 답하는 로컬 목 서버를 상대로 했고, 503을 세 번 받은 뒤 네 번째에 같은 `eventId`로 저장됐습니다(당시 제안 계약의 경로·인증 기준).
 
-PR #195 때는 받는 서버의 창구가 아직 없었습니다. 11월 11일 코드에서는 Clip 서버에 창구가 생겼고, 주소는 `/api/clip/marks`, 인증은 passphrase 원문 대신 그 값으로 만든 HMAC-SHA256 값이며, `eventId`를 `Idempotency-Key` 머리에도 싣습니다([`obs-plugin/README.md` 249·257행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/obs-plugin/README.md?plain=1#L249-L257)). 다만 README는 카드가 붙을 방송 명부 행을 만드는 방송 시작 이벤트 발행을 여전히 서버 쪽 선행 조건으로 적고 있고, 이 글에서 다룬 순간 표시 실측은 목 서버까지입니다.
+PR #195 때는 받는 서버의 창구가 아직 없었습니다. 11월 11일 코드에서는 Clip 서버에 창구가 생겼고, 주소는 `/api/clip/marks`, 인증은 passphrase 원문 대신 그 값으로 만든 HMAC-SHA256 값이며, `eventId`를 `Idempotency-Key` 머리에도 싣습니다(`obs-plugin/README.md` 249·257행). 다만 README는 카드가 붙을 방송 명부 행을 만드는 방송 시작 이벤트 발행을 여전히 서버 쪽 선행 조건으로 적고 있고, 이 글에서 다룬 순간 표시 실측은 목 서버까지입니다.
 
 ## 녹화 전용 트랙은 구분하지 못해 끄는 길을 남겼습니다
 
-OBS의 트랙 체크는 방송과 녹화가 함께 씁니다. 자동 배정은 본방 트랙과 VOD 트랙은 알아보지만, 방송자가 고급 출력 녹화에서 트랙 2–6을 녹화 전용으로 쓰고 있는지는 알 수 없습니다. 그런 방송자는 자동 배정을 꺼야 하고, 끄면 처음 쓰기 전 체크로 돌아갑니다([`obs-plugin/README.md` 240행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/obs-plugin/README.md?plain=1#L240)). 실측은 모두 macOS였고, Windows 실기에서 확인한 기록은 없습니다.
+OBS의 트랙 체크는 방송과 녹화가 함께 씁니다. 자동 배정은 본방 트랙과 VOD 트랙은 알아보지만, 방송자가 고급 출력 녹화에서 트랙 2–6을 녹화 전용으로 쓰고 있는지는 알 수 없습니다. 그런 방송자는 자동 배정을 꺼야 하고, 끄면 처음 쓰기 전 체크로 돌아갑니다(`obs-plugin/README.md` 240행). 실측은 모두 macOS였고, Windows 실기에서 확인한 기록은 없습니다.
 
 편집 입력을 자동으로 만드는 기능이 지켜야 했던 것은 트랙 개수가 아니었습니다. 첫 오디오가 방송자의 본방과 같고, 기능을 끄면 컬렉션마다 이전 설정으로 돌아가고, 다시 보내도 같은 행위가 겹치지 않아야 했습니다. 사용자 설정을 바꾸는 자동화를 넣는다면 켜는 경로보다 끄는 경로를 먼저 시험하십시오. 되돌릴 값이 어디에, 어느 단위로 남는지가 그 기능의 범위를 정합니다.
 
@@ -112,9 +112,9 @@ OBS의 트랙 체크는 방송과 녹화가 함께 씁니다. 자동 배정은 �
 
 ## 출처
 
-- [3K-PokeClip/PokeClip-mono PR #195](https://github.com/3K-PokeClip/PokeClip-mono/pull/195) — 오디오 6트랙 자동 배정과 순간 표시(2026-10-01 #179 브랜치에 머지). 실측 첫 판과 리뷰 1–3판, 기본값 변경
-- [3K-PokeClip/PokeClip-mono PR #179](https://github.com/3K-PokeClip/PokeClip-mono/pull/179) — 본방 인코더를 공유하는 SRT 송출(2026-10-01 develop 머지)
-- [PokeClip-mono `obs-plugin/README.md` 「오디오 트랙」 · 「핫키 마킹」](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/obs-plugin/README.md?plain=1#L199-L257) · [`stream-target.cpp`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/obs-plugin/src/stream-target.cpp#L478-L535)
+- 3K-PokeClip/PokeClip-mono PR #195 — 오디오 6트랙 자동 배정과 순간 표시(2026-10-01 #179 브랜치에 머지). 실측 첫 판과 리뷰 1–3판, 기본값 변경 (비공개 저장소)
+- 3K-PokeClip/PokeClip-mono PR #179 — 본방 인코더를 공유하는 SRT 송출(2026-10-01 develop 머지) (비공개 저장소)
+- PokeClip-mono `obs-plugin/README.md` 「오디오 트랙」 · 「핫키 마킹」 · `stream-target.cpp` (비공개 저장소)
 - [소스 약 10개 대신 OBS 6트랙에 순서만 고정했습니다](/posts/0-to-1/pokeclip-six-track-input-contract/) · [오디오 6트랙은 개수와 고르기와 소리 내용을 따로 검증했습니다](/posts/0-to-1/pokeclip-multiaudio-end-to-end-verification/)
 - 팀 내부 결정 기록(비공개) — 9월 30일 원래 체크 되돌리기, 10월 1일 자동 배정 기본 꺼짐
 

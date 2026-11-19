@@ -10,7 +10,7 @@ description: "PokéClip Media 상자는 IMDS 홉 상한이 2라서 인터넷에 
 
 PokéClip의 Media 상자는 EC2 한 대에서 docker compose로 MediaMTX · nginx · 사이드카 · janitor 등을 돌립니다. 이 상자는 인스턴스 메타데이터 서비스(IMDS)의 홉 상한이 2였고, 그래서 인터넷에 열린 MediaMTX와 nginx 컨테이너도 상자의 역할 자격을 받을 수 있었습니다. 그 역할에는 비밀 · 저장소 · DB 접속 권한이 들어 있습니다. 그래서 홉 상한을 1로 내려 컨테이너로 가는 IMDS 토큰 응답을 버리고, 호스트 망의 대리 창구가 토큰 파일을 가진 사이드카와 janitor에게만 자격을 건네는 구성을 만들었습니다. 실험 EC2에서 MediaMTX 망 칸(네트워크 네임스페이스)의 토큰 요청은 홉 1에서 3/3 막혔고, 음성 대조로 홉을 2로 바꾸자 3/3 다시 닿았습니다. 11월 16일 밤부터 17일 새벽 사이 송출을 받는 상자와 대기 상자 둘 다에 이 구성을 켰고, 두 상자에서도 MediaMTX 망 칸의 토큰 요청은 막히고 창구는 토큰 없는 요청에 401을 돌려줬습니다.
 
-방식과 범위는 제가 정했습니다. 대리 창구를 고른 것, 상자 역할에서 쓰지 않는 KVS 읽기 권한(`GetKey`)을 함께 뺀 것, 창구 프로그램을 사이드카 이미지에 함께 넣은 것, 사고 대응 순서를 「증거 먼저 → 격리 → 정지」로 둔 것, 운영 상자에 켜기로 한 것이 그 결정입니다. 「새 상자로만 켠다」는 런북 규칙에 예외를 두고 떠 있는 상자를 제자리에서 전환한 것은 제 물음에서 시작해 에이전트의 검토를 거쳐 제가 승인했습니다. 창구가 알려 줄 만료의 60분 상한과 IMDS 재조회 규칙은 AI의 레퍼런스 조사가 고른 값이고, 제가 따로 고르지는 않았습니다. 구현 · 시험 · 실험 EC2 실측 · 리뷰 · 레퍼런스 조사와 운영 적용 · 확인 실행은 AI 에이전트(Claude Code와 Codex)가 했습니다. 실험 EC2를 만들고 지우는 일은 제가 승인했고(1차는 명령 묶음을 한 번에, 2차는 실행 직전마다), 운영에서는 첫 상자의 전환, 송출 넘김, 둘째 상자의 설정 적용을 제가 승인했습니다. 변경은 11월 16일 develop에 병합됐고([PokeClip-mono PR 519](https://github.com/3K-PokeClip/PokeClip-mono/pull/519), 머지 커밋 `ff0ac799`), 상자 역할에서 `GetKey`를 뺀 것은 스위치와 별개로 그날 오후 운영 역할에 반영됐습니다.
+방식과 범위는 제가 정했습니다. 대리 창구를 고른 것, 상자 역할에서 쓰지 않는 KVS 읽기 권한(`GetKey`)을 함께 뺀 것, 창구 프로그램을 사이드카 이미지에 함께 넣은 것, 사고 대응 순서를 「증거 먼저 → 격리 → 정지」로 둔 것, 운영 상자에 켜기로 한 것이 그 결정입니다. 「새 상자로만 켠다」는 런북 규칙에 예외를 두고 떠 있는 상자를 제자리에서 전환한 것은 제 물음에서 시작해 에이전트의 검토를 거쳐 제가 승인했습니다. 창구가 알려 줄 만료의 60분 상한과 IMDS 재조회 규칙은 AI의 레퍼런스 조사가 고른 값이고, 제가 따로 고르지는 않았습니다. 구현 · 시험 · 실험 EC2 실측 · 리뷰 · 레퍼런스 조사와 운영 적용 · 확인 실행은 AI 에이전트(Claude Code와 Codex)가 했습니다. 실험 EC2를 만들고 지우는 일은 제가 승인했고(1차는 명령 묶음을 한 번에, 2차는 실행 직전마다), 운영에서는 첫 상자의 전환, 송출 넘김, 둘째 상자의 설정 적용을 제가 승인했습니다. 변경은 11월 16일 develop에 병합됐고(PokeClip-mono PR 519, 머지 커밋 `ff0ac799`), 상자 역할에서 `GetKey`를 뺀 것은 스위치와 별개로 그날 오후 운영 역할에 반영됐습니다.
 
 ## 인터넷에 열린 MediaMTX도 역할 자격을 받을 수 있었습니다
 
@@ -58,19 +58,19 @@ IMDS는 EC2 안의 링크 로컬 주소 `169.254.169.254`에서 그 인스턴스
 
 SDK는 `http` 창구 주소로 루프백 · `169.254.170.2` · `169.254.170.23` · `fd00:ec2::23`만 받습니다([같은 파일 305–310행](https://github.com/aws/aws-sdk-go-v2/blob/config/v1.32.34/config/resolve_credentials.go#L305-L310)). 컨테이너의 루프백은 그 망 칸 안이라 호스트의 창구에 닿지 않으므로, 창구는 `169.254.170.2`에서 듣게 했습니다. 시작 스크립트가 호스트에 더미 네트워크 장치를 만들어 그 주소를 붙입니다. IPv6 주소의 대괄호 처리가 이 검사에 걸린다는 보고도 있었지만 재현되지 않고 닫혔고([aws/aws-sdk-go-v2#3184](https://github.com/aws/aws-sdk-go-v2/issues/3184)), 우리는 IPv4 주소라 해당하지 않습니다.
 
-듣는 자리로는 ECS처럼 iptables DNAT로 루프백 창구에 돌리는 방식(규칙 수명을 우리가 관리하고 `route_localnet`을 열어야 함, [AWS ECS 문서](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html#task-iam-role-considerations))과 별도 systemd 유닛(기존 기동 모델 변경)을 기각했습니다. 창구는 compose 안의 서비스로 두되 호스트 망 · 읽기 전용 루트 · 리눅스 권한(capability) 없음으로 띄웠습니다([compose 템플릿 607행부터](https://github.com/3K-PokeClip/PokeClip-mono/blob/ff0ac799235635e9e2b0d98d31a0ed0406d7a30e/infra/media-host/compose.yml.tmpl#L607-L642)). 창구 바이너리는 별도 이미지 대신 사이드카 이미지에 함께 넣었습니다. 고정할 이미지가 하나 줄어드는 대신, 창구를 켠 상자는 이 병합 이후에 빌드한 사이드카를 써야 합니다.
+듣는 자리로는 ECS처럼 iptables DNAT로 루프백 창구에 돌리는 방식(규칙 수명을 우리가 관리하고 `route_localnet`을 열어야 함, [AWS ECS 문서](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html#task-iam-role-considerations))과 별도 systemd 유닛(기존 기동 모델 변경)을 기각했습니다. 창구는 compose 안의 서비스로 두되 호스트 망 · 읽기 전용 루트 · 리눅스 권한(capability) 없음으로 띄웠습니다(compose 템플릿 607행부터). 창구 바이너리는 별도 이미지 대신 사이드카 이미지에 함께 넣었습니다. 고정할 이미지가 하나 줄어드는 대신, 창구를 켠 상자는 이 병합 이후에 빌드한 사이드카를 써야 합니다.
 
 ## 같은 망 칸에서는 주소가 아니라 토큰 파일로 가릅니다
 
 사이드카 · janitor · MediaMTX · nginx는 한 망 칸을 쓰므로 창구가 보는 출발지 주소가 모두 같습니다. 공개 재측정에서도 토큰을 가진 사이드카 자리의 요청과 토큰 없는 이웃의 요청이 창구 로그에 같은 출발지로 남았습니다. 그래서 창구는 주소가 아니라 토큰으로 호출자를 가립니다.
 
 - **토큰을 만드는 쪽**: 시작 스크립트가 상자를 띄울 때마다 호출자별로 64자 토큰을 새로 만듭니다. 파일은 메모리 위 임시 파일 시스템(tmpfs)에 두어 재부팅하면 사라지고, 주인만 읽을 수 있는 0400입니다. 각 소비자의 토큰 폴더는 그 소비자 컨테이너에만 읽기 전용으로 붙고, 창구는 두 토큰의 사본을 따로 받습니다. 파일 끝에는 개행을 넣지 않습니다. SDK가 개행이 든 토큰을 거부하기 때문입니다([`endpointcreds/provider.go` 193행](https://github.com/aws/aws-sdk-go-v2/blob/credentials/v1.19.33/credentials/endpointcreds/provider.go#L190-L194)).
-- **토큰을 대조하는 쪽**: 창구는 토큰 원문 대신 SHA-256 다이제스트를 들고, 요청 머리의 다이제스트를 모든 호출자와 상수 시간으로 끝까지 견줍니다([`tokens.go` 83–95행](https://github.com/3K-PokeClip/PokeClip-mono/blob/ff0ac799235635e9e2b0d98d31a0ed0406d7a30e/media/internal/credrelay/tokens.go#L83-L95)). 걸린 시간으로 토큰을 한 글자씩 맞혀 보는 길을 막으려는 것입니다.
+- **토큰을 대조하는 쪽**: 창구는 토큰 원문 대신 SHA-256 다이제스트를 들고, 요청 머리의 다이제스트를 모든 호출자와 상수 시간으로 끝까지 견줍니다(`tokens.go` 83–95행). 걸린 시간으로 토큰을 한 글자씩 맞혀 보는 길을 막으려는 것입니다.
 - **엿보기를 막는 쪽**: 창구와 소비자는 평문 HTTP로 이야기합니다. 같은 망 칸에서 원시 소켓 권한(NET_RAW)이 있는 이웃은 그 토큰과 자격 응답을 그대로 엿볼 수 있었고, 권한을 모두 버리면(`cap_drop: ALL`) 엿보지 못했습니다. 비공개 로컬 실험에서 기본 권한 3/3 엿봄 · `cap_drop: ALL` 3/3 못 엿봄이었고, 공개 재측정에서도 같았습니다. 상자의 모든 컨테이너는 권한을 버리고 뜨며, nginx만 CHOWN · SETGID · SETUID를 되살립니다.
 
-uid는 근거로 쓰지 않았습니다. janitor는 녹화를 지우려고 MediaMTX와 같은 uid로 뜨므로, 둘을 가르는 것은 uid가 아니라 토큰 폴더가 붙었느냐입니다. 저장소의 렌더 시험이 이 마운트 쌍을 단언합니다([결정 기록 146–149행](https://github.com/3K-PokeClip/PokeClip-mono/blob/ff0ac799235635e9e2b0d98d31a0ed0406d7a30e/docs/decisions/2026-11-15-media-imds-credential-relay.md?plain=1#L146-L149), [media-host README 「대리 창구 받아들인 위험」](https://github.com/3K-PokeClip/PokeClip-mono/blob/ff0ac799235635e9e2b0d98d31a0ed0406d7a30e/infra/media-host/README.md?plain=1#L1428-L1451)).
+uid는 근거로 쓰지 않았습니다. janitor는 녹화를 지우려고 MediaMTX와 같은 uid로 뜨므로, 둘을 가르는 것은 uid가 아니라 토큰 폴더가 붙었느냐입니다. 저장소의 렌더 시험이 이 마운트 쌍을 단언합니다(결정 기록 146–149행, media-host README 「대리 창구 받아들인 위험」).
 
-창구의 응답 꼴도 SDK에 맞췄습니다. 오류 본문까지 모두 `Content-Type: application/json`이고 자격 응답에는 `Cache-Control: no-store`를 붙입니다. 우리 판 SDK는 `Content-Type`이 정확히 `application/json`일 때만 오류 본문을 읽습니다([`middleware.go` 108–111행](https://github.com/aws/aws-sdk-go-v2/blob/credentials/v1.19.33/credentials/endpointcreds/internal/client/middleware.go#L108-L111)). 이 분기는 자격 창구가 JSON이 아닌 오류를 내 SDK가 해석에 실패한 보고에서 들어왔고, 그 보고에서 보고자는 `HTTP_PROXY`가 요청을 프록시로 보낸 것을 원인으로 짐작했습니다([aws/aws-sdk-go-v2#2316](https://github.com/aws/aws-sdk-go-v2/issues/2316)). 창구는 IMDS를 읽을 때 프록시 변수를 타지 않습니다. 타면 IMDS 토큰과 역할 자격이 평문으로 프록시를 지나기 때문입니다. 토큰 `PUT`이 실패해도 토큰 없는 IMDSv1로 내려가지 않습니다([`source.go` 62–82행](https://github.com/3K-PokeClip/PokeClip-mono/blob/ff0ac799235635e9e2b0d98d31a0ed0406d7a30e/media/internal/credrelay/source.go#L62-L82)).
+창구의 응답 꼴도 SDK에 맞췄습니다. 오류 본문까지 모두 `Content-Type: application/json`이고 자격 응답에는 `Cache-Control: no-store`를 붙입니다. 우리 판 SDK는 `Content-Type`이 정확히 `application/json`일 때만 오류 본문을 읽습니다([`middleware.go` 108–111행](https://github.com/aws/aws-sdk-go-v2/blob/credentials/v1.19.33/credentials/endpointcreds/internal/client/middleware.go#L108-L111)). 이 분기는 자격 창구가 JSON이 아닌 오류를 내 SDK가 해석에 실패한 보고에서 들어왔고, 그 보고에서 보고자는 `HTTP_PROXY`가 요청을 프록시로 보낸 것을 원인으로 짐작했습니다([aws/aws-sdk-go-v2#2316](https://github.com/aws/aws-sdk-go-v2/issues/2316)). 창구는 IMDS를 읽을 때 프록시 변수를 타지 않습니다. 타면 IMDS 토큰과 역할 자격이 평문으로 프록시를 지나기 때문입니다. 토큰 `PUT`이 실패해도 토큰 없는 IMDSv1로 내려가지 않습니다(`source.go` 62–82행).
 
 공개 재측정에서 PR 519 머지 커밋으로 빌드한 실제 창구에 요청을 보낸 결과입니다(가짜 IMDS, [측정 조건](#측정-조건)).
 
@@ -94,7 +94,7 @@ IMDS가 주는 실제 만료는 몇 시간 뒤일 수 있습니다. 실험 EC2�
 
 - **ⓐ 실제 만료를 그대로 알림**: EKS Pod Identity 에이전트가 원천의 만료를 그대로 넘기는 방식입니다([eks-pod-identity-agent v0.2.6](https://github.com/aws/eks-pod-identity-agent/blob/v0.2.6/internal/cloud/eksauth/service.go#L107-L113)). 그런데 우리 소비자는 그 몇 시간 동안 다시 묻지 않습니다. 침해 대응으로 역할 세션을 취소하거나 IMDS가 자격을 교대해도, 소비자는 옛 키에 묶이고 되살리는 길이 소비자 재시작뿐입니다. 기각했습니다.
 - **ⓑ SDK의 `ec2rolecreds`로 IMDS를 읽어 그 값을 알림**: 이 공급자가 만료를 1시간으로 잘라 버려 창구가 실제 만료를 잃습니다. IMDS가 잠깐 실패할 때 언제까지 마지막 자격을 줘도 되는지 알 수 없습니다. 기각했습니다.
-- **ⓒ 실제 만료는 창구 안에 두고, 응답마다 `min(실제 만료, 응답 시각 + 60분)`을 알림**: 채택했습니다([`handler.go` 89–97행](https://github.com/3K-PokeClip/PokeClip-mono/blob/ff0ac799235635e9e2b0d98d31a0ed0406d7a30e/media/internal/credrelay/handler.go#L89-L97)). 소비자는 늦어도 55분 안에 다시 묻고, 알린 만료는 늘 실제 만료 이하입니다.
+- **ⓒ 실제 만료는 창구 안에 두고, 응답마다 `min(실제 만료, 응답 시각 + 60분)`을 알림**: 채택했습니다(`handler.go` 89–97행). 소비자는 늦어도 55분 안에 다시 묻고, 알린 만료는 늘 실제 만료 이하입니다.
 
 실제 만료를 바꿔 가며 창구가 알린 만료를 잰 결과입니다. 실제 남은 시간이 60분보다 길면 60분으로 잘리고, 짧으면 그대로 갑니다.
 
@@ -141,7 +141,7 @@ SDK 쪽도 같은 재측정에서 확인했습니다. 창구가 60분을 알리�
 
 「55분」은 응답 한 벌이 소비자를 묶는 길이일 뿐, 철회 뒤 복구의 상한은 아닙니다. 역할 세션을 취소하면 그 시각 전에 발급된 자격은 AWS가 거부합니다([AWS IAM 문서 — 세션 취소](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_revoke-sessions.html)). 하지만 IMDS가 그 옛 자격을 계속 내주는 동안에는 창구도 그것을 새 60분 상한으로 다시 줍니다. 확실한 복구는 새 상자로 바꾸는 것입니다. 또 새어 나간 키는 창구가 알린 만료와 상관없이 AWS의 실제 만료까지 쓸 수 있습니다. 그 시간을 줄이는 수단은 세션 취소 하나입니다.
 
-창구가 IMDS를 다시 읽는 규칙은 요청이 몰고 갑니다. 배경 작업은 없습니다. 인증된 요청이 왔을 때 마지막 유효분이 없거나, 실제 만료까지 15분 이하이거나, 마지막 성공 뒤 30분이 지났으면 IMDS를 부릅니다. 원천 호출 사이는 성공 · 실패와 무관하게 최소 10초이고, 호출 하나는 2초 안에 끝나야 합니다. IMDS가 실패하면 마지막 자격을 실제 만료 1분 전까지 계속 주고, 그동안 저하 신호(`cred_source_degraded`)를 남깁니다([`consts.go` 12–25행](https://github.com/3K-PokeClip/PokeClip-mono/blob/ff0ac799235635e9e2b0d98d31a0ed0406d7a30e/media/internal/credrelay/consts.go#L12-L25), [`cache.go` 40–69행](https://github.com/3K-PokeClip/PokeClip-mono/blob/ff0ac799235635e9e2b0d98d31a0ed0406d7a30e/media/internal/credrelay/cache.go#L40-L69)).
+창구가 IMDS를 다시 읽는 규칙은 요청이 몰고 갑니다. 배경 작업은 없습니다. 인증된 요청이 왔을 때 마지막 유효분이 없거나, 실제 만료까지 15분 이하이거나, 마지막 성공 뒤 30분이 지났으면 IMDS를 부릅니다. 원천 호출 사이는 성공 · 실패와 무관하게 최소 10초이고, 호출 하나는 2초 안에 끝나야 합니다. IMDS가 실패하면 마지막 자격을 실제 만료 1분 전까지 계속 주고, 그동안 저하 신호(`cred_source_degraded`)를 남깁니다(`consts.go` 12–25행, `cache.go` 40–69행).
 
 같은 재측정에서 이 규칙을 하나씩 일으켜 봤습니다.
 
@@ -156,7 +156,7 @@ SDK 쪽도 같은 재측정에서 확인했습니다. 창구가 60분을 알리�
 
 ## 실험 EC2에서 격리 · 재시작 복구 · 자격 교대를 확인했습니다
 
-11월 16일 새벽 실험 EC2를 한 번 더 띄웠습니다(t4g.small, Amazon Linux 2023 arm64, docker 25.0.16, 정책이 하나도 없는 전용 역할, 들어오는 연결 0, 홉 1, IPv6 IMDS 끔). PR 브랜치의 compose 렌더에서 창구 서비스 블록은 바이트 그대로 쓰고, MediaMTX · nginx · 사이드카 · janitor 자리는 같은 망 칸 · uid · 보안 옵션의 탐침으로 바꿨습니다. 시작 스크립트의 토큰 생성 · 주소 부착 함수는 저장소 파일을 그대로 불렀습니다. 판정 줄은 통과 35, 실패 0이었습니다([실측 요약](https://github.com/xodbs1021/xodbs1021.github.io/blob/main/_workspace/blog/pokeclip-media-imds-credential-relay/measurements.md), [PR 519 「Test plan」](https://github.com/3K-PokeClip/PokeClip-mono/pull/519)).
+11월 16일 새벽 실험 EC2를 한 번 더 띄웠습니다(t4g.small, Amazon Linux 2023 arm64, docker 25.0.16, 정책이 하나도 없는 전용 역할, 들어오는 연결 0, 홉 1, IPv6 IMDS 끔). PR 브랜치의 compose 렌더에서 창구 서비스 블록은 바이트 그대로 쓰고, MediaMTX · nginx · 사이드카 · janitor 자리는 같은 망 칸 · uid · 보안 옵션의 탐침으로 바꿨습니다. 시작 스크립트의 토큰 생성 · 주소 부착 함수는 저장소 파일을 그대로 불렀습니다. 판정 줄은 통과 35, 실패 0이었습니다([실측 요약](https://github.com/xodbs1021/xodbs1021.github.io/blob/main/_workspace/blog/pokeclip-media-imds-credential-relay/measurements.md), PR 519 「Test plan」).
 
 | 확인 | 결과 |
 |---|---|
@@ -184,7 +184,7 @@ SDK 쪽도 같은 재측정에서 확인했습니다. 창구가 60분을 알리�
 
 ## 경계가 아니라 피해 반경을 줄인 것입니다
 
-같은 EC2 위 컨테이너는 여전히 보안 경계가 아닙니다. 이 변경은 MediaMTX나 nginx 하나가 뚫렸을 때 그 자리에서 역할 전체가 넘어가는 길을 끊었을 뿐입니다. 알고 받아들인 위험은 이렇습니다([media-host README 「대리 창구 받아들인 위험」](https://github.com/3K-PokeClip/PokeClip-mono/blob/ff0ac799235635e9e2b0d98d31a0ed0406d7a30e/infra/media-host/README.md?plain=1#L1428-L1451)).
+같은 EC2 위 컨테이너는 여전히 보안 경계가 아닙니다. 이 변경은 MediaMTX나 nginx 하나가 뚫렸을 때 그 자리에서 역할 전체가 넘어가는 길을 끊었을 뿐입니다. 알고 받아들인 위험은 이렇습니다(media-host README 「대리 창구 받아들인 위험」).
 
 - 사이드카와 janitor는 각자 필요한 만큼이 아니라 역할 전체를 받습니다. 소비자별 권한 분리는 목표가 아니었습니다. 두 운영 상자에 켠 뒤로 RDS IAM 글의 한계는 「같은 망 칸의 모든 컨테이너」에서 「창구 토큰을 받은 둘」로 좁아졌습니다.
 - 창구는 호스트 망에 있어, 장악되면 호스트의 루프백 서비스에 닿습니다. 그 시점엔 이미 역할 전체를 얻은 뒤라 더 잃는 것이 작고, 창구는 root가 아니며 권한이 없습니다. 켠 상자의 호스트 리스너 목록은 아직 재지 않았습니다.
@@ -218,12 +218,12 @@ SDK 쪽도 같은 재측정에서 확인했습니다. 창구가 60분을 알리�
 - AWS, [Container credential provider](https://docs.aws.amazon.com/sdkref/latest/guide/feature-container-credentials.html) — `AWS_CONTAINER_CREDENTIALS_FULL_URI` · `AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE`
 - AWS, [Revoke IAM role temporary security credentials](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_revoke-sessions.html) — 세션 취소
 
-코드 · 결정 기록(공개 저장소 3K-PokeClip/PokeClip-mono, 머지 커밋 `ff0ac799`)
-- [PokeClip-mono PR 519](https://github.com/3K-PokeClip/PokeClip-mono/pull/519) — 홉 상한 1과 대리 창구, 상자별 스위치, 실험 EC2 확인 요약(2026-11-16 develop 병합)
-- [결정 기록 `2026-11-15-media-imds-credential-relay.md`](https://github.com/3K-PokeClip/PokeClip-mono/blob/ff0ac799235635e9e2b0d98d31a0ed0406d7a30e/docs/decisions/2026-11-15-media-imds-credential-relay.md) — 고른 방식과 기각한 대안
-- [`media/internal/credrelay`](https://github.com/3K-PokeClip/PokeClip-mono/tree/ff0ac799235635e9e2b0d98d31a0ed0406d7a30e/media/internal/credrelay) — `consts.go` · `cache.go` · `handler.go` · `tokens.go` · `source.go`
-- [`infra/media-host/compose.yml.tmpl`](https://github.com/3K-PokeClip/PokeClip-mono/blob/ff0ac799235635e9e2b0d98d31a0ed0406d7a30e/infra/media-host/compose.yml.tmpl#L607-L642) — 창구 서비스
-- [`infra/media-host/README.md`](https://github.com/3K-PokeClip/PokeClip-mono/blob/ff0ac799235635e9e2b0d98d31a0ed0406d7a30e/infra/media-host/README.md?plain=1#L1353-L1370) — 만료 · 캐시 규칙, [받아들인 위험](https://github.com/3K-PokeClip/PokeClip-mono/blob/ff0ac799235635e9e2b0d98d31a0ed0406d7a30e/infra/media-host/README.md?plain=1#L1428-L1451)
+코드 · 결정 기록(프로젝트 저장소 3K-PokeClip/PokeClip-mono · 2026년 11월 20일부터 비공개, 머지 커밋 `ff0ac799`)
+- PokeClip-mono PR 519 — 홉 상한 1과 대리 창구, 상자별 스위치, 실험 EC2 확인 요약(2026-11-16 develop 병합) (비공개 저장소)
+- 결정 기록 `2026-11-15-media-imds-credential-relay.md` — 고른 방식과 기각한 대안 (비공개 저장소)
+- `media/internal/credrelay` — `consts.go` · `cache.go` · `handler.go` · `tokens.go` · `source.go` (비공개 저장소)
+- `infra/media-host/compose.yml.tmpl` — 창구 서비스 (비공개 저장소)
+- `infra/media-host/README.md` — 만료 · 캐시 규칙, 받아들인 위험 (비공개 저장소)
 
 AWS SDK for Go v2 소스(우리 판)
 - config v1.32.34 [`resolve_credentials.go`](https://github.com/aws/aws-sdk-go-v2/blob/config/v1.32.34/config/resolve_credentials.go) — 공급자 선택(186–197행) · 허용 주소(305–310행) · 캐시 창 5분(373행)
