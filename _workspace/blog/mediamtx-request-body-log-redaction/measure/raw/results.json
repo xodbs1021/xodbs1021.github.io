@@ -1,0 +1,925 @@
+{
+ "markers": [
+  [
+   "MTX6379W-SRTPUB-A",
+   "API body: srtPublishPassphrase (paths/add)"
+  ],
+  [
+   "MTX6379W-SRTREAD",
+   "API body: srtReadPassphrase (paths/add)"
+  ],
+  [
+   "MTX6379W-WHEPBEARER",
+   "API body: whepBearerToken (paths/add)"
+  ],
+  [
+   "MTX6379W-SRTPUB-B",
+   "API body: srtPublishPassphrase (paths/patch)"
+  ],
+  [
+   "MTX6379W-HLSCDN",
+   "API body: hlsCDNSecret (global/patch)"
+  ],
+  [
+   "MTX6379W-USERPASS",
+   "API body: authInternalUsers[].pass (global/patch)"
+  ],
+  [
+   "MTX6379W-APIPASS",
+   "auth body: password+token of the 4 API requests"
+  ],
+  [
+   "MTX6379W-WHEPPASS",
+   "auth body: password+token of the WHEP request"
+  ],
+  [
+   "MTX6379W-QUERYTOKEN",
+   "WHEP query: request line + auth body query"
+  ],
+  [
+   "MTX6379W-SDP",
+   "WHEP body: SDP offer (application/sdp)"
+  ]
+ ],
+ "requests": [
+  "api_paths_add",
+  "api_paths_patch",
+  "api_global_patch",
+  "api_paths_get",
+  "whep_offer"
+ ],
+ "results": {
+  "v1.21.3": [
+   {
+    "statuses": [
+     {
+      "request": "api_paths_add",
+      "status": 200,
+      "body_bytes": 128
+     },
+     {
+      "request": "api_paths_patch",
+      "status": 200,
+      "body_bytes": 45
+     },
+     {
+      "request": "api_global_patch",
+      "status": 200,
+      "body_bytes": 154
+     },
+     {
+      "request": "api_paths_get",
+      "status": 200,
+      "body_bytes": 0
+     },
+     {
+      "request": "whep_offer",
+      "status": 404,
+      "body_bytes": 140
+     }
+    ],
+    "log_markers": {
+     "MTX6379W-SRTPUB-A": 1,
+     "MTX6379W-SRTREAD": 1,
+     "MTX6379W-WHEPBEARER": 1,
+     "MTX6379W-SRTPUB-B": 1,
+     "MTX6379W-HLSCDN": 1,
+     "MTX6379W-USERPASS": 1,
+     "MTX6379W-APIPASS": 8,
+     "MTX6379W-WHEPPASS": 2,
+     "MTX6379W-QUERYTOKEN": 2,
+     "MTX6379W-SDP": 1
+    },
+    "auth_server_markers": {
+     "MTX6379W-SRTPUB-A": 0,
+     "MTX6379W-SRTREAD": 0,
+     "MTX6379W-WHEPBEARER": 0,
+     "MTX6379W-SRTPUB-B": 0,
+     "MTX6379W-HLSCDN": 0,
+     "MTX6379W-USERPASS": 0,
+     "MTX6379W-APIPASS": 8,
+     "MTX6379W-WHEPPASS": 2,
+     "MTX6379W-QUERYTOKEN": 1,
+     "MTX6379W-SDP": 0
+    },
+    "body_of_lines": [
+     "15",
+     "15",
+     "15",
+     "2320",
+     "67"
+    ],
+    "auth_requests_logged": 5,
+    "auth_bodies_received_bytes": [
+     167,
+     167,
+     167,
+     167,
+     259
+    ]
+   },
+   {
+    "statuses": [
+     {
+      "request": "api_paths_add",
+      "status": 200,
+      "body_bytes": 128
+     },
+     {
+      "request": "api_paths_patch",
+      "status": 200,
+      "body_bytes": 45
+     },
+     {
+      "request": "api_global_patch",
+      "status": 200,
+      "body_bytes": 154
+     },
+     {
+      "request": "api_paths_get",
+      "status": 200,
+      "body_bytes": 0
+     },
+     {
+      "request": "whep_offer",
+      "status": 404,
+      "body_bytes": 140
+     }
+    ],
+    "log_markers": {
+     "MTX6379W-SRTPUB-A": 1,
+     "MTX6379W-SRTREAD": 1,
+     "MTX6379W-WHEPBEARER": 1,
+     "MTX6379W-SRTPUB-B": 1,
+     "MTX6379W-HLSCDN": 1,
+     "MTX6379W-USERPASS": 1,
+     "MTX6379W-APIPASS": 8,
+     "MTX6379W-WHEPPASS": 2,
+     "MTX6379W-QUERYTOKEN": 2,
+     "MTX6379W-SDP": 1
+    },
+    "auth_server_markers": {
+     "MTX6379W-SRTPUB-A": 0,
+     "MTX6379W-SRTREAD": 0,
+     "MTX6379W-WHEPBEARER": 0,
+     "MTX6379W-SRTPUB-B": 0,
+     "MTX6379W-HLSCDN": 0,
+     "MTX6379W-USERPASS": 0,
+     "MTX6379W-APIPASS": 8,
+     "MTX6379W-WHEPPASS": 2,
+     "MTX6379W-QUERYTOKEN": 1,
+     "MTX6379W-SDP": 0
+    },
+    "body_of_lines": [
+     "15",
+     "15",
+     "15",
+     "2320",
+     "67"
+    ],
+    "auth_requests_logged": 5,
+    "auth_bodies_received_bytes": [
+     167,
+     167,
+     167,
+     167,
+     259
+    ]
+   },
+   {
+    "statuses": [
+     {
+      "request": "api_paths_add",
+      "status": 200,
+      "body_bytes": 128
+     },
+     {
+      "request": "api_paths_patch",
+      "status": 200,
+      "body_bytes": 45
+     },
+     {
+      "request": "api_global_patch",
+      "status": 200,
+      "body_bytes": 154
+     },
+     {
+      "request": "api_paths_get",
+      "status": 200,
+      "body_bytes": 0
+     },
+     {
+      "request": "whep_offer",
+      "status": 404,
+      "body_bytes": 140
+     }
+    ],
+    "log_markers": {
+     "MTX6379W-SRTPUB-A": 1,
+     "MTX6379W-SRTREAD": 1,
+     "MTX6379W-WHEPBEARER": 1,
+     "MTX6379W-SRTPUB-B": 1,
+     "MTX6379W-HLSCDN": 1,
+     "MTX6379W-USERPASS": 1,
+     "MTX6379W-APIPASS": 8,
+     "MTX6379W-WHEPPASS": 2,
+     "MTX6379W-QUERYTOKEN": 2,
+     "MTX6379W-SDP": 1
+    },
+    "auth_server_markers": {
+     "MTX6379W-SRTPUB-A": 0,
+     "MTX6379W-SRTREAD": 0,
+     "MTX6379W-WHEPBEARER": 0,
+     "MTX6379W-SRTPUB-B": 0,
+     "MTX6379W-HLSCDN": 0,
+     "MTX6379W-USERPASS": 0,
+     "MTX6379W-APIPASS": 8,
+     "MTX6379W-WHEPPASS": 2,
+     "MTX6379W-QUERYTOKEN": 1,
+     "MTX6379W-SDP": 0
+    },
+    "body_of_lines": [
+     "15",
+     "15",
+     "15",
+     "2320",
+     "67"
+    ],
+    "auth_requests_logged": 5,
+    "auth_bodies_received_bytes": [
+     167,
+     167,
+     167,
+     167,
+     259
+    ]
+   }
+  ],
+  "9c68b477": [
+   {
+    "statuses": [
+     {
+      "request": "api_paths_add",
+      "status": 200,
+      "body_bytes": 128
+     },
+     {
+      "request": "api_paths_patch",
+      "status": 200,
+      "body_bytes": 45
+     },
+     {
+      "request": "api_global_patch",
+      "status": 200,
+      "body_bytes": 154
+     },
+     {
+      "request": "api_paths_get",
+      "status": 200,
+      "body_bytes": 0
+     },
+     {
+      "request": "whep_offer",
+      "status": 404,
+      "body_bytes": 140
+     }
+    ],
+    "log_markers": {
+     "MTX6379W-SRTPUB-A": 1,
+     "MTX6379W-SRTREAD": 1,
+     "MTX6379W-WHEPBEARER": 1,
+     "MTX6379W-SRTPUB-B": 1,
+     "MTX6379W-HLSCDN": 1,
+     "MTX6379W-USERPASS": 1,
+     "MTX6379W-APIPASS": 8,
+     "MTX6379W-WHEPPASS": 2,
+     "MTX6379W-QUERYTOKEN": 2,
+     "MTX6379W-SDP": 1
+    },
+    "auth_server_markers": {
+     "MTX6379W-SRTPUB-A": 0,
+     "MTX6379W-SRTREAD": 0,
+     "MTX6379W-WHEPBEARER": 0,
+     "MTX6379W-SRTPUB-B": 0,
+     "MTX6379W-HLSCDN": 0,
+     "MTX6379W-USERPASS": 0,
+     "MTX6379W-APIPASS": 8,
+     "MTX6379W-WHEPPASS": 2,
+     "MTX6379W-QUERYTOKEN": 1,
+     "MTX6379W-SDP": 0
+    },
+    "body_of_lines": [
+     "15",
+     "15",
+     "15",
+     "2320",
+     "67"
+    ],
+    "auth_requests_logged": 5,
+    "auth_bodies_received_bytes": [
+     167,
+     167,
+     167,
+     167,
+     259
+    ]
+   },
+   {
+    "statuses": [
+     {
+      "request": "api_paths_add",
+      "status": 200,
+      "body_bytes": 128
+     },
+     {
+      "request": "api_paths_patch",
+      "status": 200,
+      "body_bytes": 45
+     },
+     {
+      "request": "api_global_patch",
+      "status": 200,
+      "body_bytes": 154
+     },
+     {
+      "request": "api_paths_get",
+      "status": 200,
+      "body_bytes": 0
+     },
+     {
+      "request": "whep_offer",
+      "status": 404,
+      "body_bytes": 140
+     }
+    ],
+    "log_markers": {
+     "MTX6379W-SRTPUB-A": 1,
+     "MTX6379W-SRTREAD": 1,
+     "MTX6379W-WHEPBEARER": 1,
+     "MTX6379W-SRTPUB-B": 1,
+     "MTX6379W-HLSCDN": 1,
+     "MTX6379W-USERPASS": 1,
+     "MTX6379W-APIPASS": 8,
+     "MTX6379W-WHEPPASS": 2,
+     "MTX6379W-QUERYTOKEN": 2,
+     "MTX6379W-SDP": 1
+    },
+    "auth_server_markers": {
+     "MTX6379W-SRTPUB-A": 0,
+     "MTX6379W-SRTREAD": 0,
+     "MTX6379W-WHEPBEARER": 0,
+     "MTX6379W-SRTPUB-B": 0,
+     "MTX6379W-HLSCDN": 0,
+     "MTX6379W-USERPASS": 0,
+     "MTX6379W-APIPASS": 8,
+     "MTX6379W-WHEPPASS": 2,
+     "MTX6379W-QUERYTOKEN": 1,
+     "MTX6379W-SDP": 0
+    },
+    "body_of_lines": [
+     "15",
+     "15",
+     "15",
+     "2320",
+     "67"
+    ],
+    "auth_requests_logged": 5,
+    "auth_bodies_received_bytes": [
+     167,
+     167,
+     167,
+     167,
+     259
+    ]
+   },
+   {
+    "statuses": [
+     {
+      "request": "api_paths_add",
+      "status": 200,
+      "body_bytes": 128
+     },
+     {
+      "request": "api_paths_patch",
+      "status": 200,
+      "body_bytes": 45
+     },
+     {
+      "request": "api_global_patch",
+      "status": 200,
+      "body_bytes": 154
+     },
+     {
+      "request": "api_paths_get",
+      "status": 200,
+      "body_bytes": 0
+     },
+     {
+      "request": "whep_offer",
+      "status": 404,
+      "body_bytes": 140
+     }
+    ],
+    "log_markers": {
+     "MTX6379W-SRTPUB-A": 1,
+     "MTX6379W-SRTREAD": 1,
+     "MTX6379W-WHEPBEARER": 1,
+     "MTX6379W-SRTPUB-B": 1,
+     "MTX6379W-HLSCDN": 1,
+     "MTX6379W-USERPASS": 1,
+     "MTX6379W-APIPASS": 8,
+     "MTX6379W-WHEPPASS": 2,
+     "MTX6379W-QUERYTOKEN": 2,
+     "MTX6379W-SDP": 1
+    },
+    "auth_server_markers": {
+     "MTX6379W-SRTPUB-A": 0,
+     "MTX6379W-SRTREAD": 0,
+     "MTX6379W-WHEPBEARER": 0,
+     "MTX6379W-SRTPUB-B": 0,
+     "MTX6379W-HLSCDN": 0,
+     "MTX6379W-USERPASS": 0,
+     "MTX6379W-APIPASS": 8,
+     "MTX6379W-WHEPPASS": 2,
+     "MTX6379W-QUERYTOKEN": 1,
+     "MTX6379W-SDP": 0
+    },
+    "body_of_lines": [
+     "15",
+     "15",
+     "15",
+     "2320",
+     "67"
+    ],
+    "auth_requests_logged": 5,
+    "auth_bodies_received_bytes": [
+     167,
+     167,
+     167,
+     167,
+     259
+    ]
+   }
+  ],
+  "c12bac19": [
+   {
+    "statuses": [
+     {
+      "request": "api_paths_add",
+      "status": 200,
+      "body_bytes": 128
+     },
+     {
+      "request": "api_paths_patch",
+      "status": 200,
+      "body_bytes": 45
+     },
+     {
+      "request": "api_global_patch",
+      "status": 200,
+      "body_bytes": 154
+     },
+     {
+      "request": "api_paths_get",
+      "status": 200,
+      "body_bytes": 0
+     },
+     {
+      "request": "whep_offer",
+      "status": 404,
+      "body_bytes": 140
+     }
+    ],
+    "log_markers": {
+     "MTX6379W-SRTPUB-A": 0,
+     "MTX6379W-SRTREAD": 0,
+     "MTX6379W-WHEPBEARER": 0,
+     "MTX6379W-SRTPUB-B": 0,
+     "MTX6379W-HLSCDN": 0,
+     "MTX6379W-USERPASS": 0,
+     "MTX6379W-APIPASS": 0,
+     "MTX6379W-WHEPPASS": 0,
+     "MTX6379W-QUERYTOKEN": 1,
+     "MTX6379W-SDP": 1
+    },
+    "auth_server_markers": {
+     "MTX6379W-SRTPUB-A": 0,
+     "MTX6379W-SRTREAD": 0,
+     "MTX6379W-WHEPBEARER": 0,
+     "MTX6379W-SRTPUB-B": 0,
+     "MTX6379W-HLSCDN": 0,
+     "MTX6379W-USERPASS": 0,
+     "MTX6379W-APIPASS": 8,
+     "MTX6379W-WHEPPASS": 2,
+     "MTX6379W-QUERYTOKEN": 1,
+     "MTX6379W-SDP": 0
+    },
+    "body_of_lines": [
+     "128",
+     "167",
+     "15",
+     "45",
+     "167",
+     "15",
+     "154",
+     "167",
+     "15",
+     "167",
+     "2320",
+     "259",
+     "67"
+    ],
+    "auth_requests_logged": 5,
+    "auth_bodies_received_bytes": [
+     167,
+     167,
+     167,
+     167,
+     259
+    ]
+   },
+   {
+    "statuses": [
+     {
+      "request": "api_paths_add",
+      "status": 200,
+      "body_bytes": 128
+     },
+     {
+      "request": "api_paths_patch",
+      "status": 200,
+      "body_bytes": 45
+     },
+     {
+      "request": "api_global_patch",
+      "status": 200,
+      "body_bytes": 154
+     },
+     {
+      "request": "api_paths_get",
+      "status": 200,
+      "body_bytes": 0
+     },
+     {
+      "request": "whep_offer",
+      "status": 404,
+      "body_bytes": 140
+     }
+    ],
+    "log_markers": {
+     "MTX6379W-SRTPUB-A": 0,
+     "MTX6379W-SRTREAD": 0,
+     "MTX6379W-WHEPBEARER": 0,
+     "MTX6379W-SRTPUB-B": 0,
+     "MTX6379W-HLSCDN": 0,
+     "MTX6379W-USERPASS": 0,
+     "MTX6379W-APIPASS": 0,
+     "MTX6379W-WHEPPASS": 0,
+     "MTX6379W-QUERYTOKEN": 1,
+     "MTX6379W-SDP": 1
+    },
+    "auth_server_markers": {
+     "MTX6379W-SRTPUB-A": 0,
+     "MTX6379W-SRTREAD": 0,
+     "MTX6379W-WHEPBEARER": 0,
+     "MTX6379W-SRTPUB-B": 0,
+     "MTX6379W-HLSCDN": 0,
+     "MTX6379W-USERPASS": 0,
+     "MTX6379W-APIPASS": 8,
+     "MTX6379W-WHEPPASS": 2,
+     "MTX6379W-QUERYTOKEN": 1,
+     "MTX6379W-SDP": 0
+    },
+    "body_of_lines": [
+     "128",
+     "167",
+     "15",
+     "45",
+     "167",
+     "15",
+     "154",
+     "167",
+     "15",
+     "167",
+     "2320",
+     "259",
+     "67"
+    ],
+    "auth_requests_logged": 5,
+    "auth_bodies_received_bytes": [
+     167,
+     167,
+     167,
+     167,
+     259
+    ]
+   },
+   {
+    "statuses": [
+     {
+      "request": "api_paths_add",
+      "status": 200,
+      "body_bytes": 128
+     },
+     {
+      "request": "api_paths_patch",
+      "status": 200,
+      "body_bytes": 45
+     },
+     {
+      "request": "api_global_patch",
+      "status": 200,
+      "body_bytes": 154
+     },
+     {
+      "request": "api_paths_get",
+      "status": 200,
+      "body_bytes": 0
+     },
+     {
+      "request": "whep_offer",
+      "status": 404,
+      "body_bytes": 140
+     }
+    ],
+    "log_markers": {
+     "MTX6379W-SRTPUB-A": 0,
+     "MTX6379W-SRTREAD": 0,
+     "MTX6379W-WHEPBEARER": 0,
+     "MTX6379W-SRTPUB-B": 0,
+     "MTX6379W-HLSCDN": 0,
+     "MTX6379W-USERPASS": 0,
+     "MTX6379W-APIPASS": 0,
+     "MTX6379W-WHEPPASS": 0,
+     "MTX6379W-QUERYTOKEN": 1,
+     "MTX6379W-SDP": 1
+    },
+    "auth_server_markers": {
+     "MTX6379W-SRTPUB-A": 0,
+     "MTX6379W-SRTREAD": 0,
+     "MTX6379W-WHEPBEARER": 0,
+     "MTX6379W-SRTPUB-B": 0,
+     "MTX6379W-HLSCDN": 0,
+     "MTX6379W-USERPASS": 0,
+     "MTX6379W-APIPASS": 8,
+     "MTX6379W-WHEPPASS": 2,
+     "MTX6379W-QUERYTOKEN": 1,
+     "MTX6379W-SDP": 0
+    },
+    "body_of_lines": [
+     "128",
+     "167",
+     "15",
+     "45",
+     "167",
+     "15",
+     "154",
+     "167",
+     "15",
+     "167",
+     "2320",
+     "259",
+     "67"
+    ],
+    "auth_requests_logged": 5,
+    "auth_bodies_received_bytes": [
+     167,
+     167,
+     167,
+     167,
+     259
+    ]
+   }
+  ],
+  "v1.21.4": [
+   {
+    "statuses": [
+     {
+      "request": "api_paths_add",
+      "status": 200,
+      "body_bytes": 128
+     },
+     {
+      "request": "api_paths_patch",
+      "status": 200,
+      "body_bytes": 45
+     },
+     {
+      "request": "api_global_patch",
+      "status": 200,
+      "body_bytes": 154
+     },
+     {
+      "request": "api_paths_get",
+      "status": 200,
+      "body_bytes": 0
+     },
+     {
+      "request": "whep_offer",
+      "status": 404,
+      "body_bytes": 140
+     }
+    ],
+    "log_markers": {
+     "MTX6379W-SRTPUB-A": 0,
+     "MTX6379W-SRTREAD": 0,
+     "MTX6379W-WHEPBEARER": 0,
+     "MTX6379W-SRTPUB-B": 0,
+     "MTX6379W-HLSCDN": 0,
+     "MTX6379W-USERPASS": 0,
+     "MTX6379W-APIPASS": 0,
+     "MTX6379W-WHEPPASS": 0,
+     "MTX6379W-QUERYTOKEN": 1,
+     "MTX6379W-SDP": 1
+    },
+    "auth_server_markers": {
+     "MTX6379W-SRTPUB-A": 0,
+     "MTX6379W-SRTREAD": 0,
+     "MTX6379W-WHEPBEARER": 0,
+     "MTX6379W-SRTPUB-B": 0,
+     "MTX6379W-HLSCDN": 0,
+     "MTX6379W-USERPASS": 0,
+     "MTX6379W-APIPASS": 8,
+     "MTX6379W-WHEPPASS": 2,
+     "MTX6379W-QUERYTOKEN": 1,
+     "MTX6379W-SDP": 0
+    },
+    "body_of_lines": [
+     "128",
+     "167",
+     "15",
+     "45",
+     "167",
+     "15",
+     "154",
+     "167",
+     "15",
+     "167",
+     "2328",
+     "259",
+     "67"
+    ],
+    "auth_requests_logged": 5,
+    "auth_bodies_received_bytes": [
+     167,
+     167,
+     167,
+     167,
+     259
+    ]
+   },
+   {
+    "statuses": [
+     {
+      "request": "api_paths_add",
+      "status": 200,
+      "body_bytes": 128
+     },
+     {
+      "request": "api_paths_patch",
+      "status": 200,
+      "body_bytes": 45
+     },
+     {
+      "request": "api_global_patch",
+      "status": 200,
+      "body_bytes": 154
+     },
+     {
+      "request": "api_paths_get",
+      "status": 200,
+      "body_bytes": 0
+     },
+     {
+      "request": "whep_offer",
+      "status": 404,
+      "body_bytes": 140
+     }
+    ],
+    "log_markers": {
+     "MTX6379W-SRTPUB-A": 0,
+     "MTX6379W-SRTREAD": 0,
+     "MTX6379W-WHEPBEARER": 0,
+     "MTX6379W-SRTPUB-B": 0,
+     "MTX6379W-HLSCDN": 0,
+     "MTX6379W-USERPASS": 0,
+     "MTX6379W-APIPASS": 0,
+     "MTX6379W-WHEPPASS": 0,
+     "MTX6379W-QUERYTOKEN": 1,
+     "MTX6379W-SDP": 1
+    },
+    "auth_server_markers": {
+     "MTX6379W-SRTPUB-A": 0,
+     "MTX6379W-SRTREAD": 0,
+     "MTX6379W-WHEPBEARER": 0,
+     "MTX6379W-SRTPUB-B": 0,
+     "MTX6379W-HLSCDN": 0,
+     "MTX6379W-USERPASS": 0,
+     "MTX6379W-APIPASS": 8,
+     "MTX6379W-WHEPPASS": 2,
+     "MTX6379W-QUERYTOKEN": 1,
+     "MTX6379W-SDP": 0
+    },
+    "body_of_lines": [
+     "128",
+     "167",
+     "15",
+     "45",
+     "167",
+     "15",
+     "154",
+     "167",
+     "15",
+     "167",
+     "2328",
+     "259",
+     "67"
+    ],
+    "auth_requests_logged": 5,
+    "auth_bodies_received_bytes": [
+     167,
+     167,
+     167,
+     167,
+     259
+    ]
+   },
+   {
+    "statuses": [
+     {
+      "request": "api_paths_add",
+      "status": 200,
+      "body_bytes": 128
+     },
+     {
+      "request": "api_paths_patch",
+      "status": 200,
+      "body_bytes": 45
+     },
+     {
+      "request": "api_global_patch",
+      "status": 200,
+      "body_bytes": 154
+     },
+     {
+      "request": "api_paths_get",
+      "status": 200,
+      "body_bytes": 0
+     },
+     {
+      "request": "whep_offer",
+      "status": 404,
+      "body_bytes": 140
+     }
+    ],
+    "log_markers": {
+     "MTX6379W-SRTPUB-A": 0,
+     "MTX6379W-SRTREAD": 0,
+     "MTX6379W-WHEPBEARER": 0,
+     "MTX6379W-SRTPUB-B": 0,
+     "MTX6379W-HLSCDN": 0,
+     "MTX6379W-USERPASS": 0,
+     "MTX6379W-APIPASS": 0,
+     "MTX6379W-WHEPPASS": 0,
+     "MTX6379W-QUERYTOKEN": 1,
+     "MTX6379W-SDP": 1
+    },
+    "auth_server_markers": {
+     "MTX6379W-SRTPUB-A": 0,
+     "MTX6379W-SRTREAD": 0,
+     "MTX6379W-WHEPBEARER": 0,
+     "MTX6379W-SRTPUB-B": 0,
+     "MTX6379W-HLSCDN": 0,
+     "MTX6379W-USERPASS": 0,
+     "MTX6379W-APIPASS": 8,
+     "MTX6379W-WHEPPASS": 2,
+     "MTX6379W-QUERYTOKEN": 1,
+     "MTX6379W-SDP": 0
+    },
+    "body_of_lines": [
+     "128",
+     "167",
+     "15",
+     "45",
+     "167",
+     "15",
+     "154",
+     "167",
+     "15",
+     "167",
+     "2328",
+     "259",
+     "67"
+    ],
+    "auth_requests_logged": 5,
+    "auth_bodies_received_bytes": [
+     167,
+     167,
+     167,
+     167,
+     259
+    ]
+   }
+  ]
+ }
+}

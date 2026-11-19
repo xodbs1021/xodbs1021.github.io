@@ -1,0 +1,160 @@
+2026/11/19 14:32:33 INF MediaMTX v1.21.4, darwin, arm64
+2026/11/19 14:32:33 INF configuration loaded from /tmp/mtx6379w-run/final/v1.21.4/run1/mediamtx.yml
+2026/11/19 14:32:33 DEB path manager created
+2026/11/19 14:32:33 INF [WebRTC] started with listeners on 127.0.0.1:28889 (TCP/HTTP), 127.0.0.1:28189 (UDP/ICE)
+2026/11/19 14:32:33 INF [API] started with listener on 127.0.0.1:29997 (TCP/HTTP)
+2026/11/19 14:32:34 DEB [API] [conn 127.0.0.1:61406] [c->s] POST /v3/config/paths/add/probe HTTP/1.1
+Host: 127.0.0.1:29997
+Accept-Encoding: identity
+Authorization: <redacted>
+Connection: close
+Content-Length: 128
+Content-Type: application/json
+User-Agent: Python-urllib/3.14
+
+(body of 128 bytes)
+2026/11/19 14:32:34 DEB [c->s] POST /auth HTTP/1.1
+Host: 127.0.0.1:28181
+Content-Type: application/json
+
+(body of 167 bytes)
+2026/11/19 14:32:34 DEB [s->c] HTTP/1.0 200 OK
+Content-Length: 0
+Date: Thu, 19 Nov 2026 05:32:34 GMT
+Server: BaseHTTP/0.6 Python/3.14.5
+
+
+2026/11/19 14:32:34 INF reloading configuration (API request)
+2026/11/19 14:32:34 DEB [API] [conn 127.0.0.1:61406] [s->c] HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Server: mediamtx
+
+(body of 15 bytes)
+2026/11/19 14:32:34 DEB [path probe] created
+2026/11/19 14:32:34 DEB [API] [conn 127.0.0.1:61409] [c->s] PATCH /v3/config/paths/patch/probe HTTP/1.1
+Host: 127.0.0.1:29997
+Accept-Encoding: identity
+Authorization: <redacted>
+Connection: close
+Content-Length: 45
+Content-Type: application/json
+User-Agent: Python-urllib/3.14
+
+(body of 45 bytes)
+2026/11/19 14:32:34 DEB [c->s] POST /auth HTTP/1.1
+Host: 127.0.0.1:28181
+Content-Type: application/json
+
+(body of 167 bytes)
+2026/11/19 14:32:34 DEB [s->c] HTTP/1.0 200 OK
+Content-Length: 0
+Date: Thu, 19 Nov 2026 05:32:34 GMT
+Server: BaseHTTP/0.6 Python/3.14.5
+
+
+2026/11/19 14:32:34 INF reloading configuration (API request)
+2026/11/19 14:32:34 DEB [API] [conn 127.0.0.1:61409] [s->c] HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Server: mediamtx
+
+(body of 15 bytes)
+2026/11/19 14:32:34 DEB [path probe] destroyed: terminated
+2026/11/19 14:32:34 DEB [path probe] created
+2026/11/19 14:32:34 DEB [API] [conn 127.0.0.1:61412] [c->s] PATCH /v3/config/global/patch HTTP/1.1
+Host: 127.0.0.1:29997
+Accept-Encoding: identity
+Authorization: <redacted>
+Connection: close
+Content-Length: 154
+Content-Type: application/json
+User-Agent: Python-urllib/3.14
+
+(body of 154 bytes)
+2026/11/19 14:32:34 DEB [c->s] POST /auth HTTP/1.1
+Host: 127.0.0.1:28181
+Content-Type: application/json
+
+(body of 167 bytes)
+2026/11/19 14:32:34 DEB [s->c] HTTP/1.0 200 OK
+Content-Length: 0
+Date: Thu, 19 Nov 2026 05:32:34 GMT
+Server: BaseHTTP/0.6 Python/3.14.5
+
+
+2026/11/19 14:32:34 INF reloading configuration (API request)
+2026/11/19 14:32:34 INF [API] closing
+2026/11/19 14:32:34 DEB [API] [conn 127.0.0.1:61412] [s->c] HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Server: mediamtx
+
+(body of 15 bytes)
+2026/11/19 14:32:34 DEB [API] closed
+2026/11/19 14:32:34 INF [API] started with listener on 127.0.0.1:29997 (TCP/HTTP)
+2026/11/19 14:32:34 DEB [API] [conn 127.0.0.1:61414] [c->s] GET /v3/config/paths/get/probe HTTP/1.1
+Host: 127.0.0.1:29997
+Accept-Encoding: identity
+Authorization: <redacted>
+Connection: close
+User-Agent: Python-urllib/3.14
+
+
+2026/11/19 14:32:34 DEB [c->s] POST /auth HTTP/1.1
+Host: 127.0.0.1:28181
+Content-Type: application/json
+
+(body of 167 bytes)
+2026/11/19 14:32:34 DEB [s->c] HTTP/1.0 200 OK
+Content-Length: 0
+Date: Thu, 19 Nov 2026 05:32:34 GMT
+Server: BaseHTTP/0.6 Python/3.14.5
+
+
+2026/11/19 14:32:34 DEB [API] [conn 127.0.0.1:61414] [s->c] HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Server: mediamtx
+
+(body of 2328 bytes)
+2026/11/19 14:32:35 DEB [WebRTC] [conn 127.0.0.1:61416] [c->s] POST /probe/whep?token=MTX6379W-QUERYTOKEN HTTP/1.1
+Host: 127.0.0.1:28889
+Accept-Encoding: identity
+Authorization: <redacted>
+Connection: close
+Content-Length: 140
+Content-Type: application/sdp
+User-Agent: Python-urllib/3.14
+
+v=0
+o=- 1 1 IN IP4 127.0.0.1
+s=MTX6379W-SDP
+t=0 0
+m=video 9 UDP/TLS/RTP/SAVPF 96
+c=IN IP4 0.0.0.0
+a=rtpmap:96 H264/90000
+a=recvonly
+
+2026/11/19 14:32:35 INF [WebRTC] [session e2d0fddf] created by 127.0.0.1:61416
+2026/11/19 14:32:35 DEB [c->s] POST /auth HTTP/1.1
+Host: 127.0.0.1:28181
+Content-Type: application/json
+
+(body of 259 bytes)
+2026/11/19 14:32:35 DEB [s->c] HTTP/1.0 200 OK
+Content-Length: 0
+Date: Thu, 19 Nov 2026 05:32:35 GMT
+Server: BaseHTTP/0.6 Python/3.14.5
+
+
+2026/11/19 14:32:35 INF [WebRTC] [session e2d0fddf] closed: no stream is available on path 'probe'
+2026/11/19 14:32:35 DEB [WebRTC] [conn 127.0.0.1:61416] [s->c] HTTP/1.1 404 Not Found
+Content-Type: application/json; charset=utf-8
+Server: mediamtx
+
+(body of 67 bytes)
+2026/11/19 14:32:36 INF shutting down gracefully
+2026/11/19 14:32:36 INF [API] closing
+2026/11/19 14:32:36 DEB [API] closed
+2026/11/19 14:32:36 INF [WebRTC] closing
+2026/11/19 14:32:36 DEB [WebRTC] closed
+2026/11/19 14:32:36 DEB path manager is shutting down
+2026/11/19 14:32:36 DEB [path probe] destroyed: terminated
+2026/11/19 14:32:36 INF waiting for running hooks

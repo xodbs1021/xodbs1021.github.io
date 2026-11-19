@@ -805,6 +805,32 @@
       "poster": "/images/mediamtx-offline-recording-source-lifecycle-offline-recording-gate-mobile-poster.jpg"
     }
   },
+  "mediamtx-request-body-log-redaction-body-content-gate": {
+    "scene": "BodyContentGate",
+    "alt": "제목 v1.21.4 · debug 로그 아래에 본문을 남기는 목록 application/sdp · application/trickle-ice-sdpfrag 가 적혀 있다. 세 줄의 요청 카드가 있다. 첫 줄 application/sdp · WHEP 제안 140 B 카드에서 청록 본문 꾸러미가 관문 칸으로 가고 관문이 청록 ✓로 바뀐 뒤 로그로 가서 [c->s] POST /probe/whep 와 청록 s=MTX6379W-SDP 줄이 뜬다. 둘째 줄 application/json · API 설정 · 128 B 카드와 셋째 줄 application/json · 인증 요청 · 167 B 카드에는 빨간 비밀 이름표가 있다. 두 카드의 꾸러미는 관문에서 회색 점선 ✕를 만나 회색 128 B, 167 B 크기 꾸러미로 바뀌어 로그로 가고, 로그에는 (body of 128 bytes), (body of 167 bytes) 만 뜬다",
+    "sha256": "c4b245c134296b1c29f040fa41f16baf1d703592b1a8163abf77bb140cc477ac",
+    "bytes": 229573,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 11,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/mediamtx-request-body-log-redaction-body-content-gate-poster.jpg",
+    "mobile": {
+      "sha256": "a5c5aaf3cb957605bc925e0c027d4e6bf5d7e463bb215e85c87c1af7ae436c3c",
+      "bytes": 226506,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 11,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/mediamtx-request-body-log-redaction-body-content-gate-mobile-poster.jpg"
+    }
+  },
   "mediamtx-seven-hooks-missing-exit-callback-silent-exec-failure": {
     "scene": "SilentExecFailure",
     "alt": "두 줄이 있다. 위 줄은 v1.21.3 · OnExit 없음, 아래 줄은 #6259 · OnExit 있음. 각 줄에 자식 프로세스 자리(처음에는 회색 점선 상자), MediaMTX 상자, 로그 상자가 있다. 두 줄 모두 로그에 launched가 찍히고 MediaMTX에서 자식 자리로 exec 화살표가 간다. 자식 자리는 빨갛게 바뀌며 자식 프로세스 생기지 않음, stderr 없음이 뜬다. 실패가 되돌아올 때 위 줄은 회색 점선 받을 곳 없음으로 끝나고 로그에 (더 없음)이 뜬다. 아래 줄은 청록 OnExit 화살표로 MediaMTX에 닿고 로그에 청록 exited: no such file이 찍힌다",

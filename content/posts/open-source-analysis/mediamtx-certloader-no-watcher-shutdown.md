@@ -1,15 +1,15 @@
 ---
 title: "인증서를 저장하지 못한 MediaMTX는 종료되지 않았습니다"
 date: "2026-10-28T18:38:23+09:00"
-lastmod: "2026-11-13T22:07:44+09:00"
+lastmod: "2026-11-19T15:12:25+09:00"
 draft: false
 author: "김태윤"
-description: "MediaMTX v1.21.3은 기본 설정에서 MoQ 서버를 켜고 TLS 인증서를 작업 디렉터리에 자동 생성합니다. 그 디렉터리에 쓸 수 없으면 실행은 되지만 SIGINT 뒤 [MoQ] closing에서 멈춥니다. 완료 채널 done을 닫을 watch()가 시작되지 않았기 때문이고, 그 분기에 close(cl.done) 한 줄을 더한 PR #6427이 2026년 10월 27일 main에 머지됐습니다(11월 13일 기준 미릴리스). 네 판을 AI가 다시 빌드해 쓰기 가능·불가 디렉터리에서 종료를 잰 기록입니다."
+description: "MediaMTX v1.21.3은 기본 설정에서 MoQ 서버를 켜고 TLS 인증서를 작업 디렉터리에 자동 생성합니다. 그 디렉터리에 쓸 수 없으면 실행은 되지만 SIGINT 뒤 [MoQ] closing에서 멈춥니다. 완료 채널 done을 닫을 watch()가 시작되지 않았기 때문이고, 그 분기에 close(cl.done) 한 줄을 더한 PR #6427이 2026년 10월 27일 main에 머지됐고 2026년 11월 15일 v1.21.4에 들어갔습니다. 네 판을 AI가 다시 빌드해 쓰기 가능·불가 디렉터리에서 종료를 잰 기록입니다."
 categories: ["open-source-analysis"]
 tags: ["MediaMTX", "Go", "오픈소스 기여", "동시성", "shutdown", "goroutine", "regression-test"]
 ---
 
-MediaMTX v1.21.3의 기본 설정은 MoQ(Media over QUIC) 서버를 켜고(`moq: true`), 그 TLS 인증서를 작업 디렉터리의 `auto.key`·`auto.crt`로 자동 생성합니다. 작업 디렉터리에 쓸 수 없으면 인증서를 메모리에만 두고 실행되지만, SIGINT를 보내면 `[MoQ] closing`에서 더 나아가지 않습니다. 2026년 11월 13일 다시 재 보니 v1.21.3은 `chmod 555` 작업 디렉터리에서 5번 모두 10초 안에 끝나지 않았고, 쓸 수 있는 디렉터리에서는 1.6–5.9ms에 끝났습니다. 포트만 옮긴 기본 설정으로 실행해도 같았습니다. 감시 작업을 시작하지 않는 분기에서 `close(cl.done)` 한 줄을 더한 [PR #6427](https://github.com/bluenviron/mediamtx/pull/6427)은 10월 27일 main에 머지됐고, 이 수정이 든 판은 같은 조건에서 5번 모두 6.2ms 안에 끝났습니다. 11월 13일 기준 최신 릴리스는 여전히 v1.21.3이라 #6427은 아직 릴리스에 없습니다.
+MediaMTX v1.21.3의 기본 설정은 MoQ(Media over QUIC) 서버를 켜고(`moq: true`), 그 TLS 인증서를 작업 디렉터리의 `auto.key`·`auto.crt`로 자동 생성합니다. 작업 디렉터리에 쓸 수 없으면 인증서를 메모리에만 두고 실행되지만, SIGINT를 보내면 `[MoQ] closing`에서 더 나아가지 않습니다. 2026년 11월 13일 다시 재 보니 v1.21.3은 `chmod 555` 작업 디렉터리에서 5번 모두 10초 안에 끝나지 않았고, 쓸 수 있는 디렉터리에서는 1.6–5.9ms에 끝났습니다. 포트만 옮긴 기본 설정으로 실행해도 같았습니다. 감시 작업을 시작하지 않는 분기에서 `close(cl.done)` 한 줄을 더한 [PR #6427](https://github.com/bluenviron/mediamtx/pull/6427)은 10월 27일 main에 머지됐고, 이 수정이 든 판은 같은 조건에서 5번 모두 6.2ms 안에 끝났습니다. #6427은 11월 15일 나온 [v1.21.4](https://github.com/bluenviron/mediamtx/releases/tag/v1.21.4)에 들어갔습니다.
 
 범위와 검증 기준, 제출 결정은 제가 했고 구현과 실측은 AI(Claude Code·Codex)가 했습니다. 이 글의 재측정도 AI(Claude Code)가 실행했습니다.
 
@@ -93,7 +93,7 @@ PR에 더한 `TestCloseAutoCert`는 `saved`와 `not saved` 두 경우를 하위 
 
 먼저 올린 [#6261](https://github.com/bluenviron/mediamtx/pull/6261)은 같은 기다림을 WaitGroup으로 넣었습니다. `watch()`를 시작하지 않으면 카운터가 0이라 `Wait()`가 바로 반환하므로 이 분기에서 멈추지 않습니다. 위 시험에서 `7d95a222`의 `not saved`가 통과한 이유입니다. #6261은 10월 25일 닫혔고, 유지보수자는 하나의 고루틴을 기다리는 데 WaitGroup은 과하다며 채널로 다시 구현한 #6417을 머지했습니다.
 
-#6427은 한국 시각 10월 27일 05:03에 `065f94c2`로 머지됐습니다. 11월 13일 상류 main(`3b1c4e87`)에는 이 커밋이 있지만, 최신 릴리스는 10월 25일의 v1.21.3이라 아직 릴리스에는 없습니다.
+#6427은 한국 시각 10월 27일 05:03에 `065f94c2`로 머지됐습니다. 이 커밋은 11월 15일 나온 v1.21.4에 들어갔고, 릴리스 노트 General 절에 「Fix hang when closing after certificate save failure. Closing the server no longer blocks forever when the auto-generated certificate can't be saved, for instance on a read-only file system. (#6427)」로 실렸습니다.
 
 영향 범위는 넓지 않습니다. 이 분기는 `AllowAuto: true`인 로더에서만 열리고, 테스트를 빼면 그 값을 쓰는 곳은 MoQ 서버뿐입니다. `httpp.Server`의 `AllowAutoCert`는 어디서도 켜지 않습니다. 이 수정은 인증서 저장을 성공시키지도 않습니다. 저장하지 못한 인증서로 돌던 서버가 끝날 수 있게 할 뿐입니다.
 
@@ -116,6 +116,6 @@ PR에 더한 `TestCloseAutoCert`는 `saved`와 `not saved` 두 경우를 하위 
 - [PR #6098 「restore ability to run the server in a read-only file system」](https://github.com/bluenviron/mediamtx/pull/6098)
 - [커밋 b5b63d02(#5815) 「support reading and publishing with Media-over-QUIC」](https://github.com/bluenviron/mediamtx/commit/b5b63d02fc1c55096cf5a035207d6e5694d1ab4d)
 - [v1.21.3 `internal/certloader/certloader.go`](https://github.com/bluenviron/mediamtx/blob/9540cb6c1d9f1e9351fcc4ded3afc249ffff22bc/internal/certloader/certloader.go) · [`mediamtx.yml`](https://github.com/bluenviron/mediamtx/blob/9540cb6c1d9f1e9351fcc4ded3afc249ffff22bc/mediamtx.yml) · [`internal/servers/moq/server.go`](https://github.com/bluenviron/mediamtx/blob/9540cb6c1d9f1e9351fcc4ded3afc249ffff22bc/internal/servers/moq/server.go)
-- [MediaMTX 릴리스 목록](https://github.com/bluenviron/mediamtx/releases) — 2026-11-13 확인 기준 최신 v1.21.3
+- [MediaMTX v1.21.4 릴리스 노트](https://github.com/bluenviron/mediamtx/releases/tag/v1.21.4) — 2026-11-15, #6427 포함
 - [The Go Programming Language Specification 「Close」](https://go.dev/ref/spec#Close)
 - [MediaMTX 인증서 감시 작업은 Close 뒤에도 돌았습니다](/posts/open-source-analysis/mediamtx-certificate-watcher-close-join/) — #6261 · #6417과 TestCloseDuringReload

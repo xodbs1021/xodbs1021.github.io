@@ -260,6 +260,15 @@
       "bytes": 22869
     }
   },
+  "5b4c6128bdf7a24e": {
+    "source": "content/posts/open-source-analysis/mediamtx-request-body-log-redaction.md",
+    "wide": {
+      "file": "5b4c6128bdf7a24e-wide.svg",
+      "width": 392,
+      "height": 634,
+      "bytes": 23366
+    }
+  },
   "5efdefe49e60f0d1": {
     "source": "content/posts/projects/pokeclip-media-timeline-over-wall-clock.md",
     "wide": {

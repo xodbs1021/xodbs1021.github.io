@@ -1,0 +1,160 @@
+2026/11/19 14:32:24 INF MediaMTX 9c68b477, darwin, arm64
+2026/11/19 14:32:24 INF configuration loaded from /tmp/mtx6379w-run/final/9c68b477/run3/mediamtx.yml
+2026/11/19 14:32:24 DEB path manager created
+2026/11/19 14:32:24 INF [WebRTC] started with listeners on 127.0.0.1:28889 (TCP/HTTP), 127.0.0.1:28189 (UDP/ICE)
+2026/11/19 14:32:24 INF [API] started with listener on 127.0.0.1:29997 (TCP/HTTP)
+2026/11/19 14:32:24 DEB [API] [conn 127.0.0.1:61299] [c->s] POST /v3/config/paths/add/probe HTTP/1.1
+Host: 127.0.0.1:29997
+Accept-Encoding: identity
+Authorization: <redacted>
+Connection: close
+Content-Length: 128
+Content-Type: application/json
+User-Agent: Python-urllib/3.14
+
+{"srtPublishPassphrase": "MTX6379W-SRTPUB-A", "srtReadPassphrase": "MTX6379W-SRTREAD", "whepBearerToken": "MTX6379W-WHEPBEARER"}
+2026/11/19 14:32:24 DEB [c->s] POST /auth HTTP/1.1
+Host: 127.0.0.1:28181
+Content-Type: application/json
+
+{"ip":"127.0.0.1","user":"apiuser","password":"MTX6379W-APIPASS","token":"MTX6379W-APIPASS","action":"api","path":"","protocol":"","id":null,"query":"","userAgent":""}
+2026/11/19 14:32:24 DEB [s->c] HTTP/1.0 200 OK
+Content-Length: 0
+Date: Thu, 19 Nov 2026 05:32:24 GMT
+Server: BaseHTTP/0.6 Python/3.14.5
+
+
+2026/11/19 14:32:24 INF reloading configuration (API request)
+2026/11/19 14:32:24 DEB [API] [conn 127.0.0.1:61299] [s->c] HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Server: mediamtx
+
+(body of 15 bytes)
+2026/11/19 14:32:24 DEB [path probe] created
+2026/11/19 14:32:24 DEB [API] [conn 127.0.0.1:61301] [c->s] PATCH /v3/config/paths/patch/probe HTTP/1.1
+Host: 127.0.0.1:29997
+Accept-Encoding: identity
+Authorization: <redacted>
+Connection: close
+Content-Length: 45
+Content-Type: application/json
+User-Agent: Python-urllib/3.14
+
+{"srtPublishPassphrase": "MTX6379W-SRTPUB-B"}
+2026/11/19 14:32:24 DEB [c->s] POST /auth HTTP/1.1
+Host: 127.0.0.1:28181
+Content-Type: application/json
+
+{"ip":"127.0.0.1","user":"apiuser","password":"MTX6379W-APIPASS","token":"MTX6379W-APIPASS","action":"api","path":"","protocol":"","id":null,"query":"","userAgent":""}
+2026/11/19 14:32:24 DEB [s->c] HTTP/1.0 200 OK
+Content-Length: 0
+Date: Thu, 19 Nov 2026 05:32:24 GMT
+Server: BaseHTTP/0.6 Python/3.14.5
+
+
+2026/11/19 14:32:24 INF reloading configuration (API request)
+2026/11/19 14:32:24 DEB [API] [conn 127.0.0.1:61301] [s->c] HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Server: mediamtx
+
+(body of 15 bytes)
+2026/11/19 14:32:24 DEB [path probe] destroyed: terminated
+2026/11/19 14:32:24 DEB [path probe] created
+2026/11/19 14:32:24 DEB [API] [conn 127.0.0.1:61303] [c->s] PATCH /v3/config/global/patch HTTP/1.1
+Host: 127.0.0.1:29997
+Accept-Encoding: identity
+Authorization: <redacted>
+Connection: close
+Content-Length: 154
+Content-Type: application/json
+User-Agent: Python-urllib/3.14
+
+{"hlsCDNSecret": "MTX6379W-HLSCDN", "authInternalUsers": [{"user": "u1", "pass": "MTX6379W-USERPASS", "ips": [], "permissions": [{"action": "publish"}]}]}
+2026/11/19 14:32:24 DEB [c->s] POST /auth HTTP/1.1
+Host: 127.0.0.1:28181
+Content-Type: application/json
+
+{"ip":"127.0.0.1","user":"apiuser","password":"MTX6379W-APIPASS","token":"MTX6379W-APIPASS","action":"api","path":"","protocol":"","id":null,"query":"","userAgent":""}
+2026/11/19 14:32:24 DEB [s->c] HTTP/1.0 200 OK
+Content-Length: 0
+Date: Thu, 19 Nov 2026 05:32:24 GMT
+Server: BaseHTTP/0.6 Python/3.14.5
+
+
+2026/11/19 14:32:24 INF reloading configuration (API request)
+2026/11/19 14:32:24 DEB [API] [conn 127.0.0.1:61303] [s->c] HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Server: mediamtx
+
+(body of 15 bytes)
+2026/11/19 14:32:24 INF [API] closing
+2026/11/19 14:32:24 DEB [API] closed
+2026/11/19 14:32:24 INF [API] started with listener on 127.0.0.1:29997 (TCP/HTTP)
+2026/11/19 14:32:25 DEB [API] [conn 127.0.0.1:61305] [c->s] GET /v3/config/paths/get/probe HTTP/1.1
+Host: 127.0.0.1:29997
+Accept-Encoding: identity
+Authorization: <redacted>
+Connection: close
+User-Agent: Python-urllib/3.14
+
+
+2026/11/19 14:32:25 DEB [c->s] POST /auth HTTP/1.1
+Host: 127.0.0.1:28181
+Content-Type: application/json
+
+{"ip":"127.0.0.1","user":"apiuser","password":"MTX6379W-APIPASS","token":"MTX6379W-APIPASS","action":"api","path":"","protocol":"","id":null,"query":"","userAgent":""}
+2026/11/19 14:32:25 DEB [s->c] HTTP/1.0 200 OK
+Content-Length: 0
+Date: Thu, 19 Nov 2026 05:32:25 GMT
+Server: BaseHTTP/0.6 Python/3.14.5
+
+
+2026/11/19 14:32:25 DEB [API] [conn 127.0.0.1:61305] [s->c] HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Server: mediamtx
+
+(body of 2320 bytes)
+2026/11/19 14:32:25 DEB [WebRTC] [conn 127.0.0.1:61307] [c->s] POST /probe/whep?token=MTX6379W-QUERYTOKEN HTTP/1.1
+Host: 127.0.0.1:28889
+Accept-Encoding: identity
+Authorization: <redacted>
+Connection: close
+Content-Length: 140
+Content-Type: application/sdp
+User-Agent: Python-urllib/3.14
+
+v=0
+o=- 1 1 IN IP4 127.0.0.1
+s=MTX6379W-SDP
+t=0 0
+m=video 9 UDP/TLS/RTP/SAVPF 96
+c=IN IP4 0.0.0.0
+a=rtpmap:96 H264/90000
+a=recvonly
+
+2026/11/19 14:32:25 INF [WebRTC] [session 7f982ae5] created by 127.0.0.1:61307
+2026/11/19 14:32:25 DEB [c->s] POST /auth HTTP/1.1
+Host: 127.0.0.1:28181
+Content-Type: application/json
+
+{"ip":"127.0.0.1","user":"whepuser","password":"MTX6379W-WHEPPASS","token":"MTX6379W-WHEPPASS","action":"read","path":"probe","protocol":"webrtc","id":"7f982ae5-2f45-40b4-abdd-d479cd99ab0f","query":"token=MTX6379W-QUERYTOKEN","userAgent":"Python-urllib/3.14"}
+2026/11/19 14:32:25 DEB [s->c] HTTP/1.0 200 OK
+Content-Length: 0
+Date: Thu, 19 Nov 2026 05:32:25 GMT
+Server: BaseHTTP/0.6 Python/3.14.5
+
+
+2026/11/19 14:32:25 INF [WebRTC] [session 7f982ae5] closed: no stream is available on path 'probe'
+2026/11/19 14:32:25 DEB [WebRTC] [conn 127.0.0.1:61307] [s->c] HTTP/1.1 404 Not Found
+Content-Type: application/json; charset=utf-8
+Server: mediamtx
+
+(body of 67 bytes)
+2026/11/19 14:32:26 INF shutting down gracefully
+2026/11/19 14:32:26 INF [API] closing
+2026/11/19 14:32:26 DEB [API] closed
+2026/11/19 14:32:26 INF [WebRTC] closing
+2026/11/19 14:32:26 DEB [WebRTC] closed
+2026/11/19 14:32:26 DEB path manager is shutting down
+2026/11/19 14:32:26 DEB [path probe] destroyed: terminated
+2026/11/19 14:32:26 INF waiting for running hooks
