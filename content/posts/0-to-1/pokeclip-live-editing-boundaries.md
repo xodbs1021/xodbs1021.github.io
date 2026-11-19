@@ -12,7 +12,7 @@ portfolio_pages: [5]
 portfolio_edition: "2026-10-15-v2"
 ---
 
-PokeClip은 방송을 보는 도중에 지난 장면을 찾아, 배경음악을 뺀 소리처럼 원하는 소리로 클립을 만드는 서비스입니다. 녹화된 4초 조각 하나를 세 곳이 다르게 씁니다. 라이브 시청은 지금 장면을, 되감기는 이미 저장소에 올라간 지난 장면을, 클립 편집은 소리 6개가 따로 남은 원본을 원합니다. 그래서 조각마다 원본 fMP4(영상 1 · 소리 6), 되감기용 재포장본(영상 1 · 소리 1), DB 장부 한 줄을 남기고, 편집 요청은 원본을 덮지 않고 레시피로 남겼습니다. 2026년 10월 15일 진행 중이던 되감기 발행 계층은 10월 19일 develop에 머지됐고([PR #289](https://github.com/3K-PokeClip/PokeClip-mono/pull/289)), 11월 3일 첫 출시본 v1.0.0에 들어갔습니다.
+PokeClip은 방송을 보는 도중에 지난 장면을 찾아, 배경음악을 뺀 소리처럼 원하는 소리로 클립을 만드는 서비스입니다. 녹화된 4초 조각 하나를 세 곳이 다르게 씁니다. 라이브 시청은 지금 장면을, 되감기는 이미 저장소에 올라간 지난 장면을, 클립 편집은 소리 6개가 따로 남은 원본을 원합니다. 그래서 조각마다 원본 fMP4(영상 1 · 소리 6), 되감기용 재포장본(영상 1 · 소리 1), DB 장부 한 줄을 남기고, 편집 요청은 원본을 덮지 않고 레시피로 남겼습니다. 2026년 10월 15일 진행 중이던 되감기 발행 계층은 10월 19일 develop에 머지됐고(PR #289), 11월 3일 첫 출시본 v1.0.0에 들어갔습니다.
 
 저는 3인 팀에서 전체 구조와 미디어·인프라의 경계를 정했습니다. 어떤 파일을 남기고 어떤 상태가 바뀌어야 다음 단계로 넘기는지가 제 몫이었습니다. Spring 코어와 렌더 일꾼, 웹, OBS 플러그인은 팀원이 주로 구현했고, 미디어 계층의 구현과 실측에는 AI(Claude Code와 Codex)를 썼습니다.
 
@@ -28,7 +28,7 @@ OBS 플러그인은 영상 1개와 소리 6개를 함께 보냅니다. 트랙 0�
 | 되감기 | S3에 올린 재포장본과 사이드카가 발행한 목록 | 업로드가 확인된 조각만 목록에 넣음 |
 | 클립 편집 | S3에 올린 원본 fMP4 | 아직 고르지 않은 소리도 남김 |
 
-저장 단계에서 트랙 0만 남기면 재생은 단순해지지만, 음악만 빼고 다시 섞을 재료가 사라집니다. 반대로 6개를 시청 경로에 그대로 두면 시청자가 고르지 않는 트랙까지 목록과 플레이어가 다뤄야 합니다. 그래서 원본은 그대로 두고, 되감기용으로 첫 영상 트랙과 첫 소리 트랙만 남긴 재포장본을 따로 만들었습니다. 재포장은 압축된 미디어를 다시 담기만 하고 다시 인코딩하지 않습니다. 사이드카가 메모리 안에서 만듭니다([`media/README.md` 1358–1362행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/README.md?plain=1#L1358-L1362)).
+저장 단계에서 트랙 0만 남기면 재생은 단순해지지만, 음악만 빼고 다시 섞을 재료가 사라집니다. 반대로 6개를 시청 경로에 그대로 두면 시청자가 고르지 않는 트랙까지 목록과 플레이어가 다뤄야 합니다. 그래서 원본은 그대로 두고, 되감기용으로 첫 영상 트랙과 첫 소리 트랙만 남긴 재포장본을 따로 만들었습니다. 재포장은 압축된 미디어를 다시 담기만 하고 다시 인코딩하지 않습니다. 사이드카가 메모리 안에서 만듭니다(`media/README.md` 1358–1362행).
 
 영상에서 조각이 들어올 때마다 세 갈래가 다르게 움직입니다. 라이브 목록은 밀리며 옛 조각을 버리고, 되감기 목록은 업로드가 확인된 뒤에만 늘어나고, 편집기는 고른 구간의 6트랙 원본을 끌어옵니다.
 
@@ -38,9 +38,9 @@ OBS 플러그인은 영상 1개와 소리 6개를 함께 보냅니다. 트랙 0�
 
 ## 조각마다 원본·재포장본·장부 한 줄을 남겼습니다 {#미디어-서버가-만든-파일에-방송-시간을-붙였습니다}
 
-MediaMTX가 SRT 송출을 받아 조각을 녹화하고, 조각을 닫을 때 훅으로 사이드카에 알립니다. 사이드카는 Go로 짠 우리 계층입니다. 조각마다 장부에 한 줄을 적고, 원본과 재포장본을 각각 S3에 올린 뒤 그 줄의 상태 칸을 바꿉니다([`media/internal/index/ddl.go` 39–56행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/index/ddl.go#L39-L56)). 그림의 청록 상자가 클립과 되감기가 각각 확인하는 칸입니다.
+MediaMTX가 SRT 송출을 받아 조각을 녹화하고, 조각을 닫을 때 훅으로 사이드카에 알립니다. 사이드카는 Go로 짠 우리 계층입니다. 조각마다 장부에 한 줄을 적고, 원본과 재포장본을 각각 S3에 올린 뒤 그 줄의 상태 칸을 바꿉니다(`media/internal/index/ddl.go` 39–56행). 그림의 청록 상자가 클립과 되감기가 각각 확인하는 칸입니다.
 
-```mermaid {#fig-segment-outputs kind="개념도" caption="녹화 조각 하나가 남기는 세 가지. 원본 fMP4는 클립 편집이, 트랙 0만 남긴 재포장본은 되감기 목록이 읽습니다. 장부 한 줄은 두 파일의 S3 키와 업로드 상태, 그리고 미디어 시각과 벽시각을 따로 적습니다. develop 825a3dfe의 stream_segments 표에서 칸을 골라 재구성했습니다." source="https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/index/ddl.go#L39-L56"}
+```mermaid {#fig-segment-outputs kind="개념도" caption="녹화 조각 하나가 남기는 세 가지. 원본 fMP4는 클립 편집이, 트랙 0만 남긴 재포장본은 되감기 목록이 읽습니다. 장부 한 줄은 두 파일의 S3 키와 업로드 상태, 그리고 미디어 시각과 벽시각을 따로 적습니다. develop 825a3dfe의 stream_segments 표에서 칸을 골라 재구성했습니다." source="프로젝트 저장소 media/internal/index/ddl.go(비공개)"}
 flowchart TB
   accTitle: 녹화 조각 하나가 남기는 것
   accDescr: 녹화 조각 하나(원본 fMP4, 영상 1과 소리 6)가 닫히면 사이드카가 장부 한 줄을 적는다. 그 줄에는 미디어 시각, 벽시각 추정, 길이가 있다. 그다음 원본을 그대로 S3에 올려 s3_key와 upload_state를 채우고, 재포장본(영상 1, 소리 1)을 S3에 올려 playback_s3_key와 playback_upload_state를 채운다. 원본은 클립 편집이, 재포장본은 되감기 목록이 읽는다.
@@ -56,7 +56,7 @@ flowchart TB
 
 업로드 상태를 원본과 재포장본에 따로 둔 이유는 두 파일을 읽는 쪽이 다르기 때문입니다. 재포장본 업로드가 실패해도 원본은 클립에 쓸 수 있고, 되감기 목록은 재포장본이 `uploaded`가 된 조각만 넣습니다. 「파일이 생겼다」와 「다음 단계가 읽어도 된다」를 같은 사건으로 보지 않은 것입니다.
 
-시각도 둘을 적습니다. `start_pts_ms`는 조각 안 미디어의 시각이고, `start_wall_utc`는 받는 서버가 추정한 벽시각입니다. 처음에는 벽시각으로 클립 구간을 정했지만, 11월 2일 벽시각의 용도를 화면 표시·라이브 넘김·채팅 정렬로 좁히고 클립·렌더의 정밀 좌표를 미디어 시각으로 옮기기로 정했습니다([시간축 글](/posts/projects/pokeclip-media-timeline-over-wall-clock/)). 그 변경의 클립 쪽 [PR #475](https://github.com/3K-PokeClip/PokeClip-mono/pull/475)와 렌더 쪽 [PR #496](https://github.com/3K-PokeClip/PokeClip-mono/pull/496)은 11월 11일 기준 머지 전 초안입니다.
+시각도 둘을 적습니다. `start_pts_ms`는 조각 안 미디어의 시각이고, `start_wall_utc`는 받는 서버가 추정한 벽시각입니다. 처음에는 벽시각으로 클립 구간을 정했지만, 11월 2일 벽시각의 용도를 화면 표시·라이브 넘김·채팅 정렬로 좁히고 클립·렌더의 정밀 좌표를 미디어 시각으로 옮기기로 정했습니다([시간축 글](/posts/projects/pokeclip-media-timeline-over-wall-clock/)). 그 변경의 클립 쪽 PR #475와 렌더 쪽 PR #496은 11월 11일 기준 머지 전 초안입니다.
 
 ## 편집 요청은 원본을 덮지 않고 레시피로 남겼습니다
 
@@ -74,8 +74,8 @@ flowchart TB
 
 | 날짜 | 상태 |
 |---|---|
-| 10월 19일 | 되감기 목록 S3 발행 계층 [PR #289](https://github.com/3K-PokeClip/PokeClip-mono/pull/289) develop 머지. 같은 날 dev 미디어 서버에 계정별 방송을 반영하고 실측 |
-| 11월 3일 | 첫 출시본 [v1.0.0](https://github.com/3K-PokeClip/PokeClip-mono/pull/466). 미디어 서버 이미지(녹화기 · 사이드카)와 웹 · 인증 · 클립 · 채팅 서버가 들어감 |
+| 10월 19일 | 되감기 목록 S3 발행 계층 PR #289 develop 머지. 같은 날 dev 미디어 서버에 계정별 방송을 반영하고 실측 |
+| 11월 3일 | 첫 출시본 v1.0.0. 미디어 서버 이미지(녹화기 · 사이드카)와 웹 · 인증 · 클립 · 채팅 서버가 들어감 |
 | 11월 6일 | 운영 주소 공개 |
 | 11월 10일 | 회차 다시보기 고침을 운영 미디어 서버에 반영([회차 다시보기 글](/posts/projects/pokeclip-round-vod/)) |
 
@@ -90,11 +90,11 @@ flowchart TB
 
 ## 출처
 
-- [3K-PokeClip/PokeClip-mono `media/internal/index/ddl.go` 39–56행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/index/ddl.go#L39-L56) — 조각 장부 표의 칸
-- [3K-PokeClip/PokeClip-mono `media/README.md` 「되감기 렌디션 — Go 재포장」](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/README.md?plain=1#L1358-L1362) — 첫 영상 · 첫 소리 트랙만 남기는 재포장
-- [3K-PokeClip/PokeClip-mono PR #289](https://github.com/3K-PokeClip/PokeClip-mono/pull/289) — 되감기 목록 S3 발행(2026-10-19 develop 머지)
-- [3K-PokeClip/PokeClip-mono PR #466](https://github.com/3K-PokeClip/PokeClip-mono/pull/466) — 첫 출시본 v1.0.0과 출시 이미지 목록(2026-11-03)
-- [3K-PokeClip/PokeClip-mono PR #475](https://github.com/3K-PokeClip/PokeClip-mono/pull/475) · [PR #496](https://github.com/3K-PokeClip/PokeClip-mono/pull/496) — 클립 · 렌더 좌표를 미디어 시각으로 옮기는 초안
+- 3K-PokeClip/PokeClip-mono `media/internal/index/ddl.go` 39–56행 — 조각 장부 표의 칸 (비공개 저장소)
+- 3K-PokeClip/PokeClip-mono `media/README.md` 「되감기 렌디션 — Go 재포장」 — 첫 영상 · 첫 소리 트랙만 남기는 재포장 (비공개 저장소)
+- 3K-PokeClip/PokeClip-mono PR #289 — 되감기 목록 S3 발행(2026-10-19 develop 머지) (비공개 저장소)
+- 3K-PokeClip/PokeClip-mono PR #466 — 첫 출시본 v1.0.0과 출시 이미지 목록(2026-11-03) (비공개 저장소)
+- 3K-PokeClip/PokeClip-mono PR #475 · PR #496 — 클립 · 렌더 좌표를 미디어 시각으로 옮기는 초안 (비공개 저장소)
 - [MediaMTX 문서 「Publish」](https://mediamtx.org/docs/features/publish) — SRT 송출 수신
 - [HLS 클립은 왜 벽시각 대신 미디어 시각으로 자를까?](/posts/projects/pokeclip-media-timeline-over-wall-clock/) — 벽시각과 미디어 시각의 용도
 - [2시간 방송이 다시보기에서 7.5분만 보였던 이유](/posts/projects/pokeclip-round-vod/) — 조각 · 세션 · 사슬 · 회차 용어와 11월 10일 운영 반영

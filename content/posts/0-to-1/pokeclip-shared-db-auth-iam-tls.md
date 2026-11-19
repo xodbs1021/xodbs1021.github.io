@@ -13,7 +13,7 @@ PokéClip의 미디어 서버에는 PostgreSQL(RDS)에 붙는 Go 프로그램이
 
 대신 RDS IAM 인증을 썼습니다. 서버가 가진 AWS 역할로 짧게 사는 로그인 토큰을 서명해 비밀번호 자리에 넣는 방식입니다. IAM 정책 한 줄로 끝나지는 않았습니다. 토큰을 언제 만들지, 누구에게 건넬지, 로그인한 뒤 무엇까지 할 수 있게 할지, 실제로 그렇게 붙었는지를 무엇으로 판정할지를 각각 정해야 했습니다. 그사이 AWS가 말하는 토큰 수명(15분)과 실험 RDS가 받아 준 시간(약 20분, 1회 측정)이 달랐고, 그 차이가 시험과 판단을 바꿨습니다.
 
-토큰을 새 연결 직전에 만드는 것, verify-full로 확인한 서버에만 건네는 것, 로그인 뒤 권한을 따로 좁히는 것, 연결 결과를 db_connected 한 줄로 판정하는 것, 이 네 가지는 10월 23일 제가 정했고, 같은 방식을 Java 앱 서버에도 적용하자고 제안했습니다. 미디어 쪽 구현 · 시험 실행 · 리뷰는 AI 에이전트(Claude Code와 Codex)가 했고, AWS 자원을 만들고 지우는 쓰기는 제가 승인했습니다. 에이전트가 구현한 코드는 10월 23일 공개 저장소 [PR #314](https://github.com/3K-PokeClip/PokeClip-mono/pull/314)로 병합됐습니다(커밋 `7f99ccd1`). 11월 3일 운영 인프라 적용은 제가 직접 했습니다. Java 앱 서버 쪽 구현은 그 서버들을 맡은 팀원이 했습니다.
+토큰을 새 연결 직전에 만드는 것, verify-full로 확인한 서버에만 건네는 것, 로그인 뒤 권한을 따로 좁히는 것, 연결 결과를 db_connected 한 줄로 판정하는 것, 이 네 가지는 10월 23일 제가 정했고, 같은 방식을 Java 앱 서버에도 적용하자고 제안했습니다. 미디어 쪽 구현 · 시험 실행 · 리뷰는 AI 에이전트(Claude Code와 Codex)가 했고, AWS 자원을 만들고 지우는 쓰기는 제가 승인했습니다. 에이전트가 구현한 코드는 10월 23일 프로젝트 저장소 PR #314로 병합됐습니다(커밋 `7f99ccd1`). 11월 3일 운영 인프라 적용은 제가 직접 했습니다. Java 앱 서버 쪽 구현은 그 서버들을 맡은 팀원이 했습니다.
 
 ## 비밀번호 대신 서버 역할로 15분짜리 토큰을 서명했습니다 {#비밀번호를-없애면-무엇이-달라지나}
 
@@ -34,13 +34,13 @@ DB 사용자에 `rds_iam`을 주고 실행 역할에 `rds-db:connect`를 주는 
 2. 그 자격으로 DB 호스트 · 포트 · 사용자 · 리전에 대한 토큰 서명(로컬 계산)
 3. 토큰을 비밀번호 자리에 넣어 로그인
 
-Go로 작성된 미디어 쪽은 이 일을 새 패키지 [`media/internal/pgconf`](https://github.com/3K-PokeClip/PokeClip-mono/tree/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/media/internal/pgconf)에 모았습니다. 사이드카의 두 연결 풀과 janitor 풀이 모두 이 패키지로 설정을 만들고, 따로 있던 DSN 조립 코드 두 벌은 지웠습니다. 이 패키지에서 AWS SDK를 import하는 곳은 [`iam.go`](https://github.com/3K-PokeClip/PokeClip-mono/blob/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/media/internal/pgconf/iam.go) 한 파일뿐입니다. `POSTGRES_AUTH`가 비었거나 `password`이면 예전처럼 비밀번호로 붙으므로 로컬 개발 환경은 바뀌지 않습니다.
+Go로 작성된 미디어 쪽은 이 일을 새 패키지 `media/internal/pgconf`에 모았습니다. 사이드카의 두 연결 풀과 janitor 풀이 모두 이 패키지로 설정을 만들고, 따로 있던 DSN 조립 코드 두 벌은 지웠습니다. 이 패키지에서 AWS SDK를 import하는 곳은 `iam.go` 한 파일뿐입니다. `POSTGRES_AUTH`가 비었거나 `password`이면 예전처럼 비밀번호로 붙으므로 로컬 개발 환경은 바뀌지 않습니다.
 
 ## 토큰은 풀이 새 연결을 맺기 직전에 만들었습니다 {#토큰은-새-연결-직전에-만든다}
 
 가장 쉬운 구현은 풀을 만들 때 토큰을 한 번 만들어 DSN에 넣는 것입니다. 처음에는 잘 붙고, 문제는 나중에 생깁니다. 토큰은 로그인하는 순간에만 쓰이고, 이미 맺은 연결은 토큰이 만료돼도 계속 쓸 수 있습니다([AWS 문서](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.html)). 하지만 풀이 연결을 새로 맺어야 할 때(연결이 끊겼거나 수명이 다했거나 부하가 늘었을 때) 오래된 토큰을 내밀면 거부됩니다. 그 순간은 배포하고 한참 뒤라서 원인을 찾기 어렵습니다.
 
-그래서 Go PostgreSQL 드라이버 pgx의 풀이 새 연결을 맺기 직전에 부르는 `BeforeConnect`에서 매번 새 토큰을 만듭니다([`pgconf.go` 260–277행](https://github.com/3K-PokeClip/PokeClip-mono/blob/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/media/internal/pgconf/pgconf.go#L260-L277)).
+그래서 Go PostgreSQL 드라이버 pgx의 풀이 새 연결을 맺기 직전에 부르는 `BeforeConnect`에서 매번 새 토큰을 만듭니다(`pgconf.go` 260–277행).
 
 ```go
 // 축약·변형 발췌 — 지역 변수 일부를 펼치고 빈 토큰 검사를 생략했다. timeout 은 10초(tokenTimeout).
@@ -81,7 +81,7 @@ func iamBeforeConnect(tf TokenFunc, s Settings, timeout time.Duration) func(cont
 
 CA 번들([AWS 문서](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.SSL.html)의 전 상용 리전 통합본)은 빌드 때 내려받지 않고 저장소에 커밋했습니다. 고정 없이 빌드 때 내려받으면 빌드마다 내용이 바뀔 수 있고, `ADD --checksum`으로 고정해도 인증서 내용 자체의 변경 diff는 저장소에 남지 않습니다. 커밋해 두면 번들이 바뀔 때 리뷰할 diff가 남습니다. 기대 해시는 Dockerfile의 `sha256sum -c` 한 줄에 두고, 이미지 안에서는 root 소유 0644 파일로 둡니다. 경로는 `POSTGRES_SSLROOTCERT` 하나로 받습니다.
 
-조용히 약해지는 길은 기동 단계에서 막았습니다([`validate`](https://github.com/3K-PokeClip/PokeClip-mono/blob/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/media/internal/pgconf/pgconf.go#L137-L172)). IAM 모드에서 아래 중 하나라도 해당하면 프로그램이 뜨지 않습니다.
+조용히 약해지는 길은 기동 단계에서 막았습니다(`validate`). IAM 모드에서 아래 중 하나라도 해당하면 프로그램이 뜨지 않습니다.
 
 - 비밀번호가 남아 있음
 - `sslmode`가 `verify-full`이 아님
@@ -89,7 +89,7 @@ CA 번들([AWS 문서](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Us
 - 호스트 값에 `/`나 쉼표가 있음 — pgx가 유닉스 소켓이나 여러 호스트로 읽어, 토큰을 서명한 대상과 실제로 접속하는 대상이 갈라짐
 - 앞뒤 공백을 걷어낸 뒤에도 호스트 안에 공백이 남았거나, IPv6 주소가 대괄호로 감싸여 있지 않음 — 토큰에 서명하는 `호스트:포트` 형식이 깨짐
 
-모드와 상관없이, `POSTGRES_SSLROOTCERT` 없이 `PGSSLROOTCERT`만 있어도 뜨지 않습니다([`FromEnv` 108–111행](https://github.com/3K-PokeClip/PokeClip-mono/blob/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/media/internal/pgconf/pgconf.go#L108-L111)). pgx는 설정에 없어도 libpq 환경 변수 `PGSSLROOTCERT`를 기본값으로 읽기 때문에([pgx v5.10.0](https://github.com/jackc/pgx/blob/v5.10.0/pgconn/config.go#L595)), CA 경로를 받는 이름을 하나로 고정하려는 것입니다.
+모드와 상관없이, `POSTGRES_SSLROOTCERT` 없이 `PGSSLROOTCERT`만 있어도 뜨지 않습니다(`FromEnv` 108–111행). pgx는 설정에 없어도 libpq 환경 변수 `PGSSLROOTCERT`를 기본값으로 읽기 때문에([pgx v5.10.0](https://github.com/jackc/pgx/blob/v5.10.0/pgconn/config.go#L595)), CA 경로를 받는 이름을 하나로 고정하려는 것입니다.
 
 영상에서 위 길은 인증서와 이름이 맞는 RDS, 아래 길은 인증서가 맞지 않는 서버입니다. 아래 길의 토큰이 서버에 닿기 전에 멈추는 것을 보십시오.
 
@@ -110,7 +110,7 @@ CA 번들([AWS 문서](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Us
 
 토큰 시점과 verify-full, 두 결정은 「토큰은 15분 산다」는 공식값 위에 있었습니다([AWS 문서](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.html)). 계획 단계의 시험도 이 숫자를 믿었습니다. 일부러 「토큰 캐시」 버그를 심은 변이 바이너리(변이본)는 16분 30초를 기다린 뒤 새 연결에서 실패해야 했습니다. 그런데 실제 RDS에서는 원본과 변이본이 둘 다 성공했습니다.
 
-변이가 바이너리에 안 들어갔을 가능성(캐시 변이 diff를 적용해 빌드에 성공했고, 두 바이너리의 해시도 달랐음)과 로컬 시계가 어긋났을 가능성(AWS 응답의 `Date` 헤더와 같은 초였음)을 하나씩 배제한 뒤, 서명 시각을 과거로 옮긴 토큰으로 다시 쟀습니다([실측 요약](https://github.com/xodbs1021/xodbs1021.github.io/blob/main/_workspace/blog/pokeclip-shared-db-auth-iam-tls/measurements.md), 결론은 [10월 23일 결정 기록](https://github.com/3K-PokeClip/PokeClip-mono/blob/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/docs/decisions/2026-10-23-rds-iam-db-auth.md)에도 적었습니다). [[fig-token-acceptance]]에서 15분 점선 오른쪽에도 수용 점이 셋 있습니다. 서명 뒤 16분 · 18분 · 19분 30초 된 토큰은 받았고, 20분 30초 · 22분 · 30분 된 토큰은 `PAM authentication failed`로 거부했습니다.
+변이가 바이너리에 안 들어갔을 가능성(캐시 변이 diff를 적용해 빌드에 성공했고, 두 바이너리의 해시도 달랐음)과 로컬 시계가 어긋났을 가능성(AWS 응답의 `Date` 헤더와 같은 초였음)을 하나씩 배제한 뒤, 서명 시각을 과거로 옮긴 토큰으로 다시 쟀습니다([실측 요약](https://github.com/xodbs1021/xodbs1021.github.io/blob/main/_workspace/blog/pokeclip-shared-db-auth-iam-tls/measurements.md), 결론은 10월 23일 결정 기록에도 적었습니다). [[fig-token-acceptance]]에서 15분 점선 오른쪽에도 수용 점이 셋 있습니다. 서명 뒤 16분 · 18분 · 19분 30초 된 토큰은 받았고, 20분 30초 · 22분 · 30분 된 토큰은 `PAM authentication failed`로 거부했습니다.
 
 {{< chart id="fig-token-acceptance" kind="실측" caption="서명 뒤 경과 시간별 IAM 토큰 로그인 결과. 실험 RDS 1대(PostgreSQL 17.11, 서울), 2026-10-22, 시점마다 1회." source="https://github.com/xodbs1021/xodbs1021.github.io/blob/main/_workspace/blog/pokeclip-shared-db-auth-iam-tls/measurements.md" height="260px" >}}
 {
@@ -159,22 +159,22 @@ IAM 토큰은 「누가 로그인하는가」를 정합니다. 로그인한 뒤 
 
 ## 연결 결과는 db_connected 한 줄로 판정했습니다 {#연결-결과는-db_connected-로그-한-줄로-판정한다}
 
-「설정에 iam이라고 썼다」와 「실제로 IAM과 TLS로 붙었다」는 다릅니다. 그래서 연결 확인에 성공하면 정해진 줄 하나를 남기게 했습니다([`connected.go`](https://github.com/3K-PokeClip/PokeClip-mono/blob/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/media/internal/pgconf/connected.go)).
+「설정에 iam이라고 썼다」와 「실제로 IAM과 TLS로 붙었다」는 다릅니다. 그래서 연결 확인에 성공하면 정해진 줄 하나를 남기게 했습니다(`connected.go`).
 
 ```text
 # 형식 단순화 — 실제 출력은 같은 칸의 JSON(slog) 한 줄
 db_connected pool=… auth=iam sslmode=verify-full tls=true user=media_indexer host=… port=5432 db=…
 ```
 
-`tls`는 설정값이 아니라 실제 연결이 TLS인지를 본 값입니다. 이 줄은 비밀번호 모드(로컬)에서도 같은 형식으로 남는데, 그쪽 기본값 `prefer`는 서버가 TLS를 못 하면 조용히 평문으로 내려갑니다. 그래서 설정이 아니라 실제 연결 상태를 적었습니다. 비밀번호 · 토큰 · DSN은 이 줄에 싣지 않습니다. janitor에는 이 줄을 남기려고 기동 때 Ping을 새로 넣었습니다. 사이드카는 인덱서 풀 한 줄로 판정하고, 발행자 풀은 이 줄을 내지 않습니다([README](https://github.com/3K-PokeClip/PokeClip-mono/blob/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/media/README.md?plain=1#L305)). 배포 점검([런북](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/infra/terraform/runbooks/media-swap.md))은 이 줄을 기준으로 판정합니다. 11월 3일 운영 미디어 서버 첫 기동 점검에서 사이드카(인덱서 풀)와 janitor의 `db_connected` 줄(`auth=iam` · `verify-full` · `tls=true`)을 확인하고 통과했습니다([실측 요약](https://github.com/xodbs1021/xodbs1021.github.io/blob/main/_workspace/blog/pokeclip-shared-db-auth-iam-tls/measurements.md)).
+`tls`는 설정값이 아니라 실제 연결이 TLS인지를 본 값입니다. 이 줄은 비밀번호 모드(로컬)에서도 같은 형식으로 남는데, 그쪽 기본값 `prefer`는 서버가 TLS를 못 하면 조용히 평문으로 내려갑니다. 그래서 설정이 아니라 실제 연결 상태를 적었습니다. 비밀번호 · 토큰 · DSN은 이 줄에 싣지 않습니다. janitor에는 이 줄을 남기려고 기동 때 Ping을 새로 넣었습니다. 사이드카는 인덱서 풀 한 줄로 판정하고, 발행자 풀은 이 줄을 내지 않습니다(README). 배포 점검(런북)은 이 줄을 기준으로 판정합니다. 11월 3일 운영 미디어 서버 첫 기동 점검에서 사이드카(인덱서 풀)와 janitor의 `db_connected` 줄(`auth=iam` · `verify-full` · `tls=true`)을 확인하고 통과했습니다([실측 요약](https://github.com/xodbs1021/xodbs1021.github.io/blob/main/_workspace/blog/pokeclip-shared-db-auth-iam-tls/measurements.md)).
 
 ## Java 앱 서버에서는 JDBC URL이 구멍이 됐습니다 {#java-앱-서버로-넓힌-팀원의-구현}
 
-Java 앱 서버 네 대(auth, clip, chat-collector, chat-detector — Spring Boot, HikariCP)에도 사이드카처럼 IAM 토큰을 쓰자고 제가 제안했습니다. 그 서버들을 맡은 팀원이 chat-detector 하나로 실험 RDS에서 스파이크를 한 뒤([#336](https://github.com/3K-PokeClip/PokeClip-mono/pull/336)), 네 서버가 같이 쓰는 모듈 `db-support`를 만들어 모두에 붙였습니다([#340](https://github.com/3K-PokeClip/PokeClip-mono/pull/340), [#343](https://github.com/3K-PokeClip/PokeClip-mono/pull/343)).
+Java 앱 서버 네 대(auth, clip, chat-collector, chat-detector — Spring Boot, HikariCP)에도 사이드카처럼 IAM 토큰을 쓰자고 제가 제안했습니다. 그 서버들을 맡은 팀원이 chat-detector 하나로 실험 RDS에서 스파이크를 한 뒤(#336), 네 서버가 같이 쓰는 모듈 `db-support`를 만들어 모두에 붙였습니다(#340, #343).
 
-- **토큰 시점 — 같습니다.** Hikari의 `HikariCredentialsProvider`에 AWS SDK `RdsUtilities`로 서명한 토큰을 넣어 새 연결마다 만듭니다([`RdsIamCredentialsProvider`](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/services/db-support/src/main/java/com/pokeclip/db/RdsIamCredentialsProvider.java)). 토큰 생성 상한도 10초입니다. 팀원의 스파이크(10월 23일)에서 연결 수명을 2분으로 줄이고 32분을 돌려, 토큰 187개를 발급하는 동안 실패 0을 확인했습니다.
-- **구현 방식 — AWS 공식 JDBC 래퍼는 쓰지 않았습니다.** 결정 당시(10월 23일) chat 두 서버는 응답 없는 연결을 `socketTimeout: 10`(초)으로 끊었습니다(지금은 auth · clip도 같은 10초입니다 — [auth](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/services/auth/src/main/resources/application.yml#L35) · [clip](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/services/clip/src/main/resources/application.yml#L28) 설정). 결정 당시 래퍼는 이 값을 밀리초로 받아 pgjdbc에 초로 넘겼고, 1초 미만은 경고 없이 0으로 잘렸습니다. pgjdbc는 0을 「시한 없음」으로 봅니다([aws-advanced-jdbc-wrapper#2157](https://github.com/aws/aws-advanced-jdbc-wrapper/issues/2157)). 경고만 더하는 수정([#2198](https://github.com/aws/aws-advanced-jdbc-wrapper/pull/2198))은 한국 시간 10월 23일에 병합됐고 이슈는 11월 5일에 닫혔습니다. 변환 방식은 하위 호환을 위해 그대로입니다.
-- **토큰을 건넬 상대 — Java라서 구멍이 하나 더 있었습니다.** Java도 `verify-full`을 강제하고 Go와 같은 CA 번들을 씁니다(두 번들의 바이트가 같은지 시험이 확인합니다). 그런데 JDBC는 URL 쿼리와 드라이버 속성으로 접속을 바꿀 수 있습니다. `sslfactory=org.postgresql.ssl.NonValidatingFactory`는 `verify-full`을 둔 채 인증서 검증을 건너뛰고([pgJDBC 문서](https://jdbc.postgresql.org/documentation/ssl/)), `password=`는 IAM 토큰 대신 URL의 비밀번호를 드라이버에 넘기게 하고, `PGHOST=`는 서명한 호스트와 실제 접속 대상을 가릅니다. 막을 키를 고르는 방식은 리뷰에서 우회로가 두 번 연달아 나와, IAM 모드에서는 URL 쿼리를 통째로 거부하고 드라이버 속성은 `socketTimeout` 하나만 받는 허용 목록으로 바꿨습니다([`DataSourceLoginConfiguration`](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/services/db-support/src/main/java/com/pokeclip/db/DataSourceLoginConfiguration.java)). Go 쪽은 DSN을 개별 환경 변수로 직접 조립하고, DSN에 넣은 값이 pgx가 읽는 `PG*` 환경 변수보다 우선해서([pgx v5.10.0 `ParseConfig`](https://github.com/jackc/pgx/blob/v5.10.0/pgconn/config.go#L356-L363)) IAM 경로에 이런 통로가 없습니다.
+- **토큰 시점 — 같습니다.** Hikari의 `HikariCredentialsProvider`에 AWS SDK `RdsUtilities`로 서명한 토큰을 넣어 새 연결마다 만듭니다(`RdsIamCredentialsProvider`). 토큰 생성 상한도 10초입니다. 팀원의 스파이크(10월 23일)에서 연결 수명을 2분으로 줄이고 32분을 돌려, 토큰 187개를 발급하는 동안 실패 0을 확인했습니다.
+- **구현 방식 — AWS 공식 JDBC 래퍼는 쓰지 않았습니다.** 결정 당시(10월 23일) chat 두 서버는 응답 없는 연결을 `socketTimeout: 10`(초)으로 끊었습니다(지금은 auth · clip도 같은 10초입니다 — auth · clip 설정). 결정 당시 래퍼는 이 값을 밀리초로 받아 pgjdbc에 초로 넘겼고, 1초 미만은 경고 없이 0으로 잘렸습니다. pgjdbc는 0을 「시한 없음」으로 봅니다([aws-advanced-jdbc-wrapper#2157](https://github.com/aws/aws-advanced-jdbc-wrapper/issues/2157)). 경고만 더하는 수정([#2198](https://github.com/aws/aws-advanced-jdbc-wrapper/pull/2198))은 한국 시간 10월 23일에 병합됐고 이슈는 11월 5일에 닫혔습니다. 변환 방식은 하위 호환을 위해 그대로입니다.
+- **토큰을 건넬 상대 — Java라서 구멍이 하나 더 있었습니다.** Java도 `verify-full`을 강제하고 Go와 같은 CA 번들을 씁니다(두 번들의 바이트가 같은지 시험이 확인합니다). 그런데 JDBC는 URL 쿼리와 드라이버 속성으로 접속을 바꿀 수 있습니다. `sslfactory=org.postgresql.ssl.NonValidatingFactory`는 `verify-full`을 둔 채 인증서 검증을 건너뛰고([pgJDBC 문서](https://jdbc.postgresql.org/documentation/ssl/)), `password=`는 IAM 토큰 대신 URL의 비밀번호를 드라이버에 넘기게 하고, `PGHOST=`는 서명한 호스트와 실제 접속 대상을 가릅니다. 막을 키를 고르는 방식은 리뷰에서 우회로가 두 번 연달아 나와, IAM 모드에서는 URL 쿼리를 통째로 거부하고 드라이버 속성은 `socketTimeout` 하나만 받는 허용 목록으로 바꿨습니다(`DataSourceLoginConfiguration`). Go 쪽은 DSN을 개별 환경 변수로 직접 조립하고, DSN에 넣은 값이 pgx가 읽는 `PG*` 환경 변수보다 우선해서([pgx v5.10.0 `ParseConfig`](https://github.com/jackc/pgx/blob/v5.10.0/pgconn/config.go#L356-L363)) IAM 경로에 이런 통로가 없습니다.
 - **로그인 뒤 권한 — 서버마다 사용자를 따로 뒀습니다.** 서버별 사용자는 제가 IAM 적용과 함께 제안한 방향이고 팀원이 구현했으며, 남의 표를 읽는 권한은 그 표의 주인이 주게 했습니다. 이 내용도 [로그인 뒤 권한 글](/posts/0-to-1/pokeclip-shared-db-login-privileges/#서버마다-사용자를-따로-두고-남의-표-읽기는-표-주인이-줬습니다)에 있습니다.
 - **판정 — 같습니다.** `auth` · `sslmode` · `tls` 등 공통 칸의 `db_connected` 줄을 남기고, `tls`도 실제 연결 기준입니다.
 
@@ -183,11 +183,11 @@ Java 앱 서버 네 대(auth, clip, chat-collector, chat-detector — Spring Boo
 ## 20분 창은 1대 · 1회 측정이고 되돌리기에는 별도 절차가 필요합니다 {#남은-한계}
 
 - 20분 수용 창은 인스턴스 1대 · 1회 측정입니다. 다른 인스턴스 · 버전에서 같은지는 모릅니다.
-- Java 스파이크 환경의 TLS 연결에서는 호출자가 읽기 시한(10초)의 두 배를 기다렸습니다. 10초 시한이 걸린 뒤 드라이버가 TLS 소켓을 닫는데, JDK가 닫기 전에 남은 입력을 한 번 더 읽고 거기에도 같은 시한이 걸려 호출자는 20초를 기다렸습니다(스레드 덤프로 확인, [PR #336](https://github.com/3K-PokeClip/PokeClip-mono/pull/336)). IAM이 아니라 TLS 소켓을 닫는 경로 때문이고, 무한히 매달리지는 않습니다.
+- Java 스파이크 환경의 TLS 연결에서는 호출자가 읽기 시한(10초)의 두 배를 기다렸습니다. 10초 시한이 걸린 뒤 드라이버가 TLS 소켓을 닫는데, JDK가 닫기 전에 남은 입력을 한 번 더 읽고 거기에도 같은 시한이 걸려 호출자는 20초를 기다렸습니다(스레드 덤프로 확인, PR #336). IAM이 아니라 TLS 소켓을 닫는 경로 때문이고, 무한히 매달리지는 않습니다.
 - 실험 RDS에서 첫 IAM 로그인은 약 5.6초가 걸렸고([실측 요약](https://github.com/xodbs1021/xodbs1021.github.io/blob/main/_workspace/blog/pokeclip-shared-db-auth-iam-tls/measurements.md)), 그 뒤 로그인은 0.5초 안팎이었습니다. 원인은 재지 않았습니다.
 - 같은 네트워크 네임스페이스의 컨테이너는 인스턴스 메타데이터에서 같은 역할 자격을 얻을 수 있어, 두 DB 사용자의 토큰을 다 만들 수 있었습니다. 11월 16–17일 운영 Media 상자 둘에 대리 창구를 켠 뒤로 이 범위는 창구 토큰을 받은 사이드카와 janitor 둘로 좁아졌고, 이 둘은 여전히 서로의 DB 사용자 토큰도 만들 수 있습니다([IMDS 홉 상한 글](/posts/0-to-1/pokeclip-media-imds-credential-relay/)).
 - 코드가 막을 수 없는 조건이 있습니다. 컨테이너에 정적 AWS 키 환경 변수가 있거나 `~/.aws`가 마운트되면 SDK가 인스턴스 역할보다 그것을 먼저 씁니다([AWS SDK for Go v2 문서](https://docs.aws.amazon.com/sdk-for-go/v2/developer-guide/configure-gosdk.html)). 배포 정의에서 이 둘이 없음을 지켜야 합니다.
-- 운영을 비밀번호로 되돌리는 일은 `POSTGRES_AUTH`를 비우는 것만으로 되지 않습니다. `rds_iam`을 가진 사용자는 IAM 인증이 우선이라 별도 절차가 필요합니다([AWS 문서](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.html), [README 「password 로 되돌리기」](https://github.com/3K-PokeClip/PokeClip-mono/blob/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/media/README.md?plain=1#L2511)).
+- 운영을 비밀번호로 되돌리는 일은 `POSTGRES_AUTH`를 비우는 것만으로 되지 않습니다. `rds_iam`을 가진 사용자는 IAM 인증이 우선이라 별도 절차가 필요합니다([AWS 문서](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.html), README 「password 로 되돌리기」).
 
 IAM 인증을 붙일 때는 정책보다 먼저 「토큰을 언제 만들고 누구에게 건네는가」를 코드에서 정하십시오. 그리고 공식 수명을 시험의 대기 시간으로 그대로 쓰지 말고, 실제 인스턴스가 받아 주는 시간을 한 번은 재 보십시오.
 
@@ -210,13 +210,13 @@ IAM 인증을 붙일 때는 정책보다 먼저 「토큰을 언제 만들고 �
 - pgJDBC, [Using SSL](https://jdbc.postgresql.org/documentation/ssl/) — `sslfactory` 설정
 - AWS, [Configure the SDK (Go v2)](https://docs.aws.amazon.com/sdk-for-go/v2/developer-guide/configure-gosdk.html) — 자격 증명 탐색 순서
 
-코드 · 결정 기록(공개 저장소 3K-PokeClip/PokeClip-mono)
-- [PR #314](https://github.com/3K-PokeClip/PokeClip-mono/pull/314) — 사이드카 · janitor RDS IAM 인증, 실험 RDS 시험 항목(병합 `7f99ccd1`)
-- [10월 23일 결정 기록 `2026-10-23-rds-iam-db-auth.md`](https://github.com/3K-PokeClip/PokeClip-mono/blob/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/docs/decisions/2026-10-23-rds-iam-db-auth.md) — RDS IAM DB 인증 결정과 고르지 않은 대안
-- [`media/internal/pgconf`](https://github.com/3K-PokeClip/PokeClip-mono/tree/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/media/internal/pgconf) — `pgconf.go` · `iam.go` · `connected.go`
-- [PR #336](https://github.com/3K-PokeClip/PokeClip-mono/pull/336) · [PR #340](https://github.com/3K-PokeClip/PokeClip-mono/pull/340) · [PR #343](https://github.com/3K-PokeClip/PokeClip-mono/pull/343) — Java 앱 서버 스파이크와 `db-support`(팀원)
-- [`media/README.md`](https://github.com/3K-PokeClip/PokeClip-mono/blob/7f99ccd10f0709345cb966b042c9206b4d6a3bc5/media/README.md) — `db_connected` 줄 · DB 접속 운영 전제 · password 로 되돌리기
-- [운영 런북 `media-swap.md`](https://github.com/3K-PokeClip/PokeClip-mono/blob/33f7ae1f879b87f3f968d5ca2637d6e72cdae5dc/infra/terraform/runbooks/media-swap.md) — 기동 판정 `SIDECAR_DB` · `JANITOR_DB`
+코드 · 결정 기록(프로젝트 저장소 3K-PokeClip/PokeClip-mono · 2026년 11월 20일부터 비공개)
+- PR #314 — 사이드카 · janitor RDS IAM 인증, 실험 RDS 시험 항목(병합 `7f99ccd1`) (비공개 저장소)
+- 10월 23일 결정 기록 `2026-10-23-rds-iam-db-auth.md` — RDS IAM DB 인증 결정과 고르지 않은 대안 (비공개 저장소)
+- `media/internal/pgconf` — `pgconf.go` · `iam.go` · `connected.go` (비공개 저장소)
+- PR #336 · PR #340 · PR #343 — Java 앱 서버 스파이크와 `db-support`(팀원) (비공개 저장소)
+- `media/README.md` — `db_connected` 줄 · DB 접속 운영 전제 · password 로 되돌리기 (비공개 저장소)
+- 운영 런북 `media-swap.md` — 기동 판정 `SIDECAR_DB` · `JANITOR_DB` (비공개 저장소)
 
 실측
 - [실측 요약](https://github.com/xodbs1021/xodbs1021.github.io/blob/main/_workspace/blog/pokeclip-shared-db-auth-iam-tls/measurements.md) — 실험 RDS(2026-10-22) 정상 · 거부 경로, 토큰 수용 창, 운영 첫 기동 점검(2026-11-03). 비공개 기록에서 계정 · 주소를 빼고 옮김

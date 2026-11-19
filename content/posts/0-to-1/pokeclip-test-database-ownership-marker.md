@@ -14,7 +14,7 @@ portfolio_edition: "2026-10-15-v2"
 
 2026년 8월 4일 S3 업로드 인수 시험의 첫 실행이 멈췄습니다. 로컬 Docker compose의 개발 DB에 스트림 405개 분량의 행 1,121개가 남아 있었고, 업로드 스위퍼가 이 행들에 매달려 시험 대상 5행에 90초 안에 닿지 못했습니다. 제품 결함은 아니었습니다. 1,121행을 지운 두 번째 실행은 끝까지 통과했습니다. 다시 쌓이지 않도록 SQL 통합 테스트가 쓰는 곳을 전용 테스트 DB 하나로 모으고, 새로 만든 DB에만 소유 표식을 심어 표식이 없는 DB는 쓰지도 비우지도 않게 했습니다.
 
-작업 티켓의 원안은 테스트가 끝날 때 `t.Cleanup`에서 자기 행을 지우는 것이었습니다. 저는 store 테스트도 업로드 테스트처럼 별도 DB에서 돌리면 되지 않느냐고 물었고, 확인 뒤 전용 DB로 통일하는 쪽으로 바꿔 확정했습니다. 개발 DB에 남은 테스트 잔재를 한 번 지우는 것도 제가 승인했습니다. 구현은 AI(Claude Code)가 했고, 리뷰는 Claude Code와 Codex, 그리고 Claude Code의 보안 검수 에이전트가 했습니다. [PR #61](https://github.com/3K-PokeClip/PokeClip-mono/pull/61)은 제 승인 뒤 8월 16일 19시 5분(한국 시각)에 병합됐습니다.
+작업 티켓의 원안은 테스트가 끝날 때 `t.Cleanup`에서 자기 행을 지우는 것이었습니다. 저는 store 테스트도 업로드 테스트처럼 별도 DB에서 돌리면 되지 않느냐고 물었고, 확인 뒤 전용 DB로 통일하는 쪽으로 바꿔 확정했습니다. 개발 DB에 남은 테스트 잔재를 한 번 지우는 것도 제가 승인했습니다. 구현은 AI(Claude Code)가 했고, 리뷰는 Claude Code와 Codex, 그리고 Claude Code의 보안 검수 에이전트가 했습니다. PR #61은 제 승인 뒤 8월 16일 19시 5분(한국 시각)에 병합됐습니다.
 
 ## 잔여 1,121행이 스위퍼를 막아 업로드 인수 시험이 멈췄습니다
 
@@ -24,7 +24,7 @@ portfolio_edition: "2026-10-15-v2"
 
 ## 테스트는 연결만 닫고 행을 남겼습니다 {#연결을-닫는-것과-데이터를-지우는-것은-달랐습니다}
 
-`media/internal/index`의 SQL 통합 테스트는 두 파일로 나뉘어 접속 대상이 달랐습니다. `upload_store_test.go`는 같은 PostgreSQL 서버에 전용 테스트 DB를 만들어 그 안에서만 돌았습니다. `store_test.go`는 개발용 접속 문자열 `PG_DSN`이 가리키는 공용 개발 DB에 직접 행을 넣었고, 끝날 때 연결만 닫았습니다. 지우는 코드는 없었습니다([공개 결정 기록](https://github.com/3K-PokeClip/PokeClip-mono/blob/2fc2323cbd84a683e935bfdf9f0171febf276535/docs/decisions/2026-08-16-%ED%85%8C%EC%8A%A4%ED%8A%B8%EC%A0%84%EC%9A%A9DB-%EC%86%8C%EC%9C%A0%ED%91%9C%EC%8B%9D.md)).
+`media/internal/index`의 SQL 통합 테스트는 두 파일로 나뉘어 접속 대상이 달랐습니다. `upload_store_test.go`는 같은 PostgreSQL 서버에 전용 테스트 DB를 만들어 그 안에서만 돌았습니다. `store_test.go`는 개발용 접속 문자열 `PG_DSN`이 가리키는 공용 개발 DB에 직접 행을 넣었고, 끝날 때 연결만 닫았습니다. 지우는 코드는 없었습니다(공개 결정 기록).
 
 | 후보 | 해결하는 것 | 남는 문제 |
 |---|---|---|
@@ -38,7 +38,7 @@ portfolio_edition: "2026-10-15-v2"
 
 전용 DB를 여러 번 다시 쓰려면 `CREATE DATABASE`가 「이미 있음」(PostgreSQL 오류 코드 42P04)을 정상으로 넘겨야 합니다. 그런데 이 관용은 `PG_TEST_DB`가 이미 있는 남의 DB를 가리킬 때도 통과시키고, 통과하면 테스트가 그 DB의 표를 비웁니다. 그래서 비우기 전에 「이 DB를 써도 되는가」를 판정해야 했습니다.
 
-첫 설계는 public 스키마의 표 개수와 이름이 테스트가 만드는 모양과 같으면 테스트 DB로 보는 것이었습니다. 코드 리뷰 중에 AI 리뷰어(Claude Code)가 표 `stream_segments` 하나와 행 하나만 있는 미끼 DB를 만들어 돌리자, 테스트가 통과하면서 그 행이 사라졌습니다. 공용 개발 DB도 public에 표가 `stream_segments` 하나뿐이라 테스트 DB와 모양이 완전히 같았습니다([PR #61 본문](https://github.com/3K-PokeClip/PokeClip-mono/pull/61)). 같은 리뷰에서 Codex도 이 구멍을 높은 심각도로 지적했습니다.
+첫 설계는 public 스키마의 표 개수와 이름이 테스트가 만드는 모양과 같으면 테스트 DB로 보는 것이었습니다. 코드 리뷰 중에 AI 리뷰어(Claude Code)가 표 `stream_segments` 하나와 행 하나만 있는 미끼 DB를 만들어 돌리자, 테스트가 통과하면서 그 행이 사라졌습니다. 공용 개발 DB도 public에 표가 `stream_segments` 하나뿐이라 테스트 DB와 모양이 완전히 같았습니다(PR #61 본문). 같은 리뷰에서 Codex도 이 구멍을 높은 심각도로 지적했습니다.
 
 영상의 왼쪽은 옛 판정, 오른쪽은 새 판정이 같은 미끼 DB를 만났을 때입니다. 모양이 같은 DB에서 왼쪽만 행이 지워지는 것을 보십시오.
 
@@ -48,7 +48,7 @@ portfolio_edition: "2026-10-15-v2"
 
 [[fig-testdb-guards]]는 테스트가 전용 DB를 쓰기 전에 거치는 판정입니다. 시작을 거부하는 두 가드와 표식 확인이 어디에 있는지 보십시오.
 
-```mermaid {#fig-testdb-guards kind="재구성" caption="테스트 DB 부트스트랩의 가드 3종(이름 가드 2종과 소유 표식 확인). 이름 가드 2종은 PG_DSN의 DB 이름이 비었거나 PG_TEST_DB와 같으면 시작을 거부하고, CREATE DATABASE로 새로 만든 DB에만 표식을 심으며, 이미 있는 DB는 표식이 있을 때만 씁니다. PR #61 병합 커밋 7d7930c의 media/internal/index/testdb_test.go와 지금의 media/internal/pgtest/pgtest.go 84–169행 재구성." source="https://github.com/3K-PokeClip/PokeClip-mono/blob/2fc2323cbd84a683e935bfdf9f0171febf276535/media/internal/pgtest/pgtest.go#L84-L169"}
+```mermaid {#fig-testdb-guards kind="재구성" caption="테스트 DB 부트스트랩의 가드 3종(이름 가드 2종과 소유 표식 확인). 이름 가드 2종은 PG_DSN의 DB 이름이 비었거나 PG_TEST_DB와 같으면 시작을 거부하고, CREATE DATABASE로 새로 만든 DB에만 표식을 심으며, 이미 있는 DB는 표식이 있을 때만 씁니다. PR #61 병합 커밋 7d7930c의 media/internal/index/testdb_test.go와 지금의 media/internal/pgtest/pgtest.go 84–169행 재구성." source="프로젝트 저장소 media/internal/pgtest/pgtest.go(비공개)"}
 flowchart TB
   accTitle: 테스트 DB 부트스트랩의 가드와 소유 표식
   accDescr: 테스트가 시작하면 PG_DSN의 DB 이름이 비었거나 PG_TEST_DB와 같으면 시작을 거부한다. 통과하면 CREATE DATABASE를 내고, 새로 만든 DB에만 소유 표식 표를 심는다. 그다음 표식이 있는지 보고, 이미 있던 DB에 표식이 없으면 사용과 정리를 거부한다. 표식이 있는 DB만 스키마 준비, 표 비우기, 테스트로 간다.
@@ -61,7 +61,7 @@ flowchart TB
   style G3 fill:#0a0c08,stroke:#0a0c07,stroke-width:3px
 ```
 
-판정이 맞는지는 자동 테스트가 아니라 PR 본문에 옮겨 둔 실측 로그로 확인했습니다([PR #61 본문](https://github.com/3K-PokeClip/PokeClip-mono/pull/61)의 실측 로그 요지).
+판정이 맞는지는 자동 테스트가 아니라 PR 본문에 옮겨 둔 실측 로그로 확인했습니다(PR #61 본문의 실측 로그 요지).
 
 - 가드 3종 음성 대조: 테스트 DB 이름을 공용 DB 이름으로 줬을 때, `PG_DSN`에 DB 이름이 없을 때, 남의 DB를 가리켰을 때 셋 다 종료 코드 1로 멈췄습니다.
 - 미끼 DB: 옛 표 개수 코드는 종료 코드 0으로 통과하고 미끼 행이 사라졌습니다(RED). 표식 코드는 네 경우 모두 종료 코드 1로 멈췄고 미끼 행이 남았으며, 미끼 DB에 표식도 스키마도 만들지 않았습니다(GREEN).
@@ -73,7 +73,7 @@ flowchart TB
 
 표식은 「테스트가 써도 되는 DB인가」를 가릅니다. 두 실행이 같은 `PG_TEST_DB`를 함께 쓰면 둘 다 그 DB를 쓸 자격이 있으므로, 한쪽이 다른 쪽의 데이터를 비웁니다. 그래서 PR #61은 「실행마다 고유한 `PG_TEST_DB`를 준다」를 규약으로 적었습니다. 두 실행이 거의 동시에 들어오면, 한쪽이 DB를 만들고 표식을 심기 전의 아주 짧은 틈에 다른 쪽이 그 DB를 「남의 DB」로 보고 실패할 수도 있습니다. 데이터를 잃는 쪽이 아니라 실패하는 쪽이라 낮은 위험으로 남겼습니다.
 
-2026년 9월 2일 이 부트스트랩은 여러 패키지가 함께 쓰는 `internal/pgtest`로 옮겨졌습니다. `go test ./...`는 패키지를 병렬로 돌리므로, 지금은 `index`를 뺀 패키지마다 기본 이름에 접미사를 붙인 DB를 따로 씁니다([`pgtest.go` 50–64행](https://github.com/3K-PokeClip/PokeClip-mono/blob/2fc2323cbd84a683e935bfdf9f0171febf276535/media/internal/pgtest/pgtest.go#L50-L64)). 가드와 표식 판정은 병합 때와 같습니다. 그래도 별개의 두 프로세스가 같은 `PG_TEST_DB`를 쓰는 경우를 막는 코드는 2026년 11월 12일에도 없고, 표식 경합 오탐도 그대로입니다.
+2026년 9월 2일 이 부트스트랩은 여러 패키지가 함께 쓰는 `internal/pgtest`로 옮겨졌습니다. `go test ./...`는 패키지를 병렬로 돌리므로, 지금은 `index`를 뺀 패키지마다 기본 이름에 접미사를 붙인 DB를 따로 씁니다(`pgtest.go` 50–64행). 가드와 표식 판정은 병합 때와 같습니다. 그래도 별개의 두 프로세스가 같은 `PG_TEST_DB`를 쓰는 경우를 막는 코드는 2026년 11월 12일에도 없고, 표식 경합 오탐도 그대로입니다.
 
 DB를 만들려면 테스트 계정에 `CREATEDB` 권한이 있어야 합니다([PostgreSQL `CREATE DATABASE` 문서](https://www.postgresql.org/docs/current/sql-createdatabase.html)). 표식이 생기기 전에 만든 로컬 전용 DB는 한 번 지우고 다시 만들어야 했습니다. 표식이 없다는 이유로 발견한 DB를 자동으로 채택하거나 비우는 방식은 고르지 않았습니다. 표식을 심기 전에 중단돼 남은 DB는 구조상 항상 비어 있으므로, 안내대로 지우면 잃는 것이 없습니다.
 
@@ -93,10 +93,10 @@ DB를 만들려면 테스트 계정에 `CREATEDB` 권한이 있어야 합니다(
 
 ## 출처
 
-- [3K-PokeClip/PokeClip-mono PR #61](https://github.com/3K-PokeClip/PokeClip-mono/pull/61) — 전용 테스트 DB 통일과 소유 표식(2026-08-16 병합), 본문의 실측 로그와 알려진 제약
-- [PokeClip-mono 결정 기록 「테스트 전용 DB · 소유 표식」](https://github.com/3K-PokeClip/PokeClip-mono/blob/2fc2323cbd84a683e935bfdf9f0171febf276535/docs/decisions/2026-08-16-%ED%85%8C%EC%8A%A4%ED%8A%B8%EC%A0%84%EC%9A%A9DB-%EC%86%8C%EC%9C%A0%ED%91%9C%EC%8B%9D.md) — 기각한 대안
-- [병합 당시 `media/internal/index/testdb_test.go`](https://github.com/3K-PokeClip/PokeClip-mono/blob/7d7930c3f954bb9105dec44a604da749cbfe8307/media/internal/index/testdb_test.go#L100-L156) — 가드와 표식
-- [지금의 `media/internal/pgtest/pgtest.go`](https://github.com/3K-PokeClip/PokeClip-mono/blob/2fc2323cbd84a683e935bfdf9f0171febf276535/media/internal/pgtest/pgtest.go#L50-L169) — 패키지별 DB 이름, 가드, 표식
+- 3K-PokeClip/PokeClip-mono PR #61 — 전용 테스트 DB 통일과 소유 표식(2026-08-16 병합), 본문의 실측 로그와 알려진 제약 (비공개 저장소)
+- PokeClip-mono 결정 기록 「테스트 전용 DB · 소유 표식」 — 기각한 대안 (비공개 저장소)
+- 병합 당시 `media/internal/index/testdb_test.go` — 가드와 표식 (비공개 저장소)
+- 지금의 `media/internal/pgtest/pgtest.go` — 패키지별 DB 이름, 가드, 표식 (비공개 저장소)
 - [PostgreSQL `CREATE DATABASE`](https://www.postgresql.org/docs/current/sql-createdatabase.html)
 - [업로드가 끝났는지는 S3 응답이 아니라 DB 장부로 봤습니다](/posts/0-to-1/pokeclip-upload-state-and-recovery/) — 스위퍼와 8월 4일 인수 시험
 - 팀 내부 실험 기록(비공개) — 8월 4일 인수 시험 첫 실행

@@ -9,9 +9,9 @@ draft: false
 description: "4초 조각 900개 라이브 목록이 1시간 되감기를 겸하던 구조를 라이브 LL-HLS 목록과 장부 기반 S3 되감기 목록으로 나눈 판단, 되감기 끝에서 라이브로 넘기는 조건(같은 회차 · 못 본 녹화를 건너뛰지 않음 · 확인 시한), 넘김 시험에서 드러난 75초 PDT 어긋남, 출시본에 들어간 자동 넘김과 남은 건너뜀 재측정."
 ---
 
-PokeClip 시청자는 라이브를 보다가 지난 장면으로 돌아가 클립 구간을 고릅니다. 2026년 8월 설계 당시에는 라이브 재생 목록 하나가 4초 조각 900개, 곧 1시간을 담아 되감기를 겸했습니다. 라이브 목록을 줄이면 되감기가 함께 사라지는 구조였습니다. 그래서 라이브는 미디어 서버(MediaMTX)가 내는 LL-HLS 목록으로 두고, 1시간 되감기 목록은 DB 장부를 기준으로 S3에 따로 발행했습니다. 목록이 둘이 되자 되감기 끝에서 라이브로 넘어가는 조건이 필요해졌습니다. 같은 회차이고 아직 못 본 녹화를 건너뛰지 않을 때만 자동으로 넘기기로 했고, 이 자동 넘김은 10월 31일 [PR #460](https://github.com/3K-PokeClip/PokeClip-mono/pull/460)으로 develop에 들어가 11월 3일 v1.0.0 출시본에 포함됐습니다. 다만 넘기는 순간 내용이 1.17–1.50초 앞으로 건너뛰는 문제가 남아, 시간축 개정 뒤 다시 재야 합니다.
+PokeClip 시청자는 라이브를 보다가 지난 장면으로 돌아가 클립 구간을 고릅니다. 2026년 8월 설계 당시에는 라이브 재생 목록 하나가 4초 조각 900개, 곧 1시간을 담아 되감기를 겸했습니다. 라이브 목록을 줄이면 되감기가 함께 사라지는 구조였습니다. 그래서 라이브는 미디어 서버(MediaMTX)가 내는 LL-HLS 목록으로 두고, 1시간 되감기 목록은 DB 장부를 기준으로 S3에 따로 발행했습니다. 목록이 둘이 되자 되감기 끝에서 라이브로 넘어가는 조건이 필요해졌습니다. 같은 회차이고 아직 못 본 녹화를 건너뛰지 않을 때만 자동으로 넘기기로 했고, 이 자동 넘김은 10월 31일 PR #460으로 develop에 들어가 11월 3일 v1.0.0 출시본에 포함됐습니다. 다만 넘기는 순간 내용이 1.17–1.50초 앞으로 건너뛰는 문제가 남아, 시간축 개정 뒤 다시 재야 합니다.
 
-저는 라이브와 되감기 목록을 나누는 방향, 자동 넘김을 같은 회차 안으로 좁히는 범위, 넘김을 확인하지 못하면 되감기로 되돌리는 동작, 완료 기준과 재측정 통과선(±250ms)을 정했고 PR을 머지했습니다. 웹 되감기 연동([PR #436](https://github.com/3K-PokeClip/PokeClip-mono/pull/436))과 자동 넘김(PR #460)의 설계 문서, 구현, 실측은 AI(Claude Code와 하위 에이전트)가 했고, 리뷰는 Claude Code와 Codex가 함께 했습니다. 이 글의 10월 28일 판은 웹의 주 구현을 팀원이 맡았다고 적었지만, 두 PR의 구현은 AI가 했습니다. 용어는 [회차 다시보기 글](/posts/projects/pokeclip-round-vod/)을 따릅니다. 조각은 세션(사이드카가 목록 하나를 여닫는 단위)에, 세션은 사슬(계승으로 이어진 세션 묶음)에, 사슬은 회차(시청자가 보는 방송 한 번)에 속합니다. 10월 28일 판의 「같은 방송·다른 방송」은 이 글의 「같은 회차·다른 회차」입니다.
+저는 라이브와 되감기 목록을 나누는 방향, 자동 넘김을 같은 회차 안으로 좁히는 범위, 넘김을 확인하지 못하면 되감기로 되돌리는 동작, 완료 기준과 재측정 통과선(±250ms)을 정했고 PR을 머지했습니다. 웹 되감기 연동(PR #436)과 자동 넘김(PR #460)의 설계 문서, 구현, 실측은 AI(Claude Code와 하위 에이전트)가 했고, 리뷰는 Claude Code와 Codex가 함께 했습니다. 이 글의 10월 28일 판은 웹의 주 구현을 팀원이 맡았다고 적었지만, 두 PR의 구현은 AI가 했습니다. 용어는 [회차 다시보기 글](/posts/projects/pokeclip-round-vod/)을 따릅니다. 조각은 세션(사이드카가 목록 하나를 여닫는 단위)에, 세션은 사슬(계승으로 이어진 세션 묶음)에, 사슬은 회차(시청자가 보는 방송 한 번)에 속합니다. 10월 28일 판의 「같은 방송·다른 방송」은 이 글의 「같은 회차·다른 회차」입니다.
 
 ## 900조각 라이브 목록이 1시간 되감기를 겸하고 있었습니다 {#live를-짧게-유지하려면-dvr이-먼저-있어야-했습니다}
 
@@ -31,7 +31,7 @@ DVR(Digital Video Recorder)은 방송 중에 이미 지나간 구간을 되돌�
 
 그림 1에서 MediaMTX 아래로 갈라지는 두 갈래를 보면 됩니다. 라이브 갈래는 미디어 서버에서 바로 나가고, 되감기 갈래는 녹화 조각이 사이드카와 DB 장부를 거쳐 S3 목록이 됩니다.
 
-```mermaid {#fig-live-dvr-paths kind="개념도" caption="라이브 목록은 MediaMTX가 내고, 되감기 1시간 목록은 사이드카가 녹화 조각을 DB 장부에 적은 뒤 S3에 발행합니다. 플레이어는 제어면 API에서 지금 볼 되감기 목록 주소를 받습니다. PokeClip-mono media/README.md 「되감기 상태 제어면」과 PR #289 · #436 재구성." source="https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/README.md?plain=1#L721-L733"}
+```mermaid {#fig-live-dvr-paths kind="개념도" caption="라이브 목록은 MediaMTX가 내고, 되감기 1시간 목록은 사이드카가 녹화 조각을 DB 장부에 적은 뒤 S3에 발행합니다. 플레이어는 제어면 API에서 지금 볼 되감기 목록 주소를 받습니다. PokeClip-mono media/README.md 「되감기 상태 제어면」과 PR #289 · #436 재구성." source="프로젝트 저장소 media/README.md?plain=1(비공개)"}
 flowchart TB
   accTitle: 라이브 목록과 되감기 목록의 경로
   accDescr: OBS 송출을 MediaMTX가 받아 라이브 LL-HLS 목록을 내고, 녹화 조각은 사이드카가 DB 장부에 적은 뒤 S3에 되감기 1시간 목록으로 발행해 CDN으로 낸다. 라이브 목록과 되감기 목록이 모두 플레이어로 가고, 사이드카의 제어면 API가 플레이어에 지금 볼 되감기 주소를 알려 준다.
@@ -45,15 +45,15 @@ flowchart TB
   side -.->|되감기 주소| player
 ```
 
-되감기 목록은 시청 요청마다 만들지 않고, 장부 상태가 바뀔 때 발행합니다. 시청 경로가 단순해지는 대신, 늦게 끝난 발행이 새 목록을 덮지 못하게 막는 책임이 쓰기 쪽으로 옵니다. 그 장치(writer fence, 세대 예약, S3 조건부 PUT)와 10월 17일 실제 S3에서 사이드카를 재시작해 본 실험은 [발행 정합성 글](/posts/0-to-1/pokeclip-database-authoritative-manifest-publishing/)에 있습니다. 발행 층은 10월 19일 [PR #289](https://github.com/3K-PokeClip/PokeClip-mono/pull/289)로, 웹 되감기 기본 연동은 10월 27일 PR #436으로 develop에 머지됐습니다.
+되감기 목록은 시청 요청마다 만들지 않고, 장부 상태가 바뀔 때 발행합니다. 시청 경로가 단순해지는 대신, 늦게 끝난 발행이 새 목록을 덮지 못하게 막는 책임이 쓰기 쪽으로 옵니다. 그 장치(writer fence, 세대 예약, S3 조건부 PUT)와 10월 17일 실제 S3에서 사이드카를 재시작해 본 실험은 [발행 정합성 글](/posts/0-to-1/pokeclip-database-authoritative-manifest-publishing/)에 있습니다. 발행 층은 10월 19일 PR #289로, 웹 되감기 기본 연동은 10월 27일 PR #436으로 develop에 머지됐습니다.
 
 ## 되감기 끝에서 라이브로 넘기는 조건은 같은 회차와 못 본 녹화였습니다 {#url을-바꾸기-전에-같은-장면인지-확인해야-했습니다}
 
 목록을 나누면 두 목록이 만나는 지점이 생깁니다. 송출이 잠깐 끊기거나 대체 화면이 나오는 동안 녹화를 이어 보면, 1배속으로 봐도 되감기 재생 위치가 라이브 범위에 닿습니다. 이때 재생 소스를 되감기 목록에서 라이브 목록으로 바꾸는 동작을 자동 넘김이라고 부릅니다. 10월 27일 저는 자동 넘김을 같은 회차 안으로 좁혔습니다. 다른 회차, 곧 새 방송은 시청자가 버튼이나 새로고침으로 고르게 했습니다.
 
-조건은 둘입니다. 첫째, 같은 회차여야 합니다. 플레이어는 처음 열 때의 회차 번호를 쥐고 있고([`rewindSwitch.ts` 128–129행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/player/rewindSwitch.ts#L128-L129)), 제어면이 알려 준 지금 회차가 다르면 넘기지 않고 다른 회차로 표시만 합니다([412행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/player/rewindSwitch.ts#L412)). 송출이 끊겼다가 돌아온 경우에도 같은 회차일 때만 자동으로 잇습니다([`endingWait.ts` 103–108행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/player/endingWait.ts#L103-L108)).
+조건은 둘입니다. 첫째, 같은 회차여야 합니다. 플레이어는 처음 열 때의 회차 번호를 쥐고 있고(`rewindSwitch.ts` 128–129행), 제어면이 알려 준 지금 회차가 다르면 넘기지 않고 다른 회차로 표시만 합니다(412행). 송출이 끊겼다가 돌아온 경우에도 같은 회차일 때만 자동으로 잇습니다(`endingWait.ts` 103–108행).
 
-둘째, 아직 못 본 녹화를 건너뛰지 않아야 합니다. 되감기 재생 위치를 P, 되감기 목록의 끝을 E, 목록의 목표 길이(TARGETDURATION)를 TD라고 하겠습니다. P가 E 앞 1 × TD 띠 안에 들어오면 플레이어는 라이브 목록을 한 번 받아(2초 시한), 그 목록에서 틀 수 있는 가장 이른 시각인 라이브 시작 하한을 잽니다. 하한이 P 이하일 때만 넘깁니다([`liveHandoff.ts` 298행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/player/liveHandoff.ts#L298) · [422행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/player/liveHandoff.ts#L422)). 하한이 P보다 늦으면 그 사이 녹화가 잘리므로 넘기지 않고 「라이브로 가려면 LIVE 를 눌러 주세요」를 한 번 띄웁니다([17–18행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/player/liveHandoff.ts#L17-L18)).
+둘째, 아직 못 본 녹화를 건너뛰지 않아야 합니다. 되감기 재생 위치를 P, 되감기 목록의 끝을 E, 목록의 목표 길이(TARGETDURATION)를 TD라고 하겠습니다. P가 E 앞 1 × TD 띠 안에 들어오면 플레이어는 라이브 목록을 한 번 받아(2초 시한), 그 목록에서 틀 수 있는 가장 이른 시각인 라이브 시작 하한을 잽니다. 하한이 P 이하일 때만 넘깁니다(`liveHandoff.ts` 298행 · 422행). 하한이 P보다 늦으면 그 사이 녹화가 잘리므로 넘기지 않고 「라이브로 가려면 LIVE 를 눌러 주세요」를 한 번 띄웁니다(17–18행).
 
 | 상황 | 정한 동작 |
 |---|---|
@@ -77,7 +77,7 @@ flowchart TB
 
 ## 넘김은 출시본에 들어갔고 건너뜀 재측정이 남았습니다
 
-넘긴 뒤에도 바로 확정하지 않습니다. 확인 시한은 「넘긴 시각 + (E − P) + 2 × TD」입니다([`liveHandoff.ts` 21–22행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/player/liveHandoff.ts#L21-L22) · [359–370행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/player/liveHandoff.ts#L359-L370)). 그 안에 라이브가 P 근처에서 이어 재생되면 확정하고, 시한을 넘기면 되감기로 돌아갑니다([556–557행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/player/liveHandoff.ts#L556-L557)). 돌아갈 때 시청자가 멈춰 있었으면 새 재생기도 멈춘 채 세웁니다. 10월 28일 판의 「10초 확인 게이트」는 설계 단계의 값이고, 머지된 코드는 이 시한 식을 씁니다.
+넘긴 뒤에도 바로 확정하지 않습니다. 확인 시한은 「넘긴 시각 + (E − P) + 2 × TD」입니다(`liveHandoff.ts` 21–22행 · 359–370행). 그 안에 라이브가 P 근처에서 이어 재생되면 확정하고, 시한을 넘기면 되감기로 돌아갑니다(556–557행). 돌아갈 때 시청자가 멈춰 있었으면 새 재생기도 멈춘 채 세웁니다. 10월 28일 판의 「10초 확인 게이트」는 설계 단계의 값이고, 머지된 코드는 이 시한 식을 씁니다.
 
 영상에서 재생점 P가 E 앞의 청록 띠에 들어서는 순간과, 넘긴 뒤 시한 막대가 다 차기 전에 이어지는지를 보면 됩니다.
 
@@ -85,12 +85,12 @@ flowchart TB
 
 시한 안에 이어지지 않으면 시청자는 넘기기 전 자리에서 되감기를 계속 봅니다.
 
-PR #460은 10월 31일 develop에 머지됐고(머지 커밋 `90665f08`), 11월 3일 v1.0.0 출시 PR [#466](https://github.com/3K-PokeClip/PokeClip-mono/pull/466)에 포함됐습니다. 그러나 완료 기준은 아직 채우지 못했습니다.
+PR #460은 10월 31일 develop에 머지됐고(머지 커밋 `90665f08`), 11월 3일 v1.0.0 출시 PR #466에 포함됐습니다. 그러나 완료 기준은 아직 채우지 못했습니다.
 
 - **넘김 건너뜀.** 10월 30일 로컬 측정에서 넘기는 순간 내용이 Chrome에서 1.17초(녹화 35프레임), WebKit에서 1.50초(45프레임) 앞으로 건너뛰었습니다. 머지 직전 판(10월 31일)에서도 0.97초·1.20초가 남았습니다. 위 PDT 어긋남과 같은 꼴로 보고, PDT 개정이 배포된 뒤 ±250ms를 통과선으로 반드시 다시 재기로 했습니다.
 - **녹화 손실 0.** 10월 28–29일 측정에서 같은 세션 안 재접속 경계의 영상 8–9프레임(0.27–0.30초)이 화면에서 빠졌습니다(10월 30일 원인 분석). 넘김 코드가 아니라 재접속 이음 규칙 몫이고, 원인은 [재접속 이음 글](/posts/0-to-1/pokeclip-reconnect-audio-gap/)에 있습니다.
 
-측정 중에 하나는 바로 고쳤습니다. 송출이 다시 붙은 직후 약 47초 동안 MediaMTX 라이브 목록 앞쪽이 빈 조각 표시(`EXT-X-GAP`)로 채워졌고, 이를 세면 라이브 시작 하한이 실제 첫 내용보다 약 3.4초 앞에 섰습니다. 그래서 잘림을 「넘김 → 되돌림」으로 겪었습니다. 내용 손실은 없었지만, 맨 앞 GAP을 빼고 하한을 재도록 PR #460 안에서 고쳤습니다([`playbackEdge.ts` 109–125행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/player/playbackEdge.ts#L109-L125)). Firefox는 실험대에서 브라우저를 띄우지 못해 재지 못했습니다.
+측정 중에 하나는 바로 고쳤습니다. 송출이 다시 붙은 직후 약 47초 동안 MediaMTX 라이브 목록 앞쪽이 빈 조각 표시(`EXT-X-GAP`)로 채워졌고, 이를 세면 라이브 시작 하한이 실제 첫 내용보다 약 3.4초 앞에 섰습니다. 그래서 잘림을 「넘김 → 되돌림」으로 겪었습니다. 내용 손실은 없었지만, 맨 앞 GAP을 빼고 하한을 재도록 PR #460 안에서 고쳤습니다(`playbackEdge.ts` 109–125행). Firefox는 실험대에서 브라우저를 띄우지 못해 재지 못했습니다.
 
 목록을 나누면 각 목록은 단순해지지만 둘 사이의 경계는 따로 책임져야 합니다. 비슷한 구조를 만든다면 넘김 코드보다 두 목록의 PDT가 같은 장면을 같은 값으로 가리키는지부터 재 보십시오. 이 프로젝트에서는 그 전제가 75초 틀려 있었습니다.
 
@@ -103,12 +103,12 @@ PR #460은 10월 31일 develop에 머지됐고(머지 커밋 `90665f08`), 11월 
 
 ## 출처
 
-- [3K-PokeClip/PokeClip-mono PR #289](https://github.com/3K-PokeClip/PokeClip-mono/pull/289) — 되감기 목록 S3 발행(2026-10-19 develop 머지)
-- [3K-PokeClip/PokeClip-mono PR #436](https://github.com/3K-PokeClip/PokeClip-mono/pull/436) — 웹 되감기 전환(2026-10-27 develop 머지)
-- [3K-PokeClip/PokeClip-mono PR #460](https://github.com/3K-PokeClip/PokeClip-mono/pull/460) — 되감기 끝에서 라이브로 자동 넘김(2026-10-31 develop 머지)
-- [3K-PokeClip/PokeClip-mono PR #466](https://github.com/3K-PokeClip/PokeClip-mono/pull/466) — v1.0.0 출시(2026-11-03 main 머지)
-- [PokeClip-mono `liveHandoff.ts`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/player/liveHandoff.ts) · [`rewindSwitch.ts`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/player/rewindSwitch.ts) · [`endingWait.ts`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/player/endingWait.ts) · [`playbackEdge.ts`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/web/src/features/player/playbackEdge.ts) — 넘김 조건 · 확인 시한 · 시작 하한
-- [PokeClip-mono `media/README.md` 「되감기 상태 제어면」](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/README.md?plain=1#L721-L733) — 플레이어가 되감기 주소를 받는 API
+- 3K-PokeClip/PokeClip-mono PR #289 — 되감기 목록 S3 발행(2026-10-19 develop 머지) (비공개 저장소)
+- 3K-PokeClip/PokeClip-mono PR #436 — 웹 되감기 전환(2026-10-27 develop 머지) (비공개 저장소)
+- 3K-PokeClip/PokeClip-mono PR #460 — 되감기 끝에서 라이브로 자동 넘김(2026-10-31 develop 머지) (비공개 저장소)
+- 3K-PokeClip/PokeClip-mono PR #466 — v1.0.0 출시(2026-11-03 main 머지) (비공개 저장소)
+- PokeClip-mono `liveHandoff.ts` · `rewindSwitch.ts` · `endingWait.ts` · `playbackEdge.ts` — 넘김 조건 · 확인 시한 · 시작 하한 (비공개 저장소)
+- PokeClip-mono `media/README.md` 「되감기 상태 제어면」 — 플레이어가 되감기 주소를 받는 API (비공개 저장소)
 - [RFC 8216 4.3.2.6 EXT-X-PROGRAM-DATE-TIME](https://www.rfc-editor.org/rfc/rfc8216#section-4.3.2.6) · [4.3.3.4 EXT-X-ENDLIST](https://www.rfc-editor.org/rfc/rfc8216#section-4.3.3.4)
 - [HLS 클립은 왜 벽시각 대신 미디어 시각으로 자를까?](/posts/projects/pokeclip-media-timeline-over-wall-clock/) — PDT 개정 경과
 - [늦게 끝난 발행이 새 HLS 목록을 덮지 못하게 했습니다](/posts/0-to-1/pokeclip-database-authoritative-manifest-publishing/) — 발행 정합성과 재시작 실험

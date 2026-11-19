@@ -56,13 +56,13 @@ PokeClip 미디어 서버는 방송 시작·종료를 다른 서비스에 이벤
 
 소비자는 미디어 서버가 낸 시작·종료를 상태로 반영하기만 합니다. 이벤트 한 건은 `eventId`로 중복을 거르고, 같은 방송 안의 순서는 `sequence`로 봅니다. 중복 전달이나 역순 도착이 없다는 보장은 아니고, 중복과 순서를 소비자가 판단할 재료를 계약에 넣은 것입니다. 종료가 시작보다 먼저 도착하는 경우의 자리표시 행도 검토 대상에 두었습니다. 이벤트는 SNS FIFO 주제로 내고 서비스마다 SQS FIFO 큐와 DLQ로 받는 구조로 설계했습니다.
 
-의도적 종료 신호 수신부는 10월 29일 [PR #450](https://github.com/3K-PokeClip/PokeClip-mono/pull/450)으로, 시작·종료 이벤트 발행 배선은 10월 30일 [PR #461](https://github.com/3K-PokeClip/PokeClip-mono/pull/461)로 develop에 머지됐습니다. 발행은 주제 주소, 허용 목록, 내부 스트림 키 조회(resolve) 설정을 모두 넣어야 켜지는 기본 꺼짐 상태로 들어갔습니다.
+의도적 종료 신호 수신부는 10월 29일 PR #450으로, 시작·종료 이벤트 발행 배선은 10월 30일 PR #461로 develop에 머지됐습니다. 발행은 주제 주소, 허용 목록, 내부 스트림 키 조회(resolve) 설정을 모두 넣어야 켜지는 기본 꺼짐 상태로 들어갔습니다.
 
 ## 그 뒤 세션 위에 사슬과 회차가 생겼습니다
 
 9월 3일에는 세션 하나가 방송 하나라고 봤습니다. 구현이 진행되면서 한 방송이 세션 여럿으로 갈리는 경우가 생겼습니다. 끊긴 송출이 300초 안에 돌아오면 새 세션이 앞 세션을 잇고(계승), 조각 하나가 목록의 목표 길이를 넘거나 코덱 설정이 바뀐 채 돌아와도 새 세션이 열립니다. `streamId`가 세션 id 그대로였다면 한 방송에 `streamId`가 여럿 생길 수 있었습니다.
 
-그래서 미디어 쪽은 세션 위에 두 단위를 더 뒀습니다. 계승으로 이어진 세션 묶음이 사슬이고, 시청자가 「방송 한 번」으로 보는 단위가 회차입니다. 재접속 창 300초를 넘기거나 의도적 종료 신호 뒤 다시 켜면 새 회차입니다. 지금 이벤트의 `streamId`는 회차 id이고, 그 값은 회차 첫 세션의 id입니다([media/README.md 「회차 단위 VOD 용어」](https://github.com/3K-PokeClip/PokeClip-mono/blob/1818c54948395fb0ba80cb37e85770b4d526d853/media/README.md?plain=1#L797-L806)). 시작 이벤트도 새 회차를 열 때만 내고, 계승이나 분할로 같은 회차를 잇는 세션은 내지 않습니다(PR #461). 값의 모양은 여전히 세션 id이지만 뜻은 「방송 한 번」입니다. 9월 3일에 「방송 회차」라고 부르며 노린 뜻이 이렇게 자리 잡았습니다.
+그래서 미디어 쪽은 세션 위에 두 단위를 더 뒀습니다. 계승으로 이어진 세션 묶음이 사슬이고, 시청자가 「방송 한 번」으로 보는 단위가 회차입니다. 재접속 창 300초를 넘기거나 의도적 종료 신호 뒤 다시 켜면 새 회차입니다. 지금 이벤트의 `streamId`는 회차 id이고, 그 값은 회차 첫 세션의 id입니다(media/README.md 「회차 단위 VOD 용어」). 시작 이벤트도 새 회차를 열 때만 내고, 계승이나 분할로 같은 회차를 잇는 세션은 내지 않습니다(PR #461). 값의 모양은 여전히 세션 id이지만 뜻은 「방송 한 번」입니다. 9월 3일에 「방송 회차」라고 부르며 노린 뜻이 이렇게 자리 잡았습니다.
 
 | 필드·칸 | 2026년 9월 3일 계약 | 2026년 11월 지금 |
 |---|---|---|
@@ -74,7 +74,7 @@ PokeClip 미디어 서버는 방송 시작·종료를 다른 서비스에 이벤
 
 그림 2는 지금 이벤트 필드가 장부의 어느 칸을 가리키는지입니다. 청록 경로가 소비자의 조각 조회입니다.
 
-```mermaid {#fig-stream-id-fields kind="개념도" caption="방송 시작·종료 이벤트 필드와 미디어 장부 칸의 대응(2026년 11월). streamId는 회차를, ingestStreamId는 조각이 놓인 인제스트 경로를 가리키고, 소비자의 조각 조회는 경로와 시간 범위로 합니다. 회차 대응은 PokeClip-mono media/README.md 「회차 단위 VOD 용어」와 broadcast/envelope.go, 경로 대응과 소비자 조회는 9월 3일 팀 계약 문서(비공개) 기준 재구성." source="https://github.com/3K-PokeClip/PokeClip-mono/blob/1818c54948395fb0ba80cb37e85770b4d526d853/media/README.md?plain=1#L797-L806"}
+```mermaid {#fig-stream-id-fields kind="개념도" caption="방송 시작·종료 이벤트 필드와 미디어 장부 칸의 대응(2026년 11월). streamId는 회차를, ingestStreamId는 조각이 놓인 인제스트 경로를 가리키고, 소비자의 조각 조회는 경로와 시간 범위로 합니다. 회차 대응은 PokeClip-mono media/README.md 「회차 단위 VOD 용어」와 broadcast/envelope.go, 경로 대응과 소비자 조회는 9월 3일 팀 계약 문서(비공개) 기준 재구성." source="프로젝트 저장소 media/README.md?plain=1(비공개)"}
 flowchart TB
   accTitle: 이벤트 필드와 장부 칸의 대응
   accDescr: 이벤트의 streamId는 장부의 round_id, 곧 회차를 가리킨다. 회차 안에는 세션 여럿이 있고 각 세션은 session_id를 갖는다. 이벤트의 ingestStreamId는 장부의 인제스트 경로 칸을 가리키고, 소비자는 그 경로와 시간 범위로 녹화 조각 표를 조회한다.
@@ -98,11 +98,11 @@ flowchart TB
 
 ## 출처
 
-- [3K-PokeClip/PokeClip-mono PR #461](https://github.com/3K-PokeClip/PokeClip-mono/pull/461) — 시작·종료 이벤트 발행 배선, 새 회차일 때만 시작 이벤트(2026-10-30 develop 머지)
-- [3K-PokeClip/PokeClip-mono PR #450](https://github.com/3K-PokeClip/PokeClip-mono/pull/450) — 회차 번호·의도적 종료 신호 수신부(2026-10-29 머지)
-- [PokeClip-mono `media/README.md` 시작·종료 이벤트 발행](https://github.com/3K-PokeClip/PokeClip-mono/blob/1818c54948395fb0ba80cb37e85770b4d526d853/media/README.md?plain=1#L433-L470) — outbox, SNS FIFO, 회차마다 시작·종료
-- [PokeClip-mono `broadcast/envelope.go`](https://github.com/3K-PokeClip/PokeClip-mono/blob/1818c54948395fb0ba80cb37e85770b4d526d853/media/internal/broadcast/envelope.go#L27-L51) — 이벤트 봉투 필드와 회차별 eventId
-- [PokeClip-mono `media/README.md` 「회차 단위 VOD 용어」](https://github.com/3K-PokeClip/PokeClip-mono/blob/1818c54948395fb0ba80cb37e85770b4d526d853/media/README.md?plain=1#L797-L806) — 회차 id = 머리 세션 id = 이벤트 `streamId`
+- 3K-PokeClip/PokeClip-mono PR #461 — 시작·종료 이벤트 발행 배선, 새 회차일 때만 시작 이벤트(2026-10-30 develop 머지) (비공개 저장소)
+- 3K-PokeClip/PokeClip-mono PR #450 — 회차 번호·의도적 종료 신호 수신부(2026-10-29 머지) (비공개 저장소)
+- PokeClip-mono `media/README.md` 시작·종료 이벤트 발행 — outbox, SNS FIFO, 회차마다 시작·종료 (비공개 저장소)
+- PokeClip-mono `broadcast/envelope.go` — 이벤트 봉투 필드와 회차별 eventId (비공개 저장소)
+- PokeClip-mono `media/README.md` 「회차 단위 VOD 용어」 — 회차 id = 머리 세션 id = 이벤트 `streamId` (비공개 저장소)
 - [끝난 HLS 목록은 다시 열지 않고 새 세션 주소를 줬습니다](/posts/0-to-1/pokeclip-session-url-and-endlist/) — 세션·사슬·회차
 - [포트폴리오 요약 PDF 19쪽](/portfolio/2026-10-15-v2/full.pdf#page=19) — 2026-10-15판, 9월 3일 협의 요약
 - 팀 위키 계약 문서와 9월 3일 확인 요청·답변 기록(비공개)

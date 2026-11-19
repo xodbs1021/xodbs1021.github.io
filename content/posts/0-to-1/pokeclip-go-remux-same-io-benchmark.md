@@ -14,7 +14,7 @@ portfolio_edition: "2026-10-15-v2"
 
 PokeClip 되감기용 조각(영상 1·소리 1)을 녹화 조각마다 `ffmpeg -c copy`로 뽑으려던 8월 28일 계획은 9월 4일 첫 시험에서 막혔습니다. 같은 송출의 조각 3개에서 뽑은 init(`ftyp+moov`, 재생에 필요한 트랙 설정)이 비트레이트 칸 12바이트씩 서로 달랐습니다. 한 세션 안에서는 init이 같아야 한다는 전제가 서지 않았고, `-c copy`는 파트까지 다시 잘랐습니다(4개→2개). 9월 19일 MediaMTX 녹화기와 같은 라이브러리로 짠 Go 재포장으로 바꿨고, 10분 녹화 150조각에서 init 해시는 하나였습니다. 속도는 뒤에 같은 범위로 다시 쟀습니다. 같은 파일을 읽고·재포장하고·쓰는 200회 p50이 FFmpeg 23.43ms, Go 3.05ms(7.69배)였습니다.
 
-Go 재포장으로 바꾸기로 한 것(9월 19일), 그 재포장을 10분 녹화로 크게 시험하라고 한 것, AI가 제안한 입력 상한 16MiB를 확인한 것(9월 23일)은 제 결정입니다. 9월 4일·19일 시험과 Go 재포장 구현([PR #192](https://github.com/3K-PokeClip/PokeClip-mono/pull/192))은 AI(Claude Code)가 했고, 10월 4일·6일 측정은 제 승인을 받아 AI(Codex)가 했습니다. FFmpeg 경로는 계획과 시험에만 있었고 제품에서 돈 적이 없습니다. 포트폴리오 요약(2026-10-15판) 13쪽은 「파일마다 FFmpeg 프로세스를 띄우던 경로를 상주 Go 호출로 바꿨다」고 적었지만, 바꾼 것은 운영 경로가 아니라 계획이었고 이유도 속도가 아니라 init 결정성이었습니다. 14쪽의 「내 판단 · 빠른 호출만으로 동시성을 늘리지 않습니다」도 측정 결과이고, 동시 작업 수 상한을 제가 정한 기록은 없습니다.
+Go 재포장으로 바꾸기로 한 것(9월 19일), 그 재포장을 10분 녹화로 크게 시험하라고 한 것, AI가 제안한 입력 상한 16MiB를 확인한 것(9월 23일)은 제 결정입니다. 9월 4일·19일 시험과 Go 재포장 구현(PR #192)은 AI(Claude Code)가 했고, 10월 4일·6일 측정은 제 승인을 받아 AI(Codex)가 했습니다. FFmpeg 경로는 계획과 시험에만 있었고 제품에서 돈 적이 없습니다. 포트폴리오 요약(2026-10-15판) 13쪽은 「파일마다 FFmpeg 프로세스를 띄우던 경로를 상주 Go 호출로 바꿨다」고 적었지만, 바꾼 것은 운영 경로가 아니라 계획이었고 이유도 속도가 아니라 init 결정성이었습니다. 14쪽의 「내 판단 · 빠른 호출만으로 동시성을 늘리지 않습니다」도 측정 결과이고, 동시 작업 수 상한을 제가 정한 기록은 없습니다.
 
 ## FFmpeg로 뽑은 init은 조각마다 12바이트씩 달랐습니다
 
@@ -37,15 +37,15 @@ Go 재포장으로 바꾸기로 한 것(9월 19일), 그 재포장을 10분 녹�
 
 ## 녹화기와 같은 mediacommon으로 첫 영상·첫 소리만 남겼습니다 {#범용-변환기에서-필요한-재포장만-가져오기}
 
-Go 재포장은 사이드카 프로세스 안에서 메모리로만 동작합니다. MediaMTX 녹화기가 녹화 파일을 쓸 때 쓴 [`bluenviron/mediacommon/v2`](https://github.com/bluenviron/mediacommon)로 파일을 읽어, 파일 속 순서로 첫 영상과 첫 소리 트랙만 남기고 init과 조각을 한 번에 만듭니다. init은 트랙 설정만으로 정해지는 값이라 같은 송출 설정이면 세션 안 어느 조각에서 만들어도 바이트가 같습니다. 파트를 다시 자르지 않고 `mfra`도 붙이지 않습니다. 자식 프로세스와 디스크 쓰기가 없습니다([`media/README.md` 「되감기 렌디션」](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/README.md?plain=1#L1358-L1370)).
+Go 재포장은 사이드카 프로세스 안에서 메모리로만 동작합니다. MediaMTX 녹화기가 녹화 파일을 쓸 때 쓴 [`bluenviron/mediacommon/v2`](https://github.com/bluenviron/mediacommon)로 파일을 읽어, 파일 속 순서로 첫 영상과 첫 소리 트랙만 남기고 init과 조각을 한 번에 만듭니다. init은 트랙 설정만으로 정해지는 값이라 같은 송출 설정이면 세션 안 어느 조각에서 만들어도 바이트가 같습니다. 파트를 다시 자르지 않고 `mfra`도 붙이지 않습니다. 자식 프로세스와 디스크 쓰기가 없습니다(`media/README.md` 「되감기 렌디션」).
 
 9월 19일 10분 녹화로 크게 시험했습니다. 4분 송출, 3초 끊김, 4분 송출, 8초 끊김, 2분 송출로 만든 150조각(송출 연결 3개, 340MB)에서 init 해시는 `4fcd68e6…`(1,160바이트) 하나였습니다. 같은 연결 안 조각 경계 147곳은 영상 ±1틱(11µs), 소리 ±1표본 안에서 맞닿았고, 남긴 소리는 세 연결 모두 첫 트랙(220Hz)이었습니다.
 
-시각 도장은 Producer가 계산하지 않습니다. 인덱서가 조각마다 「mtxi + 세션 보정값」을 계산해 넘기고([`chain.go` `advanceChain` · `stitchOffset`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/indexer/chain.go#L52-L135)), Producer는 받은 `PlaybackPos`를 두 트랙의 BaseTime에 같은 값으로 더하기만 합니다([`producer.go` 54–58행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/playback/producer.go#L54-L58) · [281–300행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/playback/producer.go#L281-L300)). 파일 안 A/V 위상은 입력 BaseTime에 이미 들어 있으므로 그대로 남습니다.
+시각 도장은 Producer가 계산하지 않습니다. 인덱서가 조각마다 「mtxi + 세션 보정값」을 계산해 넘기고(`chain.go` `advanceChain` · `stitchOffset`), Producer는 받은 `PlaybackPos`를 두 트랙의 BaseTime에 같은 값으로 더하기만 합니다(`producer.go` 54–58행 · 281–300행). 파일 안 A/V 위상은 입력 BaseTime에 이미 들어 있으므로 그대로 남습니다.
 
-라이브러리 판은 녹화기와 맞춰 고정했습니다. 9월 19일에는 그때 포크 녹화기와 같은 v2.9.3이었고, v2.9.3과 v2.9.4로 각각 150조각을 돌린 산출이 바이트까지 같았습니다. 지금은 v2.9.5이고, 판 고정 시험과 산출 바이트 골든 시험이 바뀜을 잡습니다([README 1362–1366행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/README.md?plain=1#L1362-L1366)).
+라이브러리 판은 녹화기와 맞춰 고정했습니다. 9월 19일에는 그때 포크 녹화기와 같은 v2.9.3이었고, v2.9.3과 v2.9.4로 각각 150조각을 돌린 산출이 바이트까지 같았습니다. 지금은 v2.9.5이고, 판 고정 시험과 산출 바이트 골든 시험이 바뀜을 잡습니다(README 1362–1366행).
 
-대가도 있습니다. Go 직접 의존이 하나 늘었고, init과 시각 규칙을 우리가 지켜야 합니다. 입력을 통째로 메모리에 올리므로 점유가 「동시 워커 수 × 입력의 약 4.5배」입니다. 그래서 입력 상한을 두었습니다. 9월 23일 AI가 6초·8Mbps·소리 6트랙 조각(6.5MiB)의 2.4배인 16MiB를 제안했고 제가 확인했습니다. 생산 코드는 9월 24일 [PR #192](https://github.com/3K-PokeClip/PokeClip-mono/pull/192)로 develop에 들어갔습니다.
+대가도 있습니다. Go 직접 의존이 하나 늘었고, init과 시각 규칙을 우리가 지켜야 합니다. 입력을 통째로 메모리에 올리므로 점유가 「동시 워커 수 × 입력의 약 4.5배」입니다. 그래서 입력 상한을 두었습니다. 9월 23일 AI가 6초·8Mbps·소리 6트랙 조각(6.5MiB)의 2.4배인 16MiB를 제안했고 제가 확인했습니다. 생산 코드는 9월 24일 PR #192로 develop에 들어갔습니다.
 
 ## 옛 10.9배는 Go 쪽 읽기·쓰기를 뺀 값이었습니다 {#과거-109배와-현재-769배를-섞지-않았습니다}
 
@@ -88,7 +88,7 @@ p50을 나누면 10.87배입니다. 그런데 FFmpeg는 프로세스를 시작�
 | 4 | 171.84MiB | 11.145ms |
 | 8 | 303.20MiB | 45.211ms |
 
-동시 작업을 4에서 8로 늘리자 처리량은 초당 293회에서 294회로 거의 같았지만, 최대 RSS는 171.84MiB에서 303.20MiB로, 호출 p95는 11.145ms에서 45.211ms로 늘었습니다. 이 조건(GOMAXPROCS=4)에서는 작업을 더 늘려 얻는 것이 없고 메모리와 긴 응답만 늘었습니다. p95는 실행별 p95의 중앙값이고, 호출당 누적 할당 36.90MB는 최대 RSS와 다른 지표입니다. 지금 사이드카의 업로드 워커는 하나라([README 1456행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/README.md?plain=1#L1454-L1458)) 이 표는 워커를 늘릴 때 쓸 근거로 남았습니다.
+동시 작업을 4에서 8로 늘리자 처리량은 초당 293회에서 294회로 거의 같았지만, 최대 RSS는 171.84MiB에서 303.20MiB로, 호출 p95는 11.145ms에서 45.211ms로 늘었습니다. 이 조건(GOMAXPROCS=4)에서는 작업을 더 늘려 얻는 것이 없고 메모리와 긴 응답만 늘었습니다. p95는 실행별 p95의 중앙값이고, 호출당 누적 할당 36.90MB는 최대 RSS와 다른 지표입니다. 지금 사이드카의 업로드 워커는 하나라(README 1456행) 이 표는 워커를 늘릴 때 쓸 근거로 남았습니다.
 
 ## 속도 시험과 재생 정합성 시험은 따로 남겼습니다 {#속도와-재생-정합성은-다른-증거가-필요했습니다}
 
@@ -106,8 +106,8 @@ FFmpeg를 Go로 바꾼 이유는 속도가 아니라 같은 입력 설정에서 
 
 ## 출처
 
-- [3K-PokeClip/PokeClip-mono PR #192](https://github.com/3K-PokeClip/PokeClip-mono/pull/192) — 되감기용 재포장 부품(Producer)과 축별 업로드(2026-09-24 develop 머지). 본문에 「ffmpeg 산출은 조각마다 init이 12바이트씩 달라 … 파트를 다시 잘랐다」
-- [PokeClip-mono `media/README.md` 「되감기 렌디션 — Go 재포장」](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/README.md?plain=1#L1358-L1370) · [`producer.go`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/playback/producer.go#L54-L58) · [`chain.go`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/indexer/chain.go#L52-L135)
+- 3K-PokeClip/PokeClip-mono PR #192 — 되감기용 재포장 부품(Producer)과 축별 업로드(2026-09-24 develop 머지). 본문에 「ffmpeg 산출은 조각마다 init이 12바이트씩 달라 … 파트를 다시 잘랐다」 (비공개 저장소)
+- PokeClip-mono `media/README.md` 「되감기 렌디션 — Go 재포장」 · `producer.go` · `chain.go` (비공개 저장소)
 - [bluenviron/mediacommon](https://github.com/bluenviron/mediacommon) — MediaMTX가 쓰는 미디어 라이브러리
 - [FFmpeg 문서: MOV/MPEG-4/ISOMBFF muxers](https://ffmpeg.org/ffmpeg-formats.html#MOV_002fMPEG_002d4_002fISOMBFF-muxers) — `movflags`·`use_editlist`·`frag_duration`
 - [HLS 녹화 재생을 가른 것은 init이 아니라 tfdt였습니다](/posts/0-to-1/pokeclip-cdn-timeline-normalization/) · [같은 세션 재접속에 HLS 끊김 표시를 달지 않은 이유](/posts/0-to-1/pokeclip-reconnect-audio-gap/)

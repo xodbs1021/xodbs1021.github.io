@@ -93,7 +93,7 @@ AWS 문서의 [캐시 키 정책](https://docs.aws.amazon.com/AmazonCloudFront/l
 
 ## 운영 배포는 세션 쿠키 대신 CDN 비밀을 원본에 넘깁니다 {#앞선-로컬-실험은-성능-개선율이-아니라-비교의-기준선입니다}
 
-지금 운영 엣지는 실험의 「세션 쿠키·쿼리를 원본에 넘김」 대신 MediaMTX의 CDN 모드를 씁니다. 라이브 경로의 CloudFront 함수가 원본으로 가는 요청의 `Authorization` 머리를 키-값 저장소(KVS)에 둔 CDN 비밀로 늘 덮어쓰고, MediaMTX는 그 비밀(`hlsCDNSecret`)로 CDN이 보낸 요청인지 확인합니다([`live-auth.js` 머리 주석](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/functions/live-auth.js#L1-L21), [`mediamtx.yml.tmpl` 143행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/mediamtx.yml.tmpl#L143)). 비밀을 못 읽으면 원본으로 넘기지 않고 503을 돌려줍니다. 원본에는 `Host`와 `Authorization`(라이브 목록은 `_HLS_*` 쿼리도)만 가고 쿠키와 그 밖의 시청자 머리는 가지 않으며, 시청자 인증은 엣지의 서명 쿠키가 맡습니다([`policies.tf` 128–149행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/policies.tf#L128-L149)).
+지금 운영 엣지는 실험의 「세션 쿠키·쿼리를 원본에 넘김」 대신 MediaMTX의 CDN 모드를 씁니다. 라이브 경로의 CloudFront 함수가 원본으로 가는 요청의 `Authorization` 머리를 키-값 저장소(KVS)에 둔 CDN 비밀로 늘 덮어쓰고, MediaMTX는 그 비밀(`hlsCDNSecret`)로 CDN이 보낸 요청인지 확인합니다(`live-auth.js` 머리 주석, `mediamtx.yml.tmpl` 143행). 비밀을 못 읽으면 원본으로 넘기지 않고 503을 돌려줍니다. 원본에는 `Host`와 `Authorization`(라이브 목록은 `_HLS_*` 쿼리도)만 가고 쿠키와 그 밖의 시청자 머리는 가지 않으며, 시청자 인증은 엣지의 서명 쿠키가 맡습니다(`policies.tf` 128–149행).
 
 | 경로 | 원본 | 캐시 키 · 보관 | 원본에 넘기는 값 |
 |---|---|---|---|
@@ -103,7 +103,7 @@ AWS 문서의 [캐시 키 정책](https://docs.aws.amazon.com/AmazonCloudFront/l
 | 되감기 ③ 조각 · init | 같음 | 원본이 1년 `immutable`(엣지는 최대 1일) | 같음 |
 | VOD 문서 | 같음 | 원본이 3,600초 | 같음 |
 
-근거는 [`policies.tf` 33–57행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/policies.tf#L33-L57)(라이브 목록), [61–81행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/policies.tf#L61-L81)(라이브 조각), [`s3store.go` 29–30행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/rewind/publish/s3store.go#L29-L30)(되감기 목록 · VOD 문서), [`upload/s3.go` 30행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/upload/s3.go#L30)(③ 조각 · init), [`variables.tf` 92–103행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/variables.tf#L92-L103)(되감기 · VOD 엣지 상한 1일), [`main.tf` 154–156행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/main.tf#L154-L156)(되감기 원본의 Origin Shield)입니다. 실험이 「Origin Shield 없음」, 「목록 TTL 0」, 「조각 TTL 120초」였던 것과 다릅니다.
+근거는 `policies.tf` 33–57행(라이브 목록), 61–81행(라이브 조각), `s3store.go` 29–30행(되감기 목록 · VOD 문서), `upload/s3.go` 30행(③ 조각 · init), `variables.tf` 92–103행(되감기 · VOD 엣지 상한 1일), `main.tf` 154–156행(되감기 원본의 Origin Shield)입니다. 실험이 「Origin Shield 없음」, 「목록 TTL 0」, 「조각 TTL 120초」였던 것과 다릅니다.
 
 캐시 키와 원본 전달을 나눈다는 실험의 결론은 그대로 두고, 원본에 넘기는 값을 시청자 세션에서 CDN 공용 비밀로 바꾼 것입니다. 시청자마다 다른 값을 원본에 넘기지 않고, 원본은 그 비밀로 CDN을 거친 요청인지 확인합니다. 이 구성에서 원본 요청이 얼마나 줄었는지는 재지 않았습니다. 라이브 경로의 CDN 원본은 VPC 원본으로 붙인 미디어 ALB이고, 송출을 NLB 뒤 프라이빗 EC2로 받는 배치는 [미디어 서버 배치 글](/posts/0-to-1/pokeclip-stateful-media-deployment/)에 있습니다.
 
@@ -122,11 +122,11 @@ CDN 앞에서 인증이 필요한 원본을 다룬다면, 캐시 키에서 뺄 �
 
 - [AWS 문서 「Control the cache key with a policy」](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/controlling-the-cache-key.html) · [「Control origin requests with a policy」](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/controlling-origin-requests.html) — 캐시 키 정책과 원본 요청 정책
 - [AWS 문서 「Use signed cookies」](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-signed-cookies.html) — CloudFront 서명 쿠키
-- [PokeClip-mono `infra/terraform/modules/cdn_media/policies.tf`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/policies.tf#L33-L149) — 라이브 목록 · 조각 캐시 정책과 원본 요청 정책
-- [PokeClip-mono `infra/terraform/modules/cdn_media/functions/live-auth.js`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/functions/live-auth.js#L1-L21) — 원본 요청의 `Authorization` 덮어쓰기
-- [PokeClip-mono `infra/terraform/modules/cdn_media/main.tf`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/cdn_media/main.tf#L154-L156) — 되감기 원본의 Origin Shield
-- [PokeClip-mono `infra/media-host/mediamtx.yml.tmpl`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/media-host/mediamtx.yml.tmpl#L143) — MediaMTX CDN 모드
-- [PokeClip-mono `media/internal/rewind/publish/s3store.go`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/rewind/publish/s3store.go#L29-L30) · [`media/internal/upload/s3.go`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/upload/s3.go#L30) — 되감기 목록 · VOD · ③ 조각의 Cache-Control
+- PokeClip-mono `infra/terraform/modules/cdn_media/policies.tf` — 라이브 목록 · 조각 캐시 정책과 원본 요청 정책 (비공개 저장소)
+- PokeClip-mono `infra/terraform/modules/cdn_media/functions/live-auth.js` — 원본 요청의 `Authorization` 덮어쓰기 (비공개 저장소)
+- PokeClip-mono `infra/terraform/modules/cdn_media/main.tf` — 되감기 원본의 Origin Shield (비공개 저장소)
+- PokeClip-mono `infra/media-host/mediamtx.yml.tmpl` — MediaMTX CDN 모드 (비공개 저장소)
+- PokeClip-mono `media/internal/rewind/publish/s3store.go` · `media/internal/upload/s3.go` — 되감기 목록 · VOD · ③ 조각의 Cache-Control (비공개 저장소)
 - [방송 중인 미디어 서버는 API처럼 갈아 끼울 수 없었습니다](/posts/0-to-1/pokeclip-stateful-media-deployment/)
 - 팀 내부 실험 기록(비공개) — 10월 5일 라이브 CDN 실험, 10월 6일 S3 원본 실험
 

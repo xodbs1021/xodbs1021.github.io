@@ -67,7 +67,7 @@ MezzFS는 큰 파일 안의 바이트 위치를 소프트웨어로 찾습니다.
 
 ## 렌더 일꾼 코드는 지금도 조각을 하나씩 받습니다 {#저장-계층-추가보다-먼저-남은-검증}
 
-8월 14일에 남긴 병렬 GET은 아직 코드에 없습니다. 렌더 일꾼은 클립에 필요한 조각을 for 루프로 하나씩 받은 뒤 이어 붙입니다([`ClipRenderer.java` 79–83행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/workers/render/src/main/java/com/pokeclip/render/work/ClipRenderer.java#L79-L83)). 포트폴리오 요약(2026-10-15판) 24쪽은 「제한된 병렬 다운로드를 유지」라고 적었는데, 렌더 일꾼이 병렬로 받은 적은 없습니다. 유지한 것은 지금의 객체 단위와 시간 인덱스이고, 병렬 다운로드는 남은 과제입니다.
+8월 14일에 남긴 병렬 GET은 아직 코드에 없습니다. 렌더 일꾼은 클립에 필요한 조각을 for 루프로 하나씩 받은 뒤 이어 붙입니다(`ClipRenderer.java` 79–83행). 포트폴리오 요약(2026-10-15판) 24쪽은 「제한된 병렬 다운로드를 유지」라고 적었는데, 렌더 일꾼이 병렬로 받은 적은 없습니다. 유지한 것은 지금의 객체 단위와 시간 인덱스이고, 병렬 다운로드는 남은 과제입니다.
 
 10월 6일 GET 실험은 Python으로 만든 임시 다운로드 시험이라 Java 렌더 일꾼에 넣은 전후 비교가 아닙니다. 프로세스를 재사용했기 때문에 누적 최대 RSS로 동시성별 메모리 차이를 계산하지도 않았습니다. 앞 조건의 최고값이 다음 조건에 남기 때문입니다. 렌더 일꾼에 병렬 GET을 넣을 때 실제 객체 크기 분포에서 동시성과 메모리를 다시 재야 합니다. 그래도 남는 병목이 확인되면, 그때 저장 계층을 다시 견줍니다.
 
@@ -84,7 +84,7 @@ MezzFS는 큰 파일 안의 바이트 위치를 소프트웨어로 찾습니다.
 - [AWS 문서 「Best practices design patterns: optimizing Amazon S3 performance」](https://docs.aws.amazon.com/AmazonS3/latest/userguide/optimizing-performance.html) — 접두사당 요청 처리율과 자동 분할
 - [Netflix Technology Blog 「Netflix Live Origin」](https://netflixtechblog.com/netflix-live-origin-41f1b0ad5371) — 라이브 원본을 S3에서 KV 저장소로 옮긴 이유
 - [Netflix Technology Blog 「MezzFS — Mounting object storage in Netflix's media processing platform」](https://netflixtechblog.com/mezzfs-mounting-object-storage-in-netflixs-media-processing-platform-cda01c446ba) — S3 FUSE 마운트와 부분 읽기
-- [PokeClip-mono `workers/render/.../ClipRenderer.java`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/workers/render/src/main/java/com/pokeclip/render/work/ClipRenderer.java#L79-L83) — 조각을 하나씩 받는 다운로드 루프
+- PokeClip-mono `workers/render/.../ClipRenderer.java` — 조각을 하나씩 받는 다운로드 루프 (비공개 저장소)
 - [BETWEEN 대신 구간 겹침으로 클립 첫 조각을 찾았습니다](/posts/0-to-1/pokeclip-segment-overlap-contract/)
 - 팀 내부 기록(비공개) — 8월 14일 스파이크 판정과 사후 리뷰, 8월 30일 PUT 원시 기록, 10월 6일 GET 실험
 

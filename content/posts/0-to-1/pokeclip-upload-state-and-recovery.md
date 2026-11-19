@@ -14,11 +14,11 @@ portfolio_edition: "2026-10-15-v2"
 
 PokeClip 사이드카 안의 업로더는 녹화 조각을 S3에 PUT한 뒤 DB 장부의 그 조각 행을 `uploaded`로 바꿉니다. 두 동작 사이에서 프로세스가 죽으면 S3에는 객체가 있는데 장부에는 `pending`이 남습니다. 그래서 업로드가 끝났는지는 S3 응답이 아니라 장부로 판단하게 했습니다. 장부가 `uploaded`가 아니면 아직 끝나지 않은 일이고, 30초마다 도는 스위퍼가 그 행을 다시 읽어 같은 S3 키로 다시 올립니다. 2026년 8월 4일 실제 S3 버킷 인수 시험에서 60초 송출의 녹화 파일 15개, `uploaded` 행 15개, S3 키 15개가 일치했습니다. 10월 5일 시험에서는 대기 1,100건이 9번째 순회에서 모두 접수됐고, 실제 PostgreSQL에서 돌린 복구 6가지 × 5회, 30번이 모두 끝났습니다. 실제 S3 장애에서 복구에 걸리는 시간은 재지 않았습니다.
 
-8월 3일 업로더의 구현 방침 6건은 제가 정했습니다. 실제 S3 버킷으로 검증하기, AWS SDK 기본 자격 증명 체인만 쓰기, 별도 컨테이너가 아니라 사이드카 프로세스 안에 두기, 밀림은 로그로만 감시하기, 마지막 조각은 확정된 뒤 다시 확인하고 올리기, 재기동하면 미완료 행을 다시 집고 실패를 끝 상태로 보지 않기입니다. 이 방침 위의 설계 초안과 리뷰는 AI 둘(Claude Code와 Codex)이 했고, 설계 승인은 제가 했습니다. 구현은 8월 4일 [PR #30](https://github.com/3K-PokeClip/PokeClip-mono/pull/30)·[PR #31](https://github.com/3K-PokeClip/PokeClip-mono/pull/31)로 AI(Claude Code)가 했고, 리뷰는 Claude Code와 Codex가 했습니다. 10월 5일 시험은 AI(Codex)가 했습니다.
+8월 3일 업로더의 구현 방침 6건은 제가 정했습니다. 실제 S3 버킷으로 검증하기, AWS SDK 기본 자격 증명 체인만 쓰기, 별도 컨테이너가 아니라 사이드카 프로세스 안에 두기, 밀림은 로그로만 감시하기, 마지막 조각은 확정된 뒤 다시 확인하고 올리기, 재기동하면 미완료 행을 다시 집고 실패를 끝 상태로 보지 않기입니다. 이 방침 위의 설계 초안과 리뷰는 AI 둘(Claude Code와 Codex)이 했고, 설계 승인은 제가 했습니다. 구현은 8월 4일 PR #30·PR #31로 AI(Claude Code)가 했고, 리뷰는 Claude Code와 Codex가 했습니다. 10월 5일 시험은 AI(Codex)가 했습니다.
 
 ## S3 PUT과 장부 확정 사이에서 죽으면 pending 행이 남습니다 {#접수-저장-확정을-하나의-성공으로-묶지-않기}
 
-인덱서가 녹화 조각을 장부에 넣으면 그 행은 `pending`이고, 장부에는 올릴 S3 키와 파일 크기가 적혀 있습니다. 업로더는 그 키로 PUT하고, 성공하면 장부를 조건부로 갱신합니다. 조건은 「아직 `uploaded`가 아니고, 장부의 크기가 방금 올린 크기와 같을 때만」입니다(`upload_state <> 'uploaded' AND bytes = $3`, [`upload_store.go` 168–170행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/index/upload_store.go#L168-L170)). 이렇게 기대한 상태를 확인하고 바꾸는 갱신을 CAS(Compare-And-Swap)라고 부릅니다. 한 번 `uploaded`가 된 행은 이 문장으로 되돌릴 수 없고, 올린 뒤 장부의 크기가 바뀌었으면 확정하지 않습니다.
+인덱서가 녹화 조각을 장부에 넣으면 그 행은 `pending`이고, 장부에는 올릴 S3 키와 파일 크기가 적혀 있습니다. 업로더는 그 키로 PUT하고, 성공하면 장부를 조건부로 갱신합니다. 조건은 「아직 `uploaded`가 아니고, 장부의 크기가 방금 올린 크기와 같을 때만」입니다(`upload_state <> 'uploaded' AND bytes = $3`, `upload_store.go` 168–170행). 이렇게 기대한 상태를 확인하고 바꾸는 갱신을 CAS(Compare-And-Swap)라고 부릅니다. 한 번 `uploaded`가 된 행은 이 문장으로 되돌릴 수 없고, 올린 뒤 장부의 크기가 바뀌었으면 확정하지 않습니다.
 
 영상은 PUT과 CAS 사이에서 프로세스가 죽는 장면입니다. 위 칸 S3에는 객체가 생겼는데 아래 칸 장부는 `pending`으로 남아 있는 순간을 보십시오.
 
@@ -28,7 +28,7 @@ PokeClip 사이드카 안의 업로더는 녹화 조각을 S3에 PUT한 뒤 DB �
 
 [[fig-upload-state]]는 장부 행이 갈 수 있는 상태와 바뀌는 조건입니다. `failed`도 끝 상태가 아니라 스위퍼가 다시 집는 상태입니다.
 
-```mermaid {#fig-upload-state kind="재구성" caption="② 원본 조각 행의 업로드 상태. PUT이 성공하고 장부 크기가 같을 때만 CAS로 uploaded가 되고, 재시도를 다 쓰거나 하드 실패면 failed가 됩니다. PUT 뒤 CAS 전에 죽으면 pending이 그대로 남습니다. pending과 failed는 스위퍼가 같은 키로 다시 올리며, uploaded는 되돌리지 않습니다. PokeClip-mono develop 825a3dfe의 upload_store.go·options.go 재구성." source="https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/index/upload_store.go#L168-L175"}
+```mermaid {#fig-upload-state kind="재구성" caption="② 원본 조각 행의 업로드 상태. PUT이 성공하고 장부 크기가 같을 때만 CAS로 uploaded가 되고, 재시도를 다 쓰거나 하드 실패면 failed가 됩니다. PUT 뒤 CAS 전에 죽으면 pending이 그대로 남습니다. pending과 failed는 스위퍼가 같은 키로 다시 올리며, uploaded는 되돌리지 않습니다. PokeClip-mono develop 825a3dfe의 upload_store.go·options.go 재구성." source="프로젝트 저장소 media/internal/index/upload_store.go(비공개)"}
 flowchart TB
   accTitle: 업로드 상태와 바뀌는 조건
   accDescr: 인덱서가 넣은 pending 행은 PUT이 성공하고 장부 크기가 같으면 CAS로 uploaded가 된다. 재시도를 다 쓰거나 하드 실패면 failed가 된다. PUT 뒤 CAS 전에 프로세스가 죽으면 pending으로 남는다. 스위퍼는 30초마다 pending과 failed를 같은 키로 다시 올린다. uploaded는 되돌리지 않는다.
@@ -40,16 +40,16 @@ flowchart TB
   style U fill:#0a0c08,stroke:#0a0c07,stroke-width:3px
 ```
 
-PUT 하나는 1·2·4초 간격으로 최대 4번 시도하고, 하드 실패가 3행 연속이면 그 축의 브레이커가 열립니다([`options.go` 20–28행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/upload/options.go#L20-L28)). 녹화 루트 밖을 가리키는 경로는 재시도 대상으로 넣지 않고 PUT 전에 거절합니다.
+PUT 하나는 1·2·4초 간격으로 최대 4번 시도하고, 하드 실패가 3행 연속이면 그 축의 브레이커가 열립니다(`options.go` 20–28행). 녹화 루트 밖을 가리키는 경로는 재시도 대상으로 넣지 않고 PUT 전에 거절합니다.
 
 ## 스위퍼는 pending을 먼저 읽고 지난번 멈춘 자리부터 이어 읽습니다 {#실패한-앞부분만-다시-읽으면-뒤가-굶습니다}
 
 미완료 행을 남기자 다음 문제가 생겼습니다. 스위퍼가 매번 같은 첫 페이지부터 읽으면, 계속 실패하는 오래된 행이 그 페이지를 차지하고 뒤에 있는 새 녹화 조각은 차례가 오지 않습니다. 그래서 읽는 순서와 출발점을 정했습니다.
 
-- 순서: `pending`을 `failed`보다 먼저 읽고, 같은 부류 안에서는 조각 시작 시각이 이른 행부터 읽습니다([`upload_store.go` 345행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/index/upload_store.go#L345)).
-- 출발점: 매 순회 1단계는 맨 앞 한 페이지를 읽고, 2단계는 지난 순회가 멈춘 커서부터 이어 읽습니다. 1단계가 조회에 실패하거나 큐가 차서 멈추지 않는 한, 1단계가 접수에 성공해도 2단계는 반드시 돕니다([`sweep.go` 127–170행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/upload/sweep.go#L127-L170)).
+- 순서: `pending`을 `failed`보다 먼저 읽고, 같은 부류 안에서는 조각 시작 시각이 이른 행부터 읽습니다(`upload_store.go` 345행).
+- 출발점: 매 순회 1단계는 맨 앞 한 페이지를 읽고, 2단계는 지난 순회가 멈춘 커서부터 이어 읽습니다. 1단계가 조회에 실패하거나 큐가 차서 멈추지 않는 한, 1단계가 접수에 성공해도 2단계는 반드시 돕니다(`sweep.go` 127–170행).
 
-1단계가 최신 `pending`을 놓치지 않게 하고, 2단계의 커서가 뒤쪽 행까지 차례를 돌립니다. 지금 코드의 기본값은 30초마다 순회, 한 페이지 128행, 한 순회 최대 8페이지, 작업 큐 256칸입니다([`options.go` 22·33·37·39행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/upload/options.go#L22-L39)). 큐는 한 번에 받을 일의 양을 제한할 뿐 완료 장부가 아닙니다. 코드 주석은 이 순회를 「회차」라고 부르는데, 방송 한 번을 뜻하는 회차와는 다른 말입니다([회차 다시보기 글](/posts/projects/pokeclip-round-vod/)).
+1단계가 최신 `pending`을 놓치지 않게 하고, 2단계의 커서가 뒤쪽 행까지 차례를 돌립니다. 지금 코드의 기본값은 30초마다 순회, 한 페이지 128행, 한 순회 최대 8페이지, 작업 큐 256칸입니다(`options.go` 22·33·37·39행). 큐는 한 번에 받을 일의 양을 제한할 뿐 완료 장부가 아닙니다. 코드 주석은 이 순회를 「회차」라고 부르는데, 방송 한 번을 뜻하는 회차와는 다른 말입니다([회차 다시보기 글](/posts/projects/pokeclip-round-vod/)).
 
 ## 대기 1,100건은 아홉 번째 순회에서 모두 접수됐습니다
 
@@ -92,10 +92,10 @@ PUT 하나는 1·2·4초 간격으로 최대 4번 시도하고, 하드 실패가
 
 ## 출처
 
-- [3K-PokeClip/PokeClip-mono PR #30](https://github.com/3K-PokeClip/PokeClip-mono/pull/30) · [PR #31](https://github.com/3K-PokeClip/PokeClip-mono/pull/31) — 업로더 코어와 배선(2026-08-04 머지)
-- [PokeClip-mono `media/internal/index/upload_store.go`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/index/upload_store.go#L168-L175) — 업로드 CAS · [345행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/index/upload_store.go#L345) 스위퍼 조회 순서
-- [PokeClip-mono `media/internal/upload/sweep.go`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/upload/sweep.go#L127-L170) — 1단계·2단계 순회
-- [PokeClip-mono `media/internal/upload/options.go`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/media/internal/upload/options.go#L20-L39) — 재시도·순회 주기·브레이커·큐·페이지 기본값
+- 3K-PokeClip/PokeClip-mono PR #30 · PR #31 — 업로더 코어와 배선(2026-08-04 머지) (비공개 저장소)
+- PokeClip-mono `media/internal/index/upload_store.go` — 업로드 CAS · 345행 스위퍼 조회 순서 (비공개 저장소)
+- PokeClip-mono `media/internal/upload/sweep.go` — 1단계·2단계 순회 (비공개 저장소)
+- PokeClip-mono `media/internal/upload/options.go` — 재시도·순회 주기·브레이커·큐·페이지 기본값 (비공개 저장소)
 - [되감기 재포장 조각의 생성과 업로드 완료를 따로 확정했습니다](/posts/0-to-1/pokeclip-playback-producer-boundaries/) · [테스트 DB 소유권 글](/posts/0-to-1/pokeclip-test-database-ownership-marker/) · [회차 다시보기 글](/posts/projects/pokeclip-round-vod/)
 - 팀 내부 실험 기록(비공개) — 8월 4일 인수 시험, 10월 5일 접수·복구 시험
 

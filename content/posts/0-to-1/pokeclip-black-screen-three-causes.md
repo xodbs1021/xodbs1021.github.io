@@ -117,7 +117,7 @@ if (
 
 생성자 `new Hls()`가 이 병합을 부르므로([hls.ts 182–192행](https://github.com/video-dev/hls.js/blob/v1.6.16/src/hls.ts#L182-L192)) 플레이어 객체가 만들어지지 않았습니다. 객체가 없으니 `Hls.Events.ERROR`도 오지 않았고, 미디어 요청이 200이어도 재생은 시작될 수 없었습니다. `liveSyncDurationCount: 3`을 짝으로 넣자 바로 재생됐습니다.
 
-11월에 저장소에 남은 처음 페이지를 다시 읽어 보니 이 설정은 처음부터 들어 있었습니다([player.html 181–185행](https://github.com/3K-PokeClip/PokeClip-mono/blob/3d6c117a6b6702592733f717e6efed14b90c416d/infra/dev-media/player.html#L181-L185)). 그 페이지는 스크립트 로드 실패와 생성자 예외를 같은 `catch`에서 받아 같은 「hls.js 를 불러오지 못했습니다」를 띄웠습니다([200–208행](https://github.com/3K-PokeClip/PokeClip-mono/blob/3d6c117a6b6702592733f717e6efed14b90c416d/infra/dev-media/player.html#L200-L208)). 그리고 MediaMTX 1.19.3은 함께 묶은 hls.js 1.6.16을 인증보다 먼저 200으로 내줍니다([http_server.go 160–165행](https://github.com/bluenviron/mediamtx/blob/v1.19.3/internal/servers/hls/http_server.go#L160-L165), [VERSION](https://github.com/bluenviron/mediamtx/blob/v1.19.3/internal/servers/hls/hlsjsdownloader/VERSION)). 그래서 첫 문구가 실제 로드 실패였는지, 같은 설정 예외가 그 문구로 보였던 것인지는 기록만으로 가를 수 없습니다. 어느 쪽이었든 처음 페이지는 hls.js가 제대로 로드됐더라도 이 설정 때문에 재생될 수 없었습니다. PR #92 본문은 동봉본이 실측에서 실패했다고 적었지만, 이 대조로 보면 그 판단은 다시 볼 여지가 있습니다.
+11월에 저장소에 남은 처음 페이지를 다시 읽어 보니 이 설정은 처음부터 들어 있었습니다(player.html 181–185행). 그 페이지는 스크립트 로드 실패와 생성자 예외를 같은 `catch`에서 받아 같은 「hls.js 를 불러오지 못했습니다」를 띄웠습니다(200–208행). 그리고 MediaMTX 1.19.3은 함께 묶은 hls.js 1.6.16을 인증보다 먼저 200으로 내줍니다([http_server.go 160–165행](https://github.com/bluenviron/mediamtx/blob/v1.19.3/internal/servers/hls/http_server.go#L160-L165), [VERSION](https://github.com/bluenviron/mediamtx/blob/v1.19.3/internal/servers/hls/hlsjsdownloader/VERSION)). 그래서 첫 문구가 실제 로드 실패였는지, 같은 설정 예외가 그 문구로 보였던 것인지는 기록만으로 가를 수 없습니다. 어느 쪽이었든 처음 페이지는 hls.js가 제대로 로드됐더라도 이 설정 때문에 재생될 수 없었습니다. PR #92 본문은 동봉본이 실측에서 실패했다고 적었지만, 이 대조로 보면 그 판단은 다시 볼 여지가 있습니다.
 
 ## 재생과 되감기를 확인하고, 서버에서 고친 설정을 저장소로 옮겼습니다 {#재생과-되감기를-확인한-뒤-서버-변경도-남겼습니다}
 
@@ -132,9 +132,9 @@ if (
 
 gohlslib은 설정한 조각 길이가 지난 뒤 처음 오는 키프레임에서 조각을 자릅니다([muxer_segmenter.go 576–579행](https://github.com/bluenviron/gohlslib/blob/v2.4.1/muxer_segmenter.go#L576-L579)). 4초가 키프레임 간격으로 나누어떨어지지 않으면 조각이 4초를 넘어 흔들리고, 키프레임을 2초로 맞추자 4.00000초로 고정됐습니다.
 
-서버에서 직접 고친 파일은 셋이었습니다. 플레이어 페이지를 다시 썼고, nginx가 `/hls.min.js`를 캐시 없이 직접 내주게 했고, compose 파일에서 hls.js 파일 마운트를 켰습니다. 서버에만 있는 수정은 다음 배포에서 사라지므로, 같은 날 [PR #92](https://github.com/3K-PokeClip/PokeClip-mono/pull/92)로 저장소에 옮겼고 17시 19분 develop에 머지됐습니다. 고친 페이지는 `liveSyncDurationCount: 3`을 함께 줍니다([player.html 36행](https://github.com/3K-PokeClip/PokeClip-mono/blob/98e573406158b55ebf1425ca4a0e724bf0501dd5/infra/dev-media/player.html#L36)).
+서버에서 직접 고친 파일은 셋이었습니다. 플레이어 페이지를 다시 썼고, nginx가 `/hls.min.js`를 캐시 없이 직접 내주게 했고, compose 파일에서 hls.js 파일 마운트를 켰습니다. 서버에만 있는 수정은 다음 배포에서 사라지므로, 같은 날 PR #92로 저장소에 옮겼고 17시 19분 develop에 머지됐습니다. 고친 페이지는 `liveSyncDurationCount: 3`을 함께 줍니다(player.html 36행).
 
-hls.js 파일 자체는 저장소에 넣지 않고 배포 절차의 내려받기 단계로 두었습니다. 그 단계는 `hls.js@1`로 받아 판을 1.6.16에 고정하지 않습니다([RUNBOOK.md 226행](https://github.com/3K-PokeClip/PokeClip-mono/blob/98e573406158b55ebf1425ca4a0e724bf0501dd5/infra/dev-media/RUNBOOK.md?plain=1#L226)). 다시 배포하면 다른 1.x가 올 수 있습니다.
+hls.js 파일 자체는 저장소에 넣지 않고 배포 절차의 내려받기 단계로 두었습니다. 그 단계는 `hls.js@1`로 받아 판을 1.6.16에 고정하지 않습니다(RUNBOOK.md 226행). 다시 배포하면 다른 1.x가 올 수 있습니다.
 
 ## 화면이 침묵하면 단계마다 통과 증거를 따로 남기십시오
 
@@ -146,7 +146,7 @@ hls.js 파일 자체는 저장소에 넣지 않고 배포 절차의 내려받기
 
 ## 측정 조건
 
-- 2026년 8월 18일, 멘토 데모용 임시 서버 한 대. Docker Compose로 MediaMTX 1.19.3(`bluenviron/mediamtx:1.19.3`)과 nginx를 띄웠습니다. MediaMTX 설정은 LL-HLS, 조각 4초, 파트 500ms, 창 900조각, 시청자가 없어도 변환(`hlsAlwaysRemux`)이었습니다([설정 틀](https://github.com/3K-PokeClip/PokeClip-mono/blob/98e573406158b55ebf1425ca4a0e724bf0501dd5/infra/dev-media/mediamtx.demo.yml.tmpl#L27-L34)).
+- 2026년 8월 18일, 멘토 데모용 임시 서버 한 대. Docker Compose로 MediaMTX 1.19.3(`bluenviron/mediamtx:1.19.3`)과 nginx를 띄웠습니다. MediaMTX 설정은 LL-HLS, 조각 4초, 파트 500ms, 창 900조각, 시청자가 없어도 변환(`hlsAlwaysRemux`)이었습니다(설정 틀).
 - 송출은 작성자 PC의 OBS에서 SRT로 했습니다. 인코더 종류, 바꾸기 전의 B-frame 수와 키프레임 간격, 확인에 쓴 브라우저의 종류와 판은 기록에 없습니다.
 - 근거는 당일 팀 내부 트러블슈팅 기록(비공개)이고, 공개 요약은 PR #92 본문입니다. 조치와 관측을 순서대로 대조한 진단이며, 설정을 하나씩 바꾼 A/B 실험이나 반복 측정이 아닙니다.
 - 기록에는 시간대 표기가 없습니다. 서버 구성 커밋(13:33 KST), PR #92 생성(17:15 KST)과 본문의 「17:10경」에 맞춰 UTC로 판단하고 한국 시각으로 옮겼습니다.
@@ -154,11 +154,11 @@ hls.js 파일 자체는 저장소에 넣지 않고 배포 절차의 내려받기
 
 ## 출처
 
-- [3K-PokeClip/PokeClip-mono PR #92](https://github.com/3K-PokeClip/PokeClip-mono/pull/92) — 서버에서 고친 재생 페이지·nginx·compose를 저장소로 옮긴 PR(2026-08-18 develop 머지)
-- [PokeClip-mono 처음 재생 페이지 `player.html`(3d6c117)](https://github.com/3K-PokeClip/PokeClip-mono/blob/3d6c117a6b6702592733f717e6efed14b90c416d/infra/dev-media/player.html#L181-L208) — `liveMaxLatencyDurationCount`만 준 설정, 로드 실패와 생성자 예외를 같은 문구로 받는 `catch`
-- [PokeClip-mono 고친 `player.html`(98e5734)](https://github.com/3K-PokeClip/PokeClip-mono/blob/98e573406158b55ebf1425ca4a0e724bf0501dd5/infra/dev-media/player.html#L36) — `liveSyncDurationCount: 3` 짝
-- [PokeClip-mono `RUNBOOK.md`(98e5734) 226행](https://github.com/3K-PokeClip/PokeClip-mono/blob/98e573406158b55ebf1425ca4a0e724bf0501dd5/infra/dev-media/RUNBOOK.md?plain=1#L226) — hls.js 내려받기 단계
-- [PokeClip-mono `mediamtx.demo.yml.tmpl`(98e5734)](https://github.com/3K-PokeClip/PokeClip-mono/blob/98e573406158b55ebf1425ca4a0e724bf0501dd5/infra/dev-media/mediamtx.demo.yml.tmpl#L27-L34) — 데모 서버의 LL-HLS 설정
+- 3K-PokeClip/PokeClip-mono PR #92 — 서버에서 고친 재생 페이지·nginx·compose를 저장소로 옮긴 PR(2026-08-18 develop 머지) (비공개 저장소)
+- PokeClip-mono 처음 재생 페이지 `player.html`(3d6c117) — `liveMaxLatencyDurationCount`만 준 설정, 로드 실패와 생성자 예외를 같은 문구로 받는 `catch` (비공개 저장소)
+- PokeClip-mono 고친 `player.html`(98e5734) — `liveSyncDurationCount: 3` 짝 (비공개 저장소)
+- PokeClip-mono `RUNBOOK.md`(98e5734) 226행 — hls.js 내려받기 단계 (비공개 저장소)
+- PokeClip-mono `mediamtx.demo.yml.tmpl`(98e5734) — 데모 서버의 LL-HLS 설정 (비공개 저장소)
 - [bluenviron/mediamtx v1.19.3 `go.mod`](https://github.com/bluenviron/mediamtx/blob/v1.19.3/go.mod#L13-L16) — gohlslib v2.4.1, mediacommon v2.9.2
 - [bluenviron/mediamtx v1.19.3 `internal/protocols/hls/from_stream.go`](https://github.com/bluenviron/mediamtx/blob/v1.19.3/internal/protocols/hls/from_stream.go#L193-L200) — 영상 단위마다 `WriteH264`, 실패하면 `muxer error:`
 - [bluenviron/mediamtx v1.19.3 `internal/core/core.go`](https://github.com/bluenviron/mediamtx/blob/v1.19.3/internal/core/core.go#L948-L970) — `hlsSegmentCount`가 바뀌면 HLS 서버를 새로 띄움

@@ -14,7 +14,7 @@ portfolio_edition: "2026-10-15-v2"
 
 SRT 송출 연결에는 값이 둘 들어갑니다. 어느 방송 경로에 보내는지 밝히는 streamid와, 영상을 암호화하는 열쇠를 감싸는 passphrase입니다. streamid는 받은 값이 맞는지 대조만 하면 되므로 해시로 충분합니다. passphrase는 수신부가 연결마다 원문을 써야 해서 해시로 둘 수 없습니다. 7월 23일 passphrase 원문은 PostgreSQL(이하 PG) 밖 AWS Secrets Manager에 두고 PG에는 참조만 남기기로 정했지만, 처음 구현된 Auth는 원문을 PG 표에 애플리케이션 키로 암호화해 두고 있었습니다. 개발 서버의 Auth는 10월 6일 읽기를 Secrets Manager로 옮겼고, 2주 동안 PG 사본을 둔 뒤 10월 22일 사본과 이행 도구를 지웠습니다. 운영은 처음부터 Secrets Manager였고, 그 비밀은 Auth만 읽습니다.
 
-저장 위치는 제가 7월 23일 정했습니다. 저장소를 옮기는 10월의 설계와, 개발 서버 역할 정책 · 설정 파일 같은 선행 조건, 10월 7일 지연 재측정은 제가 AI와 함께 했습니다. 이전 구현은 팀원이 했습니다([PR #218](https://github.com/3K-PokeClip/PokeClip-mono/pull/218) · [PR #303](https://github.com/3K-PokeClip/PokeClip-mono/pull/303)).
+저장 위치는 제가 7월 23일 정했습니다. 저장소를 옮기는 10월의 설계와, 개발 서버 역할 정책 · 설정 파일 같은 선행 조건, 10월 7일 지연 재측정은 제가 AI와 함께 했습니다. 이전 구현은 팀원이 했습니다(PR #218 · PR #303).
 
 ## streamid는 해시로 대조하고 passphrase는 원문을 다시 읽어야 했습니다 {#대조할-식별자와-다시-읽을-비밀을-나눴습니다}
 
@@ -29,7 +29,7 @@ passphrase는 회선으로 보내지 않습니다. 송신 쪽이 영상 암호�
 | passphrase | 연결마다 원문 사용 | Secrets Manager |
 | 비밀 이름 | 허용된 비밀로 연결 | PG `stream_keys.passphrase_ref` |
 
-Auth의 스키마 주석도 「passphrase도 stream_token 원문도 여기 없다」고 적습니다([`V104__create_stream_keys.sql` 4–8행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/services/auth/src/main/resources/db/migration/V104__create_stream_keys.sql#L4-L8)). streamid만 알아서는 송출할 수 없고, passphrase까지 있어야 합니다.
+Auth의 스키마 주석도 「passphrase도 stream_token 원문도 여기 없다」고 적습니다(`V104__create_stream_keys.sql` 4–8행). streamid만 알아서는 송출할 수 없고, passphrase까지 있어야 합니다.
 
 ## 공용 암호와 PG 봉투 암호화 대신 Secrets Manager를 골랐습니다 {#공용-비밀은-단순하지만-폐기의-영향이-너무-컸습니다}
 
@@ -54,9 +54,9 @@ PR #218은 10월 6일 17시 8분에 머지됐고, 같은 날 설정을 `aws`로 
 
 읽기를 옮기면 송출 연결의 접속 경로가 Secrets Manager 호출만큼 길어집니다. 응답기가 Auth의 판정을 기다리는 시한은 1.125초였습니다. 10월 7일 개발 서버에서 이를 다시 쟀고, 가장 느린 값은 Auth를 재시작한 직후 첫 호출의 1.036초로 시한 안이었습니다(팀 내부 실험 기록 기준 비공개 실측). 그래서 Auth의 Secrets Manager 호출 시한(연산마다 3초, 호출마다 1초)은 바꾸지 않았습니다.
 
-10월 22일 [PR #303](https://github.com/3K-PokeClip/PokeClip-mono/pull/303)이 병행을 끝냈습니다. 이행 도구를 지웠고, PG 사본은 그 PR이 정한 머지 전 절차에서 지웠습니다. 이제 `aws`에서 `postgres`로 되돌리는 길은 없습니다. PG에 사본도 도구도 없기 때문입니다.
+10월 22일 PR #303이 병행을 끝냈습니다. 이행 도구를 지웠고, PG 사본은 그 PR이 정한 머지 전 절차에서 지웠습니다. 이제 `aws`에서 `postgres`로 되돌리는 길은 없습니다. PG에 사본도 도구도 없기 때문입니다.
 
-```mermaid {#fig-secret-timeline kind="재구성" caption="passphrase 저장 위치의 날짜순 변화(SM은 Secrets Manager). 개발 서버는 10월 6일 읽기를 옮기고 10월 22일 PG 사본을 지웠고, 운영은 처음부터 Secrets Manager였습니다. 10월 25일 운영 응답기 PR이 머지됐고 11월 3일 v1.0.0이 출시됐습니다. 응답기 모드의 운영 반영 시점은 확인 기록이 없습니다. PR #218 · #303 · #392 · #466과 prod/platform Terraform 정의 재구성." source="https://github.com/3K-PokeClip/PokeClip-mono/pull/303"}
+```mermaid {#fig-secret-timeline kind="재구성" caption="passphrase 저장 위치의 날짜순 변화(SM은 Secrets Manager). 개발 서버는 10월 6일 읽기를 옮기고 10월 22일 PG 사본을 지웠고, 운영은 처음부터 Secrets Manager였습니다. 10월 25일 운영 응답기 PR이 머지됐고 11월 3일 v1.0.0이 출시됐습니다. 응답기 모드의 운영 반영 시점은 확인 기록이 없습니다. PR #218 · #303 · #392 · #466과 prod/platform Terraform 정의 재구성." source="프로젝트 저장소 PR #303(비공개)"}
 flowchart TB
   accTitle: passphrase 저장 위치의 변화
   accDescr: 7월 23일 Secrets Manager에 원문, PG에 이름만 두기로 정했다. 개발 서버는 10월 초 PG secrets 표에 암호화해 두고 있었고, 10월 6일 PR 218로 Secrets Manager에서 읽기 시작해 2주 동안 PG 사본을 두었으며, 10월 22일 PR 303으로 사본과 이행 도구를 지웠다. 운영은 처음부터 Secrets Manager였고, 10월 25일 응답기 PR 392가 머지됐으며 11월 3일 v1.0.0이 출시됐다.
@@ -73,17 +73,17 @@ flowchart TB
 
 ## 운영은 처음부터 Secrets Manager였고 방송자 스트림 키 비밀은 Auth만 읽습니다 {#운영은-처음부터-secrets-manager였고-비밀은-auth만-읽습니다}
 
-운영 Terraform 정의는 Auth의 스트림 키 저장소를 처음부터 `aws`로 둡니다. 옮겨 올 PG 데이터가 없어 옛 암호를 지우는 곳도 Secrets Manager 하나입니다([`prod/platform/services.tf` 82–86행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/prod/platform/services.tf#L82-L86) · [`prod/platform/README.md` 208–209행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/prod/platform/README.md?plain=1#L208-L209)). Auth 작업 역할은 스트림 키 접두 아래 비밀에만 만들기 · 읽기 · 쓰기 · 지우기를 받습니다([`task_policies.tf` 16–31행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/prod/platform/task_policies.tf#L16-L31)). 그 접두는 와일드카드를 쓸 수 없게 검사합니다([`variables.tf` 281–292행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/prod/platform/variables.tf#L281-L292)).
+운영 Terraform 정의는 Auth의 스트림 키 저장소를 처음부터 `aws`로 둡니다. 옮겨 올 PG 데이터가 없어 옛 암호를 지우는 곳도 Secrets Manager 하나입니다(`prod/platform/services.tf` 82–86행 · `prod/platform/README.md` 208–209행). Auth 작업 역할은 스트림 키 접두 아래 비밀에만 만들기 · 읽기 · 쓰기 · 지우기를 받습니다(`task_policies.tf` 16–31행). 그 접두는 와일드카드를 쓸 수 없게 검사합니다(`variables.tf` 281–292행).
 
-미디어 서버는 이 접두를 읽지 못합니다. 미디어 서버 역할이 읽을 수 있는 비밀은 이름을 하나씩 적은 CDN 비밀 · 점검용 시험 키 · 런타임 비밀뿐입니다([`modules/media_host/iam.tf` 51–60행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/media_host/iam.tf#L51-L60)). 수신부가 passphrase를 받는 길은 영상과 같습니다. 강조한 칸이 원문을 읽는 유일한 자리입니다.
+미디어 서버는 이 접두를 읽지 못합니다. 미디어 서버 역할이 읽을 수 있는 비밀은 이름을 하나씩 적은 CDN 비밀 · 점검용 시험 키 · 런타임 비밀뿐입니다(`modules/media_host/iam.tf` 51–60행). 수신부가 passphrase를 받는 길은 영상과 같습니다. 강조한 칸이 원문을 읽는 유일한 자리입니다.
 
 {{< motion scene="SecretPathOneConnection" id="fig-secret-path" kind="개념도" caption="송출 연결 하나에서 MediaMTX는 응답기에 묻고, 응답기는 Auth에 스트림 키 판정을 부릅니다. Auth는 PG에서 streamid 해시로 행을 찾아 비밀 이름을 얻고, Secrets Manager에서 원문을 읽어 돌려줍니다. PG에는 해시와 이름만 있습니다. 단계 길이는 설명용입니다." >}}
 
-MediaMTX가 송출 연결마다 같은 상자의 응답기에 묻고, 응답기가 Auth에 판정을 청해 허용이면 그 계정의 passphrase를 받아 넘깁니다. 이 구성은 10월 25일 [PR #392](https://github.com/3K-PokeClip/PokeClip-mono/pull/392)로 들어갔습니다. 그 PR은 머지만으로 상자의 동작을 바꾸지 않고, 운영 단계에서 응답기 모드로 바꾸게 돼 있습니다. 7월 설계는 미디어 서버가 Secrets Manager를 직접 읽는다고 적었지만, 그 길은 만들지 않았습니다. 응답기를 이렇게 붙이기 전에는 경로 조정자가 비밀 이름 목록을 받아 MediaMTX 경로를 미리 맞추는 설계도 있었고, 그 설계와 기각 이유는 [경로 조정 설계 글](/posts/0-to-1/pokeclip-path-reconciler-design-history/)에 있습니다. 수신부에서 사용자별 passphrase를 고르는 방식의 대안은 [MediaMTX 사용자별 SRT 암호 제안](/posts/open-source-analysis/mediamtx-user-srt-passphrase-boundaries/)에 있습니다.
+MediaMTX가 송출 연결마다 같은 상자의 응답기에 묻고, 응답기가 Auth에 판정을 청해 허용이면 그 계정의 passphrase를 받아 넘깁니다. 이 구성은 10월 25일 PR #392로 들어갔습니다. 그 PR은 머지만으로 상자의 동작을 바꾸지 않고, 운영 단계에서 응답기 모드로 바꾸게 돼 있습니다. 7월 설계는 미디어 서버가 Secrets Manager를 직접 읽는다고 적었지만, 그 길은 만들지 않았습니다. 응답기를 이렇게 붙이기 전에는 경로 조정자가 비밀 이름 목록을 받아 MediaMTX 경로를 미리 맞추는 설계도 있었고, 그 설계와 기각 이유는 [경로 조정 설계 글](/posts/0-to-1/pokeclip-path-reconciler-design-history/)에 있습니다. 수신부에서 사용자별 passphrase를 고르는 방식의 대안은 [MediaMTX 사용자별 SRT 암호 제안](/posts/open-source-analysis/mediamtx-user-srt-passphrase-boundaries/)에 있습니다.
 
 ## 방송 플랫폼 OAuth 토큰은 PG에 암호화해 둡니다
 
-YouTube · 치지직 OAuth 토큰은 이번 이전 범위 밖이었고, 지금도 PG `secrets` 표에 AES-256-GCM으로 암호화해 둡니다. 그래서 스트림 키를 Secrets Manager로 옮긴 뒤에도 그 암호화 키(`SECRET_STORE_KEY`)는 Auth에 꼭 있어야 합니다([`auth/application.yml` 190–197행](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/services/auth/src/main/resources/application.yml#L190-L197)). DB 덤프와 그 키가 함께 새면 토큰이 열립니다. 7월 결정 문서에는 「YouTube 토큰 원문을 Secrets Manager로 뺀 것과 같은 원칙」이라는 근거가 있었지만, 그것은 계획이었고 구현된 적이 없습니다.
+YouTube · 치지직 OAuth 토큰은 이번 이전 범위 밖이었고, 지금도 PG `secrets` 표에 AES-256-GCM으로 암호화해 둡니다. 그래서 스트림 키를 Secrets Manager로 옮긴 뒤에도 그 암호화 키(`SECRET_STORE_KEY`)는 Auth에 꼭 있어야 합니다(`auth/application.yml` 190–197행). DB 덤프와 그 키가 함께 새면 토큰이 열립니다. 7월 결정 문서에는 「YouTube 토큰 원문을 Secrets Manager로 뺀 것과 같은 원칙」이라는 근거가 있었지만, 그것은 계획이었고 구현된 적이 없습니다.
 
 비밀을 DB 밖으로 옮길 때는 저장소를 바꾼 날보다, 읽는 주체가 하나로 줄어든 날과 옛 사본이 사라진 날을 따로 기록하십시오. 이 사례에서 그 날은 각각 10월 6일과 10월 22일이었고, 그 사이에는 되돌릴 길과 새 저장소가 함께 있었습니다.
 
@@ -94,9 +94,9 @@ YouTube · 치지직 OAuth 토큰은 이번 이전 범위 밖이었고, 지금�
 
 ## 출처
 
-- [3K-PokeClip/PokeClip-mono PR #218](https://github.com/3K-PokeClip/PokeClip-mono/pull/218) — 스트림 키 암호 Secrets Manager 이행(2026-10-06 머지, 팀원) · [PR #303](https://github.com/3K-PokeClip/PokeClip-mono/pull/303) — 병행 종료(2026-10-22 머지, 팀원)
-- [PR #392](https://github.com/3K-PokeClip/PokeClip-mono/pull/392) — 운영 송출 인증 응답기(2026-10-25 머지) · [PR #466](https://github.com/3K-PokeClip/PokeClip-mono/pull/466) — v1.0.0 출시 이미지(2026-11-03)
-- PokeClip-mono develop `825a3dfe` — [`V104__create_stream_keys.sql`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/services/auth/src/main/resources/db/migration/V104__create_stream_keys.sql#L4-L8) · [`auth/application.yml`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/services/auth/src/main/resources/application.yml#L190-L200) · [`prod/platform/services.tf`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/prod/platform/services.tf#L82-L86) · [`prod/platform/README.md`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/prod/platform/README.md?plain=1#L204-L210) · [`task_policies.tf`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/prod/platform/task_policies.tf#L16-L31) · [`variables.tf`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/prod/platform/variables.tf#L281-L292) · [`modules/media_host/iam.tf`](https://github.com/3K-PokeClip/PokeClip-mono/blob/825a3dfe1f8dbef20255f85cea890a21505ae465/infra/terraform/modules/media_host/iam.tf#L51-L60)
+- 3K-PokeClip/PokeClip-mono PR #218 — 스트림 키 암호 Secrets Manager 이행(2026-10-06 머지, 팀원) · PR #303 — 병행 종료(2026-10-22 머지, 팀원) (비공개 저장소)
+- PR #392 — 운영 송출 인증 응답기(2026-10-25 머지) · PR #466 — v1.0.0 출시 이미지(2026-11-03) (비공개 저장소)
+- PokeClip-mono develop `825a3dfe` — `V104__create_stream_keys.sql` · `auth/application.yml` · `prod/platform/services.tf` · `prod/platform/README.md` · `task_policies.tf` · `variables.tf` · `modules/media_host/iam.tf` (비공개 저장소)
 - Haivision, [SRT API Socket Options — `SRTO_PASSPHRASE`](https://github.com/Haivision/srt/blob/master/docs/API/API-socket-options.md#srto_passphrase) · AWS, [Authentication and access control for AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/auth-and-access.html)
 - [부분 목록으로 방송을 지우지 않기: 폐기한 경로 조정 설계에서 남은 판단](/posts/0-to-1/pokeclip-path-reconciler-design-history/) · [MediaMTX가 SRT 암호를 사용자별로 받게 제안했습니다](/posts/open-source-analysis/mediamtx-user-srt-passphrase-boundaries/)
 - 팀 내부 결정 · 실험 기록(비공개) — 7월 23일 스트림 키 저장 위치, 10월 6일 이행 선행 조건, 10월 7일 지연 재측정

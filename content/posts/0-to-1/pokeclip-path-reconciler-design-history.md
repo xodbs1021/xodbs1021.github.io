@@ -18,7 +18,7 @@ PokeClip의 dev 데모 미디어 서버는 송출 경로 하나에 SRT 암호 �
 
 ## 데모 서버는 경로 하나에 암호 하나라 한 사람만 송출할 수 있었습니다
 
-10월 19일 응답기에 잇기 전까지(10월 5일 판 기준) 데모 서버 설정에는 송출 경로가 하나, 그 경로의 `srtPublishPassphrase`가 하나 있었고, 다른 송출자가 앞 송출을 덮어쓰지 못하게 막혀 있었습니다. 관리 API도 꺼져 있었습니다([`mediamtx.demo.yml.tmpl` 21 · 45–61행, 10월 5일 판](https://github.com/3K-PokeClip/PokeClip-mono/blob/c6e1f17d70ab4646cdbdf3dc6e772309177a8109/infra/dev-media/mediamtx.demo.yml.tmpl#L21-L61)). 암호를 아는 사람은 누구나 같은 경로로 보낼 수 있었고, 동시에 둘이 보낼 수는 없었습니다.
+10월 19일 응답기에 잇기 전까지(10월 5일 판 기준) 데모 서버 설정에는 송출 경로가 하나, 그 경로의 `srtPublishPassphrase`가 하나 있었고, 다른 송출자가 앞 송출을 덮어쓰지 못하게 막혀 있었습니다. 관리 API도 꺼져 있었습니다(`mediamtx.demo.yml.tmpl` 21 · 45–61행, 10월 5일 판). 암호를 아는 사람은 누구나 같은 경로로 보낼 수 있었고, 동시에 둘이 보낼 수는 없었습니다.
 
 계정마다 송출하려면 MediaMTX가 연결마다 어느 계정인지 알아야 했습니다. 당시 MediaMTX의 SRT 암호는 경로 설정에만 있었습니다. 그래서 첫 전제는 계정마다 경로를 하나씩 만들고 각 경로에 그 계정의 암호를 넣는 것이었습니다.
 
@@ -34,7 +34,7 @@ Control API로 넣은 경로는 MediaMTX 프로세스 메모리에만 있어서,
 
 밀어 넣는 쪽은 Auth가 미디어 서버의 재시작을 알 수 없고, 서버 사이에 관리 API를 열어야 했습니다. 그래서 당겨 오는 쪽을 골랐습니다. 조정자는 10초마다 Auth의 모든 페이지를 받아 목록을 만들고, 각 계정의 암호 참조를 읽어 경로에 반영합니다. 한 주기 안에서 목록 조회 3초, 암호 읽기 2초, 경로 적용 4초로 시간 예산을 따로 뒀습니다. 조회가 시간을 다 쓰면 이미 확인한 폐기조차 적용하지 못하기 때문입니다.
 
-암호 원문은 Secrets Manager로 옮긴다는 전제였습니다. 이 이행은 조정자와 별개로 진행돼, 팀원이 만든 [PR #218](https://github.com/3K-PokeClip/PokeClip-mono/pull/218)이 10월 6일 17시 08분 머지됐고, 옛 저장소와 함께 쓰던 병행 기간은 10월 22일 [PR #303](https://github.com/3K-PokeClip/PokeClip-mono/pull/303)으로 끝났습니다.
+암호 원문은 Secrets Manager로 옮긴다는 전제였습니다. 이 이행은 조정자와 별개로 진행돼, 팀원이 만든 PR #218이 10월 6일 17시 08분 머지됐고, 옛 저장소와 함께 쓰던 병행 기간은 10월 22일 PR #303으로 끝났습니다.
 
 ## 목록에 없는 것과 읽지 못한 것을 다르게 다뤘습니다 {#목록에-없다는-것과-읽지-못했다는-것은-달랐습니다}
 
@@ -98,9 +98,9 @@ flowchart TB
 
 ## 응답기 방식은 10월 19일 dev 서버에서 먼저 돌았습니다 {#이후에는-경로를-미리-맞추는-대신-연결에서-계정을-판정하기로-했습니다}
 
-연결마다 Auth에 계정을 묻고 그 계정의 암호를 돌려주는 인증 응답기가 10월 17일 [PR #266](https://github.com/3K-PokeClip/PokeClip-mono/pull/266)로 들어왔고, dev 데모 서버를 응답기에 잇는 구성이 10월 19일 [PR #283](https://github.com/3K-PokeClip/PokeClip-mono/pull/283)으로 머지됐습니다. 같은 날 #6306을 실은 제품 포크로 서버에 반영해 실송출로 확인했습니다. 그 결과는 [사용자별 SRT 암호 글](/posts/open-source-analysis/mediamtx-user-srt-passphrase-boundaries/#10월-19일-후속-개발-서버에서-계정별-송출과-차단을-연결했습니다)에 짧게 남겼습니다. Auth 조회 장애와 암호 없는 성공 응답은 그때 판정하지 못했습니다.
+연결마다 Auth에 계정을 묻고 그 계정의 암호를 돌려주는 인증 응답기가 10월 17일 PR #266로 들어왔고, dev 데모 서버를 응답기에 잇는 구성이 10월 19일 PR #283으로 머지됐습니다. 같은 날 #6306을 실은 제품 포크로 서버에 반영해 실송출로 확인했습니다. 그 결과는 [사용자별 SRT 암호 글](/posts/open-source-analysis/mediamtx-user-srt-passphrase-boundaries/#10월-19일-후속-개발-서버에서-계정별-송출과-차단을-연결했습니다)에 짧게 남겼습니다. Auth 조회 장애와 암호 없는 성공 응답은 그때 판정하지 못했습니다.
 
-운영 상자의 응답기 연결은 10월 25일 [PR #392](https://github.com/3K-PokeClip/PokeClip-mono/pull/392)로 들어왔습니다. 이 PR은 옛 방식과 응답기 방식 두 모드를 두고, 머지만으로는 어떤 상자의 동작도 바꾸지 않습니다. dev 데모 미디어 상자는 11월 6일 멈췄습니다. #6306은 10월 27일 같은 PR에서 커밋 하나로 다시 썼고, 11월 11일에도 열려 있습니다.
+운영 상자의 응답기 연결은 10월 25일 PR #392로 들어왔습니다. 이 PR은 옛 방식과 응답기 방식 두 모드를 두고, 머지만으로는 어떤 상자의 동작도 바꾸지 않습니다. dev 데모 미디어 상자는 11월 6일 멈췄습니다. #6306은 10월 27일 같은 PR에서 커밋 하나로 다시 썼고, 11월 11일에도 열려 있습니다.
 
 조정자는 버렸지만, 그 설계에서 확인한 실패 조건은 다른 동기화에도 남습니다. 목록을 다 읽지 못했으면 누락을 삭제 근거로 쓰지 말고, 확정한 폐기는 뒤의 오류로 뒤집지 마십시오. 대안을 고를 때는 한 요청의 지연이 아니라 그 지연이 다른 연결과 요청으로 번지는지를 재십시오.
 
@@ -112,9 +112,9 @@ flowchart TB
 
 ## 출처
 
-- [`infra/dev-media/mediamtx.demo.yml.tmpl` 10월 5일 판](https://github.com/3K-PokeClip/PokeClip-mono/blob/c6e1f17d70ab4646cdbdf3dc6e772309177a8109/infra/dev-media/mediamtx.demo.yml.tmpl#L45-L61) — 경로 하나 · 암호 하나
-- [3K-PokeClip/PokeClip-mono PR #218](https://github.com/3K-PokeClip/PokeClip-mono/pull/218) · [PR #303](https://github.com/3K-PokeClip/PokeClip-mono/pull/303) — 스트림키 암호 Secrets Manager 이행과 병행 종료(팀원)
-- [3K-PokeClip/PokeClip-mono PR #266](https://github.com/3K-PokeClip/PokeClip-mono/pull/266) · [PR #283](https://github.com/3K-PokeClip/PokeClip-mono/pull/283) · [PR #392](https://github.com/3K-PokeClip/PokeClip-mono/pull/392) — 인증 응답기, dev 구성, 운영 상자 두 모드
+- `infra/dev-media/mediamtx.demo.yml.tmpl` 10월 5일 판 — 경로 하나 · 암호 하나 (비공개 저장소)
+- 3K-PokeClip/PokeClip-mono PR #218 · PR #303 — 스트림키 암호 Secrets Manager 이행과 병행 종료(팀원) (비공개 저장소)
+- 3K-PokeClip/PokeClip-mono PR #266 · PR #283 · PR #392 — 인증 응답기, dev 구성, 운영 상자 두 모드 (비공개 저장소)
 - [bluenviron/mediamtx#6306](https://github.com/bluenviron/mediamtx/pull/6306) — 사용자별 SRT 암호(작성자 본인, 열림)
 - [bluenviron/mediamtx#5613](https://github.com/bluenviron/mediamtx/issues/5613) — 같은 기능 요청
 - [MediaMTX 문서 「Authentication」](https://mediamtx.org/docs/features/authentication) · [「Control API」](https://mediamtx.org/docs/features/control-api)

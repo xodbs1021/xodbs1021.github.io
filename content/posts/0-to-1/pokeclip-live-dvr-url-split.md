@@ -59,7 +59,7 @@ LL-HLS의 델타 갱신(Playlist Delta Update)이 이 금지를 실제 고장으
 
 같은 날 되감기 목록 끝에 붙이던 「핫 테일」도 걷어냈습니다. 핫 테일은 되감기 목록의 가장 최근 구간을 MediaMTX의 블로킹 요청으로 그대로 이어 주던 장치였습니다. 라이브와 되감기가 한 주소를 쓰던 시절의 구조라, 남겨 두면 되감기 목록에 라이브 조각 주소가 실리고 그 조각은 라이브 창을 벗어나는 즉시 404가 됩니다. 실린 URI를 나중에 S3 주소로 고치는 것은 앞 절의 규칙이 막습니다. 그래서 되감기 목록에는 업로드가 확인된 녹화 조각만 싣습니다.
 
-그 대가로 되감기 목록의 머리는 라이브보다 늦습니다. 녹화 조각이 4초로 마감되고, 다시 포장해 업로드하는 시간만큼입니다. 설계 때 추정은 약 5초였습니다. 이 틈은 라이브 창이 덮습니다. 그래서 「되감기 지연 < 라이브 창」을 불변식으로 두었습니다. 라이브 창은 그 뒤 녹화와 같은 4초 조각 7개, 곧 28초로 정했고([`mediamtx.yml.tmpl` 128–130행](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/infra/media-host/mediamtx.yml.tmpl#L128-L130)), 그 판단은 [라이브 창 글](/posts/0-to-1/pokeclip-live-window-without-fork/)에 있습니다.
+그 대가로 되감기 목록의 머리는 라이브보다 늦습니다. 녹화 조각이 4초로 마감되고, 다시 포장해 업로드하는 시간만큼입니다. 설계 때 추정은 약 5초였습니다. 이 틈은 라이브 창이 덮습니다. 그래서 「되감기 지연 < 라이브 창」을 불변식으로 두었습니다. 라이브 창은 그 뒤 녹화와 같은 4초 조각 7개, 곧 28초로 정했고(`mediamtx.yml.tmpl` 128–130행), 그 판단은 [라이브 창 글](/posts/0-to-1/pokeclip-live-window-without-fork/)에 있습니다.
 
 이 불변식은 무조건 성립하지 않습니다. 업로드가 실패해 다시 시도를 기다리는 동안에는 되감기 머리가 멈춰 라이브 창의 여유를 넘깁니다. 영상이 멈춘 조각을 목록에서 어떻게 다루는지는 [재생 목록 경계 글](/posts/0-to-1/pokeclip-manifest-window-boundaries/)에, 되감기 목록을 장부에서 S3로 정적 발행하는 방식은 [발행 정합성 글](/posts/0-to-1/pokeclip-database-authoritative-manifest-publishing/)에 있습니다.
 
@@ -67,7 +67,7 @@ LL-HLS의 델타 갱신(Playlist Delta Update)이 이 금지를 실제 고장으
 
 오리진 대체를 버린 뒤에도 CloudFront 배포는 하나로 두었습니다. CloudFront는 요청 경로를 캐시 비헤이비어(경로 규칙)의 패턴과 위에서부터 견주고, 처음 맞는 규칙의 원본 · 캐시 정책 · 함수를 씁니다([AWS 「Cache behavior settings」 Path pattern](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/DownloadDistValuesCacheBehavior.html#DownloadDistValuesPathPattern)). 원본이 둘이어도 도메인 하나에서 경로로 가를 수 있습니다. 서명 쿠키는 `Domain` 속성이 가리키는 도메인의 요청에 붙으므로([AWS 「Set signed cookies using a custom policy」](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-setting-signed-cookie-custom-policy.html)), 미디어 도메인이 하나면 쿠키도 한 도메인 안에서 다룹니다.
 
-고정 커밋의 Terraform 원문에서 경로 규칙을 그대로 뽑으면 아래와 같습니다([`main.tf` 25–98행](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/infra/terraform/modules/cdn_media/main.tf#L25-L98) · [187–201행](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/infra/terraform/modules/cdn_media/main.tf#L187-L201)). 같은 원문에서 원본 블록은 둘이고 오리진 그룹은 없습니다.
+고정 커밋의 Terraform 원문에서 경로 규칙을 그대로 뽑으면 아래와 같습니다(`main.tf` 25–98행 · 187–201행). 같은 원문에서 원본 블록은 둘이고 오리진 그룹은 없습니다.
 
 | 순서 | 경로 패턴 | 원본 | 서명 쿠키 | 엣지 함수 |
 |---|---|---|---|---|
@@ -80,11 +80,11 @@ LL-HLS의 델타 갱신(Playlist Delta Update)이 이 금지를 실제 고장으
 | 7 | `/playback/*` | Media 상자 | 예 | 없음 |
 | 기본 | `*` | (닿지 않음) | 예 | deny-default → 404 |
 
-Media 상자는 EC2이고, CloudFront는 그 앞의 내부 ALB를 VPC 원본으로 봅니다. S3는 OAC(원본 접근 제어)로 서명해서 읽고, Origin Shield는 S3 쪽에만 켰습니다([`main.tf` 136–159행](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/infra/terraform/modules/cdn_media/main.tf#L136-L159)). `/live/*.m3u8`이 `/live/*`보다 앞에 있는 까닭은 목록과 조각의 캐시 시간이 달라서입니다. 목록은 1초, 조각은 원본의 `Cache-Control`을 따릅니다.
+Media 상자는 EC2이고, CloudFront는 그 앞의 내부 ALB를 VPC 원본으로 봅니다. S3는 OAC(원본 접근 제어)로 서명해서 읽고, Origin Shield는 S3 쪽에만 켰습니다(`main.tf` 136–159행). `/live/*.m3u8`이 `/live/*`보다 앞에 있는 까닭은 목록과 조각의 캐시 시간이 달라서입니다. 목록은 1초, 조각은 원본의 `Cache-Control`을 따릅니다.
 
 아래 그림에서 경로의 첫 구간이 원본을 고르고, 맞는 규칙이 없는 경로는 원본까지 가지 않는 것을 보면 됩니다.
 
-```mermaid {#fig-route-tree kind="개념도" caption="미디어 도메인 하나 아래의 주소와 원본입니다. 라이브와 되감기 주소 API는 Media 상자(EC2)로, 되감기 목록 · 조각 · init과 다시보기 목록은 S3로 가고, 어느 규칙에도 맞지 않는 경로는 원본에 닿지 않습니다(서명 쿠키 검사에서 403, 통과해도 기본 규칙의 함수가 404). 다시보기 목록은 조각을 새로 만들지 않고 /dvr 조각 주소를 가리킵니다. /playback · /api/ingest 규칙은 표에 있습니다. PokeClip-mono develop 627fb5a2의 main.tf 기준." source="https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/infra/terraform/modules/cdn_media/main.tf#L25-L98"}
+```mermaid {#fig-route-tree kind="개념도" caption="미디어 도메인 하나 아래의 주소와 원본입니다. 라이브와 되감기 주소 API는 Media 상자(EC2)로, 되감기 목록 · 조각 · init과 다시보기 목록은 S3로 가고, 어느 규칙에도 맞지 않는 경로는 원본에 닿지 않습니다(서명 쿠키 검사에서 403, 통과해도 기본 규칙의 함수가 404). 다시보기 목록은 조각을 새로 만들지 않고 /dvr 조각 주소를 가리킵니다. /playback · /api/ingest 규칙은 표에 있습니다. PokeClip-mono develop 627fb5a2의 main.tf 기준." source="프로젝트 저장소 infra/terraform/modules/cdn_media/main.tf(비공개)"}
 flowchart LR
   accTitle: 미디어 도메인의 경로와 원본
   accDescr: 라이브 목록과 조각, 되감기 주소 API는 Media 상자 EC2로 간다. 되감기 목록, 회차 경로 조각, init, 다시보기 목록은 S3로 간다. 그 밖의 경로는 원본에 가지 않고 서명 쿠키 검사에서 403, 통과해도 404를 받는다.
@@ -97,17 +97,17 @@ flowchart LR
   x[그 밖의 경로] --> n[403 · 404]
 ```
 
-기본 규칙은 AWS가 경고하는 자리입니다. 경로 패턴과 그 순서를 잘못 두면 의도하지 않은 접근을 허용할 수 있습니다([같은 AWS 문서](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/DownloadDistValuesCacheBehavior.html#DownloadDistValuesPathPattern)). 그래서 어느 규칙에도 맞지 않는 경로는 원본에 닿지 않게 했습니다. 기본 규칙에도 서명 쿠키 검사를 걸어 쿠키가 맞지 않으면 403이고, 통과해도 어떤 경로 · 메서드 · 쿼리든 404를 돌려주는 함수가 원본보다 먼저 답합니다([`main.tf` 189–201행](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/infra/terraform/modules/cdn_media/main.tf#L189-L201) · [`deny-default.js`](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/infra/terraform/modules/cdn_media/functions/deny-default.js#L16-L19)). `/live` 없는 경로로 원본에 직접 닿는 갈래가 없어집니다. 이 구조는 [PokeClip-mono PR 387](https://github.com/3K-PokeClip/PokeClip-mono/pull/387)로 들어왔습니다.
+기본 규칙은 AWS가 경고하는 자리입니다. 경로 패턴과 그 순서를 잘못 두면 의도하지 않은 접근을 허용할 수 있습니다([같은 AWS 문서](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/DownloadDistValuesCacheBehavior.html#DownloadDistValuesPathPattern)). 그래서 어느 규칙에도 맞지 않는 경로는 원본에 닿지 않게 했습니다. 기본 규칙에도 서명 쿠키 검사를 걸어 쿠키가 맞지 않으면 403이고, 통과해도 어떤 경로 · 메서드 · 쿼리든 404를 돌려주는 함수가 원본보다 먼저 답합니다(`main.tf` 189–201행 · `deny-default.js`). `/live` 없는 경로로 원본에 직접 닿는 갈래가 없어집니다. 이 구조는 PokeClip-mono PR 387로 들어왔습니다.
 
-라이브 규칙의 함수(live-auth)는 원본에 넘길 CDN 비밀을 KVS(KeyValueStore, 엣지 함수가 읽는 키-값 저장소)에서 읽어 싣고, 못 읽으면 503으로 닫습니다([`live-auth.js` 53–70행](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/infra/terraform/modules/cdn_media/functions/live-auth.js#L53-L70)). CDN 비밀을 원본에 넘기게 된 까닭은 [CDN 캐시 · 원본 인증 글](/posts/0-to-1/pokeclip-cdn-cache-auth-measurement/)에 있습니다.
+라이브 규칙의 함수(live-auth)는 원본에 넘길 CDN 비밀을 KVS(KeyValueStore, 엣지 함수가 읽는 키-값 저장소)에서 읽어 싣고, 못 읽으면 503으로 닫습니다(`live-auth.js` 53–70행). CDN 비밀을 원본에 넘기게 된 까닭은 [CDN 캐시 · 원본 인증 글](/posts/0-to-1/pokeclip-cdn-cache-auth-measurement/)에 있습니다.
 
-플레이어는 되감기 목록 주소를 직접 만들지 않습니다. `/api/streams/{스트림}/rewind`에 물어 지금 열 목록 주소를 받고, 그 주소가 제어면과 같은 출처의 `.m3u8`일 때만 재생기에 넘깁니다([`rewindStatus.ts` 3–8행](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/web/src/api/rewindStatus.ts#L3-L8)). 이 응답도 CDN에서 1초 캐시됩니다.
+플레이어는 되감기 목록 주소를 직접 만들지 않습니다. `/api/streams/{스트림}/rewind`에 물어 지금 열 목록 주소를 받고, 그 주소가 제어면과 같은 출처의 `.m3u8`일 때만 재생기에 넘깁니다(`rewindStatus.ts` 3–8행). 이 응답도 CDN에서 1초 캐시됩니다.
 
 ## iOS 17.1 미만에서는 되감기가 라이브 창 28초뿐입니다
 
-주소를 나눈 대가는 플레이어가 두 주소를 오갈 수 있어야 한다는 것입니다. 웹 플레이어는 hls.js가 재생기를 맡을 때만 되감기 세션을 열어 `/dvr` 목록으로 넘어갑니다. hls.js 없이 브라우저 내장 HLS로 재생하면 조각 목록과 시각 축을 앱이 볼 수 없어, 라이브 창 안에서만 시크합니다([`useHlsPlayback.ts` 277–284행](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/web/src/features/player/useHlsPlayback.ts#L277-L284)).
+주소를 나눈 대가는 플레이어가 두 주소를 오갈 수 있어야 한다는 것입니다. 웹 플레이어는 hls.js가 재생기를 맡을 때만 되감기 세션을 열어 `/dvr` 목록으로 넘어갑니다. hls.js 없이 브라우저 내장 HLS로 재생하면 조각 목록과 시각 축을 앱이 볼 수 없어, 라이브 창 안에서만 시크합니다(`useHlsPlayback.ts` 277–284행).
 
-hls.js는 iPhone에서 iOS 17.1부터 Managed Media Source로 동작합니다([hls.js 1.7.3 README](https://github.com/video-dev/hls.js/blob/v1.7.3/README.md#L328) · [WebKit 「Safari 17.1」](https://webkit.org/blog/14735/webkit-features-in-safari-17-1/)). 그보다 오래된 iPhone은 내장 HLS로 재생하므로, 라이브 목록이 900조각에서 7조각으로 줄어든 지금은 되감기가 28초로 줄어듭니다. 운영 접근 로그에 iPhone 요청이 없어 저는 이것을 한계로 받아들였고, iPhone 요청이 생기면 다시 보기로 했습니다([`media/README.md` 한계 표](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/media/README.md?plain=1#L2938)).
+hls.js는 iPhone에서 iOS 17.1부터 Managed Media Source로 동작합니다([hls.js 1.7.3 README](https://github.com/video-dev/hls.js/blob/v1.7.3/README.md#L328) · [WebKit 「Safari 17.1」](https://webkit.org/blog/14735/webkit-features-in-safari-17-1/)). 그보다 오래된 iPhone은 내장 HLS로 재생하므로, 라이브 목록이 900조각에서 7조각으로 줄어든 지금은 되감기가 28초로 줄어듭니다. 운영 접근 로그에 iPhone 요청이 없어 저는 이것을 한계로 받아들였고, iPhone 요청이 생기면 다시 보기로 했습니다(`media/README.md` 한계 표).
 
 EC2 하나가 죽으면 라이브도 함께 멈춥니다. 오리진 대체 설계에서는 EC2가 죽어도 이미 업로드한 구간을 S3가 대신 냈습니다. 그 이점은 사라졌지만, 그 구간은 이제 되감기 주소가 처음부터 S3에서 냅니다. S3 쪽이 막히면 반대로 되감기 · 다시보기만 멈추고 라이브는 계속됩니다.
 
@@ -128,12 +128,12 @@ EC2 하나가 죽으면 라이브도 함께 멈춥니다. 오리진 대체 설�
 - [hls.js 1.7.3 README](https://github.com/video-dev/hls.js/blob/v1.7.3/README.md#L328) · [WebKit Features in Safari 17.1](https://webkit.org/blog/14735/webkit-features-in-safari-17-1/) — iPhone의 Managed Media Source
 - [데일리안, 「유튜브 빠진 LCK 중계…SOOP 이어 치지직도 '타임머신' 무료로 푼다」(2026-01-08)](https://www.dailian.co.kr/news/view/1595812) — 방송 중 최대 1시간 되감기
 
-코드(공개 저장소 3K-PokeClip/PokeClip-mono, develop `627fb5a2`)
-- [`cdn_media/main.tf`](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/infra/terraform/modules/cdn_media/main.tf#L25-L98) — 경로 규칙 · [원본 둘](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/infra/terraform/modules/cdn_media/main.tf#L136-L159) · [기본 규칙](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/infra/terraform/modules/cdn_media/main.tf#L187-L201)
-- [`deny-default.js`](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/infra/terraform/modules/cdn_media/functions/deny-default.js#L16-L19) · [`live-auth.js` 53–70행](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/infra/terraform/modules/cdn_media/functions/live-auth.js#L53-L70)
-- [`mediamtx.yml.tmpl` 128–130행](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/infra/media-host/mediamtx.yml.tmpl#L128-L130) — 라이브 조각 4초 × 7
-- [`rewindStatus.ts` 3–8행](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/web/src/api/rewindStatus.ts#L3-L8) · [`useHlsPlayback.ts` 277–284행](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/web/src/features/player/useHlsPlayback.ts#L277-L284) · [`media/README.md` 한계 표](https://github.com/3K-PokeClip/PokeClip-mono/blob/627fb5a20ecb9d221fcc030c26adcbbcbe12c04e/media/README.md?plain=1#L2938)
-- [PokeClip-mono PR 387](https://github.com/3K-PokeClip/PokeClip-mono/pull/387) — media 배포 모듈과 엣지 함수
+코드(프로젝트 저장소 3K-PokeClip/PokeClip-mono · 2026년 11월 20일부터 비공개, develop `627fb5a2`)
+- `cdn_media/main.tf` — 경로 규칙 · 원본 둘 · 기본 규칙 (비공개 저장소)
+- `deny-default.js` · `live-auth.js` 53–70행 (비공개 저장소)
+- `mediamtx.yml.tmpl` 128–130행 — 라이브 조각 4초 × 7 (비공개 저장소)
+- `rewindStatus.ts` 3–8행 · `useHlsPlayback.ts` 277–284행 · `media/README.md` 한계 표 (비공개 저장소)
+- PokeClip-mono PR 387 — media 배포 모듈과 엣지 함수 (비공개 저장소)
 
 재측정
 - [경로 규칙 표 스크립트 · 결과](https://github.com/xodbs1021/xodbs1021.github.io/tree/main/_workspace/blog/pokeclip-live-dvr-url-split/measure)
