@@ -1,10 +1,10 @@
 ---
 title: "MediaMTX 훅 7곳은 실행 실패를 로그에 남기지 않았습니다"
 date: "2026-10-15T11:40:52+09:00"
-lastmod: "2026-11-13T23:47:38+09:00"
+lastmod: "2026-11-19T13:20:34+09:00"
 draft: false
 author: "김태윤"
-description: "MediaMTX가 외부 명령을 띄우는 13곳 중 7곳은 종료 콜백(OnExit)이 없어, 실행 파일이 없을 때 로그에 command launched만 남았습니다. 7곳에 기존 6곳과 같은 보고를 붙인 PR #6259(2026-11-13 확인 기준 열림)와, v1.21.3과 PR head 69280137을 빌드해 7종 훅 22번 실행의 실패 이유가 0줄에서 22줄로 바뀐 것을 확인한 AI 재측정."
+description: "MediaMTX가 외부 명령을 띄우는 13곳 중 7곳은 종료 콜백(OnExit)이 없어, 실행 파일이 없을 때 로그에 command launched만 남았습니다. 7곳에 기존 6곳과 같은 보고를 붙인 PR #6259(2026-11-18 머지, 11-19 기준 릴리스 전)와, v1.21.3과 PR head 69280137을 빌드해 7종 훅 22번 실행의 실패 이유가 0줄에서 22줄로 바뀐 것을 확인한 AI 재측정."
 categories: ["open-source-analysis"]
 tags: ["MediaMTX", "오픈소스 기여", "훅", "관측", "Go"]
 portfolio_cases: [41]
@@ -12,7 +12,7 @@ portfolio_pages: [41]
 portfolio_edition: "2026-10-15-v2"
 ---
 
-MediaMTX v1.21.3의 `runOnDisconnect`에 존재하지 않는 `/nonexistent/on-disconnect`를 걸고 RTSP 연결을 열었다 닫으면, 로그에는 `runOnDisconnect command launched` 한 줄만 남습니다. 실행 파일이 없으니 자식 프로세스가 생기지 않고, 자식이 물려받을 stderr에도 아무것도 쓰이지 않습니다. 외부 명령을 띄우는 13곳 중 7곳이 종료 콜백(`OnExit`)을 달지 않았기 때문입니다. 이 7곳에 나머지 6곳과 같은 보고를 붙이는 [PR #6259](https://github.com/bluenviron/mediamtx/pull/6259)를 올렸고, 2026년 11월 13일 다시 잰 결과 7종 훅의 실행 22번 가운데 실패 이유가 남은 것은 v1.21.3에서 0번, PR head에서 22번이었습니다. PR은 11월 13일 확인 기준 열려 있습니다.
+MediaMTX v1.21.3의 `runOnDisconnect`에 존재하지 않는 `/nonexistent/on-disconnect`를 걸고 RTSP 연결을 열었다 닫으면, 로그에는 `runOnDisconnect command launched` 한 줄만 남습니다. 실행 파일이 없으니 자식 프로세스가 생기지 않고, 자식이 물려받을 stderr에도 아무것도 쓰이지 않습니다. 외부 명령을 띄우는 13곳 중 7곳이 종료 콜백(`OnExit`)을 달지 않았기 때문입니다. 이 7곳에 나머지 6곳과 같은 보고를 붙이는 [PR #6259](https://github.com/bluenviron/mediamtx/pull/6259)를 올렸고, 2026년 11월 13일 다시 잰 결과 7종 훅의 실행 22번 가운데 실패 이유가 남은 것은 v1.21.3에서 0번, PR head에서 22번이었습니다. PR은 11월 18일 머지됐고, 올린 커밋이 바뀌지 않고 그대로 들어갔습니다([`6d411780`](https://github.com/bluenviron/mediamtx/commit/6d411780ec5bd13609c60e8e05af9c5b89c320c0)). 11월 15일에 나온 v1.21.4보다 늦게 머지돼, 11월 19일 기준 이 수정이 든 릴리스는 아직 없습니다. 메인테이너는 머지하며 `command launched`와 `command started`로 갈린 로그 문구를 따로 맞춰 보겠다고 남겼습니다([PR #6259 댓글](https://github.com/bluenviron/mediamtx/pull/6259#issuecomment-6961984773)).
 
 범위와 검증 기준, 제출 결정은 제가 했고 구현과 실측은 AI(Claude Code·Codex)가 했습니다. 이 글의 재측정도 AI(Claude Code)가 실행했습니다.
 
@@ -103,7 +103,7 @@ v1.21.3과 #6259 head [`69280137`](https://github.com/bluenviron/mediamtx/pull/6
 
 ## 출처
 
-- [bluenviron/mediamtx PR #6259 「hooks: log the failure of every hook command」](https://github.com/bluenviron/mediamtx/pull/6259) — 본문의 문제·변경·영향, 2026-11-13 확인 기준 열림
+- [bluenviron/mediamtx PR #6259 「hooks: log the failure of every hook command」](https://github.com/bluenviron/mediamtx/pull/6259) — 본문의 문제·변경·영향, 2026-11-18 머지(머지 커밋 `6d411780`, 2026-11-19 확인 기준 v1.21.4 미포함)
 - [#6259 head 69280137](https://github.com/bluenviron/mediamtx/pull/6259/commits/69280137d990d0c8975e690378aead841af03ebc) · [`hooks_test.go`](https://github.com/bluenviron/mediamtx/blob/69280137d990d0c8975e690378aead841af03ebc/internal/hooks/hooks_test.go) · [옛 head acb903fb](https://github.com/bluenviron/mediamtx/commit/acb903fbdfb97d81df682f85ef1a53aee22abdab)
 - [기준 커밋 04825598의 `externalcmd/cmd.go` 72–81행](https://github.com/bluenviron/mediamtx/blob/048255986f7e04b859b4c4efe651448ec785ecd4/internal/externalcmd/cmd.go#L72-L81) — 재시작하지 않는 명령의 보고 규칙 · [`hooks/on_connect.go` 39–64행](https://github.com/bluenviron/mediamtx/blob/048255986f7e04b859b4c4efe651448ec785ecd4/internal/hooks/on_connect.go#L39-L64) — 한 함수 안의 두 모양
 - [커밋 ed775608 「add runOnDisconnect, runOnNotReady, runOnUnread」(#2355)](https://github.com/bluenviron/mediamtx/commit/ed775608116cfd0517f4f96039c431e3b916a248)
