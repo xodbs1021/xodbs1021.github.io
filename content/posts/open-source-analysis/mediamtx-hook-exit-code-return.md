@@ -1,7 +1,7 @@
 ---
 title: "MediaMTX는 실패한 훅의 종료 코드를 0으로 받았습니다"
 date: "2026-10-15T11:40:52+09:00"
-lastmod: "2026-11-14T00:17:06+09:00"
+lastmod: "2026-11-19T13:20:34+09:00"
 draft: false
 author: "김태윤"
 description: "Windows가 아닌 플랫폼의 MediaMTX는 훅 명령이 5로 끝나도 종료 코드를 계산만 하고 0을 돌려줘, 재시작을 켜면 code 0이 찍히고 끄면 아무 줄도 남지 않았습니다. return 하나를 되돌린 PR #6155(v1.21.0)와, v1.20.1 · v1.21.0을 빌드해 exit 5 · exit 1 · SIGTERM을 재시작 켬 · 끔으로 돌린 AI 재측정, TestCmdExitCode를 병합 전후 커밋에서 돌린 결과."
@@ -94,7 +94,7 @@ flowchart TB
 - [`8402a728`의 `internal/externalcmd/cmd_os.go`](https://github.com/bluenviron/mediamtx/blob/8402a728e6e1d819cd0c8045d231fd0191d04998/internal/externalcmd/cmd_os.go#L46-L49) · [`cmd.go`](https://github.com/bluenviron/mediamtx/blob/8402a728e6e1d819cd0c8045d231fd0191d04998/internal/externalcmd/cmd.go#L62-L94) · [`cmd_os_windows.go`](https://github.com/bluenviron/mediamtx/blob/8402a728e6e1d819cd0c8045d231fd0191d04998/internal/externalcmd/cmd_os_windows.go#L124)
 - [커밋 7437ee7a 「update golangci-lint」(#2868)](https://github.com/bluenviron/mediamtx/commit/7437ee7a0928ee553432d4f31b61a67dd64f4e9a) — `return`이 빠진 커밋 · [111302f9(#5787)](https://github.com/bluenviron/mediamtx/commit/111302f9e37c34fc3e21dc149755e9fb4212763d) · [5b9b6afc(#5834)](https://github.com/bluenviron/mediamtx/commit/5b9b6afcb80d2d1a59049b1eafe59c0381cd815f)
 - [Go `os.ProcessState.ExitCode`](https://pkg.go.dev/os#ProcessState.ExitCode) — 시그널로 끝나면 -1
-- [PR #6259 「hooks: log the failure of every hook command」](https://github.com/bluenviron/mediamtx/pull/6259) — 2026-11-13 기준 열림
+- [PR #6259 「hooks: log the failure of every hook command」](https://github.com/bluenviron/mediamtx/pull/6259) — 2026-11-18 머지
 - [MediaMTX v1.21.0](https://github.com/bluenviron/mediamtx/releases/tag/v1.21.0) · [v1.20.1](https://github.com/bluenviron/mediamtx/releases/tag/v1.20.1) 릴리스
 - [MediaMTX 훅 7곳은 실행 실패를 로그에 남기지 않았습니다](/posts/open-source-analysis/mediamtx-seven-hooks-missing-exit-callback/) — 종료 콜백이 없는 7곳
 
