@@ -1,6 +1,6 @@
 ---
 title: "MediaMTX 디버그 로그에 비밀번호가 그대로 찍혔습니다"
-date: "2026-11-19T14:00:00+09:00"
+date: "2026-11-19T15:14:24+09:00"
 draft: false
 author: "김태윤"
 description: "MediaMTX v1.21.3까지 logLevel: debug에서는 Control API 요청의 JSON 본문과 HTTP 인증 요청 본문(password · token)이 로그에 그대로 남았습니다. 응답 본문에 쓰던 Content-Type 목록을 요청에도 적용한 PR #6379(2026-11-01 머지, v1.21.4 포함)와, 네 판을 AI가 다시 빌드해, 요청 본문에 실린 지어낸 비밀 값의 로그 등장이 16번에서 0번으로 줄고 요청 줄의 쿼리 토큰(2 → 1)과 SDP 본문(1 → 1)은 남는 것을 센 기록입니다."
