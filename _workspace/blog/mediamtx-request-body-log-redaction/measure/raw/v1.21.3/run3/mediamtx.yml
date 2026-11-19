@@ -1,4 +1,4 @@
-# Measurement config (same file for every build). /tmp/mtx6379w-run/final/v1.21.3/run3 is replaced by run.py.
+# Measurement config (same file for every build). run.py replaced the RUNDIR placeholder in logFile.
 # Only loopback addresses; every server that is not needed is switched off.
 logLevel: debug
 logDestinations: [file]

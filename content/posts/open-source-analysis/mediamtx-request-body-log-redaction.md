@@ -3,14 +3,14 @@ title: "MediaMTX 디버그 로그에 비밀번호가 그대로 찍혔습니다"
 date: "2026-11-19T14:00:00+09:00"
 draft: false
 author: "김태윤"
-description: "MediaMTX v1.21.3까지 logLevel: debug에서는 Control API 요청의 JSON 본문과 HTTP 인증 요청 본문(password · token)이 로그에 그대로 남았습니다. 응답 본문에 쓰던 Content-Type 목록을 요청에도 적용한 PR #6379(2026-11-01 머지, v1.21.4 포함)와, 네 판을 AI가 다시 빌드해 지어낸 비밀 값의 로그 등장이 16번에서 0번으로 줄고 SDP 본문은 남는 것을 센 기록입니다."
+description: "MediaMTX v1.21.3까지 logLevel: debug에서는 Control API 요청의 JSON 본문과 HTTP 인증 요청 본문(password · token)이 로그에 그대로 남았습니다. 응답 본문에 쓰던 Content-Type 목록을 요청에도 적용한 PR #6379(2026-11-01 머지, v1.21.4 포함)와, 네 판을 AI가 다시 빌드해, 요청 본문에 실린 지어낸 비밀 값의 로그 등장이 16번에서 0번으로 줄고 요청 줄의 쿼리 토큰(2 → 1)과 SDP 본문(1 → 1)은 남는 것을 센 기록입니다."
 categories: ["open-source-analysis"]
 tags: ["MediaMTX", "오픈소스 기여", "로그", "보안", "HTTP", "Go"]
 ---
 
-MediaMTX v1.21.3에서 `logLevel: debug`를 켜고 Control API로 경로의 `srtPublishPassphrase`를 바꾸면, 요청 JSON 본문이 그 값째로 로그에 남습니다. `authMethod: http`라면 MediaMTX가 인증 서버로 보내는 요청 본문의 `password` · `token`도 남습니다. 요청 본문을 Content-Type과 상관없이 로그 문자열에 넣던 함수 하나 때문이었습니다. 응답 본문에 이미 쓰던 Content-Type 목록을 요청에도 적용한 [PR #6379](https://github.com/bluenviron/mediamtx/pull/6379)를 올렸고, 2026년 11월 1일 머지돼 [v1.21.4](https://github.com/bluenviron/mediamtx/releases/tag/v1.21.4)(11월 15일)에 들어갔습니다. 11월 19일 두 판을 빌드해 같은 요청을 보내 보니, 지어낸 비밀 값이 로그에 나온 횟수가 v1.21.3에서 16번, v1.21.4에서 0번이었고 SDP 본문은 두 판 모두 1번 남았습니다. 기본 로그 수준(`info`)에서는 생기지 않는 문제입니다.
+MediaMTX v1.21.3에서 `logLevel: debug`를 켜고 Control API로 경로의 `srtPublishPassphrase`를 바꾸면, 요청 JSON 본문이 그 값째로 로그에 남습니다. `authMethod: http`라면 MediaMTX가 인증 서버로 보내는 요청 본문의 `password` · `token`도 남습니다. 요청 본문을 Content-Type과 상관없이 로그 문자열에 넣던 함수 하나 때문이었습니다. 응답 본문에 이미 쓰던 Content-Type 목록을 요청에도 적용한 [PR #6379](https://github.com/bluenviron/mediamtx/pull/6379)를 올렸고, 2026년 11월 1일 머지돼 [v1.21.4](https://github.com/bluenviron/mediamtx/releases/tag/v1.21.4)(11월 15일)에 들어갔습니다. 11월 19일 두 판을 빌드해 같은 요청을 보내 보니, 요청 본문에 실린 지어낸 비밀 값은 v1.21.3에서 16번, v1.21.4에서 0번 로그에 나왔습니다. 요청 줄의 쿼리 토큰(2 → 1)과 SDP 본문(1 → 1)은 남았습니다. 기본 로그 수준(`info`)에서는 생기지 않는 문제입니다.
 
-범위와 검증 기준, 제출 결정은 제가 했고 구현과 실측은 AI(Claude Code·Codex)가 했습니다. 이 글의 재측정도 AI(Claude Code)가 실행했습니다.
+범위와 검증 기준, 제출 결정은 제가 했고 구현과 실측은 AI(Claude Code)가, 교차 검토는 AI(Codex)가 했습니다. 이 글의 재측정도 AI(Claude Code)가 실행했습니다.
 
 ## debug 로그를 켜면 Control API와 인증 요청 본문이 그대로 남았습니다
 
@@ -45,7 +45,7 @@ Control API의 설정 요청은 JSON 본문으로 비밀을 나릅니다. 내부
 
 받는 요청의 본문을 debug에 남기는 동작은 오래됐습니다. v1.0.0(2023년 8월)의 HTTP 서버도 `httputil.DumpRequest(r, true)`로 본문까지 기록했고, Control API도 같은 기록기를 거쳤습니다([v1.0.0 `handler_logger.go` 52–56행](https://github.com/bluenviron/mediamtx/blob/27260572fc3416b32e3fe22f4f535877ad54127b/internal/httpserv/handler_logger.go#L52-L56)). 그보다 이른 판은 확인하지 않았습니다. 인증 요청 본문은 PR #6325가 처음 들어간 v1.21.3(10월 25일)에서만 남았고, v1.21.2에는 이 커밋이 없습니다. 두 경우 모두 v1.21.4에서 고쳐졌습니다.
 
-모두 `logLevel: debug`일 때의 이야기입니다. 기본값은 `info`이고([v1.21.4 `mediamtx.yml` 10행](https://github.com/bluenviron/mediamtx/blob/e65f9411a56b19076a0dfde1fb4a59414bdf642c/mediamtx.yml#L10), [`conf.go` 447행](https://github.com/bluenviron/mediamtx/blob/e65f9411a56b19076a0dfde1fb4a59414bdf642c/internal/conf/conf.go#L447)), `info` 이상에서는 이 줄들이 찍히지 않습니다. 비밀이 로그 파일에 남는 것도 debug를 켠 동안 그런 요청이 들어온 경우뿐입니다.
+모두 `logLevel: debug`일 때의 이야기입니다. 기본값은 `info`이고([v1.21.4 `mediamtx.yml` 10행](https://github.com/bluenviron/mediamtx/blob/e65f9411a56b19076a0dfde1fb4a59414bdf642c/mediamtx.yml#L10), [`conf.go` 447행](https://github.com/bluenviron/mediamtx/blob/e65f9411a56b19076a0dfde1fb4a59414bdf642c/internal/conf/conf.go#L447)), `info` 이상에서는 이 줄들이 찍히지 않습니다. 비밀이 로그(stdout · 파일 · syslog)에 남는 것도 debug를 켠 동안 그런 요청이 들어온 경우뿐입니다.
 
 ## 버그 보고 양식이 debug 로그를 안내해 공개 이슈로 나갈 수 있었습니다
 
@@ -83,7 +83,7 @@ JSON 키를 골라 가리는 방법은 쓰지 않았습니다. 비밀 필드가 
 
 Content-Type을 속인 요청은 여전히 남습니다. Control API는 Content-Type을 보지 않고 JSON을 해석하므로([v1.21.4 `api_config_paths.go` 63행](https://github.com/bluenviron/mediamtx/blob/e65f9411a56b19076a0dfde1fb4a59414bdf642c/internal/api/api_config_paths.go#L63)), `Content-Type: application/sdp`를 붙여 보낸 API 요청은 본문째 기록됩니다. API 서버에서만 요청 본문 기록을 끄면 이것까지 막을 수 있었지만, 서버와 전송 계층에 설정 손잡이가 늘어 주변 코드와 모양이 달라집니다. 저는 기존 목록을 그대로 쓰고, 이 남은 경로를 PR 본문의 영향 절에 적는 쪽을 골랐습니다.
 
-처음 올린 판(10월 20일)은 시험이 약 200줄이었습니다. 10월 27일 같은 PR에서 시험을 `json_body` 사례 하나로 줄이고, 코드가 바뀌어 맞지 않게 된 본문 문장을 고쳐 다시 올렸습니다. 시험을 줄이기로 한 것도 제 결정이었습니다. 메인테이너는 11월 1일 줄 댓글이나 리뷰 없이 「merged, thanks!」라고 남기고 머지했습니다([PR #6379 댓글](https://github.com/bluenviron/mediamtx/pull/6379#issuecomment-6556072645)). squash 머지 커밋 [`c12bac19`](https://github.com/bluenviron/mediamtx/commit/c12bac192dc0bfe2fdf970324983ab0f48ffa705)의 다섯 파일은 마지막 제출판 [`70a95beb`](https://github.com/bluenviron/mediamtx/pull/6379/commits/70a95bebc35c94077e99d3d7034d66d849991cf7)과 내용이 같고, 커밋 제목 끝에 `(#6379)`가 붙은 것만 다릅니다. 머지하며 고친 코드는 없습니다.
+처음 올린 판(10월 20일)은 시험이 약 200줄이었습니다. 10월 27일 같은 PR에서 최신 main 위로 다시 올리면서 시험을 `json_body` 사례 하나로 줄였습니다. 시험이 줄어 맞지 않게 된 본문 두 문장도 고쳤습니다. 제품 코드는 처음 판과 같습니다. 시험을 줄이기로 한 것도 제 결정이었습니다. 메인테이너는 11월 1일 줄 댓글이나 리뷰 없이 머지하고 「merged, thanks!」라고 남겼습니다([PR #6379 댓글](https://github.com/bluenviron/mediamtx/pull/6379#issuecomment-6556072645)). squash 머지 커밋 [`c12bac19`](https://github.com/bluenviron/mediamtx/commit/c12bac192dc0bfe2fdf970324983ab0f48ffa705)의 다섯 파일은 마지막 제출판 [`70a95beb`](https://github.com/bluenviron/mediamtx/pull/6379/commits/70a95bebc35c94077e99d3d7034d66d849991cf7)과 내용이 같고, 커밋 제목 끝에 `(#6379)`가 붙은 것만 다릅니다. 머지하며 고친 코드는 없습니다.
 
 ## 네 판을 빌드해 표지 문자열이 로그에서 사라지는 것을 셌습니다
 
@@ -101,7 +101,7 @@ v1.21.3, 머지 직전 커밋 `9c68b477`, 머지 커밋 `c12bac19`, v1.21.4를 �
 
 API에 보낸 비밀 6개와 두 비밀번호를 합친 16번이 0번이 됐습니다. SDP 본문은 머지 뒤에도 그대로 남았습니다. 쿼리 토큰은 인증 요청 본문에서만 빠지고 `POST /probe/whep?token=… HTTP/1.1` 요청 줄에는 남았습니다. 요청 줄은 이 PR의 범위가 아닙니다.
 
-[[fig-body-content-gate]]은 머지 뒤 판에서 세 요청이 지나는 모습입니다. 위 줄의 SDP는 관문을 지나 본문이 로그로 가고, 아래 두 줄의 JSON은 크기만 갑니다.
+[[fig-body-content-gate]]는 머지 뒤 판에서 세 요청이 지나는 모습입니다. 위 줄의 SDP는 관문을 지나 본문이 로그로 가고, 아래 두 줄의 JSON은 크기만 갑니다.
 
 {{< motion scene="BodyContentGate" id="fig-body-content-gate" kind="재구성" caption="v1.21.4의 debug 로그는 요청 본문의 Content-Type을 먼저 봅니다. WHEP 요청의 SDP 제안(140 B)은 목록에 있어 본문이 남고, 비밀이 든 API 설정 요청(128 B)과 인증 요청(167 B)은 본문을 읽지 않고 (body of N bytes)만 남습니다. 바이트 수와 로그 문구는 재측정의 실제 값이고, 로그 줄은 줄여 그렸습니다." >}}
 
@@ -120,7 +120,7 @@ v1.21.4 릴리스 노트에는 이 항목이 두 번 실렸습니다. General �
 - Content-Type을 `application/sdp`로 속인 API 요청은 본문째 남습니다. 길이를 모르는 chunked 요청에는 크기 줄도 없습니다. 둘 다 PR 본문에 적은 한계이고, 이번 재측정에서는 시험하지 않았습니다.
 - API가 응답으로 비밀을 돌려주던 것은 다른 문제입니다. 같은 v1.21.4의 API 절에는 「Redact more secrets and credentials in API output.」 항목이 따로 있습니다([PR #6482](https://github.com/bluenviron/mediamtx/pull/6482) · [PR #6483](https://github.com/bluenviron/mediamtx/pull/6483) · [PR #6484](https://github.com/bluenviron/mediamtx/pull/6484)). JSON 응답 본문은 이 PR 전에도 debug 로그에 크기만 남았습니다.
 
-v1.21.3 이하에서 `logLevel: debug`로 받은 로그를 어딘가에 붙인 적이 있다면, 그 안에 든 API 설정의 비밀과 HTTP 인증 사용자의 비밀번호를 바꾸는 것이 안전합니다. 로그에서 비밀을 지우려면 비밀의 이름을 쫓기보다, 남겨도 되는 형식을 먼저 정하는 편이 새 필드에 덜 흔들립니다.
+v1.21.3 이하에서 debug 로그를 써야 한다면 먼저 v1.21.4 이상으로 올리십시오. 이미 어딘가에 붙인 로그가 있다면 그 안의 API 설정 비밀을 바꾸십시오. v1.21.3이었다면 HTTP 인증 사용자의 비밀번호도 바꾸십시오. `Authorization` 헤더를 가린 PR #5873은 v1.19.2부터 들어 있으므로, v1.19.1 이하의 로그라면 그 헤더로 보낸 자격 증명도 바꾸십시오. 로그에서 비밀을 지우려면 비밀의 이름을 쫓기보다, 남겨도 되는 형식을 먼저 정하는 편이 새 필드에 덜 흔들립니다.
 
 ## 측정 조건
 
@@ -140,6 +140,6 @@ v1.21.3 이하에서 `logLevel: debug`로 받은 로그를 어딘가에 붙인 �
 - [v1.21.4 `internal/protocols/httpp/request_for_log.go`](https://github.com/bluenviron/mediamtx/blob/e65f9411a56b19076a0dfde1fb4a59414bdf642c/internal/protocols/httpp/request_for_log.go) · [`internal/api/api_config_paths.go`](https://github.com/bluenviron/mediamtx/blob/e65f9411a56b19076a0dfde1fb4a59414bdf642c/internal/api/api_config_paths.go) · [`mediamtx.yml`](https://github.com/bluenviron/mediamtx/blob/e65f9411a56b19076a0dfde1fb4a59414bdf642c/mediamtx.yml) · [`internal/conf/conf.go`](https://github.com/bluenviron/mediamtx/blob/e65f9411a56b19076a0dfde1fb4a59414bdf642c/internal/conf/conf.go) · [`.github/ISSUE_TEMPLATE/bug.yml`](https://github.com/bluenviron/mediamtx/blob/e65f9411a56b19076a0dfde1fb4a59414bdf642c/.github/ISSUE_TEMPLATE/bug.yml)
 - [v1.0.0 `internal/httpserv/handler_logger.go`](https://github.com/bluenviron/mediamtx/blob/27260572fc3416b32e3fe22f4f535877ad54127b/internal/httpserv/handler_logger.go) — `httputil.DumpRequest(r, true)`
 - [PR #6325 「http: log outbound requests」](https://github.com/bluenviron/mediamtx/pull/6325) — 2026-10-11 KST 머지, v1.21.3
-- [PR #5859 「print body of selected HTTP responses when log level is debug」](https://github.com/bluenviron/mediamtx/pull/5859) · [PR #5858 「limit size of HTTP requests shown in debug logs」](https://github.com/bluenviron/mediamtx/pull/5858) · [PR #5873 「redact sensitive headers in HTTP debug logs」](https://github.com/bluenviron/mediamtx/pull/5873)
+- [PR #5859 「print body of selected HTTP responses when log level is debug」](https://github.com/bluenviron/mediamtx/pull/5859) · [PR #5858 「limit size of HTTP requests shown in debug logs」](https://github.com/bluenviron/mediamtx/pull/5858) · [PR #5873 「fix: redact sensitive headers in HTTP debug logs」](https://github.com/bluenviron/mediamtx/pull/5873)
 - [PR #6306 「srt: add srtPassphrase to users」](https://github.com/bluenviron/mediamtx/pull/6306)
 - [MediaMTX가 SRT 암호를 사용자별로 받게 제안했습니다](/posts/open-source-analysis/mediamtx-user-srt-passphrase-boundaries/) — 상류 수정의 머지 · 릴리스 건수
