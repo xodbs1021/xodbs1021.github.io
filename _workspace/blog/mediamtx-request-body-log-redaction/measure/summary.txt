@@ -1,0 +1,24 @@
+marker | meaning | v1.21.3 | 9c68b477 | c12bac19 | v1.21.4
+MTX6379W-SRTPUB-A | API body: srtPublishPassphrase (paths/add) | 1 | 1 | 0 | 0
+MTX6379W-SRTREAD | API body: srtReadPassphrase (paths/add) | 1 | 1 | 0 | 0
+MTX6379W-WHEPBEARER | API body: whepBearerToken (paths/add) | 1 | 1 | 0 | 0
+MTX6379W-SRTPUB-B | API body: srtPublishPassphrase (paths/patch) | 1 | 1 | 0 | 0
+MTX6379W-HLSCDN | API body: hlsCDNSecret (global/patch) | 1 | 1 | 0 | 0
+MTX6379W-USERPASS | API body: authInternalUsers[].pass (global/patch) | 1 | 1 | 0 | 0
+MTX6379W-APIPASS | auth body: password+token of the 4 API requests | 8 | 8 | 0 | 0
+MTX6379W-WHEPPASS | auth body: password+token of the WHEP request | 2 | 2 | 0 | 0
+MTX6379W-QUERYTOKEN | WHEP query: request line + auth body query | 2 | 2 | 1 | 1
+MTX6379W-SDP | WHEP body: SDP offer (application/sdp) | 1 | 1 | 1 | 1
+
+v1.21.3: runs=3 identical_log_counts=True auth_requests_logged=[5, 5, 5] auth_server_got_APIPASS=[8] auth_body_bytes=[167, 167, 167, 167, 259]
+  statuses=[('api_paths_add', 200, 128), ('api_paths_patch', 200, 45), ('api_global_patch', 200, 154), ('api_paths_get', 200, 0), ('whep_offer', 404, 140)]
+  body_of_lines(run1)=['15', '15', '15', '2320', '67']
+9c68b477: runs=3 identical_log_counts=True auth_requests_logged=[5, 5, 5] auth_server_got_APIPASS=[8] auth_body_bytes=[167, 167, 167, 167, 259]
+  statuses=[('api_paths_add', 200, 128), ('api_paths_patch', 200, 45), ('api_global_patch', 200, 154), ('api_paths_get', 200, 0), ('whep_offer', 404, 140)]
+  body_of_lines(run1)=['15', '15', '15', '2320', '67']
+c12bac19: runs=3 identical_log_counts=True auth_requests_logged=[5, 5, 5] auth_server_got_APIPASS=[8] auth_body_bytes=[167, 167, 167, 167, 259]
+  statuses=[('api_paths_add', 200, 128), ('api_paths_patch', 200, 45), ('api_global_patch', 200, 154), ('api_paths_get', 200, 0), ('whep_offer', 404, 140)]
+  body_of_lines(run1)=['128', '167', '15', '45', '167', '15', '154', '167', '15', '167', '2320', '259', '67']
+v1.21.4: runs=3 identical_log_counts=True auth_requests_logged=[5, 5, 5] auth_server_got_APIPASS=[8] auth_body_bytes=[167, 167, 167, 167, 259]
+  statuses=[('api_paths_add', 200, 128), ('api_paths_patch', 200, 45), ('api_global_patch', 200, 154), ('api_paths_get', 200, 0), ('whep_offer', 404, 140)]
+  body_of_lines(run1)=['128', '167', '15', '45', '167', '15', '154', '167', '15', '167', '2328', '259', '67']

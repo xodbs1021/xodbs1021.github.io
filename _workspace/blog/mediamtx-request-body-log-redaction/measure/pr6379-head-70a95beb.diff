@@ -1,0 +1,133 @@
+diff --git a/internal/protocols/httpp/handler_logger.go b/internal/protocols/httpp/handler_logger.go
+index 959cabc..b887491 100644
+--- a/internal/protocols/httpp/handler_logger.go
++++ b/internal/protocols/httpp/handler_logger.go
+@@ -8,7 +8,7 @@ import (
+ 	"github.com/bluenviron/mediamtx/internal/logger"
+ )
+ 
+-var responseBodyContentToLog = map[string]struct{}{
++var bodyContentToLog = map[string]struct{}{
+ 	"application/sdp":                 {},
+ 	"application/trickle-ice-sdpfrag": {},
+ }
+@@ -30,7 +30,7 @@ func (w *responseRecorder) Write(b []byte) (int, error) {
+ 	}
+ 
+ 	contentType := w.Header().Get("Content-Type")
+-	if _, ok := responseBodyContentToLog[contentType]; ok {
++	if _, ok := bodyContentToLog[contentType]; ok {
+ 		w.body = append(w.body, b...)
+ 	} else {
+ 		w.size += len(b)
+diff --git a/internal/protocols/httpp/logger_transport.go b/internal/protocols/httpp/logger_transport.go
+index 1f5928e..78dbbf1 100644
+--- a/internal/protocols/httpp/logger_transport.go
++++ b/internal/protocols/httpp/logger_transport.go
+@@ -21,7 +21,7 @@ func (t *LoggerTransport) responseForLog(res *http.Response) string {
+ 	b.WriteString(headerForLog(res.Header))
+ 	b.WriteString("\n")
+ 
+-	if _, ok := responseBodyContentToLog[ParseContentType(res.Header.Get("Content-Type"))]; ok && res.Body != nil {
++	if _, ok := bodyContentToLog[ParseContentType(res.Header.Get("Content-Type"))]; ok && res.Body != nil {
+ 		// read the body, then give it back to the caller
+ 		body, err := io.ReadAll(io.LimitReader(res.Body, maxRequestBodySizeToLog+1))
+ 		if err == nil || len(body) > 0 {
+diff --git a/internal/protocols/httpp/logger_transport_test.go b/internal/protocols/httpp/logger_transport_test.go
+index 121bbde..482cd91 100644
+--- a/internal/protocols/httpp/logger_transport_test.go
++++ b/internal/protocols/httpp/logger_transport_test.go
+@@ -44,6 +44,7 @@ func TestLoggerTransport(t *testing.T) {
+ 	req, err := http.NewRequest(http.MethodPost, s.URL+"/test", strings.NewReader("offer"))
+ 	require.NoError(t, err)
+ 	req.Header.Set("Authorization", "Bearer secret")
++	req.Header.Set("Content-Type", "application/sdp")
+ 
+ 	res, err := c.Do(req)
+ 	require.NoError(t, err)
+diff --git a/internal/protocols/httpp/request_for_log.go b/internal/protocols/httpp/request_for_log.go
+index 76f11e2..9ba7205 100644
+--- a/internal/protocols/httpp/request_for_log.go
++++ b/internal/protocols/httpp/request_for_log.go
+@@ -59,11 +59,17 @@ func headerForLog(h http.Header) string {
+ 
+ // RequestForLog returns a string representation of a request fit for logging.
+ // Sensitive headers are redacted.
++// Body is logged only for selected content types.
+ // Body is truncated to prevent memory exhaustion.
+ func RequestForLog(req *http.Request) string {
+ 	var capped []byte
+ 
++	var logBody bool
+ 	if req.Body != nil && req.Body != http.NoBody {
++		_, logBody = bodyContentToLog[ParseContentType(req.Header.Get("Content-Type"))]
++	}
++
++	if logBody {
+ 		peek, err := io.ReadAll(io.LimitReader(req.Body, maxRequestBodySizeToLog+1))
+ 		if err != nil {
+ 			return ""
+@@ -79,6 +85,8 @@ func RequestForLog(req *http.Request) string {
+ 			Reader: io.MultiReader(bytes.NewReader(peek), req.Body),
+ 			Closer: req.Body,
+ 		}
++	} else if req.ContentLength > 0 {
++		capped = fmt.Appendf(nil, "(body of %d bytes)", req.ContentLength)
+ 	}
+ 
+ 	var b bytes.Buffer
+diff --git a/internal/protocols/httpp/request_for_log_test.go b/internal/protocols/httpp/request_for_log_test.go
+index 78f2880..89a6b21 100644
+--- a/internal/protocols/httpp/request_for_log_test.go
++++ b/internal/protocols/httpp/request_for_log_test.go
+@@ -21,6 +21,7 @@ var casesRequestForLog = []struct {
+ 		name: "small_body",
+ 		header: http.Header{
+ 			"Authorization":       []string{"Bearer secret-token"},
++			"Content-Type":        []string{"application/sdp"},
+ 			"Cookie":              []string{"session=secret-cookie"},
+ 			"Proxy-Authorization": []string{"Bearer proxy-secret"},
+ 			"X-Api-Key":           []string{"secret-api-key"},
+@@ -30,6 +31,7 @@ var casesRequestForLog = []struct {
+ 		expected: "POST /test HTTP/1.1\r\n" +
+ 			"Host: localhost\r\n" +
+ 			"Authorization: <redacted>\r\n" +
++			"Content-Type: application/sdp\r\n" +
+ 			"Cookie: <redacted>\r\n" +
+ 			"Proxy-Authorization: <redacted>\r\n" +
+ 			"X-Api-Key: <redacted>\r\n" +
+@@ -41,6 +43,7 @@ var casesRequestForLog = []struct {
+ 		name: "truncated_body",
+ 		header: http.Header{
+ 			"Authorization":       []string{"Bearer secret-token"},
++			"Content-Type":        []string{"application/sdp"},
+ 			"Cookie":              []string{"session=secret-cookie"},
+ 			"Proxy-Authorization": []string{"Bearer proxy-secret"},
+ 			"X-Api-Key":           []string{"secret-api-key"},
+@@ -50,6 +53,7 @@ var casesRequestForLog = []struct {
+ 		expected: "POST /test HTTP/1.1\r\n" +
+ 			"Host: localhost\r\n" +
+ 			"Authorization: <redacted>\r\n" +
++			"Content-Type: application/sdp\r\n" +
+ 			"Cookie: <redacted>\r\n" +
+ 			"Proxy-Authorization: <redacted>\r\n" +
+ 			"X-Api-Key: <redacted>\r\n" +
+@@ -58,6 +62,18 @@ var casesRequestForLog = []struct {
+ 			strings.Repeat("a", 10*1024) +
+ 			"\n\n(truncated body)\n",
+ 	},
++	{
++		name: "json_body",
++		header: http.Header{
++			"Content-Type": []string{"application/json"},
++		},
++		body: `{"pass":"DUMMYSECRET"}`,
++		expected: "POST /test HTTP/1.1\r\n" +
++			"Host: localhost\r\n" +
++			"Content-Type: application/json\r\n" +
++			"\r\n" +
++			"(body of 22 bytes)",
++	},
+ }
+ 
+ func TestRequestForLog(t *testing.T) {

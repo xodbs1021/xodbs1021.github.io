@@ -1,0 +1,32 @@
+# Measurement config (same file for every build). /tmp/mtx6379w-run/final/v1.21.4/run1 is replaced by run.py.
+# Only loopback addresses; every server that is not needed is switched off.
+logLevel: debug
+logDestinations: [file]
+logFile: /tmp/mtx6379w-run/final/v1.21.4/run1/mediamtx.log
+
+api: yes
+apiAddress: 127.0.0.1:29997
+metrics: no
+pprof: no
+playback: no
+
+rtsp: no
+rtmp: no
+hls: no
+srt: no
+moq: no
+
+webrtc: yes
+webrtcAddress: 127.0.0.1:28889
+webrtcLocalUDPAddress: 127.0.0.1:28189
+webrtcLocalTCPAddress: ""
+webrtcIPsFromInterfaces: no
+webrtcAdditionalHosts: [127.0.0.1]
+webrtcICEServers2: []
+
+authMethod: http
+authHTTPAddress: http://127.0.0.1:28181/auth
+authHTTPExclude: []
+
+paths:
+  all_others:

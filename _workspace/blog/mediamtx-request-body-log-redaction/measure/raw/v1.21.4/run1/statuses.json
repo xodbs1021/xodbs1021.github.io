@@ -1,0 +1,27 @@
+[
+ {
+  "request": "api_paths_add",
+  "status": 200,
+  "body_bytes": 128
+ },
+ {
+  "request": "api_paths_patch",
+  "status": 200,
+  "body_bytes": 45
+ },
+ {
+  "request": "api_global_patch",
+  "status": 200,
+  "body_bytes": 154
+ },
+ {
+  "request": "api_paths_get",
+  "status": 200,
+  "body_bytes": 0
+ },
+ {
+  "request": "whep_offer",
+  "status": 404,
+  "body_bytes": 140
+ }
+]
