@@ -1,0 +1,22 @@
+# Minimal MediaMTX config for the live catch-up re-measurement.
+# LL-HLS values are the ones the post describes (same as the project's private local config):
+# hlsVariant lowLatency, 4s segments, 500ms parts, 7 segments.
+logLevel: info
+# longer than the default 10s so a paused publisher is not dropped at once (the published runs pause the player's HLS requests through the proxy, not the publisher)
+readTimeout: 60s
+rtsp: no
+webrtc: no
+srt: no
+api: no
+rtmp: yes
+rtmpAddress: :1935
+hls: yes
+hlsAddress: :8888
+hlsAlwaysRemux: yes
+hlsVariant: lowLatency
+hlsSegmentDuration: 4s
+hlsPartDuration: 500ms
+hlsSegmentCount: 7
+hlsAllowOrigins: ['*']
+paths:
+  all_others:

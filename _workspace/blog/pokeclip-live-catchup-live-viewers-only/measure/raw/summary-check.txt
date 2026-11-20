@@ -1,0 +1,14 @@
+framegap-webkit-none: ok · page errors not recorded (run predates the check)
+framegap-webkit-1.05: ok · page errors not recorded (run predates the check)
+framegap-webkit-1.1: ok · page errors not recorded (run predates the check)
+framegap-chrome-none: ok · page errors not recorded (run predates the check)
+framegap-chrome-1.05: ok · page errors not recorded (run predates the check)
+framegap-chrome-1.1: ok · page errors not recorded (run predates the check)
+lag-chrome-early: ok · page errors not recorded (run predates the check)
+lag-chrome-late: ok · page errors not recorded (run predates the check)
+lag-webkit-early: ok · page errors not recorded (run predates the check)
+lag-webkit-late: ok · page errors not recorded (run predates the check)
+drift-chrome: ok · page errors not recorded (run predates the check)
+drift-webkit: ok · page errors not recorded (run predates the check)
+drift-chrome-r2: ok · 0 page errors
+drift-webkit-r2: ok · 0 page errors

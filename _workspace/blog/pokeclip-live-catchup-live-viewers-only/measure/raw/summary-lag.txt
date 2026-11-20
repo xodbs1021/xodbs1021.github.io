@@ -1,0 +1,92 @@
+
+## lag-chrome-early — 157.0.8103.79 · listener=early
+seek     1st sample +8.2ms: hls.latency=1.81 direct=9.82 diff=-8.01 | same dispatch, after other listeners: hls.latency=9.82 | 2nd sample: hls.latency=9.82 direct=9.87
+seekSync 1st sample +2.5ms: hls.latency=9.86 direct=1.25 diff=8.61 | same dispatch, after other listeners: hls.latency=1.25 | 2nd sample: hls.latency=1.25 direct=1.30
+seek     1st sample +2.0ms: hls.latency=1.30 direct=9.30 diff=-8.00 | same dispatch, after other listeners: hls.latency=9.30 | 2nd sample: hls.latency=9.30 direct=9.35
+seekSync 1st sample +4.4ms: hls.latency=9.34 direct=1.25 diff=8.08 | same dispatch, after other listeners: hls.latency=1.25 | 2nd sample: hls.latency=1.25 direct=1.30
+seek     1st sample +3.2ms: hls.latency=1.30 direct=9.30 diff=-8.00 | same dispatch, after other listeners: hls.latency=9.30 | 2nd sample: hls.latency=9.30 direct=9.35
+seekSync 1st sample +4.6ms: hls.latency=9.35 direct=1.25 diff=8.10 | same dispatch, after other listeners: hls.latency=1.25 | 2nd sample: hls.latency=1.25 direct=1.30
+seek     1st sample +4.6ms: hls.latency=1.29 direct=9.30 diff=-8.00 | same dispatch, after other listeners: hls.latency=9.30 | 2nd sample: hls.latency=9.30 direct=9.34
+seekSync 1st sample +4.4ms: hls.latency=9.34 direct=1.25 diff=8.09 | same dispatch, after other listeners: hls.latency=1.25 | 2nd sample: hls.latency=1.25 direct=1.30
+seek     1st sample +4.3ms: hls.latency=1.30 direct=9.30 diff=-8.00 | same dispatch, after other listeners: hls.latency=9.30 | 2nd sample: hls.latency=9.30 direct=9.35
+seekSync 1st sample +3.7ms: hls.latency=9.35 direct=1.25 diff=8.09 | same dispatch, after other listeners: hls.latency=1.25 | 2nd sample: hls.latency=1.25 direct=1.30
+seek     1st sample +4.3ms: hls.latency=1.29 direct=9.30 diff=-8.00 | same dispatch, after other listeners: hls.latency=9.30 | 2nd sample: hls.latency=9.30 direct=9.34
+seekSync 1st sample +3.4ms: hls.latency=9.35 direct=1.25 diff=8.10 | same dispatch, after other listeners: hls.latency=1.25 | 2nd sample: hls.latency=1.25 direct=1.30
+seek     1st sample +3.9ms: hls.latency=1.30 direct=9.30 diff=-8.00 | same dispatch, after other listeners: hls.latency=9.30 | 2nd sample: hls.latency=9.30 direct=9.34
+seekSync 1st sample +5.6ms: hls.latency=9.34 direct=1.26 diff=8.09 | same dispatch, after other listeners: hls.latency=1.26 | 2nd sample: hls.latency=1.26 direct=1.30
+seek     1st sample +4.1ms: hls.latency=1.30 direct=9.31 diff=-8.00 | same dispatch, after other listeners: hls.latency=9.31 | 2nd sample: hls.latency=9.31 direct=9.35
+seekSync 1st sample +4.8ms: hls.latency=9.35 direct=1.25 diff=8.09 | same dispatch, after other listeners: hls.latency=1.25 | 2nd sample: hls.latency=1.25 direct=1.30
+seek     1st sample +4.5ms: hls.latency=1.30 direct=9.30 diff=-8.00 | same dispatch, after other listeners: hls.latency=9.30 | 2nd sample: hls.latency=9.30 direct=9.35
+seekSync 1st sample +6.3ms: hls.latency=9.35 direct=1.26 diff=8.09 | same dispatch, after other listeners: hls.latency=1.26 | 2nd sample: hls.latency=1.26 direct=1.30
+seek     1st sample +4.4ms: hls.latency=1.30 direct=9.30 diff=-8.00 | same dispatch, after other listeners: hls.latency=9.30 | 2nd sample: hls.latency=9.30 direct=9.35
+seekSync 1st sample +4.8ms: hls.latency=9.35 direct=1.25 diff=8.09 | same dispatch, after other listeners: hls.latency=1.25 | 2nd sample: hls.latency=1.25 direct=1.30
+first sample after seek with |hls.latency - direct| > 1 s: 20/20 · re-read after the dispatch: 0/20
+
+## lag-chrome-late — 157.0.8103.79 · listener=late
+seek     1st sample +8.9ms: hls.latency=9.78 direct=9.78 diff=0.00 | same dispatch, after other listeners: hls.latency=9.78 | 2nd sample: hls.latency=9.82 direct=9.82
+seekSync 1st sample +15.3ms: hls.latency=1.27 direct=1.27 diff=0.00 | same dispatch, after other listeners: hls.latency=1.27 | 2nd sample: hls.latency=1.31 direct=1.31
+seek     1st sample +14.6ms: hls.latency=9.33 direct=9.33 diff=0.00 | same dispatch, after other listeners: hls.latency=9.33 | 2nd sample: hls.latency=9.37 direct=9.37
+seekSync 1st sample +11.2ms: hls.latency=1.26 direct=1.26 diff=0.00 | same dispatch, after other listeners: hls.latency=1.26 | 2nd sample: hls.latency=1.30 direct=1.30
+seek     1st sample +13.3ms: hls.latency=9.32 direct=9.32 diff=0.00 | same dispatch, after other listeners: hls.latency=9.32 | 2nd sample: hls.latency=9.36 direct=9.36
+seekSync 1st sample +14.3ms: hls.latency=1.26 direct=1.26 diff=0.00 | same dispatch, after other listeners: hls.latency=1.26 | 2nd sample: hls.latency=1.31 direct=1.31
+seek     1st sample +14.6ms: hls.latency=9.33 direct=9.33 diff=0.00 | same dispatch, after other listeners: hls.latency=9.33 | 2nd sample: hls.latency=9.37 direct=9.37
+seekSync 1st sample +12.2ms: hls.latency=1.26 direct=1.26 diff=0.00 | same dispatch, after other listeners: hls.latency=1.26 | 2nd sample: hls.latency=1.31 direct=1.31
+seek     1st sample +12.0ms: hls.latency=9.31 direct=9.31 diff=0.00 | same dispatch, after other listeners: hls.latency=9.31 | 2nd sample: hls.latency=9.36 direct=9.36
+seekSync 1st sample +11.4ms: hls.latency=1.26 direct=1.26 diff=0.00 | same dispatch, after other listeners: hls.latency=1.26 | 2nd sample: hls.latency=1.31 direct=1.31
+seek     1st sample +12.2ms: hls.latency=9.32 direct=9.32 diff=0.00 | same dispatch, after other listeners: hls.latency=9.32 | 2nd sample: hls.latency=9.36 direct=9.36
+seekSync 1st sample +10.6ms: hls.latency=1.26 direct=1.26 diff=0.00 | same dispatch, after other listeners: hls.latency=1.26 | 2nd sample: hls.latency=1.31 direct=1.31
+seek     1st sample +8.4ms: hls.latency=9.31 direct=9.31 diff=0.00 | same dispatch, after other listeners: hls.latency=9.31 | 2nd sample: hls.latency=9.36 direct=9.36
+seekSync 1st sample +12.3ms: hls.latency=1.26 direct=1.26 diff=0.00 | same dispatch, after other listeners: hls.latency=1.26 | 2nd sample: hls.latency=1.31 direct=1.31
+seek     1st sample +13.1ms: hls.latency=9.32 direct=9.32 diff=0.00 | same dispatch, after other listeners: hls.latency=9.32 | 2nd sample: hls.latency=9.37 direct=9.37
+seekSync 1st sample +13.8ms: hls.latency=1.26 direct=1.26 diff=0.00 | same dispatch, after other listeners: hls.latency=1.26 | 2nd sample: hls.latency=1.31 direct=1.31
+seek     1st sample +7.7ms: hls.latency=9.31 direct=9.31 diff=0.00 | same dispatch, after other listeners: hls.latency=9.31 | 2nd sample: hls.latency=9.36 direct=9.36
+seekSync 1st sample +7.4ms: hls.latency=1.26 direct=1.26 diff=0.00 | same dispatch, after other listeners: hls.latency=1.26 | 2nd sample: hls.latency=1.30 direct=1.30
+seek     1st sample +10.5ms: hls.latency=9.31 direct=9.31 diff=0.00 | same dispatch, after other listeners: hls.latency=9.31 | 2nd sample: hls.latency=9.35 direct=9.35
+seekSync 1st sample +12.0ms: hls.latency=1.26 direct=1.26 diff=0.00 | same dispatch, after other listeners: hls.latency=1.26 | 2nd sample: hls.latency=1.31 direct=1.31
+first sample after seek with |hls.latency - direct| > 1 s: 0/20 · re-read after the dispatch: 0/20
+
+## lag-webkit-early — 26.4 · listener=early
+seek     1st sample +18.0ms: hls.latency=2.17 direct=10.19 diff=-8.02 | same dispatch, after other listeners: hls.latency=10.19 | 2nd sample: hls.latency=10.19 direct=10.39
+seekSync 1st sample +28.0ms: hls.latency=10.64 direct=1.28 diff=9.36 | same dispatch, after other listeners: hls.latency=1.28 | 2nd sample: hls.latency=1.28 direct=1.38
+seek     1st sample +32.0ms: hls.latency=1.65 direct=9.68 diff=-8.03 | same dispatch, after other listeners: hls.latency=9.68 | 2nd sample: hls.latency=9.68 direct=9.79
+seekSync 1st sample +41.0ms: hls.latency=10.04 direct=1.29 diff=8.75 | same dispatch, after other listeners: hls.latency=1.29 | 2nd sample: hls.latency=1.29 direct=1.40
+seek     1st sample +41.0ms: hls.latency=1.66 direct=9.70 diff=-8.04 | same dispatch, after other listeners: hls.latency=9.70 | 2nd sample: hls.latency=9.70 direct=9.84
+seekSync 1st sample +52.0ms: hls.latency=10.08 direct=1.30 diff=8.77 | same dispatch, after other listeners: hls.latency=1.30 | 2nd sample: hls.latency=1.30 direct=1.42
+seek     1st sample +76.0ms: hls.latency=1.67 direct=9.74 diff=-8.08 | same dispatch, after other listeners: hls.latency=9.74 | 2nd sample: hls.latency=9.74 direct=9.86
+seekSync 1st sample +186.0ms: hls.latency=10.10 direct=1.44 diff=8.66 | same dispatch, after other listeners: hls.latency=1.44 | 2nd sample: hls.latency=1.44 direct=1.44
+seek     1st sample +195.0ms: hls.latency=1.69 direct=9.89 diff=-8.20 | same dispatch, after other listeners: hls.latency=9.89 | 2nd sample: hls.latency=9.89 direct=9.90
+seekSync 1st sample +201.0ms: hls.latency=10.14 direct=1.45 diff=8.68 | same dispatch, after other listeners: hls.latency=1.45 | 2nd sample: hls.latency=1.45 direct=1.61
+seek     1st sample +122.0ms: hls.latency=3.32 direct=11.45 diff=-8.12 | same dispatch, after other listeners: hls.latency=11.45 | 2nd sample: hls.latency=11.45 direct=11.53
+seekSync 1st sample +124.0ms: hls.latency=11.80 direct=2.37 diff=9.42 | same dispatch, after other listeners: hls.latency=2.37 | 2nd sample: hls.latency=2.37 direct=2.39
+seek     1st sample +129.0ms: hls.latency=2.64 direct=10.77 diff=-8.13 | same dispatch, after other listeners: hls.latency=10.77 | 2nd sample: hls.latency=10.77 direct=10.79
+seekSync 1st sample +134.0ms: hls.latency=11.03 direct=2.38 diff=8.65 | same dispatch, after other listeners: hls.latency=2.38 | 2nd sample: hls.latency=2.38 direct=2.41
+seek     1st sample +136.0ms: hls.latency=2.66 direct=10.79 diff=-8.14 | same dispatch, after other listeners: hls.latency=10.79 | 2nd sample: hls.latency=10.79 direct=10.82
+seekSync 1st sample +145.0ms: hls.latency=11.07 direct=2.39 diff=8.67 | same dispatch, after other listeners: hls.latency=2.39 | 2nd sample: hls.latency=2.39 direct=2.43
+seek     1st sample +146.0ms: hls.latency=2.67 direct=10.81 diff=-8.15 | same dispatch, after other listeners: hls.latency=10.81 | 2nd sample: hls.latency=10.81 direct=10.85
+seekSync 1st sample +151.0ms: hls.latency=11.10 direct=2.40 diff=8.69 | same dispatch, after other listeners: hls.latency=2.40 | 2nd sample: hls.latency=2.40 direct=2.43
+seek     1st sample +155.0ms: hls.latency=2.68 direct=10.84 diff=-8.15 | same dispatch, after other listeners: hls.latency=10.84 | 2nd sample: hls.latency=10.84 direct=10.88
+seekSync 1st sample +160.0ms: hls.latency=11.13 direct=2.41 diff=8.72 | same dispatch, after other listeners: hls.latency=2.41 | 2nd sample: hls.latency=2.41 direct=2.46
+first sample after seek with |hls.latency - direct| > 1 s: 20/20 · re-read after the dispatch: 0/20
+
+## lag-webkit-late — 26.4 · listener=late
+seek     1st sample +19.0ms: hls.latency=9.92 direct=9.92 diff=0.00 | same dispatch, after other listeners: hls.latency=9.92 | 2nd sample: hls.latency=10.11 direct=10.11
+seekSync 1st sample +26.0ms: hls.latency=1.28 direct=1.28 diff=0.00 | same dispatch, after other listeners: hls.latency=1.28 | 2nd sample: hls.latency=1.40 direct=1.40
+seek     1st sample +28.0ms: hls.latency=9.67 direct=9.67 diff=0.00 | same dispatch, after other listeners: hls.latency=9.67 | 2nd sample: hls.latency=9.78 direct=9.78
+seekSync 1st sample +34.0ms: hls.latency=1.28 direct=1.29 diff=-0.00 | same dispatch, after other listeners: hls.latency=1.28 | 2nd sample: hls.latency=1.41 direct=1.41
+seek     1st sample +37.0ms: hls.latency=9.69 direct=9.69 diff=0.00 | same dispatch, after other listeners: hls.latency=9.69 | 2nd sample: hls.latency=9.80 direct=9.80
+seekSync 1st sample +45.0ms: hls.latency=1.29 direct=1.29 diff=0.00 | same dispatch, after other listeners: hls.latency=1.29 | 2nd sample: hls.latency=1.42 direct=1.42
+seek     1st sample +44.0ms: hls.latency=9.71 direct=9.71 diff=0.00 | same dispatch, after other listeners: hls.latency=9.71 | 2nd sample: hls.latency=9.84 direct=9.84
+seekSync 1st sample +53.0ms: hls.latency=1.30 direct=1.30 diff=0.00 | same dispatch, after other listeners: hls.latency=1.30 | 2nd sample: hls.latency=1.43 direct=1.43
+seek     1st sample +58.0ms: hls.latency=9.73 direct=9.73 diff=0.00 | same dispatch, after other listeners: hls.latency=9.73 | 2nd sample: hls.latency=9.86 direct=9.86
+seekSync 1st sample +66.0ms: hls.latency=1.32 direct=1.32 diff=0.00 | same dispatch, after other listeners: hls.latency=1.32 | 2nd sample: hls.latency=1.45 direct=1.45
+seek     1st sample +80.0ms: hls.latency=9.77 direct=9.77 diff=0.00 | same dispatch, after other listeners: hls.latency=9.77 | 2nd sample: hls.latency=9.91 direct=9.91
+seekSync 1st sample +79.0ms: hls.latency=1.33 direct=1.33 diff=0.00 | same dispatch, after other listeners: hls.latency=1.33 | 2nd sample: hls.latency=1.46 direct=1.46
+seek     1st sample +92.0ms: hls.latency=9.80 direct=9.80 diff=0.00 | same dispatch, after other listeners: hls.latency=9.80 | 2nd sample: hls.latency=9.92 direct=9.92
+seekSync 1st sample +105.0ms: hls.latency=1.35 direct=1.35 diff=0.00 | same dispatch, after other listeners: hls.latency=1.35 | 2nd sample: hls.latency=1.39 direct=1.39
+seek     1st sample +118.0ms: hls.latency=9.75 direct=9.75 diff=0.00 | same dispatch, after other listeners: hls.latency=9.75 | 2nd sample: hls.latency=9.78 direct=9.78
+seekSync 1st sample +128.0ms: hls.latency=1.39 direct=1.39 diff=0.00 | same dispatch, after other listeners: hls.latency=1.39 | 2nd sample: hls.latency=1.42 direct=1.42
+seek     1st sample +132.0ms: hls.latency=9.79 direct=9.79 diff=0.00 | same dispatch, after other listeners: hls.latency=9.79 | 2nd sample: hls.latency=9.82 direct=9.82
+seekSync 1st sample +144.0ms: hls.latency=1.40 direct=1.40 diff=0.00 | same dispatch, after other listeners: hls.latency=1.40 | 2nd sample: hls.latency=1.42 direct=1.42
+seek     1st sample +150.0ms: hls.latency=9.82 direct=9.82 diff=0.00 | same dispatch, after other listeners: hls.latency=9.82 | 2nd sample: hls.latency=9.85 direct=9.85
+seekSync 1st sample +157.0ms: hls.latency=1.40 direct=1.40 diff=0.00 | same dispatch, after other listeners: hls.latency=1.40 | 2nd sample: hls.latency=1.43 direct=1.43
+first sample after seek with |hls.latency - direct| > 1 s: 0/20 · re-read after the dispatch: 0/20

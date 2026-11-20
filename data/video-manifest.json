@@ -1337,6 +1337,32 @@
       "poster": "/images/pokeclip-language-ownership-boundaries-broadcast-event-fanout-mobile-poster.jpg"
     }
   },
+  "pokeclip-live-catchup-live-viewers-only-catchup-after-stall": {
+    "scene": "CatchupAfterStall",
+    "alt": "위아래 두 칸에 세로축 지연, 가로축 끊김을 놓은 뒤의 시간인 선 그래프가 있다. 위 칸 6초 끊김 뒤에서는 회색 실선(따라잡기 끔, Chrome)과 회색 점선(WebKit 점프만)이 약 6–7초 지연에 그대로 머물고, 청록 선(배속 규칙, Chrome)은 1.1배 이름표를 단 채 내려가 청록 점선 목표에 닿으면 1배 이름표로 바뀐다. 아래 칸 13초 끊김 뒤에서는 회색 실선이 약 13초에 머물고, 청록 선과 회색 점선은 놓은 직후 점프 이름표와 함께 목표 근처로 떨어진다",
+    "sha256": "823387ca911b8ded02d01ab64d621bb69bd9b6b80566eb80deeaa257f4f4f151",
+    "bytes": 167954,
+    "codec": "h264",
+    "pixFmt": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "duration": 12,
+    "audio": 0,
+    "faststart": true,
+    "poster": "/images/pokeclip-live-catchup-live-viewers-only-catchup-after-stall-poster.jpg",
+    "mobile": {
+      "sha256": "b65c7483eb1a0ebb230e3220603e2c1aef85cdacdf1eb16f2e2e243cdddab19f",
+      "bytes": 173621,
+      "codec": "h264",
+      "pixFmt": "yuv420p",
+      "width": 1080,
+      "height": 1350,
+      "duration": 12,
+      "audio": 0,
+      "faststart": true,
+      "poster": "/images/pokeclip-live-catchup-live-viewers-only-catchup-after-stall-mobile-poster.jpg"
+    }
+  },
   "pokeclip-live-dvr-separation-handoff-live-handoff": {
     "scene": "LiveHandoff",
     "alt": "되감기 목록 끝 E 앞의 청록 띠로 재생점 P가 들어가고, 라이브 목록의 시작 하한이 P 이하라는 이름표가 선 뒤 P가 라이브 목록으로 내려간다. 첫 번째에는 확인 시한 막대가 다 차기 전에 이어 재생돼 확정 이름표가 뜨고, 두 번째에는 라이브가 이어지지 않은 채 시한 막대가 다 차 빨갛게 바뀐 뒤 P가 넘기기 전 자리의 되감기 목록으로 돌아가며, 시청자가 멈춰 뒀으면 멈춘 채 둔다는 글이 뜨는 장면",

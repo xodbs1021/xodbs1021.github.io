@@ -1,0 +1,9 @@
+{
+  "name": "techblog-live-catchup-lab",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "hls.js": "1.7.3",
+    "playwright": "1.60.0"
+  }
+}
