@@ -1,0 +1,28 @@
+
+## framegap-webkit-none — 26.4 · rVFC=true · frames=4120 · waiting=1
+baseline gaps (outside ±1000ms of any switch): n=3629 median=33.0 p99=35.0 max=41.0 ms
+no switches; all gaps max=41.0 | pseudo windows (every 3 s, ±1000ms): n=40 min=34.0 median=35.0 max=41.0 ms · over 200ms: 0/40
+
+## framegap-webkit-1.05 — 26.4 · rVFC=true · frames=3840 · waiting=1
+baseline gaps (outside ±1000ms of any switch): n=1259 median=33.0 p99=35.0 max=50.0 ms
+1 -> r: switches=20 with-waiting=0 | max-gap-in-window (no waiting): min=299.0 median=317.0 max=334.0 ms · over 200ms: 20/20
+r -> 1: switches=20 with-waiting=0 | max-gap-in-window (no waiting): min=266.0 median=298.0 max=309.0 ms · over 200ms: 20/20
+
+## framegap-webkit-1.1 — 26.4 · rVFC=true · frames=3925 · waiting=1
+baseline gaps (outside ±1000ms of any switch): n=1290 median=33.0 p99=36.0 max=51.0 ms
+1 -> r: switches=20 with-waiting=0 | max-gap-in-window (no waiting): min=294.0 median=316.0 max=334.0 ms · over 200ms: 20/20
+r -> 1: switches=20 with-waiting=0 | max-gap-in-window (no waiting): min=266.0 median=290.5 max=314.0 ms · over 200ms: 20/20
+
+## framegap-chrome-none — 157.0.8103.79 · rVFC=true · frames=4140 · waiting=2
+baseline gaps (outside ±1000ms of any switch): n=3629 median=33.3 p99=50.1 max=50.1 ms
+no switches; all gaps max=50.1 | pseudo windows (every 3 s, ±1000ms): n=40 min=50.1 median=50.1 max=50.1 ms · over 200ms: 0/40
+
+## framegap-chrome-1.05 — 157.0.8103.79 · rVFC=true · frames=4101 · waiting=2
+baseline gaps (outside ±1000ms of any switch): n=1221 median=33.3 p99=50.1 max=83.3 ms
+1 -> r: switches=20 with-waiting=0 | max-gap-in-window (no waiting): min=50.0 median=50.1 max=83.4 ms · over 200ms: 0/20
+r -> 1: switches=20 with-waiting=0 | max-gap-in-window (no waiting): min=50.1 median=50.1 max=83.4 ms · over 200ms: 0/20
+
+## framegap-chrome-1.1 — 157.0.8103.79 · rVFC=true · frames=4117 · waiting=2
+baseline gaps (outside ±1000ms of any switch): n=1240 median=33.3 p99=50.1 max=50.1 ms
+1 -> r: switches=20 with-waiting=0 | max-gap-in-window (no waiting): min=50.0 median=50.1 max=83.4 ms · over 200ms: 0/20
+r -> 1: switches=20 with-waiting=0 | max-gap-in-window (no waiting): min=50.1 median=50.1 max=50.1 ms · over 200ms: 0/20

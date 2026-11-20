@@ -1,0 +1,4 @@
+logs/
+*.pid
+raw/*.failed.json
+raw/*.superseded-*.json

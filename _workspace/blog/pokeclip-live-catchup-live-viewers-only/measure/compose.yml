@@ -1,0 +1,16 @@
+name: techblog-live-catchup
+services:
+  mediamtx:
+    image: bluenviron/mediamtx:1.21.1
+    labels:
+      com.techblog.bench: live-catchup
+    volumes:
+      - ./mediamtx.yml:/mediamtx.yml:ro
+    ports:
+      - "127.0.0.1:31935:1935"
+      - "127.0.0.1:38888:8888"
+    networks: [bench]
+networks:
+  bench:
+    labels:
+      com.techblog.bench: live-catchup
