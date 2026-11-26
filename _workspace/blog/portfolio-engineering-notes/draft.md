@@ -31,7 +31,7 @@
 
 - [nginx는 경로의 방송과 쿼리의 방송이 같을 때만 넘깁니다](/posts/0-to-1/pokeclip-nginx-playback-request-boundary/): 경로·쿼리 일치와 정규화 우회 차단.
 - [systemd가 정리를 건너뛰자 옛 비밀 컨테이너가 남았습니다](/posts/0-to-1/pokeclip-media-host-restart-lifecycle/): 비정상 종료 시 수명 불일치와 복구 검증.
-- [HLS 라이브와 DVR 목록을 나누자 넘김 조건이 생겼습니다](/posts/0-to-1/pokeclip-live-dvr-separation-handoff/): 완료한 발행·되감기 연동과 진행 중인 자동 전환 검증.
+- [HLS 라이브와 DVR 목록을 나누자 넘김 조건이 생겼습니다](/posts/0-to-1/pokeclip-live-dvr-separation-handoff/): 완료한 발행·되감기 연동, 11월 3일 v1.0.0에 포함된 자동 넘김, 남은 화면 건너뜀 재측정.
 
 ## 11월에 추가한 되감기·보안·녹화 기록 {#november}
 
