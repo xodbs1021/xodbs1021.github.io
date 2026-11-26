@@ -4,7 +4,7 @@ date: "2026-11-11T01:47:37+09:00"
 lastmod: "2026-11-11T03:20:17+09:00"
 description: "녹화기의 too many reordered frames를 운영 경로 시험 방송 세 번과 AWS 실험대 143회로 좇았습니다. 지연만 튀는 것은 재정렬 오류를 내지 않았고, 급등 중 잃은 패킷의 재전송이 latency 안에 오지 못할 때 받는 쪽 SRT가 그 자리를 건너뛰었습니다. OBS 플러그인 latency를 3초로 올렸지만 복호 오류 조각은 남았습니다."
 categories: ["projects"]
-tags: ["SRT", "MediaMTX", "gosrt", "OBS", "H.264", "실험"]
+tags: ["PokeClip", "SRT", "MediaMTX", "gosrt", "OBS", "H.264", "실험"]
 draft: false
 ---
 

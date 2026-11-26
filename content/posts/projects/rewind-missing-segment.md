@@ -4,7 +4,7 @@ date: "2026-11-04T15:08:47+09:00"
 lastmod: "2026-11-11T06:06:24+09:00"
 description: "라이브 되감기에서 창 밖으로 밀린 HLS 조각이 404를 낼 때, 제어면에 하한을 묻던 설계를 같은 재생 목록을 다시 받는 한 줄 흐름으로 바꾼 과정. 공개 뒤 찾은 다시 받기 고리를 막은 후속 수정과 hls.js 1.7.3 오류 처리의 함정 둘까지."
 categories: ["projects"]
-tags: ["HLS", "hls.js", "DVR", "CDN", "라이브 스트리밍", "설계"]
+tags: ["PokeClip", "HLS", "hls.js", "DVR", "CDN", "라이브 스트리밍", "설계"]
 draft: false
 ---
 

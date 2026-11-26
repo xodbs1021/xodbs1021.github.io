@@ -85,6 +85,7 @@
   ],
   "0-to-1/portfolio-engineering-notes": [
     "10월-28일-추가한-플랫폼-개발-기록",
+    "november",
     "먼저-읽을-다섯-가지-판단",
     "structure",
     "recovery",
@@ -96,7 +97,8 @@
     "opensource",
     "shakedown",
     "reference",
-    "source"
+    "source",
+    "출처"
   ],
   "0-to-1/media-ci-path-filter-required-check-tradeoff": [
     "비싼-테스트는-이미-조건부였다",
