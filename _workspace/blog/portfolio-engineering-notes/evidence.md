@@ -9,7 +9,7 @@
 | #6306 · #6380 열림, #6206→#6326 · #6261→#6417 재구현으로 닫힘 | pulls API state/merged + #6326 #6417 제목에 (#6206)/(#6261) 명시 | 2026-11-25 | 실측(GitHub API) |
 | Secrets Manager 전환 완료(개발 10-06 읽기 전환, 10-22 사본 삭제, 운영은 처음부터) | `content/posts/0-to-1/pokeclip-secret-storage-migration-plan.md` 첫 문단 | 2026-11-25 | 문헌값(공개 글) |
 | 11월 글 요약 수치(138KB, 276→11kbps, 35분, 17초, 1.29초, 907,200행, 12,685→21, 16→0, 7.66초, 21ms·48초, 143회 등) | 각 글 frontmatter description·본문 원문과 대조 | 2026-11-25 | 문헌값(공개 글) |
-| 전환 23초·21초, 쓰기 시도 2,582건 실패 0 | aws-gcp-bidirectional-cutover-experiment.md 12행, 결과 표 89·99행 | 2026-11-27 | 문헌값(공개 글, 원자료 비공개) |
+| 전환 23초·21초, 쓰기 시도 2,582건 실패 0 | aws-gcp-bidirectional-cutover-experiment.md 12행, 결과 표 89–90·99행 | 2026-11-27 | 문헌값(공개 글, 원자료 비공개) |
 | 되감기 글 순서 url-split → dvr-cookie → sidecar → gzip | sidecar 글 14행 「1편 … 1편 둘째 글」, gzip 글 30행 「2편」 | 2026-11-25 | 실측(본문) |
 | rewind-missing-segment · recording-defect · round-vod · srt-latency는 PokeClip 글 | 각 글 둘째 문단 「저는 PokeClip 팀에서 …」 | 2026-11-25 | 실측(본문) |
 | 멀티 클라우드 2편은 Shakedown(예선)과 별개인 본선 작업 | 글 본문 「SoftBank Hackathon 2026 본선 팀」, Shakedown 글 「예선 산출물」 | 2026-11-25 | 실측(본문) |

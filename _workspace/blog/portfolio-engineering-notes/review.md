@@ -44,3 +44,4 @@
 - 최종 자동 검증: build 성공, `npm test` 45/45, test:layout(/series/, 모음 글) 0 issues, diff 비밀 검사 0건.
 - Codex 라운드 6(브랜치 기준): C0 H0 M1 L1 — M 회차 VOD 요약에 비공개 실측 표기, L review.md 보강 건수 4건으로 정정 → 반영. (양측 동시 C/H 0: Codex r5↔Claude r6 1회, Codex r6↔Claude r7 대기)
 - Codex 라운드 7(브랜치 기준): C0 H1 L1 — H 시각 자료 면제 승인 기록 없음 → 위 「면제 결정」으로 기록(사용자 위임 근거). L evidence 전환 수치 근거 위치 → 원글 12행·표 89·99행으로 정정. (양측 동시 C/H 0: S1 Codex r5↔Claude r6, S2 Codex r6↔Claude r7 = 2회)
+- Codex 라운드 8(브랜치 기준): C0 H1 L1 — H 읽기 경로 변경이 바꾼 글들의 이어 읽기 내비를 화면 검수 범위에 안 넣음 → 브랜치 워크트리에서 build·test·**전체 공개 경로** test:layout 실행: routes None · pageChecks None · failures [] · warnings [] (2026-11-27, 보고서 /tmp/notes-review/layout-full-branch). L evidence 표 인용 행을 89–90·99로 정정.
