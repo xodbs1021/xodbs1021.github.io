@@ -46,3 +46,8 @@
 - Codex 라운드 7(브랜치 기준): C0 H1 L1 — H 시각 자료 면제 승인 기록 없음 → 위 「면제 결정」으로 기록(사용자 위임 근거). L evidence 전환 수치 근거 위치 → 원글 12행·표 89·99행으로 정정. (양측 동시 C/H 0: S1 Codex r5↔Claude r6, S2 Codex r6↔Claude r7 = 2회)
 - Codex 라운드 8(브랜치 기준): C0 H1 L1 — H 읽기 경로 변경이 바꾼 글들의 이어 읽기 내비를 화면 검수 범위에 안 넣음 → 브랜치 워크트리에서 build·test·**전체 공개 경로** test:layout 실행: routes 374 · pageChecks 1,496 · visuals 545 · states 592 · failures 0 · warnings 0(콘솔 집계) (2026-11-27, 보고서 /tmp/notes-review/layout-full-branch). L evidence 표 인용 행을 89–90·99로 정정.
 - Codex 라운드 9(브랜치 기준): C0 H1 M1 — H 검사 집계가 None으로 기록됨 → 콘솔 집계(routes 374 · pageChecks 1,496 · visuals 545 · states 592 · failures 0 · warnings 0)로 정정. 변경된 이어 읽기 내비를 브랜치 빌드(dist)에서 PC·휴대폰 캡처로 확인: playlist-gzip(되감기 주소에서 엣지 하한까지: 앞 사이드카 / 다음 rewind-missing-segment), round-vod(녹화 결함을 원본까지 좇기: 앞 SRT latency), chat-ledger(공유 DB 위의 권한과 조회: 앞 login-privileges / 다음 prod-data-wipe), request-body-log-redaction(MediaMTX의 설정과 인증 기본값: 앞 user-srt-passphrase), github-oidc(인증 다음의 권한 경계: 앞 secret-storage / 다음 imds), rewind-cache-deadlock(이벤트가 사라진 뒤의 복구: 앞 media-host-restart) — 모두 reading-paths.mjs 순서와 일치, 캡처는 /tmp/notes-review/nav. M 분리 글 요약을 「v1.0.0에 포함된 자동 넘김과 남은 건너뜀 재측정」으로 갱신.
+- Claude 리뷰어 라운드 9(브랜치 기준): C0 H0 M0 L0 — 집계·내비 기록 6건·분리 글 요약·evidence 행 전부 확인(layout 보고서 직접 재검증). (양측 동시 C/H 0: S1, S2 + Codex r10 대기)
+- Codex 라운드 10(브랜치 기준): C0 H0 M0 L0.
+### 최종 종결 (2026-11-27)
+- 양측 동시 C/H 0 상태 3회: S1(Codex r5 ↔ Claude r6), S2(Codex r6 ↔ Claude r7), S6(Codex r10 ↔ Claude r9). Claude 측은 r6–r9 연속 무지적. 규약 충족 → 머지·배포.
+- 사용자 위임(2026-11-26 「니가 알아서 … 배포까지 진행해」) 아래 진행. 시각 자료 면제는 위 「면제 결정」 참조.
