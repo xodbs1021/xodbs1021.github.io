@@ -4,7 +4,7 @@ date: "2026-11-11T01:13:27+09:00"
 lastmod: "2026-11-15T03:32:00+09:00"
 description: "회차 다시보기를 검증하다 운영 녹화 조각 하나에서 Chrome 재생이 멈췄습니다. 끊김 표시·헤드리스·우리 재포장 가설을 차례로 지우고 녹화 원본의 프레임 결손에 닿은 과정과, 오류 알림 없이 굳던 웹 플레이어를 다음 조각으로 넘겨 잇는 실험."
 categories: ["projects"]
-tags: ["HLS", "hls.js", "H.264", "MediaMTX", "Chrome", "디버깅"]
+tags: ["PokeClip", "HLS", "hls.js", "H.264", "MediaMTX", "Chrome", "디버깅"]
 draft: false
 ---
 

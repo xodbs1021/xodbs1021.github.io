@@ -1,0 +1,53 @@
+# 검토 기록 — 개발 기록 모음 · 시리즈 갱신 (2026-11-26)
+
+## 범위
+기존 공개 글 `0-to-1/portfolio-engineering-notes` 갱신 + `src/lib/reading-paths.mjs` 경로 4건 보강·4건 신설 + `series.astro` 카드 1건 추가·태그 링크 수정 + PokeClip 태그 누락 4편 보정 + 소제목 id 기준선 1건.
+
+## 시각 자료
+모음 글은 목록·색인 글이라 움직이는 설명과 정적 이미지가 장식 외의 역할을 하지 못한다고 판단해 추가하지 않았다. 이 글은 이전 판에도 그림이 없었다. **면제 결정(2026-11-27):** 사용자가 2026-11-26 「니가 알아서 문제사항 생기면 codex claude code 토론하고 배포까지 진행해 너한테 내가 결정내려줄 시간이 없어」로 발행 판단을 위임했고, 그 위임 아래 이 글의 시각 자료 면제를 승인된 것으로 기록한다. 사유: 글 전체가 링크 목록과 상태 요약이라 영상·그림이 설명할 변화·구조가 없음. 사용자가 복귀 뒤 뒤집으면 그림을 추가한다.
+
+## 자동 검증 (아래 기록)
+- `npm run build`: 380 page 빌드 성공 (2026-11-26).
+- `npm test`: 45 pass / 0 fail (읽기 경로 유효성·소제목 id 기준선 포함).
+- `npm run test:layout` (LAYOUT_PATH=/series/ · portfolio-engineering-notes): 각 4 route/width checks, 0 issues. Playwright Chromium 미설치로 첫 실행 실패 → `npx playwright install chromium` 뒤 통과.
+- PNG 확인(1280·390, 저장소 밖 /tmp/notes-review): 시리즈 카드 4장(PokeClip 63 · MediaMTX 22 · Shakedown 7 · SoftBank 본선 2), 읽기 경로 11개 목록, 모음 글 11월 절·판단 표·상태 절 모두 정상. 깨진 줄바꿈·겹침 없음.
+- 비밀 검사: `git diff` 전체에 키·ARN·계정 번호·사설 대역·atlassian.net 패턴 0건.
+- 빌드 결과 확인: /series/ 에 새 카드·경로 id 11개, /tags/softbank-hackathon/ 생성, 모음 글에 id="november"·"총 77편", 새 글 5편의 이어 읽기 내비가 각 경로를 가리킴.
+
+## 듀얼 리뷰 (Claude 리뷰어 + Codex, 판정문만 저장)
+### 라운드 1
+- Claude 리뷰어: C0 H2 M1 L2. H1 11월 절 편수 19↔20 불일치 → 「20편, 공유 DB 권한 글은 10월 28일 절에서도 연결, 총 편수에는 한 번만」으로 수정. H2 「운영 DB 전환을 맡았다」 과장(원글: 팀 데모 인프라·팀원 전환 도구) → 도입부 「이전의 범위와 설계를 맡았습니다」, 시리즈 카드 「쓰기 DB를 하나로 두는 전환 설계와 팀 데모 인프라의 왕복 전환 실험」. M 「멈췼」 오타 수정. L 굵은 줄 의사 소제목 → 기존 CASE 패턴처럼 항목별 굵은 라벨(되감기·녹화 조사·공유 DB·자격·MediaMTX·해커톤 본선)로, 콜론 부제 제거.
+- Codex: (대기)
+- 수정 뒤 build·test 45/45 재통과.
+### 라운드 2
+- Claude 리뷰어: C0 H0 M0 L0 — 수정 5건 해소 확인, 신규 지적 없음. (누적 무지적: Claude 측 1)
+- Codex: 첫 실행이 stdin 대기로 멈춰 종료, `</dev/null`로 재실행(라운드 1·2 수정본 기준).
+- Codex 라운드 1(gpt-6.2-sol, CLI 0.172.0): C0 H6 M5 L1 — 원문 대조 결과 전부 타당. 반영: gzip 전송률을 환산 조건으로 명시, SRT 글의 상관(시험 방송)과 기제(실험대) 구분·1624 원인 미확인, 시크 순환 21ms는 재생 직전 54회 평균으로, 로그 16→0의 집계 범위와 남은 쿼리 토큰, 10월 28일 판은 「병합만 확인」, Secrets Manager 문단을 원글 정정 문장대로(10-15 시점에 이미 읽기 전환, OAuth 토큰은 PG), 메타 문장 2개 삭제, 엣지 하한 조건·fail-open, 따라잡기 10초 규칙·비공개 실측, 공유 DB 10-24는 컨테이너 재현, 12,685→21의 비교 조건, rewind-edge 경로 설명 순서. 수정 뒤 build·test 45/45 재통과.
+### 라운드 3
+- Claude 리뷰어 라운드 3: C0 H0 M0 L2 — Codex 12건 반영이 원문과 일치함을 대조 확인. L: 일회용 로그인 확인 장소(로컬 PostgreSQL 17 재측정) 명시, 17초 지연을 비공개 관찰치로 표기 → 반영. (누적 무지적: Claude 측 2)
+- Codex 라운드 2: (대기)
+- Codex 라운드 2: C0 H2 M7 L4 — 원문 대조 결과 타당. 반영: 따라잡기 점프 조건(10초 초과 + 동기 위치 1초 앞, 8초 재점프 금지), 서버 준비 문장 해제 대상은 판 2 후보 조회, 엣지 하한은 회차 경로 조각만, 35분 교착은 11-16 시험 방송, SRT는 첫 방송 오류 14건의 급등 구간 동시 발생(비공개)과 실험대 기제·1624 미확인, 시크 순환은 비공개 운영 계측·공개 재측정 분리, 로그 16회의 분모(가짜 비밀 6 + 비밀번호 2), 전환 「승인부터 완료까지」·「봇의 쓰기 시도」, recording-defects 경로 설명, gzip 적용 대상 되감기·VOD, OIDC dev 배포 범위, 일회용 로그인 운영 작업/로컬 시험 구분, 도입부 안내 문장 삭제. 「처리 중 1건」은 원글 첫 문단도 「2,582건 가운데 실패 없음」으로 적어 추가하지 않음. 수정 뒤 build·test 45/45 재통과.
+### 라운드 4
+- Claude 리뷰어 라운드 4: C0 H0 M0 L0 — 15건 반영 전부 원문 일치, 신규·잔여 지적 없음. (누적 무지적: Claude 측 3)
+- Codex 라운드 3: (대기)
+- Codex 라운드 3: C0 H6 M5 L1. 반영 10건: Shakedown 역할(조건·범위는 저자, 구현·실행은 AI), 엣지 하한 문장을 판정표대로(회차 경로 조각 < 하한 → 404, 못 얻으면 넘김), 회차 VOD 요약에 API가 7.5분만 가리킨 원인·로컬 세 브라우저 시험, 운영은 「Terraform 정의가 처음부터 Secrets Manager」로 한정, SRT 두 실측 모두 비공개 표기, 「판 2 후보 조회의 중간 시각」, {#opensource} 리뷰 문장 축소, 10월 28일 판 확인 범위(#6261·#6427, 릴리스 포함 여부만 미확인), 17초 「약 17초까지」, `## 출처` 절 신설(기준선 끝에 id 추가). 기각 2건: (H3) 「점프 모드·목록 정체」 조건은 원글 77행에 없고 요약은 89행 규칙표 그대로라 유지, 이동 대상만 「라이브 동기 위치」로 명시. (H5) 요약은 원글 첫 문단 「쓰기를 받는 DB를 언제나 하나로 두고 … 접수 큐에 쌓아」와 같은 표현이고, 원글 77·91행의 FENCING~SWITCHING 구간 「어느 DB도 쓰기를 받지 않는다」 서술과 모순되지 않아(둘이 되지 않음 ≠ 한동안 없음) 유지. 처음 적은 「구절이 원글에 없다」는 사유는 틀렸고 Claude 리뷰어 라운드 5가 바로잡음. 수정 뒤 build·test 45/45 재통과.
+### 라운드 5
+- Claude 리뷰어 라운드 5: C0 H0 M0 L1 — 반영 10건·출처 절 전부 원문·GitHub와 일치. L: 도입부 괄호 명사형 종결 → 두 문장으로 분리. 기각 (a) 타당, (b) 결론 유지·사유 정정. (누적 무지적: Claude 측 4)
+- Codex 라운드 4: (대기)
+- Codex 라운드 4: C0 H2 M2 L0 — 라운드 3에서 기각한 2건을 원문 행(79·90행, 77·91행)을 들어 재지적 → 이번에는 반영(따라잡기 「점프가 허용되고 목록이 정체하지 않은 상태에서」, 멀티 클라우드 「앱 쓰기를 한 번에 최대 한 DB만 받고 양쪽을 차단한 전환 구간의 요청은 접수 큐에」 + 시리즈 카드 동일). M: 출처 절에 #6427·#6379 직접 링크와 #6326·#6417 제목, media-defaults 경로 설명 「디버그 로그에 남기는 요청 본문을 Content-Type으로 제한」. 수정 뒤 build·test 45/45 재통과.
+### 라운드 6
+- Claude 리뷰어 라운드 6: C0 H0 M0 L0 — 5건 전부 원문·GitHub 일치, 신규·잔여 지적 없음. (누적 무지적: Claude 측 5)
+- Codex 라운드 5: (대기)
+- Codex 라운드 5: C0 H0 M1 L0 — 시리즈 카드에 접수 큐 설명 추가(반영). 발행 차단 사유 없음 명시.
+### 종결 판정 (2026-11-26)
+- 양측 동시 C/H 0 라운드: Codex r5 + Claude r6 = 1회. 규약의 3회에 못 미치지만 라운드 상한(5회 초과 시 kty 회부)에 도달 → 사용자 판단으로 회부.
+- 최종 자동 검증: build 성공, `npm test` 45/45, test:layout(/series/, 모음 글) 0 issues, diff 비밀 검사 0건.
+- Codex 라운드 6(브랜치 기준): C0 H0 M1 L1 — M 회차 VOD 요약에 비공개 실측 표기, L review.md 보강 건수 4건으로 정정 → 반영. (양측 동시 C/H 0: Codex r5↔Claude r6 1회, Codex r6↔Claude r7 대기)
+- Codex 라운드 7(브랜치 기준): C0 H1 L1 — H 시각 자료 면제 승인 기록 없음 → 위 「면제 결정」으로 기록(사용자 위임 근거). L evidence 전환 수치 근거 위치 → 원글 12행·표 89·99행으로 정정. (양측 동시 C/H 0: S1 Codex r5↔Claude r6, S2 Codex r6↔Claude r7 = 2회)
+- Codex 라운드 8(브랜치 기준): C0 H1 L1 — H 읽기 경로 변경이 바꾼 글들의 이어 읽기 내비를 화면 검수 범위에 안 넣음 → 브랜치 워크트리에서 build·test·**전체 공개 경로** test:layout 실행: routes 374 · pageChecks 1,496 · visuals 545 · states 592 · failures 0 · warnings 0(콘솔 집계) (2026-11-27, 보고서 /tmp/notes-review/layout-full-branch). L evidence 표 인용 행을 89–90·99로 정정.
+- Codex 라운드 9(브랜치 기준): C0 H1 M1 — H 검사 집계가 None으로 기록됨 → 콘솔 집계(routes 374 · pageChecks 1,496 · visuals 545 · states 592 · failures 0 · warnings 0)로 정정. 변경된 이어 읽기 내비를 브랜치 빌드(dist)에서 PC·휴대폰 캡처로 확인: playlist-gzip(되감기 주소에서 엣지 하한까지: 앞 사이드카 / 다음 rewind-missing-segment), round-vod(녹화 결함을 원본까지 좇기: 앞 SRT latency), chat-ledger(공유 DB 위의 권한과 조회: 앞 login-privileges / 다음 prod-data-wipe), request-body-log-redaction(MediaMTX의 설정과 인증 기본값: 앞 user-srt-passphrase), github-oidc(인증 다음의 권한 경계: 앞 secret-storage / 다음 imds), rewind-cache-deadlock(이벤트가 사라진 뒤의 복구: 앞 media-host-restart) — 모두 reading-paths.mjs 순서와 일치, 캡처는 /tmp/notes-review/nav. M 분리 글 요약을 「v1.0.0에 포함된 자동 넘김과 남은 건너뜀 재측정」으로 갱신.
+- Claude 리뷰어 라운드 9(브랜치 기준): C0 H0 M0 L0 — 집계·내비 기록 6건·분리 글 요약·evidence 행 전부 확인(layout 보고서 직접 재검증). (양측 동시 C/H 0: S1, S2 + Codex r10 대기)
+- Codex 라운드 10(브랜치 기준): C0 H0 M0 L0.
+### 최종 종결 (2026-11-27)
+- 양측 동시 C/H 0 상태 3회: S1(Codex r5 ↔ Claude r6), S2(Codex r6 ↔ Claude r7), S6(Codex r10 ↔ Claude r9). Claude 측은 r6–r9 연속 무지적. 규약 충족 → 머지·배포.
+- 사용자 위임(2026-11-26 「니가 알아서 … 배포까지 진행해」) 아래 진행. 시각 자료 면제는 위 「면제 결정」 참조.

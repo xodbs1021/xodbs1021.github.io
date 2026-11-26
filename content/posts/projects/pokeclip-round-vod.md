@@ -4,7 +4,7 @@ date: "2026-11-11T03:08:49+09:00"
 lastmod: "2026-11-15T03:32:00+09:00"
 description: "11월 4일 약 2시간 시험 방송에서 7.66초 조각 하나가 목표 길이 6초를 넘어 재생 목록이 둘로 갈렸고, 다시보기 문서도 목록마다 따로 서서 회차 API는 마지막 7.5분만 가리켰습니다. 목표 길이를 올리지 않고 회차 문서 하나에 경계 DISCONTINUITY를 다는 쪽을 고른 이유, 기다림과 물러섬 규칙, 세 브라우저 재생 시험과 남은 한계."
 categories: ["projects"]
-tags: ["HLS", "VOD", "EXT-X-DISCONTINUITY", "hls.js", "Go", "설계"]
+tags: ["PokeClip", "HLS", "VOD", "EXT-X-DISCONTINUITY", "hls.js", "Go", "설계"]
 draft: false
 ---
 
