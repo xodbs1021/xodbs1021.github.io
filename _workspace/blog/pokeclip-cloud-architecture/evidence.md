@@ -45,3 +45,4 @@
 | viewer-request 함수가 캐시 조회 전 | AWS 블로그 Charting the life of a CloudFront request | 11-27 | 문헌값 |
 | 교체 시 SRT 끊김·미업로드 파일 비이전 | runbooks/media-swap.md:2533,2805,3623; 공개 글 stateful 23-35·51-57행 | 11-27 | 코드+문헌값 |
 | 제어면 잘못된 본문 400 | media/internal/endsignal/receiver.go:263-278 | 11-27 | 실측(코드) |
+| 인터페이스 엔드포인트 private DNS: 변수 interface_endpoint_private_dns 기본값 true(되돌리기 스위치), prod는 변수로 넘겨 운영 값 미확인 | modules/network/variables.tf:81-85; modules/network/main.tf:188; prod/network/main.tf:20 | 2026-11-27 | 실측(코드) |

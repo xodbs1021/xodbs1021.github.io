@@ -31,3 +31,4 @@
 영상 ViewerRequestGates의 예시 경로 /live/s1//index.m3u8: 겹 슬래시는 nginx raw_path_unsafe(//)로 400. live-auth는 % · 역슬래시만 보고 빈 구간은 정규화 뒤 못 볼 수 있음(live-auth.js 주석) → 설명용 예시로 타당.
 | 응답기→MediaMTX 응답: 허용 200 {"srtPassphrase"}, 판정 거절 401(본문 없음), 바깥 시한 503 | media/internal/ingestauth/publish.go:266-305(writeAllowed·writeDenied), media/cmd/ingest-auth/CONTRACT.md | 2026-11-27 | 실측(코드) |
 | Auth→응답기 응답: 없는 키도 200 valid:false, 정보 로그 | services/auth StreamKeyResolveController.java:25-34 | 2026-11-27 | 실측(코드) |
+| 인터페이스 엔드포인트 private DNS: 변수 interface_endpoint_private_dns 기본값 true(되돌리기 스위치), prod는 변수로 넘겨 운영 값 미확인 | modules/network/variables.tf:81-85; modules/network/main.tf:188; prod/network/main.tf:20 | 2026-11-27 | 실측(코드) |

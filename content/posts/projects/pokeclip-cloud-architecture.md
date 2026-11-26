@@ -16,7 +16,7 @@ PokeClip은 방송자의 OBS에서 SRT(Secure Reliable Transport, UDP 기반 송
 
 사용자가 닿는 서비스 주소는 넷입니다. 웹 앱(app.)은 Route 53에서 공개 ALB(Application Load Balancer)로 가서 Next.js에 닿고, OBS 플러그인이 쓰는 API(api.)도 같은 ALB의 다른 호스트입니다. 시청용 미디어 주소(media.)는 CloudFront 배포 하나이고, 송출(ingest.)은 NLB의 UDP 8890 포트입니다. CloudFront 안에서는 경로에 따라 갈립니다. 라이브(`/live/*`)와 재생 서버(`/playback/*`), 제어면(`/api/streams/*/rewind`·`/api/ingest/*`)은 내부 ALB를 거쳐 미디어 상자로 가고, 되감기(`/dvr/*`)와 다시보기 목록(`/vod/*`)은 S3로 가며, 어느 규칙에도 맞지 않는 요청은 기본 동작이 서명 쿠키를 요구하고 함수가 404를 내므로 원본에 닿지 않습니다. 미디어 상자로 들어가는 길은 결국 시청(CloudFront → 내부 ALB)과 송출(NLB) 둘뿐입니다. [[fig-overview]]에서 볼 것은 CloudFront에서 갈라지는 두 화살표와, 미디어 상자로 모이는 두 화살표입니다.
 
-```mermaid {#fig-overview kind="개념도" caption="PokeClip의 AWS 구성 가운데 시청과 송출 길만 그린 부분도입니다. 미디어 상자(EC2)는 시청(CloudFront → 내부 ALB)과 송출(NLB) 두 길로만 들어갈 수 있고, 되감기 조각(/dvr)과 다시보기 목록(/vod)은 CloudFront에서 S3로 바로 가 상자를 거치지 않습니다. 재생 서버·제어면 경로, 사이드카가 S3에 올리는 길, 코어 서비스(ECS Fargate)는 그림에서 뺐습니다. 2026년 11월 25일 저장소 Terraform 기준입니다." source="https://taeyun.blog/posts/0-to-1/pokeclip-live-dvr-url-split/"}
+```mermaid {#fig-overview kind="개념도" caption="PokeClip의 AWS 구성 가운데 시청·송출 길과 미디어 상자의 RDS 장부 기록만 그린 부분도입니다. 미디어 상자(EC2)는 시청(CloudFront → 내부 ALB)과 송출(NLB) 두 길로만 들어갈 수 있고, 되감기 조각(/dvr)과 다시보기 목록(/vod)은 CloudFront에서 S3로 바로 가 상자를 거치지 않습니다. 재생 서버·제어면 경로, 사이드카가 S3에 올리는 길, 코어 서비스(ECS Fargate)는 그림에서 뺐습니다. 2026년 11월 25일 저장소 Terraform 기준입니다." source="https://taeyun.blog/posts/0-to-1/pokeclip-live-dvr-url-split/"}
 flowchart TB
   accTitle: PokeClip AWS 구성
   accDescr: 시청자는 CloudFront를 거쳐 라이브는 내부 ALB와 EC2 미디어 상자로, 되감기는 S3로 간다. 방송자는 NLB를 거쳐 미디어 상자로 SRT를 보낸다. 미디어 상자는 RDS에 쓴다.

@@ -8,7 +8,7 @@ draft: false
 description: "PokeClip 미디어 상자(EC2) 안에서 송출과 시청 요청이 지나는 길. 컨테이너 다섯이 네트워크 네임스페이스 하나를 나눠 쓰는 구성, SRT 연결이 응답기와 Auth를 거쳐 passphrase를 받는 순서, 캐시를 놓친 라이브 요청이 CloudFront 함수·내부 ALB·nginx·MediaMTX에서 각각 무엇을 검사받는지, nginx를 MediaMTX 앞에 둔 이유와 일부러 맡기지 않은 일, 되감기 조각이 상자를 거치지 않는 이유."
 ---
 
-PokeClip의 되감기 재생 주소 `/playback/{방송}/list?path={방송}`에는 방송 이름이 두 번 들어갑니다. 앞단의 CloudFront 서명 쿠키 정책은 경로 쪽 방송을 URL 문자열 패턴으로 맞추고, 상자 안 MediaMTX 재생 서버는 쿼리 `path`의 방송으로 조각을 고릅니다. 둘이 같은지 대조하는 단계가 없으면 한 방송의 자격으로 다른 방송의 되감기를 열 위험이 있었습니다. 라이브 쪽도 비슷한 틈이 있습니다. nginx는 `%XX`를 풀고 점 구간과 겹 슬래시를 접은 경로로 규칙을 고르고, MediaMTX의 LL-HLS 목록·조각 처리기는 Go `net/http`가 퍼센트 인코딩을 푼 경로에 `path.Dir`를 적용해 방송 경로를 구하며 `path.Dir`는 점 구간과 겹 슬래시도 접습니다. CloudFront 쿠키 정책이 원문과 정규화본 중 무엇을 대조하는지는 확인하지 못했습니다. 앞단 쿠키 정책과 상자 안 두 서버가 같은 요청을 다르게 읽을 수 있다는 뜻입니다. 그래서 VPC(Virtual Private Cloud) 안 미디어 상자(EC2)의 MediaMTX 앞에 nginx를 세워, 열거한 우회 패턴이 든 원문 경로를 거절하고 `/playback`에서는 경로의 방송과 쿼리의 방송이 같은지 대조한 뒤에만 루프백 포트로 넘깁니다. MediaMTX의 LL-HLS(Low-Latency HTTP Live Streaming) 포트 8888, 재생 서버 포트 9996, 관리 API 포트 9997은 모두 127.0.0.1에만 열려 있어서, 내부 ALB(Application Load Balancer)에서 들어온 요청이 MediaMTX에 닿는 길은 nginx뿐이고 관리 API로는 어떤 요청도 가지 않습니다. 구성은 2026년 11월 25일 저장소 main의 compose·nginx·MediaMTX 설정 기준입니다.
+PokeClip에서 MediaMTX 녹화 구간을 조회하는 주소 `/playback/{방송}/list?path={방송}`에는 방송 이름이 두 번 들어갑니다(되감기 목록과 조각 자체는 `/dvr/*`로 S3에서 나갑니다). 앞단의 CloudFront 서명 쿠키 정책은 경로 쪽 방송을 URL 문자열 패턴으로 맞추고, 상자 안 MediaMTX 재생 서버는 쿼리 `path`의 방송으로 조각을 고릅니다. 둘이 같은지 대조하는 단계가 없으면 한 방송의 자격으로 다른 방송의 되감기를 열 위험이 있었습니다. 라이브 쪽도 비슷한 틈이 있습니다. nginx는 `%XX`를 풀고 점 구간과 겹 슬래시를 접은 경로로 규칙을 고르고, MediaMTX의 LL-HLS 목록·조각 처리기는 Go `net/http`가 퍼센트 인코딩을 푼 경로에 `path.Dir`를 적용해 방송 경로를 구하며 `path.Dir`는 점 구간과 겹 슬래시도 접습니다. CloudFront 쿠키 정책이 원문과 정규화본 중 무엇을 대조하는지는 확인하지 못했습니다. 앞단 쿠키 정책과 상자 안 두 서버가 같은 요청을 다르게 읽을 수 있다는 뜻입니다. 그래서 VPC(Virtual Private Cloud) 안 미디어 상자(EC2)의 MediaMTX 앞에 nginx를 세워, 열거한 우회 패턴이 든 원문 경로를 거절하고 `/playback`에서는 경로의 방송과 쿼리의 방송이 같은지 대조한 뒤에만 루프백 포트로 넘깁니다. MediaMTX의 LL-HLS(Low-Latency HTTP Live Streaming) 포트 8888, 재생 서버 포트 9996, 관리 API 포트 9997은 모두 127.0.0.1에만 열려 있어서, 내부 ALB(Application Load Balancer)에서 들어온 요청이 MediaMTX에 닿는 길은 nginx뿐이고 관리 API로는 어떤 요청도 가지 않습니다. 구성은 2026년 11월 25일 저장소 main의 compose·nginx·MediaMTX 설정 기준입니다.
 
 저는 PokeClip 팀에서 미디어 상자의 구성과 서비스 사이의 계약을 정했고, 미디어 상자 앞에 nginx를 남기기로 한 것도 제 결정입니다. nginx의 필수 책임을 대조로 정리하고 원문 경로·쿼리·내부 포트까지 검증 범위를 잡고 대조 규칙과 원문 검사와 계약 시험을 만든 것은 AI입니다. 구현은 Claude Code, 리뷰는 Claude Code와 Codex가 했고, 저는 결과를 검수했습니다. 전체 AWS 구성과 왜 미디어 서버만 EC2에 뒀는지는 [아키텍처 글](/posts/projects/pokeclip-cloud-architecture/)에 있습니다.
 
@@ -29,7 +29,7 @@ flowchart TB
   jn -.-> cr
 ```
 
-갈라지는 자리가 MediaMTX라는 것은, 사이드카가 죽으면 녹화 발행만 멈춘다는 뜻입니다. 반면 nginx는 시청 경로에만 있지만 프로세스가 끝나면 묶음 전체가 다시 뜨므로 진행 중인 송출까지 끊깁니다. 재기동 단위도 그 경계를 따릅니다. `mediamtx`와 `nginx`는 `restart: "no"`이고, 둘 중 하나가 끝나면 compose 전체가 내려가며 systemd 유닛이 20초 뒤 다시 띄웁니다. 사이드카·응답기·janitor·자격 창구는 `on-failure`로 엔진이 되살립니다. 모든 서비스는 `cap_drop: [ALL]`이고 nginx만 CHOWN·SETGID·SETUID를 되살립니다. 비밀은 기동 때 tmpfs에 렌더한 파일로만 들어갑니다. 시작 스크립트는 선행 점검, 사이드카 환경 파일 확인, Secrets Manager에서 CDN 비밀 읽기, 기동마다 새로 만드는 MediaMTX API 비밀번호, 모드 블록 렌더 순으로 돕니다. 옛 비밀 컨테이너가 남던 문제와 systemd 정리는 [재시작 생명주기 글](/posts/0-to-1/pokeclip-media-host-restart-lifecycle/)에 있습니다.
+갈라지는 자리가 MediaMTX라는 것은, 사이드카가 죽어도 라이브 요청 경로는 사이드카를 거치지 않는다는 뜻입니다. 그때 멈추는 것은 사이드카 프로세스가 맡은 일, 곧 녹화 발행과 제어면(되감기 상태 조회·송출 종료 신호), 그리고 켜 둔 구성이라면 방송 시작·종료 이벤트의 SNS 발행입니다. 반면 SRT 영상 패킷은 MediaMTX가 직접 받고 nginx는 시청·제어면 요청과 헬스 체크를 처리하는데, nginx 프로세스가 끝나면 묶음 전체가 다시 뜨므로 진행 중인 송출까지 끊깁니다. 재기동 단위도 그 경계를 따릅니다. `mediamtx`와 `nginx`는 `restart: "no"`이고, 둘 중 하나가 끝나면 compose 전체가 내려가며 systemd 유닛이 20초 뒤 다시 띄웁니다. 사이드카·응답기·janitor·자격 창구는 `on-failure`로 엔진이 되살립니다. 모든 서비스는 `cap_drop: [ALL]`이고 nginx만 CHOWN·SETGID·SETUID를 되살립니다. 비밀은 기동 때 tmpfs에 렌더한 파일로만 들어갑니다. 시작 스크립트는 선행 점검, 사이드카 환경 파일 확인, Secrets Manager에서 CDN 비밀 읽기, 기동마다 새로 만드는 MediaMTX API 비밀번호, 모드 블록 렌더 순으로 돕니다. 옛 비밀 컨테이너가 남던 문제와 systemd 정리는 [재시작 생명주기 글](/posts/0-to-1/pokeclip-media-host-restart-lifecycle/)에 있습니다.
 
 ## 송출은 NLB에서 MediaMTX로 바로 들어가고 응답기가 열쇠를 묻습니다
 
@@ -57,14 +57,14 @@ flowchart TB
 
 빨간 점이 nginx에서 멈추는 이유는 CloudFront 쿠키 정책의 와일드카드가 쿼리의 `path` 값과 경로의 방송이 같은지를 검사하지 않기 때문입니다. 그 대조는 nginx만 합니다.
 
-1. **CloudFront 엣지.** 서명 쿠키를 봅니다. `/live/{방송}/*` 정책의 쿠키가 없거나 만료됐으면 403입니다. 같은 단계에서 `live-auth` 함수가 돕니다. 경로에 `%`·역슬래시·겹 슬래시·점 구간 중 하나라도 있거나 파일 끝이 `.m3u8`·`.mp4`가 아니면 403이고, 아니면 KeyValueStore의 CDN 비밀을 읽어 `Authorization: Bearer`로 덮어씁니다. 시청자가 보낸 Authorization은 원본에 닿지 않습니다. 비밀을 못 읽으면 503입니다. 캐시 키는 기본 키(배포 도메인과 경로)에 LL-HLS 쿼리 `_HLS_msn`·`_HLS_part`·`_HLS_skip` 셋만 더한 것입니다.
+1. **CloudFront 엣지.** 서명 쿠키를 봅니다. `/live/{방송}/*` 정책의 쿠키가 없거나 만료됐으면 403입니다. 같은 단계에서 `live-auth` 함수가 돕니다. 함수가 받은 URI에 `%`·역슬래시·겹 슬래시·점 구간 중 하나라도 있거나 파일 끝이 `.m3u8`·`.mp4`가 아니면 403이고, 아니면 KeyValueStore의 CDN 비밀을 읽어 `Authorization: Bearer`로 덮어씁니다. 시청자가 보낸 Authorization은 원본에 닿지 않습니다. 비밀을 못 읽으면 503입니다. 캐시 키는 기본 키(배포 도메인과 경로)에 LL-HLS 쿼리 `_HLS_msn`·`_HLS_part`·`_HLS_skip` 셋만 더한 것입니다.
 2. **내부 ALB.** CloudFront의 VPC 원본이 내부 ALB의 443에 TLS로 붙습니다. ALB는 `/live/*`를 live 대상 그룹으로 보내면서 `^/live/(.*)$`를 `/$1`로 고쳐 씁니다. 그래서 상자에는 `/{방송}/index.m3u8`이 도착합니다. 규칙에 맞지 않는 경로는 ALB가 고정 404로 답합니다. ALB에서 상자까지는 VPC 안 HTTP입니다.
-3. **nginx live 포트.** 요청 원문(`$request_uri`)의 경로에 `%2e`·`%2f`·`%5c`·`%25`, 겹 슬래시, 점 구간이 있으면 400입니다. 아니면 경로·쿼리·Authorization을 그대로 127.0.0.1:8888로 넘깁니다. 접두사를 더 지우지 않습니다.
+3. **nginx live 포트.** nginx 파서를 지난 요청의 원문(`$request_uri`) 경로에 `%2e`·`%2f`·`%5c`·`%25`, 겹 슬래시, 점 구간이 있으면 400입니다. 아니면 경로·쿼리·Authorization을 그대로 127.0.0.1:8888로 넘깁니다. 접두사를 더 지우지 않습니다.
 4. **MediaMTX LL-HLS.** `hlsCDNSecret`과 Bearer 값을 대조하고 맞으면 목록을 냅니다. 목록 요청이 블로킹 리로드이면 다음 파트가 나올 때까지 응답을 붙잡습니다. 그래서 nginx의 `proxy_read_timeout`은 90초로 두었고, 그 앞의 CloudFront 원본 응답 대기는 30초, ALB 유휴 시한은 60초입니다. 파트 길이는 500ms 설정이고, 이 시한들에 걸리는 빈도는 운영에서 재지 않았습니다.
 
 ## nginx는 접두사를 지우지 않고 원문 경로를 검사합니다
 
-nginx를 둔 첫째 이유는 판단과 전달이 같은 경로를 보게 하는 것입니다. nginx는 요청 경로의 `%XX`를 풀고 점 구간과 겹 슬래시를 접은 `$uri`로 location을 고릅니다. 그런데 nginx는 live 포트에서 요청 원문을 그대로 상류에 넘기고, 그 원문을 받은 MediaMTX는 Go `net/http`가 퍼센트 인코딩을 푼 `URL.Path`에 `path.Dir`를 적용해 방송 경로를 구하며 `path.Dir`는 점 구간과 겹 슬래시도 접습니다. 그 앞의 CloudFront 서명 쿠키 정책이 원문과 정규화본 중 무엇을 대조하는지는 저장소의 엣지 시험 런북에서도 미확인으로 남아 있습니다. 예를 들어 `/A/..%2fB/index.m3u8`이 MediaMTX의 LL-HLS 처리기에 그대로 닿는다면 `path.Dir`가 B 방송으로 풉니다. 쿠키 정책이 그 원문을 A 방송으로 허가했다면 쿠키 범위와 실제로 나가는 스트림이 어긋납니다. 지금 설정에서는 그 요청이 거기까지 가지 않습니다. `live-auth` 함수가 `%`를 보고 403을 내고, 설령 엣지를 거치지 않고 nginx의 live 포트에 닿아도 `%2f`가 열거 패턴에 걸려 400입니다. nginx의 몫은 이렇게 쿠키 범위와 스트림이 어긋날 수 있는 꼴을 상류 앞에서 끊는 것입니다. 그래서 nginx는 location을 고르기 전에 원문 경로부터 봅니다. 검사는 설정에 열거한 패턴(`%2e`·`%2f`·`%5c`·`%25`, 겹 슬래시, 점 구간)만 거절하고, 한글 경로 이름 같은 그 밖의 퍼센트 인코딩은 허용합니다.
+nginx를 둔 첫째 이유는 판단과 전달이 같은 경로를 보게 하는 것입니다. nginx는 요청 경로의 `%XX`를 풀고 점 구간과 겹 슬래시를 접은 `$uri`로 location을 고릅니다. 그런데 nginx는 live 포트에서 요청 원문을 그대로 상류에 넘기고, 그 원문을 받은 MediaMTX는 Go `net/http`가 퍼센트 인코딩을 푼 `URL.Path`에 `path.Dir`를 적용해 방송 경로를 구하며 `path.Dir`는 점 구간과 겹 슬래시도 접습니다. 그 앞의 CloudFront 서명 쿠키 정책이 원문과 정규화본 중 무엇을 대조하는지는 저장소의 엣지 시험 런북에서도 미확인으로 남아 있습니다. 예를 들어 `/A/..%2fB/index.m3u8`이 MediaMTX의 LL-HLS 처리기에 그대로 닿는다면 `path.Dir`가 B 방송으로 풉니다. 쿠키 정책이 그 원문을 A 방송으로 허가했다면 쿠키 범위와 실제로 나가는 스트림이 어긋납니다. 지금 설정에서는 그 요청이 거기까지 가기 어렵습니다. `live-auth` 함수가 받은 URI에 `%`가 남아 있으면 403을 내고, 같은 원문이 nginx의 live 포트에 닿으면 `%2f`가 열거 패턴에 걸려 400입니다. CloudFront가 함수에 원문을 주는지 정규화본을 주는지는 저장소 런북에서 미확인이라, 어느 단계가 막는지는 조건부로 적습니다. nginx의 몫은 이렇게 쿠키 범위와 스트림이 어긋날 수 있는 꼴을 상류 앞에서 끊는 것입니다. 그래서 nginx는 location을 고르기 전에 원문 경로부터 봅니다. nginx 자체 파서가 요청 줄을 정상으로 읽은 뒤의 이야기이고(파서가 거부하는 요청은 그 전에 nginx가 오류 코드를 냅니다), 이 원문 검사는 설정에 열거한 패턴(`%2e`·`%2f`·`%5c`·`%25`, 겹 슬래시, 점 구간)만 거절하며 한글 경로 이름 같은 그 밖의 퍼센트 인코딩은 허용합니다.
 
 ```nginx
 # 원문 경로 거절 — live · 제어면은 원문을 상류에 그대로 넘긴다.
@@ -110,7 +110,7 @@ health 포트는 nginx가 고정 200을 냅니다. 상류를 부르지 않고, �
 
 `/dvr/*`와 `/vod/*` 요청은 CloudFront에서 S3 rewind 버킷으로 바로 갑니다. 상자 안에서는 MediaMTX가 4초 fMP4 조각을 녹화 폴더에 쓰고 훅으로 사이드카에 알리면, 사이드카가 조각을 RDS 장부에 적고 원본과 되감기용 재포장본을 S3 게이트웨이 엔드포인트로 올립니다. 그다음 장부에서 되감기 목록을 렌더해 조건부 PUT으로 발행하고, 5분마다 회차별 창 하한을 KeyValueStore에 써서 엣지의 `dvr-floor` 함수가 방송 중 회차 경로의 창 밖 조각을 404로 막게 합니다. 기록기와 함수에는 각각 스위치가 있어 둘 다 켜야 동작하고, 회차가 닫히면 하한 키를 지워 다시보기가 열리며, 회차 경로 이전의 옛 꼴 조각에는 하한을 걸지 않습니다. 녹화 폴더에 쓰기로 붙는 컨테이너는 녹화하는 MediaMTX와 지우는 janitor 둘이고, 사이드카는 읽기 전용입니다. janitor는 업로드가 장부에서 확정된 로컬 파일만 지웁니다.
 
-이 분리 덕분에 사이드카나 janitor가 멈춰도 라이브 길(ALB → nginx → MediaMTX)은 영향을 받지 않고, 유효한 쿠키와 이미 받은 목록 주소로는 S3의 되감기 조각을 계속 받을 수 있습니다. 새로 되감기를 여는 일은 사이드카의 상태 조회에 기대므로 그때는 멈춥니다. 사이드카가 목록 한 줄을 만들기까지의 과정은 [사이드카 글](/posts/0-to-1/pokeclip-sidecar-rewind-playlist/)에, 다른 상자가 먼저 넣은 조각 하나에 목록이 멈춘 장애는 [되감기 교착 글](/posts/0-to-1/pokeclip-rewind-cache-deadlock/)에 있습니다.
+이 분리 덕분에 사이드카나 janitor가 멈춰도 라이브 길(ALB → nginx → MediaMTX)은 영향을 받지 않고, 유효한 쿠키와 이미 받은 목록 주소로는 S3의 되감기 조각을 계속 받을 수 있습니다. 다만 새로 되감기를 여는 일은 사이드카가 띄우는 상태 조회에 기대므로, 사이드카가 멈추면 새로 열 수 없습니다(janitor는 로컬 녹화 정리만 맡습니다). 사이드카가 목록 한 줄을 만들기까지의 과정은 [사이드카 글](/posts/0-to-1/pokeclip-sidecar-rewind-playlist/)에, 다른 상자가 먼저 넣은 조각 하나에 목록이 멈춘 장애는 [되감기 교착 글](/posts/0-to-1/pokeclip-rewind-cache-deadlock/)에 있습니다.
 
 ## 상자가 밖으로 나가는 길은 네 묶음뿐입니다
 
@@ -139,4 +139,4 @@ health 포트는 nginx가 고정 200을 냅니다. 상류를 부르지 않고, �
 - [AWS — Using signed cookies](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-signed-cookies.html) — 쿠키 검증 뒤 캐시 확인 순서.
 - [AWS — CloudFront origin response timeout](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/DownloadDistValuesOrigin.html#DownloadDistValuesOriginResponseTimeout) — 원본 응답 대기 30초.
 - [AWS — CloudFront Functions KeyValueStore helper methods](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/functions-custom-methods.html) — 함수의 KVS 읽기.
-- [Docker Compose — network_mode](https://docs.docker.com/reference/compose-file/services/#network_mode) — `service:` 네임스페이스 공유.
+- [Docker Compose — network_mode](https://docs.docker.com/reference/compose-file/container-spec/#network_mode) — `service:` 네임스페이스 공유.
