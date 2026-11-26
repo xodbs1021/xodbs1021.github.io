@@ -485,6 +485,15 @@
       "bytes": 20578
     }
   },
+  "a36947002c2458fe": {
+    "source": "content/posts/projects/pokeclip-cloud-architecture.md",
+    "wide": {
+      "file": "a36947002c2458fe-wide.svg",
+      "width": 392,
+      "height": 498,
+      "bytes": 62054
+    }
+  },
   "a4bc57a598b092bc": {
     "source": "content/posts/0-to-1/pokeclip-playback-producer-boundaries.md",
     "wide": {
@@ -755,6 +764,15 @@
       "bytes": 24425
     }
   },
+  "f1676bb833ebfff2": {
+    "source": "content/posts/projects/pokeclip-vpc-request-path.md",
+    "wide": {
+      "file": "f1676bb833ebfff2-wide.svg",
+      "width": 365,
+      "height": 528,
+      "bytes": 66413
+    }
+  },
   "f214404ff20a8c89": {
     "source": "content/posts/0-to-1/pokeclip-test-database-ownership-marker.md",
     "wide": {
@@ -807,6 +825,15 @@
       "width": 392,
       "height": 302,
       "bytes": 17069
+    }
+  },
+  "ff082852ea9ce17d": {
+    "source": "content/posts/projects/pokeclip-vpc-request-path.md",
+    "wide": {
+      "file": "ff082852ea9ce17d-wide.svg",
+      "width": 392,
+      "height": 485,
+      "bytes": 19259
     }
   }
 }

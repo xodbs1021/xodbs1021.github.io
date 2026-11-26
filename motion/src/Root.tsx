@@ -83,6 +83,8 @@ import { FRAME_TO_PLAYER_FRAMES, FrameToPlayer } from "./scenes/streaming-basics
 import { VMAF_PER_FRAME_FRAMES, VmafPerFrame } from "./scenes/video-quality-bitrate-abr/VmafPerFrame";
 import { BUFFER_DRAIN_DOWNSWITCH_FRAMES, BufferDrainDownswitch } from "./scenes/buffering-deep-dive/BufferDrainDownswitch";
 import { COALESCE_TIERS_FRAMES, CoalesceTiers } from "./scenes/cdn-for-live-streaming/CoalesceTiers";
+import { LIVE_VS_REWIND_PATH_FRAMES, LiveVsRewindPath } from "./scenes/pokeclip-cloud-architecture/LiveVsRewindPath";
+import { VIEWER_REQUEST_GATES_FRAMES, ViewerRequestGates } from "./scenes/pokeclip-vpc-request-path/ViewerRequestGates";
 import { ACKS_ISR_COMMIT_FRAMES, AcksIsrCommit } from "./scenes/kafka-core-concepts-technical-review/AcksIsrCommit";
 import { SILENT_EXEC_FAILURE_FRAMES, SilentExecFailure } from "./scenes/mediamtx-seven-hooks-missing-exit-callback/SilentExecFailure";
 import { HOOK_OUTPUT_DRAIN_FRAMES, HookOutputDrain } from "./scenes/mediamtx-hook-output-backpressure-experiments/HookOutputDrain";
@@ -927,6 +929,10 @@ export const RemotionRoot: React.FC = () => (
       width={MOBILE_VIDEO.width}
       height={MOBILE_VIDEO.height}
     />
+    <Composition id="LiveVsRewindPath" component={LiveVsRewindPath} durationInFrames={LIVE_VS_REWIND_PATH_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition id="LiveVsRewindPathMobile" component={LiveVsRewindPath} defaultProps={{ layout: "mobile" as const }} durationInFrames={LIVE_VS_REWIND_PATH_FRAMES} fps={MOBILE_VIDEO.fps} width={MOBILE_VIDEO.width} height={MOBILE_VIDEO.height} />
+    <Composition id="ViewerRequestGates" component={ViewerRequestGates} durationInFrames={VIEWER_REQUEST_GATES_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
+    <Composition id="ViewerRequestGatesMobile" component={ViewerRequestGates} defaultProps={{ layout: "mobile" as const }} durationInFrames={VIEWER_REQUEST_GATES_FRAMES} fps={MOBILE_VIDEO.fps} width={MOBILE_VIDEO.width} height={MOBILE_VIDEO.height} />
     <Composition id="CoalesceTiers" component={CoalesceTiers} durationInFrames={COALESCE_TIERS_FRAMES} fps={VIDEO.fps} width={VIDEO.width} height={VIDEO.height} />
     <Composition
       id="CoalesceTiersMobile"
