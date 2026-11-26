@@ -1,7 +1,7 @@
 # 검토 기록 — 개발 기록 모음 · 시리즈 갱신 (2026-11-26)
 
 ## 범위
-기존 공개 글 `0-to-1/portfolio-engineering-notes` 갱신 + `src/lib/reading-paths.mjs` 경로 5건 보강·4건 신설 + `series.astro` 카드 1건 추가·태그 링크 수정 + PokeClip 태그 누락 4편 보정 + 소제목 id 기준선 1건.
+기존 공개 글 `0-to-1/portfolio-engineering-notes` 갱신 + `src/lib/reading-paths.mjs` 경로 4건 보강·4건 신설 + `series.astro` 카드 1건 추가·태그 링크 수정 + PokeClip 태그 누락 4편 보정 + 소제목 id 기준선 1건.
 
 ## 시각 자료
 모음 글은 목록·색인 글이라 움직이는 설명과 정적 이미지가 장식 외의 역할을 하지 못한다고 판단해 추가하지 않았다. 공통 기준의 면제 조건(사용자 승인)은 아직 받지 않았으므로 보고에 명시한다. 이 글은 이전 판에도 그림이 없었다.
@@ -42,3 +42,4 @@
 ### 종결 판정 (2026-11-26)
 - 양측 동시 C/H 0 라운드: Codex r5 + Claude r6 = 1회. 규약의 3회에 못 미치지만 라운드 상한(5회 초과 시 kty 회부)에 도달 → 사용자 판단으로 회부.
 - 최종 자동 검증: build 성공, `npm test` 45/45, test:layout(/series/, 모음 글) 0 issues, diff 비밀 검사 0건.
+- Codex 라운드 6(브랜치 기준): C0 H0 M1 L1 — M 회차 VOD 요약에 비공개 실측 표기, L review.md 보강 건수 4건으로 정정 → 반영. (양측 동시 C/H 0: Codex r5↔Claude r6 1회, Codex r6↔Claude r7 대기)

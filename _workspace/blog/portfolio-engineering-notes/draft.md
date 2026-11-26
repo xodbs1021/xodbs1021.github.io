@@ -47,7 +47,7 @@
 
 - **녹화 조사** · [Chrome에서만 멈춘 녹화 조각, 결함은 원본에 있었습니다](/posts/projects/pokeclip-recording-defect-in-origin/): 끊김 표시·헤드리스·재포장 가설을 차례로 지우고 녹화 원본의 참조 프레임 결손에 닿은 과정.
 - **녹화 조사** · [SRT latency를 3초로 올린 이유는 늦은 재전송이었습니다](/posts/projects/pokeclip-srt-latency-late-retransmission/): 운영 경로 첫 시험 방송에서 녹화기 오류 14건이 모두 RTT 급등 구간(송출 2–7분째)에 난 것을 보고, AWS 실험대 143회에서 급등 중 잃은 패킷의 재전송이 latency 안에 오지 못하면 받는 쪽이 건너뛰는 기제를 재현(둘 다 팀 내부 기록 기준 비공개 실측). 11월 4일 방송 조각 1624에 같은 기제가 작용했는지는 미확인.
-- **녹화 조사** · [2시간 방송이 다시보기에서 7.5분만 보였던 이유](/posts/projects/pokeclip-round-vod/): 7.66초 조각 하나로 둘로 갈린 목록 때문에 회차 API가 마지막 7.5분만 가리킨 원인, 회차 문서 하나에 DISCONTINUITY를 다는 선택, 로컬에서 분할 경계를 세 브라우저로 튼 시험.
+- **녹화 조사** · [2시간 방송이 다시보기에서 7.5분만 보였던 이유](/posts/projects/pokeclip-round-vod/): 7.66초 조각 하나로 둘로 갈린 목록 때문에 회차 API가 마지막 7.5분만 가리킨 원인, 회차 문서 하나에 DISCONTINUITY를 다는 선택, 로컬에서 분할 경계를 세 브라우저로 튼 시험(모두 팀 내부 기록 기준 비공개 실측).
 - **녹화 조사** · [재생 전 검은 미리보기는 µs 아래를 버린 시크 순환이었습니다](/posts/0-to-1/pokeclip-editor-seek-loop/): 비공개 운영 계측에서 같은 자리를 다시 넣으며 48초 이어진 시크 순환(재생 직전 54회 평균 간격 약 21ms), Chrome 157의 시각 절삭 공개 재측정과 Chromium 소스 근거, 1ms 여유를 고른 이유.
 - **녹화 조사** · [HLS 클립은 왜 벽시각 대신 미디어 시각으로 자를까?](/posts/projects/pokeclip-media-timeline-over-wall-clock/): 벽시각(PDT)을 정밀 좌표로 쓰던 설계를 여섯 번 고친 끝에 클립·렌더 좌표를 미디어 시각으로 옮긴 결정.
 
